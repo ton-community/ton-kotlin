@@ -6,8 +6,12 @@ import ton.types.ExceptionCode
 import kotlin.jvm.JvmInline
 
 class Stack(
-    val storage: ArrayDeque<StackEntry> = ArrayDeque()
-) {
+    private val storage: ArrayDeque<StackEntry> = ArrayDeque()
+) : Iterable<StackEntry> {
+    val depth: Int get() = storage.size
+
+    override fun iterator(): Iterator<StackEntry> = storage.iterator()
+
     fun push(stackEntry: StackEntry) {
         storage.addLast(stackEntry)
     }

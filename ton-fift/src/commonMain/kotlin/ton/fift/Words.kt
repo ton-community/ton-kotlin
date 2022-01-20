@@ -11,7 +11,7 @@ fun interpretUpperHexDotSpace(fift: FiftInterpretator) =
 
 fun interpretUpperHexDot(fift: FiftInterpretator) = fift { output(stack.popInt257().toString(16).uppercase()) }
 fun interpretDotStack(fift: FiftInterpretator) = fift {
-    stack.storage.forEach {
+    stack.forEach {
         output(it.toString())
         output(" ")
     }
@@ -100,7 +100,7 @@ fun interpretExch2(fift: FiftInterpretator) = fift {
     stack.swap(m, n)
 }
 
-fun interpretDepth(fift: FiftInterpretator) = fift { stack.push(stack.storage.size) }
+fun interpretDepth(fift: FiftInterpretator) = fift { stack.push(stack.depth) }
 
 fun interpretConditionalDup(fift: FiftInterpretator) = fift {
     val x = stack.popInt257()
@@ -191,7 +191,7 @@ fun FiftInterpretator.defineBasicWords(dictionary: Dictionary) {
     dictionary["dup "] = ::interpretDup
     dictionary["2dup "] = ::interpret2Dup
     dictionary["over "] = ::interpretOver
-    dictionary["2over "] = ::interpretOver
+    dictionary["2over "] = ::interpret2Over
     dictionary["swap "] = ::interpretSwap
     dictionary["2swap "] = ::interpret2Swap
     dictionary["tuck "] = ::interpretTuck
