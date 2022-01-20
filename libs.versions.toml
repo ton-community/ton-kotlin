@@ -1,0 +1,9 @@
+[versions]
+coroutines = "1.6.0"
+datetime = "0.3.2"
+atomicfu = "0.17.0"
+
+[libraries]
+coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
