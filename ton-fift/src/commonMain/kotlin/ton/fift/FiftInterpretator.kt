@@ -13,29 +13,90 @@ class FiftInterpretator(
         defineBasicWords(dictionary)
     }
 
+    private var charPos = 0
+    private var currentLine: String = ""
+
     fun execute() {
-        var executed = false
         while (input.remaining > 0) {
             try {
-                val word = input.scanWord()
-                println("scan word: `$word`")
-                var wordDef = dictionary[word]
-                if (wordDef == null) {
-                    wordDef = dictionary["$word "]
-                    input.discard(1)
+                currentLine = input.readUTF8Line() ?: break
+                charPos = 0
+
+                while (canRead()) {
+                    skipSpace()
+                    val pos = charPos
+                    var word = scanWordTo(' ')
+                    var wordDef = dictionary[word]
+
+                    if (wordDef == null) {
+                        wordDef = dictionary["$word "]
+                        if (wordDef != null) {
+                            charPos++
+                        }
+                    }
+
+                    if (wordDef == null) {
+                        charPos = pos
+                        val wordBuilder = StringBuilder()
+                        while (canRead()) {
+                            val char = currentLine[charPos++]
+                            if (char != ' ' && char != '\t') {
+                                wordBuilder.append(char)
+
+                                val currentWord = wordBuilder.toString()
+                                wordDef = dictionary[currentWord]
+                                if (wordDef != null) {
+                                    word = currentWord
+                                    break
+                                }
+                            }
+                        }
+                        if (wordDef == null) {
+                            charPos = pos
+                        }
+                    }
+
+                    if (wordDef != null) {
+                        wordDef.execute(this)
+                    } else {
+                        stack.push(int257(word))
+                        charPos += word.length
+                    }
                 }
-                if (wordDef != null) {
-                    wordDef.execute(this)
-                } else {
-                    stack.push(int257(word))
-                }
-                executed = true
+                output(" ok\n")
             } catch (e: FiftException) {
-                output(e.toString())
+                output(e.message.toString())
             }
         }
-        if (executed) {
-            output(" ok\n")
+    }
+
+    fun canRead() = charPos in 0..currentLine.lastIndex
+
+    fun scanWordTo(delimiter: Char, readDelimiter: Boolean = false): String {
+        val wordBuilder = StringBuilder()
+        while (canRead()) {
+            val char = currentLine[charPos]
+            if (char != delimiter) {
+                charPos++
+                wordBuilder.append(char)
+            } else {
+                if (readDelimiter) {
+                    charPos++
+                }
+                break
+            }
+        }
+        return wordBuilder.toString()
+    }
+
+    fun skipSpace() {
+        while (canRead()) {
+            val char = currentLine[charPos]
+            if (char == ' ' || char == '\t' || char == '\n') {
+                charPos++
+            } else {
+                break
+            }
         }
     }
 
@@ -48,21 +109,3 @@ class FiftInterpretator(
     }
 }
 
-fun Input.scanWord(delimiters: String = " \n\t"): String {
-    skipSpace()
-    val word = buildString {
-        readUTF8UntilDelimiterTo(this, delimiters)
-    }
-    return word
-}
-
-fun Input.skipSpace() {
-    while (remaining > 0) {
-        val char = peekCharUtf8()
-        if (char == ' ' || char == '\t' || char == '\n') {
-            discardExact(1)
-        } else {
-            break
-        }
-    }
-}

@@ -165,7 +165,7 @@ fun interpretXor(fift: FiftInterpretator) = fift {
 fun interpretNot(fift: FiftInterpretator) = fift { stack.push(stack.popInt257().not()) }
 
 fun interpretQuoteString(fift: FiftInterpretator) = fift {
-    stack.push(fift.input.scanWord("\""))
+    stack.push(fift.scanWordTo('\"', true))
 }
 
 fun interpretEmit(fift: FiftInterpretator) = fift {
@@ -173,7 +173,10 @@ fun interpretEmit(fift: FiftInterpretator) = fift {
     output(char.toString())
 }
 
-fun interpretStringConcat(fift: FiftInterpretator) = fift { stack.push(stack.popString() + stack.popString()) }
+fun interpretStringConcat(fift: FiftInterpretator) = fift {
+    val y = stack.popString()
+    stack.push(stack.popString() + y)
+}
 
 fun FiftInterpretator.defineBasicWords(dictionary: Dictionary) {
     dictionary[". "] = ::interpretDotSpace
