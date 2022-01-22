@@ -1,21 +1,23 @@
 package ton.fift
 
 class Dictionary(
-    val storage: MutableMap<String, WordDef> = HashMap()
-) {
-    operator fun get(name: String) = storage[name]
-    operator fun set(name: String, wordDef: WordDef) {
-        storage[name] = wordDef
-    }
+    val storage: MutableMap<String, WordDef> = HashMap(),
+) : MutableMap<String, WordDef> by storage
+
+operator fun Dictionary.set(name: String, isActive: Boolean = false, function: FiftInterpretator.() -> Unit) =
+    set(name, object : WordDef {
+        override val isActive: Boolean = isActive
+
+        override fun execute(fift: FiftInterpretator) = function(fift)
+
+        override fun toString(): String = name
+    })
+
+class WordList(
+    list: MutableList<WordDef> = ArrayList(),
+) : MutableList<WordDef> by list {
+    override fun toString(): String = "WordList(${joinToString(",")})"
 }
-
-operator fun Dictionary.set(name: String, isActive: Boolean = false, function: (FiftInterpretator)->Unit) = set(name, object : WordDef {
-    override val isActive: Boolean = isActive
-
-    override fun execute(fift: FiftInterpretator) = function(fift)
-
-    override fun toString(): String = "$name $function"
-})
 
 interface WordDef {
     val isActive: Boolean
@@ -23,10 +25,26 @@ interface WordDef {
     fun execute(fift: FiftInterpretator)
 }
 
-object NopWordDef : WordDef {
+fun WordList.toWordDef() = WordListDef(this)
+
+class WordListDef(
+    val list: WordList,
+) : WordDef {
     override val isActive: Boolean = false
 
     override fun execute(fift: FiftInterpretator) {
-        // nop.
+        list.forEach { wordDef ->
+            wordDef.execute(fift)
+        }
     }
+
+    override fun toString(): String = "WordDef{${list.joinToString(",")}}"
+}
+
+object NopWordDef : WordDef {
+    override val isActive: Boolean = false
+    override fun execute(fift: FiftInterpretator) { /* nop. */
+    }
+
+    override fun toString(): String = "nop"
 }

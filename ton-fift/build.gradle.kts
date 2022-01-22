@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -15,6 +16,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-cio:2.0.0-beta-1")
                 implementation("io.github.gciatto:kt-math:0.4.0")
                 implementation(projects.tonTypes)
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
             }
         }
         val commonTest by getting

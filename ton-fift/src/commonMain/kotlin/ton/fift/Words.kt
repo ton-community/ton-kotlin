@@ -1,16 +1,38 @@
 package ton.fift
 
-fun interpretDotSpace(fift: FiftInterpretator) = fift { output("${stack.popInt257()} ") }
-fun interpretDot(fift: FiftInterpretator) = fift { output("${stack.popInt257()}") }
-fun interpretBinaryDotSpace(fift: FiftInterpretator) = fift { output("${stack.popInt257().toString(2)} ") }
-fun interpretBinaryDot(fift: FiftInterpretator) = fift { output(stack.popInt257().toString(2)) }
-fun interpretHexDotSpace(fift: FiftInterpretator) = fift { output("${stack.popInt257().toString(16)} ") }
-fun interpretHexDot(fift: FiftInterpretator) = fift { output(stack.popInt257().toString(16)) }
-fun interpretUpperHexDotSpace(fift: FiftInterpretator) =
-    fift { output("${stack.popInt257().toString(16).uppercase()} ") }
+fun FiftInterpretator.interpretDotSpace() {
+    output("${stack.popInt257()} ")
+}
 
-fun interpretUpperHexDot(fift: FiftInterpretator) = fift { output(stack.popInt257().toString(16).uppercase()) }
-fun interpretDotStack(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretDot() {
+    output("${stack.popInt257()}")
+}
+
+fun FiftInterpretator.interpretBinaryDotSpace() {
+    output("${stack.popInt257().toString(2)} ")
+}
+
+fun FiftInterpretator.interpretBinaryDot() {
+    output(stack.popInt257().toString(2))
+}
+
+fun FiftInterpretator.interpretHexDotSpace() {
+    output("${stack.popInt257().toString(16)} ")
+}
+
+fun FiftInterpretator.interpretHexDot() {
+    output(stack.popInt257().toString(16))
+}
+
+fun FiftInterpretator.interpretUpperHexDotSpace() {
+    output("${stack.popInt257().toString(16).uppercase()} ")
+}
+
+fun FiftInterpretator.interpretUpperHexDot() {
+    output(stack.popInt257().toString(16).uppercase())
+}
+
+fun FiftInterpretator.interpretDotStack() {
     stack.forEach {
         output(it.toString())
         output(" ")
@@ -18,69 +40,80 @@ fun interpretDotStack(fift: FiftInterpretator) = fift {
     output("\n")
 }
 
-fun interpretDrop(fift: FiftInterpretator) = fift { stack.pop() }
+fun FiftInterpretator.interpretDrop() {
+    stack.pop()
+}
 
-fun interpret2Drop(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpret2Drop() {
     stack.pop()
     stack.pop()
 }
 
-fun interpretDup(fift: FiftInterpretator) = fift { stack.push(stack.get()) }
-fun interpret2Dup(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretDup() {
+    stack.push(stack.get())
+}
+
+fun FiftInterpretator.interpret2Dup() {
     stack.push(stack[1])
     stack.push(stack[1])
 }
 
-fun interpretOver(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretOver() {
     stack.push(stack[1])
 }
 
-fun interpret2Over(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpret2Over() {
     stack.push(stack[3])
     stack.push(stack[3])
 }
 
-fun interpretSwap(fift: FiftInterpretator) = fift { stack.swap(0, 1) }
+fun FiftInterpretator.interpretSwap() {
+    stack.swap(0, 1)
+}
 
-fun interpret2Swap(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpret2Swap() {
     stack.swap(0, 2)
     stack.swap(1, 3)
 }
 
-fun interpretTuck(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretTuck() {
     stack.swap(0, 1)
     stack.push(stack[1])
 }
 
-fun interpretNip(fift: FiftInterpretator) = fift { stack.pop(1) }
+fun FiftInterpretator.interpretNip() {
+    stack.pop(1)
+}
 
-fun interpretRot(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretRot() {
     stack.swap(1, 2)
     stack.swap(0, 1)
 }
 
-fun interpretRotRev(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretRotRev() {
     stack.swap(0, 1)
     stack.swap(1, 2)
 }
 
-fun interpretPick(fift: FiftInterpretator) = fift { stack.push(stack[stack.popInt257().toInt()]) }
+fun FiftInterpretator.interpretPick() {
+    stack.push(stack[stack.popInt257().toInt()])
+}
 
-fun interpretRoll(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretRoll() {
     val n = stack.popInt257().toInt()
     for (i in n downTo 1) {
         stack.swap(i, i - 1)
     }
 }
 
-fun interpretRollRev(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretRollRev() {
     val n = stack.popInt257().toInt()
     for (i in 0 until n) {
         stack.swap(i, i + 1)
     }
 }
 
-fun interpretReverse(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretReverse() {
     val m = stack.popInt257().toInt()
     val n = stack.popInt257().toInt()
     val s = 2 * m + n - 1
@@ -89,20 +122,22 @@ fun interpretReverse(fift: FiftInterpretator) = fift {
     }
 }
 
-fun interpretExch(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretExch() {
     val n = stack.popInt257().toInt()
     stack.swap(0, n)
 }
 
-fun interpretExch2(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretExch2() {
     val m = stack.popInt257().toInt()
     val n = stack.popInt257().toInt()
     stack.swap(m, n)
 }
 
-fun interpretDepth(fift: FiftInterpretator) = fift { stack.push(stack.depth) }
+fun FiftInterpretator.interpretDepth() {
+    stack.push(stack.depth)
+}
 
-fun interpretConditionalDup(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretConditionalDup() {
     val x = stack.popInt257()
     if (x.sign != 0) {
         stack.push(x)
@@ -110,125 +145,410 @@ fun interpretConditionalDup(fift: FiftInterpretator) = fift {
     stack.push(x)
 }
 
-fun interpretPlus(fift: FiftInterpretator) = fift { stack.push(stack.popInt257() + stack.popInt257()) }
-fun interpretMinus(fift: FiftInterpretator) = fift {
-    val y = stack.popInt257()
+fun FiftInterpretator.interpretPlus(y: Int257 = stack.popInt257()) {
+    stack.push(stack.popInt257() + y)
+}
+
+fun FiftInterpretator.interpretMinus(y: Int257 = stack.popInt257()) {
     stack.push(stack.popInt257() - y)
 }
 
-fun interpretNegate(fift: FiftInterpretator) = fift { stack.push(-stack.popInt257()) }
+fun FiftInterpretator.interpretNegate() {
+    stack.push(-stack.popInt257())
+}
 
-fun interpretTimes(fift: FiftInterpretator) = fift { stack.push(stack.popInt257() * stack.popInt257()) }
+fun FiftInterpretator.interpretTimes() {
+    stack.push(stack.popInt257() * stack.popInt257())
+}
 
-fun interpretDiv(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretDiv() {
     val y = stack.popInt257()
     stack.push(stack.popInt257() / y)
 }
 
-fun interpretMod(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretTimesDiv() {
+    val z = stack.popInt257()
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x * y / z)
+}
+
+fun FiftInterpretator.interpretMod() {
     val y = stack.popInt257()
     stack.push(stack.popInt257() mod y)
 }
 
-fun interpretDivMod(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretDivMod() {
     val y = stack.popInt257()
     val (div, mod) = stack.popInt257() divMod y
     stack.push(div)
     stack.push(mod)
 }
 
-fun interpretShl(fift: FiftInterpretator) = fift {
-    val y = stack.popInt257().toInt()
+fun FiftInterpretator.interpretShl(y: Int = stack.popInt257().toInt()) {
     stack.push(stack.popInt257() shl y)
 }
 
-fun interpretShr(fift: FiftInterpretator) = fift {
-    val y = stack.popInt257().toInt()
+fun FiftInterpretator.interpretShr(y: Int = stack.popInt257().toInt()) {
     stack.push(stack.popInt257() shr y)
 }
 
-fun interpretAnd(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretAnd() {
     val y = stack.popInt257()
     stack.push(stack.popInt257() and y)
 }
 
-fun interpretOr(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretOr() {
     val y = stack.popInt257()
     stack.push(stack.popInt257() or y)
 }
 
-fun interpretXor(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretXor() {
     val y = stack.popInt257()
     stack.push(stack.popInt257() xor y)
 }
 
-fun interpretNot(fift: FiftInterpretator) = fift { stack.push(stack.popInt257().not()) }
-
-fun interpretQuoteString(fift: FiftInterpretator) = fift {
-    stack.push(fift.scanWordTo('\"', true))
+fun FiftInterpretator.interpretNot() {
+    stack.push(stack.popInt257().not())
 }
 
-fun interpretEmit(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretLess() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x < y)
+}
+
+fun FiftInterpretator.interpretGreater() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x > y)
+}
+
+fun FiftInterpretator.interpretEqual() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x == y)
+}
+
+fun FiftInterpretator.interpretNotEqual() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x != y)
+}
+
+fun FiftInterpretator.interpretLessOrEqual() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x <= y)
+}
+
+fun FiftInterpretator.interpretGreaterOrEqual() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x >= y)
+}
+
+fun FiftInterpretator.interpretCmp() {
+    val y = stack.popInt257()
+    val x = stack.popInt257()
+    stack.push(x.compareTo(y))
+}
+
+fun FiftInterpretator.interpretExecute() {
+    val wordDef = stack.popWordDef()
+    interpret(wordDef)
+}
+
+fun FiftInterpretator.interpretExecuteTimes() {
+    val times = stack.popInt257().toInt()
+    val wordDef = stack.popWordDef()
+    when {
+        times <= 0 -> return
+        times == 1 -> interpret(wordDef)
+        else -> repeat(times) {
+            interpret(wordDef)
+        }
+    }
+}
+
+fun FiftInterpretator.interpretExecuteIf() {
+    val wordDef = stack.popWordDef()
+    val condition = stack.popInt257()
+    if (!condition.isZero) {
+        interpret(wordDef)
+    }
+}
+
+fun FiftInterpretator.interpretExecuteIfNot() {
+    val wordDef = stack.popWordDef()
+    val condition = stack.popInt257()
+    if (condition.isZero) {
+        interpret(wordDef)
+    }
+}
+
+fun FiftInterpretator.interpretCondition() {
+    val falseWorldDef = stack.popWordDef()
+    val trueWorldDef = stack.popWordDef()
+    val condition = stack.popInt257()
+    if (condition.isZero) {
+        interpret(falseWorldDef)
+    } else {
+        interpret(trueWorldDef)
+    }
+}
+
+fun FiftInterpretator.interpretUntil() {
+    val wordDef = stack.popWordDef()
+    while (true) {
+        interpret(wordDef)
+        if (!stack.popInt257().isZero) {
+            break
+        }
+    }
+}
+
+fun FiftInterpretator.interpretWhile() {
+    val body = stack.popWordDef()
+    val wordDef = stack.popWordDef()
+    while (true) {
+        interpret(wordDef)
+        if (stack.popInt257().isZero) {
+            break
+        }
+        interpret(body)
+    }
+}
+
+fun FiftInterpretator.interpretOpenBracket() {
+    checkNotIntExec()
+    interpretCompileOpenBracket()
+    stack.pushArgCount(0)
+    state++
+}
+
+fun FiftInterpretator.interpretCloseBracket() {
+    checkCompile()
+    interpretCompileCloseBracket()
+    stack.pushArgCount(1)
+    state--
+}
+
+fun FiftInterpretator.interpretCompileOpenBracket() {
+    stack.push(WordList())
+}
+
+fun FiftInterpretator.interpretCompileCloseBracket() {
+    val wordList = stack.popWordList()
+    val wordDef = wordList.toWordDef()
+    stack.push(wordDef)
+}
+
+fun FiftInterpretator.interpretExecuteInternal() {
+    val wordDef = stack.popWordDef()
+    val count = stack.popInt257().toInt() // TODO: check count in stack
+    wordDef.execute(this)
+}
+
+fun FiftInterpretator.interpretCompileInternal() {
+    val e = stack.popWordDef()
+    val n = stack.popInt257().toInt()
+    val compileList = ArrayDeque<WordDef>()
+    repeat(n) {
+        compileList.addFirst(stack.pop().toWordDef())
+    }
+
+    val l = stack.popWordList()
+    l.addAll(compileList)
+    if (e != NopWordDef) {
+        l.add(e)
+    }
+    stack.push(l)
+}
+
+fun FiftInterpretator.interpretCreateInternal() {
+    val mode = stack.popInt257().toInt()
+    val isActive = mode and 1 != 0
+    val isPrefix = mode and 2 != 0
+    try {
+        val name = stack.popString().let {
+            if (isPrefix) "$it " else it
+        }
+        val wordDef = stack.popWordDef()
+        dictionary[name, isActive] = { wordDef.execute(this) }
+    } catch (e: Exception) {
+        interpretDotStack()
+        e.printStackTrace()
+    }
+}
+
+fun FiftInterpretator.interpretTick() {
+    skipSpace()
+    val word = scanWordTo(' ', false)
+    var wordDef = dictionary[word]
+    if (wordDef == null) {
+        wordDef = dictionary["$word "]
+    }
+    checkNotNull(wordDef) { "word `$word` undefined" }
+    stack.push(wordDef)
+    stack.pushArgCount(1)
+}
+
+fun FiftInterpretator.interpretWords() {
+    dictionary.keys.forEach { word ->
+        output(word)
+        output(" ")
+    }
+    output("\n")
+}
+
+fun FiftInterpretator.interpretQuoteString() {
+    stack.push(scanWordTo('\"', true))
+    stack.pushArgCount(1)
+}
+
+fun FiftInterpretator.interpretChar() {
+    val char = scanWordTo(' ').first().code
+    stack.push(char)
+}
+
+fun FiftInterpretator.interpretEmit() {
     val char = stack.popInt257().toInt().toChar()
     output(char.toString())
 }
 
-fun interpretStringConcat(fift: FiftInterpretator) = fift {
+fun FiftInterpretator.interpretSpace() {
+    output(" ")
+}
+
+fun FiftInterpretator.interpretCr() {
+    output("\n")
+}
+
+fun FiftInterpretator.interpretType() {
+    val string = stack.popString()
+    output(string)
+}
+
+fun FiftInterpretator.interpretStringConcat() {
     val y = stack.popString()
     stack.push(stack.popString() + y)
 }
 
-fun FiftInterpretator.defineBasicWords(dictionary: Dictionary) {
-    dictionary[". "] = ::interpretDotSpace
-    dictionary["._ "] = ::interpretDot
-    dictionary["x. "] = ::interpretHexDotSpace
-    dictionary["x._ "] = ::interpretHexDot
-    dictionary["X. "] = ::interpretUpperHexDotSpace
-    dictionary["X._ "] = ::interpretUpperHexDot
-    dictionary["b. "] = ::interpretBinaryDotSpace
-    dictionary["b._ "] = ::interpretBinaryDot
-    dictionary[".s "] = ::interpretDotStack
+fun FiftInterpretator.interpretWord() {
+    val separator = stack.popInt257().toInt().toChar()
+    val word = if (separator != ' ') {
+        skipSpace()
+        scanWordTo(separator, true)
+    } else {
+        skipSpace()
+        scanWordTo(separator, false)
+    }
+    stack.push(word)
+}
+
+fun FiftInterpretator.defineBasicWords() {
+    dictionary[". "] = { interpretDotSpace() }
+    dictionary["._ "] = { interpretDot() }
+    dictionary["x. "] = { interpretHexDotSpace() }
+    dictionary["x._ "] = { interpretHexDot() }
+    dictionary["X. "] = { interpretUpperHexDotSpace() }
+    dictionary["X._ "] = { interpretUpperHexDot() }
+    dictionary["b. "] = { interpretBinaryDotSpace() }
+    dictionary["b._ "] = { interpretBinaryDot() }
+    dictionary[".s "] = { interpretDotStack() }
     // stack manipulation
-    dictionary["drop "] = ::interpretDrop
-    dictionary["2drop "] = ::interpret2Drop
-    dictionary["dup "] = ::interpretDup
-    dictionary["2dup "] = ::interpret2Dup
-    dictionary["over "] = ::interpretOver
-    dictionary["2over "] = ::interpret2Over
-    dictionary["swap "] = ::interpretSwap
-    dictionary["2swap "] = ::interpret2Swap
-    dictionary["tuck "] = ::interpretTuck
-    dictionary["nip "] = ::interpretNip
-    dictionary["rot "] = ::interpretRot
-    dictionary["-rot "] = ::interpretRotRev
-    dictionary["pick "] = ::interpretPick
-    dictionary["roll "] = ::interpretRoll
-    dictionary["-roll "] = ::interpretRollRev
-    dictionary["reverse "] = ::interpretReverse
-    dictionary["exch "] = ::interpretExch
-    dictionary["exch2 "] = ::interpretExch2
-    dictionary["depth "] = ::interpretDepth
-    dictionary["?dup "] = ::interpretConditionalDup
+    dictionary["drop "] = { interpretDrop() }
+    dictionary["2drop "] = { interpret2Drop() }
+    dictionary["dup "] = { interpretDup() }
+    dictionary["2dup "] = { interpret2Dup() }
+    dictionary["over "] = { interpretOver() }
+    dictionary["2over "] = { interpret2Over() }
+    dictionary["swap "] = { interpretSwap() }
+    dictionary["2swap "] = { interpret2Swap() }
+    dictionary["tuck "] = { interpretTuck() }
+    dictionary["nip "] = { interpretNip() }
+    dictionary["rot "] = { interpretRot() }
+    dictionary["-rot "] = { interpretRotRev() }
+    dictionary["pick "] = { interpretPick() }
+    dictionary["roll "] = { interpretRoll() }
+    dictionary["-roll "] = { interpretRollRev() }
+    dictionary["reverse "] = { interpretReverse() }
+    dictionary["exch "] = { interpretExch() }
+    dictionary["exch2 "] = { interpretExch2() }
+    dictionary["depth "] = { interpretDepth() }
+    dictionary["?dup "] = { interpretConditionalDup() }
+
     // integer operations
-    dictionary["+ "] = ::interpretPlus
-    dictionary["- "] = ::interpretMinus
-    dictionary["negate "] = ::interpretNegate
-    dictionary["* "] = ::interpretTimes
-    dictionary["/ "] = ::interpretDiv
-    dictionary["mod "] = ::interpretMod
-    dictionary["/mod "] = ::interpretDivMod
-    dictionary["<< "] = ::interpretShl
-    dictionary[">> "] = ::interpretShr
-    dictionary["and "] = ::interpretAnd
-    dictionary["or "] = ::interpretOr
-    dictionary["xor "] = ::interpretXor
-    dictionary["not "] = ::interpretNot
+    dictionary["false "] = { stack.push(0) }
+    dictionary["true "] = { stack.push(-1) }
+    dictionary["0 "] = { stack.push(0) }
+    dictionary["1 "] = { stack.push(1) }
+    dictionary["2 "] = { stack.push(2) }
+    dictionary["-1 "] = { stack.push(-1) }
+    dictionary["bl "] = { stack.push(32) }
+    dictionary["+ "] = { interpretPlus() }
+    dictionary["- "] = { interpretMinus() }
+    dictionary["negate "] = { interpretNegate() }
+    dictionary["1+ "] = { interpretPlus(int257(1)) }
+    dictionary["1- "] = { interpretMinus(int257(1)) }
+    dictionary["2+ "] = { interpretPlus(int257(2)) }
+    dictionary["2- "] = { interpretMinus(int257(2)) }
+    dictionary["2* "] = { interpretShl(1) }
+    dictionary["2/ "] = { interpretShr(1) }
+    dictionary["* "] = { interpretTimes() }
+    dictionary["/ "] = { interpretDiv() }
+    dictionary["*/ "] = { interpretTimesDiv() }
+    dictionary["mod "] = { interpretMod() }
+    dictionary["/mod "] = { interpretDivMod() }
+    dictionary["<< "] = { interpretShl() }
+    dictionary[">> "] = { interpretShr() }
+    dictionary["and "] = { interpretAnd() }
+    dictionary["or "] = { interpretOr() }
+    dictionary["xor "] = { interpretXor() }
+    dictionary["not "] = { interpretNot() }
+    dictionary["< "] = { interpretLess() }
+    dictionary["<= "] = { interpretLessOrEqual() }
+    dictionary["> "] = { interpretGreater() }
+    dictionary[">= "] = { interpretGreaterOrEqual() }
+    dictionary["= "] = { interpretEqual() }
+    dictionary["<> "] = { interpretNotEqual() }
+    dictionary["cmp "] = { interpretCmp() }
+
+    // execution control
+    dictionary["execute "] = { interpretExecute() }
+    dictionary["if "] = { interpretExecuteIf() }
+    dictionary["ifnot "] = { interpretExecuteIfNot() }
+    dictionary["cond "] = { interpretCondition() }
+    dictionary["times "] = { interpretExecuteTimes() }
+    dictionary["until "] = { interpretUntil() }
+    dictionary["while "] = { interpretWhile() }
+
     // compile operations
+    dictionary["{ ", true] = { interpretOpenBracket() }
+    dictionary["} ", true] = { interpretCloseBracket() }
+    dictionary["({) "] = { interpretCompileOpenBracket() }
+    dictionary["(}) "] = { interpretCompileCloseBracket() }
+    dictionary["(compile) "] = { interpretCompileInternal() }
+    dictionary["(execute) "] = { interpretExecuteInternal() }
+    dictionary["(create) "] = { interpretCreateInternal() }
+
+    // dictionary operations
+    dictionary["' ", true] = { interpretTick() }
+    dictionary["’ ", true] = { interpretTick() }
+    dictionary["nop "] = { /* nop */ }
+    dictionary["'nop "] = { stack.push(NopWordDef) }
+    dictionary["words "] = { interpretWords() }
 
     // string operations
-    dictionary["\"", true] = ::interpretQuoteString
-    dictionary["emit "] = ::interpretEmit
-    dictionary["space "] = { it.output(" ") }
-    dictionary["cr "] = { it.output("\n") }
-    dictionary["$+ "] = ::interpretStringConcat
+    dictionary["\"", true] = { interpretQuoteString() }
+    dictionary["char "] = { interpretChar() }
+    dictionary["emit "] = { interpretEmit() }
+    dictionary["space "] = { interpretSpace() }
+    dictionary["cr "] = { interpretCr() }
+    dictionary["type "] = { interpretType() }
+    dictionary["$+ "] = { interpretStringConcat() }
+
+    // input parse
+    dictionary["word "] = { interpretWord() }
 }

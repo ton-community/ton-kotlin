@@ -1,0 +1,5 @@
+{ bl word 1 2 ' (create) } "::" 1 (create)
+{ bl word 0 2 ' (create) } :: :
+{ bl word 2 2 ' (create) } :: :_
+{ bl word 3 2 ' (create) } :: ::_
+{ char " word 1 ' type } ::_ ."

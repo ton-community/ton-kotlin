@@ -5,6 +5,7 @@ import org.gciatto.kt.math.BigInteger
 interface Int257 {
     val sign: Int
     val isNan: Boolean
+    val isZero: Boolean
     override fun toString(): String
     fun toString(radix: Int): String
 
@@ -13,6 +14,7 @@ interface Int257 {
     operator fun times(other: Int257): Int257
     operator fun div(other: Int257): Int257
     operator fun unaryMinus(): Int257
+    operator fun compareTo(other: Int257): Int
 
     fun toInt(): Int
     fun toLong(): Long
@@ -48,6 +50,8 @@ fun int257(value: Long): Int257 = when (value) {
     else -> BigIntegerImpl(BigInteger.of(value))
 }
 
+fun int257(boolean: Boolean) = if (boolean) int257("true") else int257("false")
+
 fun int257(value: String): Int257 = when (value) {
     "0" -> BigIntegerImpl(BigInteger.ZERO)
     "1" -> BigIntegerImpl(BigInteger.ONE)
@@ -63,7 +67,11 @@ fun int257(value: String): Int257 = when (value) {
             value[0] == '-' && value[1] == '0' && value[2] == 'x' -> -BigInteger(value.substring(3), 16)
             value[0] == '0' && value[1] == 'b' -> BigInteger(value.substring(2), 2)
             value[0] == '-' && value[1] == '0' && value[2] == 'b' -> -BigInteger(value.substring(3), 2)
-            else -> BigInteger(value)
+            else -> try {
+                BigInteger(value)
+            } catch (e: NumberFormatException) {
+                throw NumberFormatException("Illegal number: `$value`")
+            }
         }
         BigIntegerImpl(bigInteger)
     }
@@ -72,6 +80,7 @@ fun int257(value: String): Int257 = when (value) {
 object NanInt257 : Int257 {
     override val sign: Int = 0
     override val isNan: Boolean = true
+    override val isZero: Boolean = false
     override fun toString(): String = "NaN"
     override fun toString(radix: Int): String = toString()
 
@@ -82,6 +91,7 @@ object NanInt257 : Int257 {
     override fun div(other: Int257) = NanInt257
     override fun mod(other: Int257) = NanInt257
     override fun divMod(other: Int257): Pair<NanInt257, NanInt257> = NanInt257 to NanInt257
+    override fun compareTo(other: Int257): Int = throw ArithmeticException("NaN")
     override fun shl(other: Int) = NanInt257
     override fun shr(other: Int) = NanInt257
     override fun and(other: Int257) = NanInt257
@@ -102,6 +112,7 @@ class BigIntegerImpl(
 ) : Int257 {
     override val sign: Int get() = bigInteger.signum
     override val isNan: Boolean = false
+    override val isZero: Boolean = bigInteger == BigInteger.ZERO
 
     constructor(int257: Int257) : this(BigInteger.of(int257.toString()))
 
@@ -126,6 +137,8 @@ class BigIntegerImpl(
     override fun unaryMinus(): Int257 = apply {
         bigInteger = -bigInteger
     }
+
+    override fun compareTo(other: Int257): Int = bigInteger.compareTo(other.toBigInteger())
 
     override fun times(other: Int257): Int257 = apply {
         bigInteger *= other.toBigInteger()

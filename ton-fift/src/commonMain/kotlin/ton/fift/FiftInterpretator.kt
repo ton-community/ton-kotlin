@@ -1,86 +1,103 @@
 package ton.fift
 
-import io.ktor.utils.io.core.*
 import ton.fift.FiftInterpretator.OutputHandler
 
 class FiftInterpretator(
-    var input: Input,
     val stack: Stack = Stack(),
     val dictionary: Dictionary = Dictionary(),
-    val output: OutputHandler = OutputHandler { print(it) },
+    var output: OutputHandler = OutputHandler { print(it) },
 ) {
     init {
-        defineBasicWords(dictionary)
+        defineBasicWords()
     }
 
+    var state: Int = 0
     private var charPos = 0
     private var currentLine: String = ""
 
-    fun execute() {
-        while (input.remaining > 0) {
-            try {
-                currentLine = input.readUTF8Line() ?: break
-                charPos = 0
+    fun interpret(line: String) = try {
+        currentLine = line
+        charPos = 0
 
+        while (canRead()) {
+            skipSpace()
+            val pos = charPos
+            var word = scanWordTo(' ')
+            var wordDef = dictionary[word]
+
+            if (wordDef == null) {
+                wordDef = dictionary["$word "]
+                if (wordDef != null) {
+                    charPos++
+                }
+            }
+
+            if (wordDef == null) {
+                charPos = pos
+                val wordBuilder = StringBuilder()
                 while (canRead()) {
-                    skipSpace()
-                    val pos = charPos
-                    var word = scanWordTo(' ')
-                    var wordDef = dictionary[word]
+                    val char = currentLine[charPos++]
+                    if (char != ' ' && char != '\t') {
+                        wordBuilder.append(char)
 
-                    if (wordDef == null) {
-                        wordDef = dictionary["$word "]
+                        val currentWord = wordBuilder.toString()
+                        wordDef = dictionary[currentWord]
                         if (wordDef != null) {
-                            charPos++
+                            word = currentWord
+                            break
                         }
-                    }
-
-                    if (wordDef == null) {
-                        charPos = pos
-                        val wordBuilder = StringBuilder()
-                        while (canRead()) {
-                            val char = currentLine[charPos++]
-                            if (char != ' ' && char != '\t') {
-                                wordBuilder.append(char)
-
-                                val currentWord = wordBuilder.toString()
-                                wordDef = dictionary[currentWord]
-                                if (wordDef != null) {
-                                    word = currentWord
-                                    break
-                                }
-                            }
-                        }
-                        if (wordDef == null) {
-                            charPos = pos
-                        }
-                    }
-
-                    if (wordDef != null) {
-                        wordDef.execute(this)
-                    } else {
-                        stack.push(int257(word))
-                        charPos += word.length
                     }
                 }
-                output(" ok\n")
-            } catch (e: FiftException) {
-                output(e.message.toString())
+                if (wordDef == null) {
+                    charPos = pos
+                }
             }
+
+            if (wordDef != null) {
+                interpret(wordDef)
+            } else {
+                charPos += word.length
+                stack.push(int257(word))
+                stack.pushArgCount(1)
+                compileExecute()
+            }
+        }
+        output(" ok\n")
+    } catch (e: FiftException) {
+        output("${e.message.toString()} ")
+        e.printStackTrace()
+    }
+
+    fun interpret(wordDef: WordDef) {
+        if (wordDef.isActive) {
+            wordDef.execute(this)
+            compileExecute()
+        } else {
+            stack.push(0)
+            stack.push(wordDef)
+            compileExecute()
+        }
+    }
+
+    fun compileExecute() {
+        if (state > 0) {
+            interpretCompileInternal()
+        } else {
+            interpretExecuteInternal()
         }
     }
 
     fun canRead() = charPos in 0..currentLine.lastIndex
 
-    fun scanWordTo(delimiter: Char, readDelimiter: Boolean = false): String {
+    fun scanWordTo(separator: Char, readSeparator: Boolean = false): String {
         val wordBuilder = StringBuilder()
         while (canRead()) {
             val char = currentLine[charPos]
-            if (char != delimiter) {
+            if (char != separator) {
                 charPos++
                 wordBuilder.append(char)
             } else {
-                if (readDelimiter) {
+                if (readSeparator) {
                     charPos++
                 }
                 break
@@ -109,3 +126,12 @@ class FiftInterpretator(
     }
 }
 
+fun FiftInterpretator.checkCompile() = check(state > 0) { "Compilation mode only" }
+fun FiftInterpretator.checkExecute() = check(state > 0) { "Interpretation mode only" }
+fun FiftInterpretator.checkNotIntExec() = check(state >= 0) { "not allowed in internal interpret mode" }
+fun FiftInterpretator.checkIntExec() = check(state < 0) { "internal interpret mode only" }
+/*
+
+{ bl word 1 2 ' (create) } "::" 1 (create)
+{ bl word 0 2 ' (create) } :: :
+ */
