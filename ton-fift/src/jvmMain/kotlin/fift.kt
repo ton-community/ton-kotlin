@@ -5,15 +5,14 @@ fun main() {
 }
 
 fun fift() {
-    val vm = FiftInterpretator(output = {})
+    val fift = FiftInterpretator(output = {})
     getResourceAsText("Fift.fif").lines().forEach {
-        vm.interpret(it)
+        fift.interpret(it)
     }
-    vm.output = FiftInterpretator.OutputHandler { print(it) }
-
+    fift.output = { print(it) }
     while (true) {
         try {
-            vm.interpret(readln())
+            fift.interpret(readln())
         } catch (e: Exception) {
             e.printStackTrace()
         }

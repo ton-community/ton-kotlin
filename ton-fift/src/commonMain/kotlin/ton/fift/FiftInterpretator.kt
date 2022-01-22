@@ -1,11 +1,9 @@
 package ton.fift
 
-import ton.fift.FiftInterpretator.OutputHandler
-
 class FiftInterpretator(
     val stack: Stack = Stack(),
     val dictionary: Dictionary = Dictionary(),
-    var output: OutputHandler = OutputHandler { print(it) },
+    var output: (String) -> Unit = { print(it) },
 ) {
     init {
         defineBasicWords()
@@ -118,20 +116,9 @@ class FiftInterpretator(
     }
 
     operator fun invoke(block: FiftInterpretator.() -> Unit) = apply(block)
-
-    fun interface OutputHandler {
-        fun output(string: String)
-
-        operator fun invoke(string: String) = output(string)
-    }
 }
 
 fun FiftInterpretator.checkCompile() = check(state > 0) { "Compilation mode only" }
 fun FiftInterpretator.checkExecute() = check(state > 0) { "Interpretation mode only" }
 fun FiftInterpretator.checkNotIntExec() = check(state >= 0) { "not allowed in internal interpret mode" }
 fun FiftInterpretator.checkIntExec() = check(state < 0) { "internal interpret mode only" }
-/*
-
-{ bl word 1 2 ' (create) } "::" 1 (create)
-{ bl word 0 2 ' (create) } :: :
- */

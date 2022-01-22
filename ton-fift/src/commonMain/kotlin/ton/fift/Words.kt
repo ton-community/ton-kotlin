@@ -368,8 +368,8 @@ fun FiftInterpretator.interpretCompileInternal() {
 
 fun FiftInterpretator.interpretCreateInternal() {
     val mode = stack.popInt257().toInt()
-    val isActive = mode and 1 != 0
-    val isPrefix = mode and 2 != 0
+    val isActive = mode and 1 == 1
+    val isPrefix = mode and 2 == 0
     try {
         val name = stack.popString().let {
             if (isPrefix) "$it " else it
@@ -410,6 +410,7 @@ fun FiftInterpretator.interpretQuoteString() {
 fun FiftInterpretator.interpretChar() {
     val char = scanWordTo(' ').first().code
     stack.push(char)
+    stack.pushArgCount(1)
 }
 
 fun FiftInterpretator.interpretEmit() {
@@ -542,7 +543,7 @@ fun FiftInterpretator.defineBasicWords() {
 
     // string operations
     dictionary["\"", true] = { interpretQuoteString() }
-    dictionary["char "] = { interpretChar() }
+    dictionary["char ", true] = { interpretChar() }
     dictionary["emit "] = { interpretEmit() }
     dictionary["space "] = { interpretSpace() }
     dictionary["cr "] = { interpretCr() }
