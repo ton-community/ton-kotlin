@@ -96,7 +96,7 @@ sealed interface StackEntry {
                 fift.stack.push(value)
             }
 
-            override fun toString(): kotlin.String = toString()
+            override fun toString(): kotlin.String = "\"$value\""
         }
     }
 

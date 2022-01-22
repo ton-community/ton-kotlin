@@ -6,6 +6,7 @@ interface Int257 {
     val sign: Int
     val isNan: Boolean
     val isZero: Boolean
+    override fun equals(other: Any?): Boolean
     override fun toString(): String
     fun toString(radix: Int): String
 
@@ -83,6 +84,10 @@ object NanInt257 : Int257 {
     override val isZero: Boolean = false
     override fun toString(): String = "NaN"
     override fun toString(radix: Int): String = toString()
+    override fun equals(other: Any?): Boolean {
+        if (other !is Int257) return false
+        return other.isNan
+    }
 
     override fun plus(other: Int257) = NanInt257
     override fun minus(other: Int257) = NanInt257
@@ -124,6 +129,11 @@ class BigIntegerImpl(
         16 -> "0x${bigInteger.toString(16)}"
         2 -> "0b${bigInteger.toString(2)}"
         else -> bigInteger.toString()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Int257) return false
+        return compareTo(other) == 0
     }
 
     override fun plus(other: Int257) = apply {

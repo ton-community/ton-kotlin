@@ -33,8 +33,10 @@ class WordListDef(
     override val isActive: Boolean = false
 
     override fun execute(fift: FiftInterpretator) {
+//        println("execute definition: $list")
         list.forEach { wordDef ->
-            wordDef.execute(fift)
+//            println("   interpret: $wordDef")
+            fift.interpret(wordDef)
         }
     }
 

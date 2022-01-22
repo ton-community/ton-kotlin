@@ -5,10 +5,11 @@ fun main() {
 }
 
 fun fift() {
-    val fift = FiftInterpretator(output = {})
-    getResourceAsText("Fift.fif").lines().forEach {
-        fift.interpret(it)
+    val fift = FiftInterpretator()
+    fift.quiet {
+        runFile("Fift.fif")
     }
+    fift.runFile("Tests.fif")
     fift.output = { print(it) }
     while (true) {
         try {
@@ -16,6 +17,19 @@ fun fift() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+}
+
+fun FiftInterpretator.quiet(block: FiftInterpretator.() -> Unit) {
+    val o = output
+    output = {}
+    block()
+    output = o
+}
+
+fun FiftInterpretator.runFile(name: String) {
+    getResourceAsText(name).lines().forEach {
+        interpret(it)
     }
 }
 

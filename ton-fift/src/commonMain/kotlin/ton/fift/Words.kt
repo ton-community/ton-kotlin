@@ -1,5 +1,7 @@
 package ton.fift
 
+import ton.types.ExceptionCode
+
 fun FiftInterpretator.interpretDotSpace() {
     output("${stack.popInt257()} ")
 }
@@ -436,6 +438,18 @@ fun FiftInterpretator.interpretStringConcat() {
     stack.push(stack.popString() + y)
 }
 
+fun FiftInterpretator.interpretStringEqual() {
+    val y = stack.popString()
+    val x = stack.popString()
+    stack.push(x == y)
+}
+
+fun FiftInterpretator.interpretStringCmp() {
+    val y = stack.popString()
+    val x = stack.popString()
+    stack.push(x.compareTo(y))
+}
+
 fun FiftInterpretator.interpretWord() {
     val separator = stack.popInt257().toInt().toChar()
     val word = if (separator != ' ') {
@@ -446,6 +460,11 @@ fun FiftInterpretator.interpretWord() {
         scanWordTo(separator, false)
     }
     stack.push(word)
+}
+
+fun FiftInterpretator.interpretAbort() {
+    val string = stack.popString()
+    throw FiftException(ExceptionCode.AlternativeTermination, string)
 }
 
 fun FiftInterpretator.defineBasicWords() {
@@ -549,7 +568,12 @@ fun FiftInterpretator.defineBasicWords() {
     dictionary["cr "] = { interpretCr() }
     dictionary["type "] = { interpretType() }
     dictionary["$+ "] = { interpretStringConcat() }
+    dictionary["$= "] = { interpretStringEqual() }
+    dictionary["\$cmp "] = { interpretStringCmp() }
 
     // input parse
     dictionary["word "] = { interpretWord() }
+
+    // exceptions
+    dictionary["abort "] = { interpretAbort() }
 }
