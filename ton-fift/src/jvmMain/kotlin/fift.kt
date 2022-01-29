@@ -9,8 +9,6 @@ fun fift() {
     fift.quiet {
         runFile("Fift.fif")
     }
-    fift.runFile("Tests.fif")
-    fift.output = { print(it) }
     while (true) {
         try {
             fift.interpret(readln())

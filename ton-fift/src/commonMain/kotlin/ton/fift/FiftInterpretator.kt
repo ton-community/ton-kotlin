@@ -1,5 +1,7 @@
 package ton.fift
 
+import ton.types.int257.int257
+
 class FiftInterpretator(
     val stack: Stack = Stack(),
     val dictionary: Dictionary = Dictionary(),
@@ -10,8 +12,8 @@ class FiftInterpretator(
     }
 
     var state: Int = 0
-    private var charPos = 0
-    private var currentLine: String = ""
+    var charPos = 0
+    var currentLine: String = ""
 
     fun interpret(line: String) = try {
         currentLine = line
@@ -87,7 +89,7 @@ class FiftInterpretator(
 
     fun canRead() = charPos in 0..currentLine.lastIndex
 
-    fun scanWordTo(separator: Char, readSeparator: Boolean = false): String {
+    fun scanWordTo(separator: Char = ' ', readSeparator: Boolean = false): String {
         val wordBuilder = StringBuilder()
         while (canRead()) {
             val char = currentLine[charPos]

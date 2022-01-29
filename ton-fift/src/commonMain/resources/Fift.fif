@@ -4,9 +4,6 @@
 { bl word 3 2 ' (create) } :: ::_
 { bl word 0 (create) } : create
 { char " word 1 ' type } ::_ ."
-{ 0 = } : 0=
-{ 0 < } : 0<
-{ 0 > } : 0>
-{ 0 <> } : 0<>
-{ 0 <= } : 0<=
-{ 0 >= } : 0>=
+{ char " word 1 { swap { abort } if drop } } ::_ abort"
+{ 0 word drop 0 'nop } :: //
+{ { bl word dup "" $= abort"comment extends after end of file" "*/" $= } until 0 'nop } :: /*

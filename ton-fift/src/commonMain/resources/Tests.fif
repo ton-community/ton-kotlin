@@ -1,7 +1,0 @@
-{ 2 2 * . } execute
-{ dup * } : square
-{ 5 square . } execute
-{ "true " "false " rot 0= 1+ pick type 2drop } : ?.
-{ 2 3 = ?. } execute
-{ char " word 1 { swap { abort } if drop } } ::_ abort"
-{ abort"test abort" } execute

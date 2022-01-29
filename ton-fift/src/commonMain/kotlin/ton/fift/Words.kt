@@ -1,6 +1,8 @@
 package ton.fift
 
 import ton.types.ExceptionCode
+import ton.types.int257.Int257
+import ton.types.int257.int257
 
 fun FiftInterpretator.interpretDotSpace() {
     output("${stack.popInt257()} ")
@@ -342,34 +344,53 @@ fun FiftInterpretator.interpretCompileOpenBracket() {
 
 fun FiftInterpretator.interpretCompileCloseBracket() {
     val wordList = stack.popWordList()
-    val wordDef = wordList.toWordDef()
+    val wordDef = IterableWorldDef(wordList)
     stack.push(wordDef)
 }
 
 fun FiftInterpretator.interpretExecuteInternal() {
     val wordDef = stack.popWordDef()
-    val count = stack.popInt257().toInt() // TODO: check count in stack
+    val count = stack.popInt257().toInt()
+    if (stack.depth < count) {
+        throw FiftException(ExceptionCode.StackUnderflow)
+    }
     wordDef.execute(this)
 }
 
 fun FiftInterpretator.interpretCompileInternal() {
-    val e = stack.popWordDef()
-    val n = stack.popInt257().toInt()
-    val compileList = ArrayDeque<WordDef>()
-    repeat(n) {
-        compileList.addFirst(stack.pop().toWordDef())
+    val wordDef = stack.popWordDef()
+    val count = stack.popInt257().toInt()
+    doCompileLiterals(count)
+    if (wordDef != NopWordDef) {
+        doCompile(wordDef)
     }
-
-    val l = stack.popWordList()
-    l.addAll(compileList)
-    if (e != NopWordDef) {
-        l.add(e)
-    }
-    stack.push(l)
 }
 
-fun FiftInterpretator.interpretCreateInternal() {
-    val mode = stack.popInt257().toInt()
+fun FiftInterpretator.doCompile(wordDef: WordDef) {
+    val wordList = stack.popWordList()
+    if (wordDef != NopWordDef) {
+        if (wordDef is WordList) {
+            wordList.addAll(wordDef)
+        } else {
+            wordList.add(wordDef)
+        }
+    }
+    stack.push(wordList)
+}
+
+fun FiftInterpretator.doCompileLiterals(count: Int) {
+    check(count >= 0) { "cannot compile a negative number of literals" }
+    val list = ArrayDeque<WordDef>()
+    repeat(count) {
+        val stackEntry = stack.pop()
+        list.addFirst(PushStackWordDef(stackEntry))
+    }
+    val wordList = stack.popWordList()
+    wordList.addAll(list)
+    stack.push(wordList)
+}
+
+fun FiftInterpretator.interpretCreateInternal(mode: Int = stack.popInt257().toInt()) {
     val isActive = mode and 1 == 1
     val isPrefix = mode and 2 == 0
     try {
@@ -382,6 +403,14 @@ fun FiftInterpretator.interpretCreateInternal() {
         interpretDotStack()
         e.printStackTrace()
     }
+}
+
+// { bl word <mode> 2 ' (create) } :: :
+fun FiftInterpretator.interpretColon(mode: Int) {
+    stack.push(scanWordTo())
+    stack.push(mode)
+    stack.push(2)
+    stack.push(FunctionWordDef { interpretCreateInternal() })
 }
 
 fun FiftInterpretator.interpretTick() {
@@ -402,6 +431,11 @@ fun FiftInterpretator.interpretWords() {
         output(" ")
     }
     output("\n")
+}
+
+fun FiftInterpretator.interpretForgetInternal() {
+    val word = stack.popString()
+    checkNotNull(dictionary.remove(word)) { "Word `$word` not found" }
 }
 
 fun FiftInterpretator.interpretQuoteString() {
@@ -502,10 +536,6 @@ fun FiftInterpretator.defineBasicWords() {
     // integer operations
     dictionary["false "] = { stack.push(0) }
     dictionary["true "] = { stack.push(-1) }
-    dictionary["0 "] = { stack.push(0) }
-    dictionary["1 "] = { stack.push(1) }
-    dictionary["2 "] = { stack.push(2) }
-    dictionary["-1 "] = { stack.push(-1) }
     dictionary["bl "] = { stack.push(32) }
     dictionary["+ "] = { interpretPlus() }
     dictionary["- "] = { interpretMinus() }
@@ -559,6 +589,7 @@ fun FiftInterpretator.defineBasicWords() {
     dictionary["nop "] = { /* nop */ }
     dictionary["'nop "] = { stack.push(NopWordDef) }
     dictionary["words "] = { interpretWords() }
+    dictionary["(forget) "] = { interpretForgetInternal() }
 
     // string operations
     dictionary["\"", true] = { interpretQuoteString() }
@@ -576,4 +607,11 @@ fun FiftInterpretator.defineBasicWords() {
 
     // exceptions
     dictionary["abort "] = { interpretAbort() }
+}
+
+fun FiftInterpretator.defineFiftWords() {
+    dictionary[": ", true] = { interpretColon(0) }
+    dictionary[":: ", true] = { interpretColon(1) }
+    dictionary[":_ ", true] = { interpretColon(2) }
+    dictionary["::_ ", true] = { interpretColon(3) }
 }
