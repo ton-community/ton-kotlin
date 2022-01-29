@@ -2,7 +2,7 @@
 
 package ton.fift
 
-import ton.types.ExceptionCode
+import ton.types.Box
 import ton.types.int257.Int257
 import ton.types.int257.int257
 
@@ -26,24 +26,26 @@ class Stack(
     fun pop(): Any = try {
         storage.removeLast()
     } catch (e: NoSuchElementException) {
-        throw FiftException(ExceptionCode.StackUnderflow)
+        throw FiftStackOverflow()
     }
 
     fun pop(index: Int): Any = try {
         storage.removeAt(storage.lastIndex - index)
     } catch (e: NoSuchElementException) {
-        throw FiftException(ExceptionCode.StackUnderflow)
+        throw FiftStackOverflow()
     }
 
     operator fun get(index: Int = 0): Any = try {
         storage[storage.lastIndex - index]
     } catch (e: NoSuchElementException) {
-        throw FiftException(ExceptionCode.StackUnderflow)
+        throw FiftStackOverflow()
     }
 
     operator fun set(index: Int, stackEntry: Any) {
         storage[storage.lastIndex - index] = stackEntry
     }
+
+    fun clear() = storage.clear()
 
     inline fun swap(firstIndex: Int, secondIndex: Int) {
         val swap = get(firstIndex)
@@ -59,7 +61,6 @@ fun Stack.pushArgCount(args: Int) {
 
 fun Stack.popInt257() = pop() as Int257
 fun Stack.popString() = pop() as String
-
-@Suppress("UNCHECKED_CAST")
 fun Stack.popWordList() = pop() as WordList
 fun Stack.popWordDef() = pop() as WordDef
+fun Stack.popBox() = pop() as Box

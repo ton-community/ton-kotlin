@@ -1,3 +1,4 @@
+import ton.fift.FiftException
 import ton.fift.FiftInterpretator
 
 fun main() {
@@ -26,8 +27,12 @@ fun FiftInterpretator.quiet(block: FiftInterpretator.() -> Unit) {
 }
 
 fun FiftInterpretator.runFile(name: String) {
-    getResourceAsText(name).lines().forEach {
-        interpret(it)
+    getResourceAsText(name).lines().forEachIndexed { index, line ->
+        try {
+            interpret(line)
+        } catch (e: FiftException) {
+            throw IllegalStateException("Exception occurred in $name:${index + 1}:$charPos: $currentLine", e)
+        }
     }
 }
 

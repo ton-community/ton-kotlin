@@ -2,7 +2,9 @@ package ton.fift
 
 import ton.types.ExceptionCode
 
-class FiftException(
+open class FiftException(
     exceptionCode: ExceptionCode,
-    message: String? = null
+    message: String? = null,
 ) : Exception("Fift Exception: $exceptionCode, code: ${exceptionCode.code}${if (!message.isNullOrBlank()) ", $message" else ""}")
+
+class FiftStackOverflow(message: String? = null) : FiftException(ExceptionCode.StackOverflow, message)

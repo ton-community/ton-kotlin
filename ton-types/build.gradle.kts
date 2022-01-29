@@ -12,6 +12,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(kotlin("reflect"))
                 implementation("io.github.gciatto:kt-math:0.4.0")
             }
         }

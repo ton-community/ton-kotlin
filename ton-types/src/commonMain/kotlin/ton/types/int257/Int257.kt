@@ -61,7 +61,6 @@ fun int257(value: String): Int257 = when (value) {
     "10" -> BigIntegerImpl(BigInteger.TEN)
     "false" -> BigIntegerImpl(BigInteger.ZERO)
     "true" -> BigIntegerImpl(BigInteger.NEGATIVE_ONE)
-    "bl" -> BigIntegerImpl(BigInteger.of(32))
     else -> {
         val bigInteger = when {
             value[0] == '0' && value[1] == 'x' -> BigInteger(value.substring(2), 16)
