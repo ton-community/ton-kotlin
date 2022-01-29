@@ -4,6 +4,7 @@ import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import ton.types.Box
 import ton.types.ExceptionCode
+import ton.types.cell.CellBuilder
 import ton.types.int257.Int257
 import ton.types.int257.int257
 
@@ -70,6 +71,12 @@ fun FiftInterpretator.defineBasicWords() {
     dictionary["= "] = { interpretEqual() }
     dictionary["<> "] = { interpretNotEqual() }
     dictionary["cmp "] = { interpretCmp() }
+    dictionary["0= "] = { interpretEqualZero() }
+    dictionary["0<> "] = { interpretNotEqualZero() }
+    dictionary["0< "] = { interpretLessZero() }
+    dictionary["0<= "] = { interpretLessOrEqualZero() }
+    dictionary["0> "] = { interpretGreaterZero() }
+    dictionary["0>= "] = { interpretGreaterOrEqualZero() }
 
     // execution control
     dictionary["execute "] = { interpretExecute() }
@@ -91,9 +98,9 @@ fun FiftInterpretator.defineBasicWords() {
 
     // dictionary operations
     dictionary["' ", true] = { interpretTick() }
-    dictionary["’ ", true] = { interpretTick() }
     dictionary["nop "] = { /* nop */ }
     dictionary["'nop "] = { stack.push(NopWordDef) }
+    dictionary["find "] = { interpretFind() }
     dictionary["words "] = { interpretWords() }
     dictionary["(forget) "] = { interpretForgetInternal() }
 
@@ -112,6 +119,9 @@ fun FiftInterpretator.defineBasicWords() {
     dictionary["chr "] = { interpretChr() }
     dictionary["hold "] = { interpretHold() }
     dictionary["(number) "] = { interpretNumberInternal() }
+    dictionary["(-trailing) "] = { interpretStringTrailing() }
+    dictionary["-trailing "] = { interpretStringTrailing(" ") }
+    dictionary["-trailing0 "] = { interpretStringTrailing("0") }
     dictionary["\$cmp "] = { interpretStringCmp() }
     dictionary["\$len "] = { interpretStringLength() }
     dictionary["\$reverse"] = { interpretStringReverse() }
@@ -133,6 +143,12 @@ fun FiftInterpretator.defineBasicWords() {
     dictionary["! "] = { interpretBoxStore() }
     dictionary["null "] = { interpretNull() }
     dictionary["null? "] = { interpretIsNull() }
+
+    // cell manipulation
+    dictionary["<b "] = { interpretCellBuilder() }
+    dictionary["b> "] = { interpretCellBuild() }
+    dictionary["s, "] = { interpretAppendCellSlice() }
+    dictionary["hashB "] = { interpretHashB() }
 }
 
 fun FiftInterpretator.defineFiftWords() {
@@ -378,6 +394,36 @@ fun FiftInterpretator.interpretNotEqual() {
     stack.push(x != y)
 }
 
+fun FiftInterpretator.interpretEqualZero() {
+    val x = stack.popInt257()
+    stack.push(x.isZero)
+}
+
+fun FiftInterpretator.interpretNotEqualZero() {
+    val x = stack.popInt257()
+    stack.push(!x.isZero)
+}
+
+fun FiftInterpretator.interpretLessOrEqualZero() {
+    val x = stack.popInt257()
+    stack.push(x.sign == -1 || x.isZero)
+}
+
+fun FiftInterpretator.interpretLessZero() {
+    val x = stack.popInt257()
+    stack.push(x.sign == -1)
+}
+
+fun FiftInterpretator.interpretGreaterOrEqualZero() {
+    val x = stack.popInt257()
+    stack.push(x.sign == 1 || x.isZero)
+}
+
+fun FiftInterpretator.interpretGreaterZero() {
+    val x = stack.popInt257()
+    stack.push(x.sign == 1)
+}
+
 fun FiftInterpretator.interpretLessOrEqual() {
     val y = stack.popInt257()
     val x = stack.popInt257()
@@ -568,6 +614,21 @@ fun FiftInterpretator.interpretTick() {
     stack.pushArgCount(1)
 }
 
+fun FiftInterpretator.interpretFind() {
+    val word = stack.popString()
+    val wordDef = dictionary[word]
+    if (wordDef != null) {
+        stack.push(wordDef)
+        if (wordDef.isActive) {
+            stack.push(1)
+        } else {
+            stack.push(-1)
+        }
+    } else {
+        stack.push(0)
+    }
+}
+
 fun FiftInterpretator.interpretWords() {
     dictionary.keys.forEach { word ->
         output(word)
@@ -668,6 +729,11 @@ fun FiftInterpretator.interpretNumberInternal() {
     }
 }
 
+fun FiftInterpretator.interpretStringTrailing(trailing: String = stack.popInt257().toInt().utf8Char) {
+    val string = stack.popString()
+    stack.push(string.removePrefix(trailing))
+}
+
 /**
  * `$+`
  *
@@ -762,4 +828,27 @@ fun FiftInterpretator.interpretIsNull() {
     val value = stack.pop()
     val isNull = value == Unit
     stack.push(isNull)
+}
+
+fun FiftInterpretator.interpretCellBuilder() {
+    stack.push(CellBuilder())
+}
+
+fun FiftInterpretator.interpretCellBuild() {
+    val builder = stack.popCellBuilder()
+    val cell = builder.build()
+    stack.push(cell)
+}
+
+fun FiftInterpretator.interpretAppendCellSlice() {
+    val builder = stack.popCellBuilder()
+    val slice = stack.popCellSlice()
+    builder.appendSlice(slice)
+    stack.push(builder)
+}
+
+fun FiftInterpretator.interpretHashB() {
+    val cell = stack.popCell()
+    val hash = cell.hash()
+    stack.push(hash)
 }

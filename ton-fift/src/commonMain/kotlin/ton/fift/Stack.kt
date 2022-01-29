@@ -3,6 +3,9 @@
 package ton.fift
 
 import ton.types.Box
+import ton.types.cell.Cell
+import ton.types.cell.CellBuilder
+import ton.types.cell.CellSlice
 import ton.types.int257.Int257
 import ton.types.int257.int257
 
@@ -64,3 +67,6 @@ fun Stack.popString() = pop() as String
 fun Stack.popWordList() = pop() as WordList
 fun Stack.popWordDef() = pop() as WordDef
 fun Stack.popBox() = pop() as Box
+fun Stack.popCell() = pop() as Cell
+fun Stack.popCellSlice() = pop() as CellSlice
+fun Stack.popCellBuilder() = pop() as CellBuilder

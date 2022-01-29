@@ -37,7 +37,7 @@ value class BigIntegerImpl(
 
     override fun compareTo(other: Int257): Int = bigInteger.compareTo(other.toBigInteger())
 
-    override fun times(other: Int257): Int257 = (bigInteger / other.toBigInteger()).toInt257()
+    override fun times(other: Int257): Int257 = (bigInteger * other.toBigInteger()).toInt257()
 
     override fun div(other: Int257): Int257 = (bigInteger / other.toBigInteger()).toInt257()
 

@@ -67,12 +67,13 @@ variable base
 { find 0<> dup ' nip if } : (def?)
 { bl word 1 ' (def?) } :: def?
 { bl word 1 { (def?) not } } :: undef?
-{ def? ' skip-to-eof if } : skip-ifdef
-{ bl word dup (def?) { drop skip-to-eof } { 'nop swap 0 (create) } cond } : library
-{ bl word dup (def?) { 2drop skip-to-eof } { swap 1 'nop does swap 0 (create) } cond } : library-version
-{ char ) word "$" swap $+ 1 { find 0= abort"undefined parameter" execute } } ::_ $(
-{ sbitrefs rot brembitrefs rot >= -rot <= and } : s-fits?
-{ swap sbitrefs -rot + rot brembitrefs -rot <= -rot <= and } : s-fits-with?
+// TODO:
+// { def? ' skip-to-eof if } : skip-ifdef
+// { bl word dup (def?) { drop skip-to-eof } { 'nop swap 0 (create) } cond } : library
+// { bl word dup (def?) { 2drop skip-to-eof } { swap 1 'nop does swap 0 (create) } cond } : library-version
+// { char ) word "$" swap $+ 1 { find 0= abort"undefined parameter" execute } } ::_ $(
+// { sbitrefs rot brembitrefs rot >= -rot <= and } : s-fits?
+// { swap sbitrefs -rot + rot brembitrefs -rot <= -rot <= and } : s-fits-with?
 { 0 swap ! } : 0!
 { tuck @ + swap ! } : +!
 { tuck @ swap - swap ! } : -!
@@ -80,35 +81,36 @@ variable base
 { -1 swap +! } : 1-!
 { null swap ! } : null!
 { not 2 pick @ and xor swap ! } : ~!
-0 tuple constant nil
-{ 1 tuple } : single
-{ 2 tuple } : pair
-{ 3 tuple } : triple
-{ 1 untuple } : unsingle
-{ 2 untuple } : unpair
-{ 3 untuple } : untriple
-{ over tuple? { swap count = } { 2drop false } cond } : tuple-len?
-{ 0 tuple-len? } : nil?
-{ 1 tuple-len? } : single?
-{ 2 tuple-len? } : pair?
-{ 3 tuple-len? } : triple?
-{ 0 [] } : first
-{ 1 [] } : second
-{ 2 [] } : third
-' pair : cons
-' unpair : uncons
-{ 0 [] } : car
-{ 1 [] } : cdr
-{ cdr car } : cadr
-{ cdr cdr } : cddr
-{ cdr cdr car } : caddr
-{ null ' cons rot times } : list
-{ -rot pair swap ! } : 2!
-{ @ unpair } : 2@
-{ true (atom) drop } : atom
-{ bl word atom 1 'nop } ::_ `
+// TODO:
+// 0 tuple constant nil
+// { 1 tuple } : single
+// { 2 tuple } : pair
+// { 3 tuple } : triple
+// { 1 untuple } : unsingle
+// { 2 untuple } : unpair
+// { 3 untuple } : untriple
+// { over tuple? { swap count = } { 2drop false } cond } : tuple-len?
+// { 0 tuple-len? } : nil?
+// { 1 tuple-len? } : single?
+// { 2 tuple-len? } : pair?
+// { 3 tuple-len? } : triple?
+// { 0 [] } : first
+// { 1 [] } : second
+// { 2 [] } : third
+// ' pair : cons
+// ' unpair : uncons
+// { 0 [] } : car
+// { 1 [] } : cdr
+// { cdr car } : cadr
+// { cdr cdr } : cddr
+// { cdr cdr car } : caddr
+// { null ' cons rot times } : list
+// { -rot pair swap ! } : 2!
+// { @ unpair } : 2@
+// { true (atom) drop } : atom
+// { bl word atom 1 'nop } ::_ `
 { hole dup 1 { @ execute } does create } : recursive
-{ 0 { 1+ dup 1 ' $() does over (.) "$" swap $+ 0 (create) } rot times drop } : :$1..n
+// { 0 { 1+ dup 1 ' $() does over (.) "$" swap $+ 0 (create) } rot times drop } : :$1..n
 { 10 hold } : +cr
 { 9 hold } : +tab
 { "" swap { 0 word 2dup $cmp } { rot swap $+ +cr swap } while 2drop } : scan-until-word
