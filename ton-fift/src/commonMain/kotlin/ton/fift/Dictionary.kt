@@ -8,7 +8,7 @@ operator fun Dictionary.set(
     name: String,
     isActive: Boolean = false,
     function: FiftInterpretator.() -> Unit,
-) = set(name, WordDef(isActive, function))
+) = set(name, WordDef(name, isActive, function))
 
 data class WordList(
     val list: MutableList<WordDef> = ArrayList(),
@@ -23,6 +23,35 @@ data class WordList(
     }
 }
 
+interface WordDef {
+    val isActive: Boolean
+
+    fun execute(fift: FiftInterpretator)
+}
+
+object NopWordDef : NamedWordDef("nop", false) {
+    override fun execute(fift: FiftInterpretator) {
+        // nop
+    }
+}
+
+open class NamedWordDef(
+    val name: String,
+    override val isActive: Boolean,
+    val function: FiftInterpretator.() -> Unit = {},
+) : WordDef {
+    override fun execute(fift: FiftInterpretator) = function(fift)
+    override fun toString(): String = name
+}
+
+data class StackPushWordDef(
+    val element: Any,
+) : NamedWordDef(element.toString(), false) {
+    override fun execute(fift: FiftInterpretator) {
+        fift.stack.push(element)
+    }
+}
+
 data class IterableWorldDef(
     val iterable: Iterable<WordDef>,
 ) : WordDef {
@@ -34,32 +63,9 @@ data class IterableWorldDef(
         }
     }
 
-    override fun toString(): String = "IterableWorldDef(${iterable.joinToString()})"
+    override fun toString(): String = "IterableWorldDef(${iterable.joinToString(",")})"
 }
 
-interface WordDef {
-    val isActive: Boolean
-
-    fun execute(fift: FiftInterpretator)
-}
-
-object NopWordDef : WordDef {
-    override val isActive: Boolean = false
-    override fun execute(fift: FiftInterpretator) {
-        // nop.
-    }
-
-    override fun toString(): String = "nop"
-}
-
-fun WordDef(entry: Any) = object : WordDef {
-    override val isActive: Boolean = false
-    override fun execute(fift: FiftInterpretator) {
-        fift.stack.push(entry)
-    }
-}
-
-fun WordDef(isActive: Boolean = false, block: FiftInterpretator.() -> Unit): WordDef = object : WordDef {
-    override val isActive: Boolean = isActive
-    override fun execute(fift: FiftInterpretator) = block(fift)
-}
+fun WordDef(entry: Any) = StackPushWordDef(entry)
+fun WordDef(name: String, isActive: Boolean = false, block: FiftInterpretator.() -> Unit): WordDef =
+    NamedWordDef(name, isActive, block)
