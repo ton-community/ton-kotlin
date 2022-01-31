@@ -33,7 +33,7 @@ value class BigIntegerImpl(
 
     override fun minus(other: Int257): Int257 = (bigInteger - other.toBigInteger()).toInt257()
 
-    override fun unaryMinus(): Int257 = -bigInteger.toInt257()
+    override fun unaryMinus(): Int257 = (-bigInteger).toInt257()
 
     override fun compareTo(other: Int257): Int = bigInteger.compareTo(other.toBigInteger())
 

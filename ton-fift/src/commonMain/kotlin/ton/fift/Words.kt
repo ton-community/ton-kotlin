@@ -8,154 +8,154 @@ import ton.types.cell.CellBuilder
 import ton.types.int257.Int257
 import ton.types.int257.int257
 
-fun FiftInterpretator.defineBasicWords() {
-    dictionary[". "] = { interpretDotSpace() }
-    dictionary["._ "] = { interpretDot() }
-    dictionary["x. "] = { interpretHexDotSpace() }
-    dictionary["x._ "] = { interpretHexDot() }
-    dictionary["X. "] = { interpretUpperHexDotSpace() }
-    dictionary["X._ "] = { interpretUpperHexDot() }
-    dictionary["b. "] = { interpretBinaryDotSpace() }
-    dictionary["b._ "] = { interpretBinaryDot() }
-    dictionary[".s "] = { interpretDotStack() }
+fun Dictionary.defineBasicWords() {
+    this[". "] = { interpretDotSpace() }
+    this["._ "] = { interpretDot() }
+    this["x. "] = { interpretHexDotSpace() }
+    this["x._ "] = { interpretHexDot() }
+    this["X. "] = { interpretUpperHexDotSpace() }
+    this["X._ "] = { interpretUpperHexDot() }
+    this["b. "] = { interpretBinaryDotSpace() }
+    this["b._ "] = { interpretBinaryDot() }
+    this[".s "] = { interpretDotStack() }
     // stack manipulation
-    dictionary["drop "] = { interpretDrop() }
-    dictionary["2drop "] = { interpret2Drop() }
-    dictionary["dup "] = { interpretDup() }
-    dictionary["2dup "] = { interpret2Dup() }
-    dictionary["over "] = { interpretOver() }
-    dictionary["2over "] = { interpret2Over() }
-    dictionary["swap "] = { interpretSwap() }
-    dictionary["2swap "] = { interpret2Swap() }
-    dictionary["tuck "] = { interpretTuck() }
-    dictionary["nip "] = { interpretNip() }
-    dictionary["rot "] = { interpretRot() }
-    dictionary["-rot "] = { interpretRotRev() }
-    dictionary["pick "] = { interpretPick() }
-    dictionary["roll "] = { interpretRoll() }
-    dictionary["-roll "] = { interpretRollRev() }
-    dictionary["reverse "] = { interpretReverse() }
-    dictionary["exch "] = { interpretExch() }
-    dictionary["exch2 "] = { interpretExch2() }
-    dictionary["depth "] = { interpretDepth() }
-    dictionary["?dup "] = { interpretConditionalDup() }
+    this["drop "] = { interpretDrop() }
+    this["2drop "] = { interpret2Drop() }
+    this["dup "] = { interpretDup() }
+    this["2dup "] = { interpret2Dup() }
+    this["over "] = { interpretOver() }
+    this["2over "] = { interpret2Over() }
+    this["swap "] = { interpretSwap() }
+    this["2swap "] = { interpret2Swap() }
+    this["tuck "] = { interpretTuck() }
+    this["nip "] = { interpretNip() }
+    this["rot "] = { interpretRot() }
+    this["-rot "] = { interpretRotRev() }
+    this["pick "] = { interpretPick() }
+    this["roll "] = { interpretRoll() }
+    this["-roll "] = { interpretRollRev() }
+    this["reverse "] = { interpretReverse() }
+    this["exch "] = { interpretExch() }
+    this["exch2 "] = { interpretExch2() }
+    this["depth "] = { interpretDepth() }
+    this["?dup "] = { interpretConditionalDup() }
 
     // integer operations
-    dictionary["false "] = { stack.push(0) }
-    dictionary["true "] = { stack.push(-1) }
-    dictionary["bl "] = { stack.push(32) }
-    dictionary["+ "] = { interpretPlus() }
-    dictionary["- "] = { interpretMinus() }
-    dictionary["negate "] = { interpretNegate() }
-    dictionary["1+ "] = { interpretPlus(int257(1)) }
-    dictionary["1- "] = { interpretMinus(int257(1)) }
-    dictionary["2+ "] = { interpretPlus(int257(2)) }
-    dictionary["2- "] = { interpretMinus(int257(2)) }
-    dictionary["2* "] = { interpretShl(1) }
-    dictionary["2/ "] = { interpretShr(1) }
-    dictionary["* "] = { interpretTimes() }
-    dictionary["/ "] = { interpretDiv() }
-    dictionary["*/ "] = { interpretTimesDiv() }
-    dictionary["mod "] = { interpretMod() }
-    dictionary["/mod "] = { interpretDivMod() }
-    dictionary["<< "] = { interpretShl() }
-    dictionary[">> "] = { interpretShr() }
-    dictionary["and "] = { interpretAnd() }
-    dictionary["or "] = { interpretOr() }
-    dictionary["xor "] = { interpretXor() }
-    dictionary["not "] = { interpretNot() }
-    dictionary["< "] = { interpretLess() }
-    dictionary["<= "] = { interpretLessOrEqual() }
-    dictionary["> "] = { interpretGreater() }
-    dictionary[">= "] = { interpretGreaterOrEqual() }
-    dictionary["= "] = { interpretEqual() }
-    dictionary["<> "] = { interpretNotEqual() }
-    dictionary["cmp "] = { interpretCmp() }
-    dictionary["0= "] = { interpretEqualZero() }
-    dictionary["0<> "] = { interpretNotEqualZero() }
-    dictionary["0< "] = { interpretLessZero() }
-    dictionary["0<= "] = { interpretLessOrEqualZero() }
-    dictionary["0> "] = { interpretGreaterZero() }
-    dictionary["0>= "] = { interpretGreaterOrEqualZero() }
+    this["false "] = { stack.push(0) }
+    this["true "] = { stack.push(-1) }
+    this["bl "] = { stack.push(32) }
+    this["+ "] = { interpretPlus() }
+    this["- "] = { interpretMinus() }
+    this["negate "] = { interpretNegate() }
+    this["1+ "] = { interpretPlus(int257(1)) }
+    this["1- "] = { interpretMinus(int257(1)) }
+    this["2+ "] = { interpretPlus(int257(2)) }
+    this["2- "] = { interpretMinus(int257(2)) }
+    this["2* "] = { interpretShl(1) }
+    this["2/ "] = { interpretShr(1) }
+    this["* "] = { interpretTimes() }
+    this["/ "] = { interpretDiv() }
+    this["*/ "] = { interpretTimesDiv() }
+    this["mod "] = { interpretMod() }
+    this["/mod "] = { interpretDivMod() }
+    this["<< "] = { interpretShl() }
+    this[">> "] = { interpretShr() }
+    this["and "] = { interpretAnd() }
+    this["or "] = { interpretOr() }
+    this["xor "] = { interpretXor() }
+    this["not "] = { interpretNot() }
+    this["< "] = { interpretLess() }
+    this["<= "] = { interpretLessOrEqual() }
+    this["> "] = { interpretGreater() }
+    this[">= "] = { interpretGreaterOrEqual() }
+    this["= "] = { interpretEqual() }
+    this["<> "] = { interpretNotEqual() }
+    this["cmp "] = { interpretCmp() }
+    this["0= "] = { interpretEqualZero() }
+    this["0<> "] = { interpretNotEqualZero() }
+    this["0< "] = { interpretLessZero() }
+    this["0<= "] = { interpretLessOrEqualZero() }
+    this["0> "] = { interpretGreaterZero() }
+    this["0>= "] = { interpretGreaterOrEqualZero() }
 
     // execution control
-    dictionary["execute "] = { interpretExecute() }
-    dictionary["if "] = { interpretExecuteIf() }
-    dictionary["ifnot "] = { interpretExecuteIfNot() }
-    dictionary["cond "] = { interpretCondition() }
-    dictionary["times "] = { interpretExecuteTimes() }
-    dictionary["until "] = { interpretUntil() }
-    dictionary["while "] = { interpretWhile() }
+    this["execute "] = { interpretExecute() }
+    this["if "] = { interpretExecuteIf() }
+    this["ifnot "] = { interpretExecuteIfNot() }
+    this["cond "] = { interpretCondition() }
+    this["times "] = { interpretExecuteTimes() }
+    this["until "] = { interpretUntil() }
+    this["while "] = { interpretWhile() }
 
     // compile operations
-    dictionary["{ ", true] = { interpretOpenBracket() }
-    dictionary["} ", true] = { interpretCloseBracket() }
-    dictionary["({) "] = { interpretCompileOpenBracket() }
-    dictionary["(}) "] = { interpretCompileCloseBracket() }
-    dictionary["(compile) "] = { interpretCompileInternal() }
-    dictionary["(execute) "] = { interpretExecuteInternal() }
-    dictionary["(create) "] = { interpretCreateInternal() }
+    this["{ ", true] = { interpretOpenBracket() }
+    this["} ", true] = { interpretCloseBracket() }
+    this["({) "] = { interpretCompileOpenBracket() }
+    this["(}) "] = { interpretCompileCloseBracket() }
+    this["(compile) "] = { interpretCompileInternal() }
+    this["(execute) "] = { interpretExecuteInternal() }
+    this["(create) "] = { interpretCreateInternal() }
 
     // dictionary operations
-    dictionary["' ", true] = { interpretTick() }
-    dictionary["nop "] = { /* nop */ }
-    dictionary["'nop "] = { stack.push(NopWordDef) }
-    dictionary["find "] = { interpretFind() }
-    dictionary["words "] = { interpretWords() }
-    dictionary["(forget) "] = { interpretForgetInternal() }
+    this["' ", true] = { interpretTick() }
+    this["nop "] = { /* nop */ }
+    this["'nop "] = { stack.push(NopWordDef) }
+    this["find "] = { interpretFind() }
+    this["words "] = { interpretWords() }
+    this["(forget) "] = { interpretForgetInternal() }
 
     // string operations
-    dictionary["\"", true] = { interpretQuoteString() }
-    dictionary["type "] = { interpretType() }
-    dictionary["cr "] = { interpretEmitConst('\n') }
-    dictionary["emit "] = { interpretEmit() }
-    dictionary["char ", true] = { interpretChar() }
-    dictionary["(char) "] = { interpretCharInternal() }
-    dictionary["bl "] = WordDef(int257(32))
-    dictionary["space "] = { interpretEmitConst(' ') }
-    dictionary["$+ "] = { interpretStringConcat() }
-    dictionary["$= "] = { interpretStringEqual() }
-    dictionary["string? "] = { interpretIsString() }
-    dictionary["chr "] = { interpretChr() }
-    dictionary["hold "] = { interpretHold() }
-    dictionary["(number) "] = { interpretNumberInternal() }
-    dictionary["(-trailing) "] = { interpretStringTrailing() }
-    dictionary["-trailing "] = { interpretStringTrailing(" ") }
-    dictionary["-trailing0 "] = { interpretStringTrailing("0") }
-    dictionary["\$cmp "] = { interpretStringCmp() }
-    dictionary["\$len "] = { interpretStringLength() }
-    dictionary["\$reverse"] = { interpretStringReverse() }
-    dictionary["\$pos"] = { interpretStringPos() }
+    this["\"", true] = { interpretQuoteString() }
+    this["type "] = { interpretType() }
+    this["cr "] = { interpretEmitConst('\n') }
+    this["emit "] = { interpretEmit() }
+    this["char ", true] = { interpretChar() }
+    this["(char) "] = { interpretCharInternal() }
+    this["bl "] = WordDef(int257(32))
+    this["space "] = { interpretEmitConst(' ') }
+    this["$+ "] = { interpretStringConcat() }
+    this["$= "] = { interpretStringEqual() }
+    this["string? "] = { interpretIsString() }
+    this["chr "] = { interpretChr() }
+    this["hold "] = { interpretHold() }
+    this["(number) "] = { interpretNumberInternal() }
+    this["(-trailing) "] = { interpretStringTrailing() }
+    this["-trailing "] = { interpretStringTrailing(" ") }
+    this["-trailing0 "] = { interpretStringTrailing("0") }
+    this["\$cmp "] = { interpretStringCmp() }
+    this["\$len "] = { interpretStringLength() }
+    this["\$reverse"] = { interpretStringReverse() }
+    this["\$pos"] = { interpretStringPos() }
 
     // bytes
-    dictionary["x>B "] = { interpretHexToBytes() }
+    this["x>B "] = { interpretHexToBytes() }
 
     // input parse
-    dictionary["word "] = { interpretWord() }
+    this["word "] = { interpretWord() }
 
     // exceptions
-    dictionary["abort "] = { interpretAbort() }
+    this["abort "] = { interpretAbort() }
 
     // box
-    dictionary["hole "] = { interpretHole() }
-    dictionary["box "] = { interpretBox() }
-    dictionary["@ "] = { interpretBoxFetch() }
-    dictionary["! "] = { interpretBoxStore() }
-    dictionary["null "] = { interpretNull() }
-    dictionary["null? "] = { interpretIsNull() }
+    this["hole "] = { interpretHole() }
+    this["box "] = { interpretBox() }
+    this["@ "] = { interpretBoxFetch() }
+    this["! "] = { interpretBoxStore() }
+    this["null "] = { interpretNull() }
+    this["null? "] = { interpretIsNull() }
 
     // cell manipulation
-    dictionary["<b "] = { interpretCellBuilder() }
-    dictionary["b> "] = { interpretCellBuild() }
-    dictionary["s, "] = { interpretAppendCellSlice() }
-    dictionary["hashB "] = { interpretHashB() }
+    this["<b "] = { interpretCellBuilder() }
+    this["b> "] = { interpretCellBuild() }
+    this["s, "] = { interpretAppendCellSlice() }
+    this["hashB "] = { interpretHashB() }
 }
 
-fun FiftInterpretator.defineFiftWords() {
-    dictionary[": ", true] = { interpretColon(0) }
-    dictionary[":: ", true] = { interpretColon(1) }
-    dictionary[":_ ", true] = { interpretColon(2) }
-    dictionary["::_ ", true] = { interpretColon(3) }
+fun Dictionary.defineFiftWords() {
+    this[": ", true] = { interpretColon(0) }
+    this[":: ", true] = { interpretColon(1) }
+    this[":_ ", true] = { interpretColon(2) }
+    this["::_ ", true] = { interpretColon(3) }
 }
 
 fun FiftInterpretator.interpretDotSpace() {
@@ -528,7 +528,7 @@ fun FiftInterpretator.interpretCompileOpenBracket() {
 
 fun FiftInterpretator.interpretCompileCloseBracket() {
     val wordList = stack.popWordList()
-    val wordDef = IterableWorldDef(wordList)
+    val wordDef = SequentialWordDef(wordList)
     stack.push(wordDef)
 }
 

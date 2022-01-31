@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 fun testFift(block: FiftInterpretator.() -> Unit) {
-    val fift = FiftInterpretator()
+    val fift = FiftInterpretator(output = {})
     fift.apply(block)
     assertTrue(fift.stack.isEmpty)
 }
@@ -24,42 +24,38 @@ class WordsTest {
 
 
     @Test
-    fun `test word '+ '`() {
-        val fift = FiftInterpretator()
-        fift.interpret("1 2 +")
-        assertEquals(int257(3), fift.stack.popInt257())
-        fift.interpret("5 -10 +")
-        assertEquals(int257(-5), fift.stack.popInt257())
-        fift.interpret("42 37 94 + + 11 +")
-        assertEquals(int257(184), fift.stack.popInt257())
-        assertTrue(fift.stack.isEmpty)
+    fun `test word '+ '`() = testFift {
+        interpret("1 2 +")
+        assertEquals(int257(3), stack.popInt257())
+        interpret("5 -10 +")
+        assertEquals(int257(-5), stack.popInt257())
+        interpret("42 37 94 + + 11 +")
+        assertEquals(int257(184), stack.popInt257())
+        assertTrue(stack.isEmpty)
     }
 
     @Test
-    fun `test word '- '`() {
-        val fift = FiftInterpretator()
-        fift.interpret("5 3 -")
-        assertEquals(int257(2), fift.stack.popInt257())
-        fift.interpret("-10 -3 -")
-        assertEquals(int257(-7), fift.stack.popInt257())
-        fift.interpret("-19 397 -24 - - 33 -")
-        assertEquals(int257(-473), fift.stack.popInt257())
-        assertTrue(fift.stack.isEmpty)
+    fun `test word '- '`() = testFift {
+        interpret("5 3 -")
+        assertEquals(int257(2), stack.popInt257())
+        interpret("-10 -3 -")
+        assertEquals(int257(-7), stack.popInt257())
+        interpret("-19 397 -24 - - 33 -")
+        assertEquals(int257(-473), stack.popInt257())
+        assertTrue(stack.isEmpty)
     }
 
     @Test
-    fun `test word 'negate '`() {
-        val fift = FiftInterpretator()
-        fift.interpret("53 negate")
-        assertEquals(int257(-53), fift.stack.popInt257())
-        fift.interpret("-10 negate")
-        assertEquals(int257(10), fift.stack.popInt257())
-        fift.interpret("397 -24 negate negate 99 negate 11")
-        assertEquals(int257(11), fift.stack.popInt257())
-        assertEquals(int257(-99), fift.stack.popInt257())
-        assertEquals(int257(-24), fift.stack.popInt257())
-        assertEquals(int257(397), fift.stack.popInt257())
-        assertTrue(fift.stack.isEmpty)
+    fun `test word 'negate '`() = testFift {
+        interpret("53 negate")
+        assertEquals(int257(-53), stack.popInt257())
+        interpret("-10 negate")
+        assertEquals(int257(10), stack.popInt257())
+        interpret("397 -24 negate negate 99 negate 11")
+        assertEquals(int257(11), stack.popInt257())
+        assertEquals(int257(-99), stack.popInt257())
+        assertEquals(int257(-24), stack.popInt257())
+        assertEquals(int257(397), stack.popInt257())
     }
 
     @Test
@@ -74,7 +70,7 @@ class WordsTest {
     fun testDrop() = testFift {
         interpret("3 1 2 drop")
         assertEquals(int257(1), stack.popInt257())
-        interpret("drop drop")
+        interpret("drop")
     }
 
     @Test

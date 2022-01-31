@@ -52,7 +52,7 @@ data class StackPushWordDef(
     }
 }
 
-data class IterableWorldDef(
+data class SequentialWordDef(
     val iterable: Iterable<WordDef>,
 ) : WordDef {
     override val isActive: Boolean = false
@@ -63,7 +63,7 @@ data class IterableWorldDef(
         }
     }
 
-    override fun toString(): String = "IterableWorldDef(${iterable.joinToString(",")})"
+    override fun toString(): String = "{${iterable.joinToString(",")}}"
 }
 
 fun WordDef(entry: Any) = StackPushWordDef(entry)

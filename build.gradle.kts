@@ -1,8 +1,12 @@
 plugins {
     kotlin("multiplatform")
+    `maven-publish`
 }
 
 allprojects {
+    group = "com.github.andreypfau"
+    version = "1.0-SNAPSHOT"
+
     repositories {
         mavenCentral()
     }

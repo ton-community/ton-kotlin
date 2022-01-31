@@ -6,12 +6,9 @@ import ton.types.int257.int257
 
 class FiftInterpretator(
     val stack: Stack = Stack(),
-    val dictionary: Dictionary = Dictionary(),
+    val dictionary: Dictionary = Dictionary().apply { defineBasicWords() },
     var output: (String) -> Unit = { print(it) },
 ) {
-    init {
-        defineBasicWords()
-    }
 
     var state: Int = 0
     var charPos = 0
@@ -78,6 +75,7 @@ class FiftInterpretator(
         output(" ok\n")
     } catch (e: FiftException) {
         stack.clear()
+        state = 0
         throw e
     }
 
