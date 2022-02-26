@@ -7,20 +7,21 @@ import kotlin.math.ceil
 class BitString(
     val bitSize: Int,
 ) : Iterable<Boolean> {
+    private inline val Int.byteIndex get() = this / 8 or 0
     private var position = 0
 
     val byteSize = ceil(bitSize / 8.0).toInt()
     val array = ByteArray(byteSize)
 
     operator fun set(index: Int, value: Boolean) {
-        if (value) {
-            array[index / 8 or 0] = array[index / 8 or 0] or (1 shl 7 - index % 8).toByte()
+        array[index.byteIndex] = if (value) {
+            array[index.byteIndex] or (1 shl 7 - index % 8).toByte()
         } else {
-            array[index / 8 or 0] = array[index / 8 or 0] and (1 shl 7 - index % 8).inv().toByte()
+            array[index.byteIndex] and (1 shl 7 - index % 8).inv().toByte()
         }
     }
 
-    operator fun get(index: Int): Boolean = array[index / 8 or 0] and (1 shl 7 - index % 8).toByte() > 0
+    operator fun get(index: Int): Boolean = array[index.byteIndex] and (1 shl 7 - index % 8).toByte() > 0
 
     fun writeBit(value: Boolean = true) {
         set(position++, value)
