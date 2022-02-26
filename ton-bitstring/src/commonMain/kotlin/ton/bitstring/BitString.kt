@@ -20,9 +20,7 @@ class BitString(
         }
     }
 
-    operator fun get(index: Int): Boolean {
-        return array[index / 8 or 0] and (1 shl 7 - index % 8).toByte() > 0
-    }
+    operator fun get(index: Int): Boolean = array[index / 8 or 0] and (1 shl 7 - index % 8).toByte() > 0
 
     fun writeBit(value: Boolean = true) {
         set(position++, value)
