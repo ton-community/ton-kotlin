@@ -7,9 +7,10 @@ import kotlin.math.ceil
 class BitString(
     val bitSize: Int,
 ) : Iterable<Boolean> {
+    private var position = 0
+
     val byteSize = ceil(bitSize / 8.0).toInt()
     val array = ByteArray(byteSize)
-    var position = 0
 
     operator fun set(index: Int, value: Boolean) {
         if (value) {
@@ -103,7 +104,7 @@ class BitString(
     override fun iterator(): Iterator<Boolean> = BitStringIterator()
 
     inner class BitStringIterator : BooleanIterator() {
-        var index = 0
+        private var index = 0
         override fun hasNext(): Boolean = index < bitSize
         override fun nextBoolean(): Boolean = get(index++)
     }
