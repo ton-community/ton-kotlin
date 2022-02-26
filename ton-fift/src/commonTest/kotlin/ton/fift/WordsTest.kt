@@ -1,5 +1,6 @@
 package ton.fift
 
+import io.ktor.utils.io.core.*
 import ton.types.int257.int257
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,6 +10,13 @@ fun testFift(block: FiftInterpretator.() -> Unit) {
     val fift = FiftInterpretator(output = {})
     fift.apply(block)
     assertTrue(fift.stack.isEmpty)
+}
+
+fun main() {
+    val a = buildPacket {
+
+    }
+    a.readByte()
 }
 
 class WordsTest {
