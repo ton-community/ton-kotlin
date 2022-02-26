@@ -1,27 +1,26 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package ton.bitstring
 
 import kotlin.experimental.and
+import kotlin.experimental.or
 import kotlin.math.ceil
 
 class BitString(
     val bitSize: Int,
 ) : Iterable<Boolean> {
     val byteSize = ceil(bitSize / 8.0).toInt()
-    val array = UByteArray(byteSize)
+    val array = ByteArray(byteSize)
     var position = 0
 
     operator fun set(index: Int, value: Boolean) {
         if (value) {
-            array[index / 8 or 0] = array[index / 8 or 0] or (1 shl 7 - index % 8).toUByte()
+            array[index / 8 or 0] = array[index / 8 or 0] or (1 shl 7 - index % 8).toByte()
         } else {
-            array[index / 8 or 0] = array[index / 8 or 0] and (1 shl 7 - index % 8).inv().toUByte()
+            array[index / 8 or 0] = array[index / 8 or 0] and (1 shl 7 - index % 8).inv().toByte()
         }
     }
 
     operator fun get(index: Int): Boolean {
-        return array[index / 8 or 0] and (1 shl 7 - index % 8).toUByte() > 0u
+        return array[index / 8 or 0] and (1 shl 7 - index % 8).toByte() > 0
     }
 
     fun writeBit(value: Boolean) {
@@ -79,7 +78,7 @@ class BitString(
     private fun toString(sb: StringBuilder) {
         if (position % 4 == 0) {
             array.slice(0 until ceil(position / 8.0).toInt()).forEach {
-                val hex = it.toString(16).uppercase()
+                val hex = it.toUByte().toString(16).uppercase()
                 sb.append(hex)
             }
             if (position % 8 != 0) {
