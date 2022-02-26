@@ -2,7 +2,7 @@
 
 package ton.types.int257
 
-import org.gciatto.kt.math.BigInteger
+import ton.common.biginteger.BigInteger
 import kotlin.jvm.JvmInline
 
 inline fun Int257.toBigInteger(): BigInteger = if (this is BigIntegerImpl) {

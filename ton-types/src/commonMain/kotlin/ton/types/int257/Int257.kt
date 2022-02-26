@@ -1,6 +1,6 @@
 package ton.types.int257
 
-import org.gciatto.kt.math.BigInteger
+import ton.common.biginteger.BigInteger
 
 interface Int257 {
     val sign: Int

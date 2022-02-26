@@ -314,7 +314,8 @@ fun FiftInterpretator.interpretMinus(y: Int257 = stack.popInt257()) {
 fun FiftInterpretator.interpretNegate() {
     stack.push(-stack.popInt257())
 }
-
+// 0001
+// 1000
 fun FiftInterpretator.interpretTimes() {
     stack.push(stack.popInt257() * stack.popInt257())
 }
