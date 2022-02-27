@@ -1,12 +1,15 @@
 package ton.bitstring
 
+import kotlinx.serialization.Serializable
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.ceil
 
+@Serializable(with = BitStringSerializer::class)
 class BitString(
     val bitSize: Int,
 ) : Iterable<Boolean> {
+
     private inline val Int.byteIndex get() = this / 8 or 0
     private var position = 0
 
@@ -33,34 +36,15 @@ class BitString(
         }
     }
 
-    fun writeByte(value: Byte, bitLength: Int = Byte.SIZE_BITS) {
-        repeat(bitLength) {
-            val mask = 1 shl it
-            val bit = (value and mask.toByte()) != 0.toByte()
-            writeBit(bit)
-        }
-    }
-
-    fun writeShort(value: Short, bitLength: Int = Short.SIZE_BITS) {
-        repeat(bitLength) {
-            val mask = 1 shl it
-            val bit = (value and mask.toShort()) != 0.toShort()
-            writeBit(bit)
-        }
-    }
-
     fun writeInt(value: Int, bitLength: Int = Int.SIZE_BITS) {
-        repeat(bitLength) {
-            val mask = 1 shl it
-            val bit = (value and mask) != 0
-            writeBit(bit)
-        }
+        writeBit(false)
+        writeUInt(value.toUInt(), bitLength - 1)
     }
 
-    fun writeLong(value: Long, bitLength: Int = Long.SIZE_BITS) {
-        repeat(bitLength) {
-            val mask = 1 shl it
-            val bit = (value and mask.toLong()) != 0L
+    fun writeUInt(value: UInt, bitLength: Int = UInt.SIZE_BITS) {
+        for (i in bitLength - 1 downTo 0) {
+            val mask = 1u shl i
+            val bit = (value and mask) != 0u
             writeBit(bit)
         }
     }
@@ -102,9 +86,32 @@ class BitString(
 
     override fun iterator(): Iterator<Boolean> = BitStringIterator()
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as BitString
+
+        if (bitSize != other.bitSize) return false
+        if (!array.contentEquals(other.array)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = bitSize
+        result = 31 * result + array.contentHashCode()
+        return result
+    }
+
+
     inner class BitStringIterator : BooleanIterator() {
         private var index = 0
         override fun hasNext(): Boolean = index < bitSize
         override fun nextBoolean(): Boolean = get(index++)
     }
+}
+
+fun BitString(vararg boolean: Boolean) = BitString(boolean.size).apply {
+    writeBitArray(boolean)
 }

@@ -25,5 +25,6 @@ dependencyResolutionManagement {
 
 include(":ton-bitstring")
 include(":ton-fift")
+include(":ton-tlb")
 include(":ton-types")
 include(":ton-common-biginteger")

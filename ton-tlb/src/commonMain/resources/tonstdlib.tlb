@@ -1,0 +1,165 @@
+//
+// TON TL-B standard library
+//
+
+//
+// dependson "hashmap.tlb"
+//
+
+unit$_ = Unit;
+true$_ = True;
+
+bool_false$0 = Bool;
+bool_true$1 = Bool;
+
+bool_false$0 = BoolFalse;
+bool_true$1 = BoolTrue;
+
+nothing$0 {X:Type} = Maybe X;
+just$1 {X:Type} value:X = Maybe X;
+
+left$0 {X:Type} {Y:Type} value:X = Either X Y;
+right$1 {X:Type} {Y:Type} value:Y = Either X Y;
+
+pair$_ {X:Type} {Y:Type} first:X second:Y = Both X Y;
+
+bit$_ (## 1) = Bit;
+
+// ---------- addresses -----------
+addr_none$00 = MsgAddressExt;
+addr_extern$01 len:(## 9) external_address:(bits len)
+    = MsgAddressExt;
+
+anycast_info$_ depth:(#<= 30) { depth >= 1 }
+    rewrite_pfx:(bits depth) = Anycast;
+
+addr_std$10 anycast:(Maybe Anycast)
+    workchain_id:int8 address:bits256 = MsgAddressInt;
+addr_var$11 anycast:(Maybe Anycast) addr_len:(## 9)
+    workchain_id:int32 address:(bits addr_len) = MsgAddressInt;
+
+_ _:MsgAddressInt = MsgAddress;
+_ _:MsgAddressExt = MsgAddress;
+
+addr_none$00 = MsgAddressNone;
+addr_std$10 anycast:(## 1) {anycast = 0}
+    workchain_id:int8 address:bits256 = MsgAddressSmpl;
+
+// --------------------------------
+
+// ---------- var u/int -----------
+var_uint$_ {n:#} len:(#< n) value:(uint (len * 8))
+    = VarUInteger n;
+var_int$_ {n:#} len:(#< n) value:(int (len * 8))
+    = VarInteger n;
+// --------------------------------
+
+// ---------- currencies ----------
+nanotons$_ amount:(VarUInteger 16) = TONs;
+
+extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32))
+    = ExtraCurrencyCollection;
+
+currencies$_ tons:TONs other:ExtraCurrencyCollection
+    = CurrencyCollection;
+// --------------------------------
+
+// ----------- msg info -----------
+int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+  src:MsgAddressInt dest:MsgAddressInt
+  value:CurrencyCollection ihr_fee:TONs fwd_fee:TONs
+  created_lt:uint64 created_at:uint32 = CommonMsgInfo;
+ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt
+  import_fee:TONs = CommonMsgInfo;
+ext_out_msg_info$11 src:MsgAddressInt dest:MsgAddressExt
+  created_lt:uint64 created_at:uint32 = CommonMsgInfo;
+
+int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+  src:MsgAddress dest:MsgAddressInt
+  value:CurrencyCollection ihr_fee:TONs fwd_fee:TONs
+  created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+ext_out_msg_info$11 src:MsgAddress dest:MsgAddressExt
+  created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+// --------------------------------
+
+// ----------- TickTock -----------
+tick_tock$_ tick:Bool tock:Bool = TickTock;
+// --------------------------------
+
+// --------------------------------
+_ split_depth:(Maybe (## 5)) special:(Maybe TickTock)
+  code:(Maybe ^Cell) data:(Maybe ^Cell)
+  library:(HashmapE 256 SimpleLib) = StateInit;
+
+simple_lib$_ public:Bool root:^Cell = SimpleLib;
+
+message$_ {X:Type} info:CommonMsgInfo
+  init:(Maybe (Either StateInit ^StateInit))
+  body:(Either X ^X) = Message X;
+
+message$_ {X:Type} info:CommonMsgInfoRelaxed
+  init:(Maybe (Either StateInit ^StateInit))
+  body:(Either X ^X) = MessageRelaxed X;
+
+_ (Message Any) = MessageAny;
+// --------------------------------
+
+// --------------------------------
+interm_addr_regular$0 use_dest_bits:(#<= 96)
+  = IntermediateAddress;
+interm_addr_simple$10 workchain_id:int8 addr_pfx:uint64
+  = IntermediateAddress;
+interm_addr_ext$11 workchain_id:int32 addr_pfx:uint64
+  = IntermediateAddress;
+msg_envelope#4 cur_addr:IntermediateAddress
+  next_addr:IntermediateAddress fwd_fee_remaining:TONs
+  msg:^(Message Any) = MsgEnvelope;
+// --------------------------------
+
+// --------------------------------
+msg_import_ext$000 msg:^(Message Any) transaction:^Transaction
+              = InMsg;
+msg_import_ihr$010 msg:^(Message Any) transaction:^Transaction
+    ihr_fee:TONs proof_created:^Cell = InMsg;
+msg_import_imm$011 in_msg:^MsgEnvelope
+    transaction:^Transaction fwd_fee:TONs = InMsg;
+msg_import_fin$100 in_msg:^MsgEnvelope
+    transaction:^Transaction fwd_fee:TONs = InMsg;
+msg_import_tr$101  in_msg:^MsgEnvelope out_msg:^MsgEnvelope
+    transit_fee:TONs = InMsg;
+msg_discard_fin$110 in_msg:^MsgEnvelope transaction_id:uint64
+    fwd_fee:TONs = InMsg;
+msg_discard_tr$111 in_msg:^MsgEnvelope transaction_id:uint64
+    fwd_fee:TONs proof_delivered:^Cell = InMsg;
+// --------------------------------
+
+// --------------------------------
+import_fees$_ fees_collected:TONs
+  value_imported:CurrencyCollection = ImportFees;
+
+_ (HashmapAugE 256 InMsg ImportFees) = InMsgDescr;
+
+msg_export_ext$000 msg:^(Message Any)
+    transaction:^Transaction = OutMsg;
+msg_export_imm$010 out_msg:^MsgEnvelope
+    transaction:^Transaction reimport:^InMsg = OutMsg;
+msg_export_new$001 out_msg:^MsgEnvelope
+    transaction:^Transaction = OutMsg;
+msg_export_tr$011  out_msg:^MsgEnvelope
+    imported:^InMsg = OutMsg;
+msg_export_deq$1100 out_msg:^MsgEnvelope
+    import_block_lt:uint63 = OutMsg;
+msg_export_deq_short$1101 msg_env_hash:bits256
+    next_workchain:int32 next_addr_pfx:uint64
+    import_block_lt:uint64 = OutMsg;
+msg_export_tr_req$111 out_msg:^MsgEnvelope
+    imported:^InMsg = OutMsg;
+msg_export_deq_imm$100 out_msg:^MsgEnvelope
+    reimport:^InMsg = OutMsg;
+
+_ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;
+
+_ (HashmapAugE 256 OutMsg CurrencyCollection) = OutMsgDescr;
+
+_ (HashmapAugE 352 EnqueuedMsg uint64) = OutMsgQueue;
+// --------------------------------
