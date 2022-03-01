@@ -19,3 +19,9 @@ annotation class TlbNumber(
 annotation class TlbBits(
     val lengthField: String,
 )
+
+@InheritableSerialInfo
+@Target(AnnotationTarget.CLASS)
+annotation class TlbScheme(
+    val scheme: String,
+)

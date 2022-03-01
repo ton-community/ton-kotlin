@@ -16,8 +16,9 @@ sealed class Tlb(
     companion object Default : Tlb(EmptySerializersModule)
 
     fun <T> decodeFromBitString(serializationStrategy: DeserializationStrategy<T>, bitString: BitString): T {
-        val decoder = TlbDecoder(this, BitStringReader(bitString), serializationStrategy)
-        return decoder.decodeSerializableValue(serializationStrategy)
+
+
+        TODO()
     }
 
     inline fun <reified T> decodeFromBitString(value: BitString): T =
