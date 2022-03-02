@@ -49,4 +49,22 @@ class BitStringTest {
         bitString.writeBit(false)
         assertEquals("2D9_", bitString.toString())
     }
+
+    @Test
+    fun testInt() {
+        val bitString = BitString(64)
+        bitString.writeUInt(6u, 5)
+        bitString.writeUInt(3u, 4)
+        bitString.writeUInt(91111u, 32)
+
+        val reader = BitStringReader(bitString)
+        val actualBitString = BitString(64).apply {
+            writeUInt(reader.readUInt(5), 5)
+            writeUInt(reader.readUInt(4), 4)
+            writeUInt(reader.readUInt(32), 32)
+        }
+
+        assertEquals(bitString, actualBitString)
+    }
 }
+

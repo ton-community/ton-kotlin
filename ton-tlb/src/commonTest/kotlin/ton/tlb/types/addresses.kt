@@ -3,7 +3,6 @@ package ton.tlb.types
 import kotlinx.serialization.Serializable
 import ton.bitstring.BitString
 
-@Serializable
 sealed interface MsgAddressExt
 
 @Serializable
@@ -15,7 +14,6 @@ data class AddrExtern(
     val external_address: BitString,
 ) : MsgAddressExt
 
-@Serializable
 sealed interface Anycast
 
 @Serializable

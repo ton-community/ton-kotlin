@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalUnsignedTypes::class, ExperimentalSerializationApi::class)
+
 package ton.bitstring
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -11,11 +14,11 @@ class BitStringSerializer : KSerializer<BitString> {
     override val descriptor: SerialDescriptor = SerialDescriptor("BitString", byteArraySerializer.descriptor)
 
     override fun serialize(encoder: Encoder, value: BitString) {
-        encoder.encodeSerializableValue(byteArraySerializer, value.array)
+        encoder.encodeSerializableValue(byteArraySerializer, value.array.toByteArray())
     }
 
     override fun deserialize(decoder: Decoder): BitString {
-        val array = decoder.decodeSerializableValue(byteArraySerializer)
+        val array = decoder.decodeSerializableValue(byteArraySerializer).toUByteArray()
         return BitString(array.size * 8).also {
             array.copyInto(it.array)
         }

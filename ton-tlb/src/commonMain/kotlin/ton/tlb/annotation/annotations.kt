@@ -1,4 +1,4 @@
-package ton.tlb
+package ton.tlb.annotation
 
 import kotlinx.serialization.InheritableSerialInfo
 
