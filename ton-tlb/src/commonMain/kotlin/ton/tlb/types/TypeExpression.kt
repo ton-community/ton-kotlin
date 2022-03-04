@@ -4,7 +4,7 @@ import ton.bitstring.BitString
 import ton.tlb.Cell
 import ton.tlb.TlbDecoder
 
-interface TypeExpression<T> {
+sealed interface TypeExpression<T> {
     fun decode(decoder: TlbDecoder): T
 }
 
@@ -18,26 +18,27 @@ data class IntConstantType(
 
 fun TypeExpression<*>.constant(value: Int) = IntConstantType(value)
 
-operator fun TypeExpression<Int>.times(other: TypeExpression<Int>) = object : TypeExpression<Int> {
-    override fun decode(decoder: TlbDecoder): Int =
-        this@times.decode(decoder) * other.decode(decoder)
-
-    override fun toString(): String = "(${this@times} * $other)"
+data class TimesTypeExpression(
+    val left: TypeExpression<Int>,
+    val right: TypeExpression<Int>,
+) : TypeExpression<Int> {
+    override fun decode(decoder: TlbDecoder): Int = left.decode(decoder) * right.decode(decoder)
 }
 
-operator fun TypeExpression<Int>.times(other: Int) = object : TypeExpression<Int> {
-    override fun decode(decoder: TlbDecoder): Int =
-        this@times.decode(decoder) * other
+operator fun TypeExpression<Int>.times(other: TypeExpression<Int>) = TimesTypeExpression(this, other)
+operator fun TypeExpression<Int>.times(other: Int) = TimesTypeExpression(this, IntConstantType(other))
+operator fun Int.times(other: TypeExpression<Int>) = TimesTypeExpression(IntConstantType(this), other)
 
-    override fun toString(): String = "(${this@times} * $other)"
+data class PlusTypeExpression(
+    val left: TypeExpression<Int>,
+    val right: TypeExpression<Int>,
+) : TypeExpression<Int> {
+    override fun decode(decoder: TlbDecoder): Int = left.decode(decoder) + right.decode(decoder)
 }
 
-operator fun Int.times(other: TypeExpression<Int>) = object : TypeExpression<Int> {
-    override fun decode(decoder: TlbDecoder): Int =
-        this@times * other.decode(decoder)
-
-    override fun toString(): String = "(${this@times} * $other)"
-}
+operator fun TypeExpression<Int>.plus(other: TypeExpression<Int>) = PlusTypeExpression(this, other)
+operator fun TypeExpression<Int>.plus(other: Int) = PlusTypeExpression(this, IntConstantType(other))
+operator fun Int.plus(other: TypeExpression<Int>) = PlusTypeExpression(IntConstantType(this), other)
 
 data class UintType(
     val bitsCount: TypeExpression<Int>,

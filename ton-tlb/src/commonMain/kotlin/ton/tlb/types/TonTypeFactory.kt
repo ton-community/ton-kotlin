@@ -330,17 +330,21 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         }
         constructor("tr_phase_compute_vm$1") {
             field("success", Bool())
+            field("msg_state_used", Bool())
+            field("account_activated", Bool())
             field("gas_fees", Grams())
             unnamedField(cellReference {
-                field("gas_used", VarUInteger(constant(7)))
-                field("gas_limit", VarUInteger(constant(7)))
-                field("gas_credit", Maybe(VarUInteger(constant(3))))
-                field("mode", int8())
-                field("exit_code", int32())
-                field("exit_arg", Maybe(int32()))
-                field("vm_steps", uint32())
-                field("vm_init_state_hash", bits256())
-                field("vm_final_state_hash", bits256())
+                anonymousConstructor {
+                    field("gas_used", VarUInteger(constant(7)))
+                    field("gas_limit", VarUInteger(constant(7)))
+                    field("gas_credit", Maybe(VarUInteger(constant(3))))
+                    field("mode", int8())
+                    field("exit_code", int32())
+                    field("exit_arg", Maybe(int32()))
+                    field("vm_steps", uint32())
+                    field("vm_init_state_hash", bits256())
+                    field("vm_final_state_hash", bits256())
+                }
             })
         }
     }

@@ -2,7 +2,7 @@ package ton.tlb.types
 
 import ton.tlb.TlbDecoder
 
-interface TypeField<T> : TypeExpression<T> {
+sealed interface TypeField<T> : TypeExpression<T> {
     val type: TypeExpression<T>
     var value: T?
     override fun decode(decoder: TlbDecoder): T = value ?: run {

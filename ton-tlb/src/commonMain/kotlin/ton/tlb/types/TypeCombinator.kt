@@ -24,10 +24,9 @@ data class TypeCombinator(
             } else break
         }
         checkNotNull(matchedTypeConstructor) { "Constructor not found for ${constructorPrefix.toString(true)}" }
-//        println("Matched constructor: ${matchedTypeConstructor.name}")
+        println("Matched constructor: ${matchedTypeConstructor.name}")
 //            println("reader: ${decoder.reader}")
-        val contextDecoder = TlbDecoder(decoder.cell, decoder, decoder.reader)
-        val result = matchedTypeConstructor.decode(contextDecoder)
+        val result = matchedTypeConstructor.decode(decoder)
         println("End decoding combinator: $name")
         return result.ifEmpty {
             matchedTypeConstructor.name
