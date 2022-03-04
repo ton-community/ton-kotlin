@@ -1,34 +1,9 @@
 package ton.tlb
 
 import ton.bitstring.BitString
-import ton.tlb.types.AddrExtern
-import ton.tlb.types.AddrNone
-import ton.tlb.types.MsgAddressExt
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class Deserialization {
-
-    @Test
-    fun test() {
-        val addrNone: MsgAddressExt = Tlb.decodeFromBitString(BitString(false, false))
-        assertEquals(AddrNone, addrNone)
-        val addrExtern: MsgAddressExt = Tlb.decodeFromBitString(BitString(1024).apply {
-            writeBit(false)
-            writeBit(true)
-            writeInt(12, 9)
-            writeBitString(BitString(12).also { bs ->
-                repeat(12) {
-                    bs.writeBit()
-                }
-            })
-        })
-        assertEquals(AddrExtern(12, BitString(12).also { bs ->
-            repeat(12) {
-                bs.writeBit()
-            }
-        }), addrExtern)
-    }
 
     @Test
     fun testDecode() {
@@ -66,7 +41,6 @@ class Deserialization {
         val decoder = TlbDecoder(cell)
         val result = decoder.decodeToJson(decoder.Transaction())
 
-        println("==================")
         println(result)
     }
 }
