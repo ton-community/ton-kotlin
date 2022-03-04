@@ -16,7 +16,7 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
     // anycast_info$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;
     fun Anycast() = TypeCombinator("Anycast") {
         constructor("anycast_info") {
-            val depth = field("depth", lessThanInt(30))
+            val depth = field("depth", lessThanOrEqualsInt(30))
             field("rewrite_pfx", bits(depth))
         }
     }

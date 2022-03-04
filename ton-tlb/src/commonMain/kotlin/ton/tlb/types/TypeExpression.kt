@@ -93,6 +93,23 @@ data class LessThanIntType(
 fun TypeExpression<*>.lessThanInt(value: Int) = LessThanIntType(constant(value))
 fun TypeExpression<*>.lessThanInt(value: TypeExpression<Int>) = LessThanIntType(value)
 
+
+data class LessThanOrEqualsIntType(
+    val value: TypeExpression<Int>,
+) : TypeExpression<Int> {
+    override fun decode(decoder: TlbDecoder): Int {
+        val int = value.decode(decoder)
+        val countLeadingZeroBits = int.countLeadingZeroBits()
+        val bits = UInt.SIZE_BITS - countLeadingZeroBits
+        return decoder.reader.readUInt(bits).toInt()
+    }
+
+    override fun toString(): String = "(#<= $value)"
+}
+
+fun TypeExpression<*>.lessThanOrEqualsInt(value: Int) = LessThanOrEqualsIntType(constant(value))
+fun TypeExpression<*>.lessThanOrEqualsInt(value: TypeExpression<Int>) = LessThanOrEqualsIntType(value)
+
 data class BitStringType(
     val bitsCount: TypeExpression<Int>,
 ) : TypeExpression<BitString> {
