@@ -24,17 +24,17 @@ class BitString constructor(
 
     operator fun get(index: Int): Boolean = (array[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
 
-    fun writeBit(value: Boolean = true) {
+    fun writeBit(value: Boolean = true) = apply {
         set(position++, value)
     }
 
-    fun writeBits(vararg values: Boolean) {
+    fun writeBits(vararg values: Boolean) = apply {
         values.forEach {
             writeBit(it)
         }
     }
 
-    fun writeInt(value: Int, bitLength: Int = Int.SIZE_BITS) {
+    fun writeInt(value: Int, bitLength: Int = Int.SIZE_BITS) = apply {
         if (bitLength == 1) {
             when (value) {
                 -1 -> writeBit(true)
@@ -52,9 +52,9 @@ class BitString constructor(
         }
     }
 
-    fun writeUInt(value: UInt, bitLength: Int = UInt.SIZE_BITS) {
+    fun writeUInt(value: UInt, bitLength: Int = UInt.SIZE_BITS) = apply {
         if (bitLength == 0) {
-            if (value == 0u) return
+            if (value == 0u) return this
         }
         for (i in bitLength - 1 downTo 0) {
             val mask = 1u shl i
@@ -63,7 +63,7 @@ class BitString constructor(
         }
     }
 
-    fun writeBitString(bitString: BitString) {
+    fun writeBitString(bitString: BitString) = apply {
         bitString.forEach {
             writeBit(it)
         }

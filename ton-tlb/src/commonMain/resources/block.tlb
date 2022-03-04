@@ -109,10 +109,10 @@ addr_var$11 anycast:(Maybe Anycast) addr_len:(## 9)
 _ _:MsgAddressInt = MsgAddress;
 _ _:MsgAddressExt = MsgAddress;
 //
-var_uint$_ {n:#} len:(#< n) value:(uint (len * 8))
-         = VarUInteger n;
+
 var_int$_ {n:#} len:(#< n) value:(int (len * 8))
         = VarInteger n;
+var_uint$_ {n:#} len:(#< n) value:(uint (len * 8)) = VarUInteger n;
 nanograms$_ amount:(VarUInteger 16) = Grams;
 //
 extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32))
