@@ -50,6 +50,7 @@ interface InbuiltTypeFactory {
         }
     }
 
+    // bit$_ (## 1) = Bit;
     fun Bit() = TypeCombinator("Bit") {
         constructor("bit") {
             field("_", uint(1))

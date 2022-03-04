@@ -53,6 +53,7 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         }
     }
 
+    // nanograms$_ amount:(VarUInteger 16) = Grams;
     fun Grams() = TypeCombinator("Grams") {
         constructor("nanograms") {
             field("amount", VarUInteger(constant(16)))
@@ -66,6 +67,7 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         }
     }
 
+    // currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
     fun CurrencyCollection() = TypeCombinator("CurrencyCollection") {
         constructor("currencies") {
             field("grams", Grams())
@@ -191,6 +193,7 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         }
     }
 
+    // update_hashes#72 {X:Type} old_hash:bits256 new_hash:bits256 = HASH_UPDATE X;
     fun HASH_UPDATE(x: TypeExpression<*>) = TypeCombinator("HASH_UPDATE") {
         constructor("update_hashes#72") {
             field("old_hash", bits256())
@@ -351,6 +354,13 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         constructor("cskip_no_gas$10")
     }
 
+    // tr_phase_action$_ success:Bool valid:Bool no_funds:Bool
+    //  status_change:AccStatusChange
+    //  total_fwd_fees:(Maybe Grams) total_action_fees:(Maybe Grams)
+    //  result_code:int32 result_arg:(Maybe int32) tot_actions:uint16
+    //  spec_actions:uint16 skipped_actions:uint16 msgs_created:uint16
+    //  action_list_hash:bits256 tot_msg_size:StorageUsedShort
+    //  = TrActionPhase;
     fun TrActionPhase() = TypeCombinator("TrActionPhase") {
         constructor("tr_phase_action") {
             field("success", Bool())
@@ -370,6 +380,11 @@ interface TonTypeFactory : InbuiltTypeFactory, HashmapTypeFactory {
         }
     }
 
+    // tr_phase_bounce_negfunds$00 = TrBouncePhase;
+    // tr_phase_bounce_nofunds$01 msg_size:StorageUsedShort
+    //   req_fwd_fees:Grams = TrBouncePhase;
+    // tr_phase_bounce_ok$1 msg_size:StorageUsedShort
+    //   msg_fees:Grams fwd_fees:Grams = TrBouncePhase;
     fun TrBouncePhase() = TypeCombinator("TrBouncePhase") {
         constructor("tr_phase_bounce_negfunds$00")
         constructor("tr_phase_bounce_nofunds$01") {
