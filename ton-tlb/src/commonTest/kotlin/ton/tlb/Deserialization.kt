@@ -1,6 +1,10 @@
 package ton.tlb
 
 import ton.bitstring.BitString
+import ton.tlb.types.NegatedTypeExpression
+import ton.tlb.types.TypeCombinator
+import ton.tlb.types.constructor
+import ton.tlb.types.field
 import kotlin.test.Test
 
 class Deserialization {
@@ -42,5 +46,21 @@ class Deserialization {
         val result = decoder.decodeToJson(decoder.Transaction())
 
         println(result)
+    }
+
+    @Test
+    fun testUnary() {
+        val cell = Cell(BitString(true, true, true, false))
+        val decoder = TlbDecoder(cell)
+        val result = decoder.decodeToJson(decoder.TestType())
+        println(result)
+    }
+
+    fun TlbDecoder.TestType() = TypeCombinator("TestType") {
+        constructor("testtype") {
+            val n = NegatedTypeExpression<Int>()
+            field("x", Unary(n))
+            field("y", n)
+        }
     }
 }

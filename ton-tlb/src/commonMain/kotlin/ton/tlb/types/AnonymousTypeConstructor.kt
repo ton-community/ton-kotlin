@@ -4,6 +4,7 @@ import ton.tlb.TlbDecoder
 
 class AnonymousTypeConstructor(
     override val fields: MutableList<TypeField<*>> = ArrayList(),
+    override val negated: MutableList<NegatedTypeExpression> = ArrayList(),
 ) : TypeConstructor {
     override fun decode(decoder: TlbDecoder): Map<TypeField<*>, Any?> =
         fields.asSequence().map { field ->

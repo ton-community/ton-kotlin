@@ -1,18 +1,12 @@
 package ton.bitstring
 
-data class BitStringReader(
-    val bitString: BitString,
-    var pos: Int = 0,
-) {
-    fun readBit(): Boolean {
-        return bitString[pos++]
-    }
+interface BitStringReader {
+    val bitString: BitString
+    var readPosition: Int
 
-    fun peekBit(offset: Int = 0): Boolean = bitString[pos + offset]
+    operator fun get(index: Int): Boolean
 
-    fun skip(bits: Int = 1) {
-        pos += bits
-    }
+    fun readBit(): Boolean = get(readPosition++)
 
     fun readInt(bits: Int = Int.SIZE_BITS): Int {
         val isNegative = readBit()
@@ -38,26 +32,18 @@ data class BitStringReader(
         return long
     }
 
-    fun readBitString(bits: Int): BitString {
-        val bs = BitString(bits)
+    fun readBitString(bits: Int): BitString = buildBitString {
         repeat(bits) {
-            val bit = readBit()
-            bs.writeBit(bit)
+            writeBit(readBit())
         }
-        return bs
-    }
-
-    override fun toString(): String = buildString {
-        append("[{")
-        append(bitString)
-        append(" ")
-        bitString.forEachIndexed { index, bit ->
-            if (index == pos) {
-                append(" HERE->|")
-            }
-            append(bit.toInt())
-        }
-        append("}]")
     }
 }
 
+data class BitStringReaderImpl(
+    override val bitString: BitString,
+    override var readPosition: Int = 0,
+) : BitStringReader {
+    override fun get(index: Int): Boolean = bitString[index]
+}
+
+fun BitStringReader(data: BitString): BitStringReader = BitStringReaderImpl(data)

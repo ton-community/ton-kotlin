@@ -1,7 +1,7 @@
 package ton.tlb.types
 
 import ton.bitstring.BitString
-import ton.tlb.Cell
+import ton.cell.Cell
 import ton.tlb.TlbDecoder
 
 sealed interface TypeExpression<T> {
@@ -16,7 +16,13 @@ data class IntConstantType(
     override fun toString(): String = value.toString()
 }
 
-fun TypeExpression<*>.constant(value: Int) = IntConstantType(value)
+data class NegatedTypeExpression(
+    var value: TypeExpression<Int>? = null,
+) : TypeExpression<Int> {
+    override fun decode(decoder: TlbDecoder): Int = requireNotNull(value?.decode(decoder))
+}
+
+fun TypeExpression<*>.constant(value: Int): TypeExpression<Int> = IntConstantType(value)
 
 data class TimesTypeExpression(
     val left: TypeExpression<Int>,
@@ -39,6 +45,18 @@ data class PlusTypeExpression(
 operator fun TypeExpression<Int>.plus(other: TypeExpression<Int>) = PlusTypeExpression(this, other)
 operator fun TypeExpression<Int>.plus(other: Int) = PlusTypeExpression(this, IntConstantType(other))
 operator fun Int.plus(other: TypeExpression<Int>) = PlusTypeExpression(IntConstantType(this), other)
+
+data class MinusTypeExpression(
+    val left: TypeExpression<Int>,
+    val right: TypeExpression<Int>,
+) : TypeExpression<Int> {
+    override fun decode(decoder: TlbDecoder): Int = left.decode(decoder) - right.decode(decoder)
+}
+
+operator fun TypeExpression<Int>.minus(other: TypeExpression<Int>) = MinusTypeExpression(this, other)
+operator fun TypeExpression<Int>.minus(other: Int) = MinusTypeExpression(this, IntConstantType(other))
+operator fun Int.minus(other: TypeExpression<Int>) = MinusTypeExpression(IntConstantType(this), other)
+
 
 data class UintType(
     val bitsCount: TypeExpression<Int>,
@@ -133,7 +151,7 @@ fun TypeExpression<*>.bits256() = bitString(256)
 
 object AnyType : TypeExpression<BitString> {
     override fun decode(decoder: TlbDecoder): BitString =
-        decoder.reader.readBitString(decoder.reader.bitString.bitSize - decoder.reader.pos)
+        decoder.reader.readBitString(decoder.reader.bitString.bitSize - decoder.reader.readPosition)
 
     override fun toString(): String = "Any"
 }
@@ -142,7 +160,7 @@ fun TypeExpression<*>.any() = AnyType
 
 
 object CellType : TypeExpression<Cell> {
-    override fun decode(decoder: TlbDecoder): Cell = decoder.cell
+    override fun decode(decoder: TlbDecoder): Cell = decoder.reader.readCell()
     override fun toString(): String = "Cell"
 }
 

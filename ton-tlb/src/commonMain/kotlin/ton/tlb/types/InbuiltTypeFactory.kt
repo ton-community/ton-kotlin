@@ -22,7 +22,6 @@ interface InbuiltTypeFactory {
     // nothing$0 {X:Type} = Maybe X;
     // just$1 {X:Type} value:X = Maybe X;
     fun Maybe(x: TypeExpression<*>) = TypeCombinator("Maybe") {
-        arguments.add(x)
         constructor("nothing$0")
         constructor("just$1") {
             field("value", x)
@@ -32,8 +31,6 @@ interface InbuiltTypeFactory {
     // left$0 {X:Type} {Y:Type} value:X = Either X Y;
     // right$1 {X:Type} {Y:Type} value:Y = Either X Y;
     fun Either(x: TypeExpression<*>, y: TypeExpression<*>) = TypeCombinator("Either") {
-        arguments.add(x)
-        arguments.add(y)
         constructor("left$0") {
             field("value", x)
         }

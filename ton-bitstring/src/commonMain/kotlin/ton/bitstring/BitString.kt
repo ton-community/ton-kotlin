@@ -4,15 +4,13 @@ package ton.bitstring
 
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
-import kotlin.math.pow
 
 @Serializable(with = BitStringSerializer::class)
-class BitString constructor(
+data class BitString constructor(
     val bitSize: Int,
     val array: UByteArray,
 ) : Iterable<Boolean> {
     private inline val Int.byteIndex get() = this / 8 or 0
-    private var position = 0
 
     operator fun set(index: Int, value: Boolean) {
         array[index.byteIndex] = if (value) {
@@ -23,51 +21,6 @@ class BitString constructor(
     }
 
     operator fun get(index: Int): Boolean = (array[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
-
-    fun writeBit(value: Boolean = true) = apply {
-        set(position++, value)
-    }
-
-    fun writeBits(vararg values: Boolean) = apply {
-        values.forEach {
-            writeBit(it)
-        }
-    }
-
-    fun writeInt(value: Int, bitLength: Int = Int.SIZE_BITS) = apply {
-        if (bitLength == 1) {
-            when (value) {
-                -1 -> writeBit(true)
-                0 -> writeBit(false)
-                else -> throw IllegalArgumentException("bitLength is too small for $value")
-            }
-        } else {
-            if (value < 0) {
-                writeBit(true)
-                writeUInt((2.0.pow(bitLength - 1) + value).toUInt(), bitLength - 1)
-            } else {
-                writeBit(false)
-                writeUInt(value.toUInt(), bitLength - 1)
-            }
-        }
-    }
-
-    fun writeUInt(value: UInt, bitLength: Int = UInt.SIZE_BITS) = apply {
-        if (bitLength == 0) {
-            if (value == 0u) return this
-        }
-        for (i in bitLength - 1 downTo 0) {
-            val mask = 1u shl i
-            val bit = (value and mask) != 0u
-            writeBit(bit)
-        }
-    }
-
-    fun writeBitString(bitString: BitString) = apply {
-        bitString.forEach {
-            writeBit(it)
-        }
-    }
 
     override fun toString(): String = toString(false)
     fun toString(debug: Boolean): String = buildString {
@@ -85,8 +38,8 @@ class BitString constructor(
     }
 
     private fun toString(sb: StringBuilder) {
-        if (position % 4 == 0) {
-            val slice = array.slice(0 until ceil(position / 8.0).toInt())
+        if (bitSize % 4 == 0) {
+            val slice = array.slice(0 until ceil(bitSize / 8.0).toInt())
             slice.forEach {
                 val hex = it.toString(16).uppercase()
                 if (hex.length < 2) {
@@ -94,26 +47,21 @@ class BitString constructor(
                 }
                 sb.append(hex)
             }
-            if (position % 8 != 0) {
+            if (bitSize % 8 != 0) {
                 sb.setLength(sb.length - 1)
             }
         } else {
-            val temp = copy()
-            temp.writeBit(true)
-            while (temp.position % 4 != 0) {
-                temp.writeBit(false)
+            val temp = buildBitString {
+                writeBitString(this@BitString)
+                writeBit(true)
+                while (writePosition % 4 != 0) {
+                    writeBit(false)
+                }
             }
             temp.toString(sb)
             sb.append('_')
         }
     }
-
-    fun copy() = BitString(bitSize).also { bitString ->
-        bitString.position = position
-        array.copyInto(bitString.array)
-    }
-
-    override fun iterator(): Iterator<Boolean> = BitStringIterator()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -133,6 +81,8 @@ class BitString constructor(
         return result
     }
 
+    override fun iterator(): Iterator<Boolean> = BitStringIterator()
+
     inner class BitStringIterator : BooleanIterator() {
         private var index = 0
         override fun hasNext(): Boolean = index < bitSize
@@ -140,14 +90,13 @@ class BitString constructor(
     }
 }
 
-
 fun BitString(bitSize: Int) = BitString(bitSize, UByteArray(ceil(bitSize / UByte.SIZE_BITS.toDouble()).toInt()))
-fun BitString(vararg bits: Boolean) = BitString(bits.size) {
+fun BitString(vararg bits: Boolean) = buildBitString {
     writeBits(*bits)
 }
 
 fun BitString(bitSize: Int, builder: BitString.() -> Unit) = BitString(bitSize).apply(builder)
-fun BitString(hex: String) = BitString(hex.length * 4) {
+fun BitString(hex: String) = buildBitString {
     hex.forEach {
         when (it) {
             '0' -> writeUInt(0u, 4)
@@ -169,6 +118,5 @@ fun BitString(hex: String) = BitString(hex.length * 4) {
         }
     }
 }
-
 
 fun Boolean.toInt() = if (this) 1 else 0

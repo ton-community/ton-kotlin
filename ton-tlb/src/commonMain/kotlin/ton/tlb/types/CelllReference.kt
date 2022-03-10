@@ -6,7 +6,7 @@ class CellReference<T>(
     val decoderContext: TlbDecoder.() -> TypeExpression<T>,
 ) : TypeExpression<T> {
     override fun decode(decoder: TlbDecoder): T {
-        val cell = decoder.cell.references[decoder.cellRefPointer++]
+        val cell = decoder.reader.readCell()
         val cellDecoder = TlbDecoder(cell, decoder)
         println("Start decoding cell: $cell")
         val result = decoderContext(cellDecoder).decode(cellDecoder)

@@ -5,15 +5,14 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import ton.bitstring.BitString
-import ton.bitstring.BitStringReader
+import ton.cell.CellReader
 import ton.tlb.types.InbuiltTypeFactory
 import ton.tlb.types.TonTypeFactory
 import ton.tlb.types.TypeCombinator
 
 data class TlbDecoder(
-    val cell: Cell,
+    val reader: CellReader,
     val parent: TlbDecoder? = null,
-    val reader: BitStringReader = BitStringReader(cell.data),
 ) : InbuiltTypeFactory, TonTypeFactory {
     var cellRefPointer = 0
 
