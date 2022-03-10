@@ -151,7 +151,7 @@ fun TypeExpression<*>.bits256() = bitString(256)
 
 object AnyType : TypeExpression<BitString> {
     override fun decode(decoder: TlbDecoder): BitString =
-        decoder.reader.readBitString(decoder.reader.bitString.bitSize - decoder.reader.readPosition)
+        decoder.reader.readBitString(decoder.reader.bitString.size - decoder.reader.readPosition)
 
     override fun toString(): String = "Any"
 }

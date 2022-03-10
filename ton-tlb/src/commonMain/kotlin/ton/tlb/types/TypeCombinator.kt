@@ -17,7 +17,7 @@ data class TypeCombinator(
 //            println("reader: ${decoder.reader}")
         var constructorPrefix = BitString(0)
         var matchedTypeConstructor: (() -> TypeNamedConstructor)? = null
-        while (constructorPrefix.bitSize <= UInt.SIZE_BITS) {
+        while (constructorPrefix.size <= UInt.SIZE_BITS) {
             matchedTypeConstructor = constructors[constructorPrefix]
 //            println("Try to match prefix: ${constructorPrefix.toString(true)} result: $matchedTypeConstructor")
             if (matchedTypeConstructor == null) {

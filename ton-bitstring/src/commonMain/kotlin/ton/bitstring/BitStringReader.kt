@@ -39,11 +39,14 @@ interface BitStringReader {
     }
 }
 
-data class BitStringReaderImpl(
+private data class BitStringReaderImpl(
     override val bitString: BitString,
     override var readPosition: Int = 0,
 ) : BitStringReader {
     override fun get(index: Int): Boolean = bitString[index]
+
+    override fun toString() = "BitStringReader(bitString=$bitString, readPosition=$readPosition)"
 }
 
 fun BitStringReader(data: BitString): BitStringReader = BitStringReaderImpl(data)
+fun BitString.reader() = BitStringReader(this)

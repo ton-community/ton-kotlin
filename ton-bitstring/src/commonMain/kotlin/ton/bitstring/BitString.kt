@@ -7,20 +7,20 @@ import kotlin.math.ceil
 
 @Serializable(with = BitStringSerializer::class)
 data class BitString constructor(
-    val bitSize: Int,
-    val array: UByteArray,
+    val size: Int,
+    val bits: UByteArray,
 ) : Iterable<Boolean> {
     private inline val Int.byteIndex get() = this / 8 or 0
 
     operator fun set(index: Int, value: Boolean) {
-        array[index.byteIndex] = if (value) {
-            array[index.byteIndex] or (1 shl 7 - index % 8).toUByte()
+        bits[index.byteIndex] = if (value) {
+            bits[index.byteIndex] or (1 shl 7 - index % 8).toUByte()
         } else {
-            array[index.byteIndex] and (1 shl 7 - index % 8).inv().toUByte()
+            bits[index.byteIndex] and (1 shl 7 - index % 8).inv().toUByte()
         }
     }
 
-    operator fun get(index: Int): Boolean = (array[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
+    operator fun get(index: Int): Boolean = (bits[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
 
     override fun toString(): String = toString(false)
     fun toString(debug: Boolean): String = buildString {
@@ -38,8 +38,8 @@ data class BitString constructor(
     }
 
     private fun toString(sb: StringBuilder) {
-        if (bitSize % 4 == 0) {
-            val slice = array.slice(0 until ceil(bitSize / 8.0).toInt())
+        if (size % 4 == 0) {
+            val slice = bits.slice(0 until ceil(size / 8.0).toInt())
             slice.forEach {
                 val hex = it.toString(16).uppercase()
                 if (hex.length < 2) {
@@ -47,7 +47,7 @@ data class BitString constructor(
                 }
                 sb.append(hex)
             }
-            if (bitSize % 8 != 0) {
+            if (size % 8 != 0) {
                 sb.setLength(sb.length - 1)
             }
         } else {
@@ -69,15 +69,15 @@ data class BitString constructor(
 
         other as BitString
 
-        if (bitSize != other.bitSize) return false
-        if (!array.contentEquals(other.array)) return false
+        if (size != other.size) return false
+        if (!bits.contentEquals(other.bits)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = bitSize
-        result = 31 * result + array.contentHashCode()
+        var result = size
+        result = 31 * result + bits.contentHashCode()
         return result
     }
 
@@ -85,7 +85,7 @@ data class BitString constructor(
 
     inner class BitStringIterator : BooleanIterator() {
         private var index = 0
-        override fun hasNext(): Boolean = index < bitSize
+        override fun hasNext(): Boolean = index < size
         override fun nextBoolean(): Boolean = get(index++)
     }
 }

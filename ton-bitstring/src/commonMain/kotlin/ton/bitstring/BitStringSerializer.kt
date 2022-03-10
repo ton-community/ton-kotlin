@@ -14,13 +14,13 @@ class BitStringSerializer : KSerializer<BitString> {
     override val descriptor: SerialDescriptor = SerialDescriptor("BitString", byteArraySerializer.descriptor)
 
     override fun serialize(encoder: Encoder, value: BitString) {
-        encoder.encodeSerializableValue(byteArraySerializer, value.array.toByteArray())
+        encoder.encodeSerializableValue(byteArraySerializer, value.bits.toByteArray())
     }
 
     override fun deserialize(decoder: Decoder): BitString {
         val array = decoder.decodeSerializableValue(byteArraySerializer).toUByteArray()
         return BitString(array.size * 8).also {
-            array.copyInto(it.array)
+            array.copyInto(it.bits)
         }
     }
 }
