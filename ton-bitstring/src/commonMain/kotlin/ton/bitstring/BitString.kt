@@ -4,12 +4,13 @@ package ton.bitstring
 
 import kotlinx.serialization.Serializable
 import kotlin.math.ceil
+import kotlin.math.min
 
 @Serializable(with = BitStringSerializer::class)
 data class BitString constructor(
     val size: Int,
     val bits: UByteArray,
-) : Iterable<Boolean> {
+) : Iterable<Boolean>, Comparable<BitString> {
     private inline val Int.byteIndex get() = this / 8 or 0
 
     operator fun set(index: Int, value: Boolean) {
@@ -21,6 +22,16 @@ data class BitString constructor(
     }
 
     operator fun get(index: Int): Boolean = (bits[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
+
+    operator fun plus(other: BitString): BitString = buildBitString {
+        writeBitString(this@BitString)
+        writeBitString(other)
+    }
+
+    operator fun plus(bit: Boolean) = buildBitString {
+        writeBitString(this@BitString)
+        writeBit(bit)
+    }
 
     override fun toString(): String = toString(false)
     fun toString(debug: Boolean): String = buildString {
@@ -61,6 +72,23 @@ data class BitString constructor(
             temp.toString(sb)
             sb.append('_')
         }
+    }
+
+    override fun compareTo(other: BitString): Int {
+        val limit = min(size, other.size)
+        repeat(limit) {
+            val thisValue = this[it]
+            val otherValue = other[it]
+            if (thisValue != otherValue) {
+                if (thisValue) {
+                    return 1
+                }
+                if (otherValue) {
+                    return -1
+                }
+            }
+        }
+        return size-other.size
     }
 
     override fun equals(other: Any?): Boolean {
