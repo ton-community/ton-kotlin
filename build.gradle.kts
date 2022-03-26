@@ -26,12 +26,12 @@ allprojects {
                 useJUnitPlatform()
             }
         }
-        linuxX64()
-        macosX64()
-        js() {
-            useCommonJs()
-            browser()
-        }
+//        linuxX64()
+//        macosX64()
+//        js {
+//            useCommonJs()
+//            browser()
+//        }
         sourceSets {
             val commonMain by getting {
                 dependencies {

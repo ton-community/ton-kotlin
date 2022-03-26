@@ -1,15 +1,28 @@
 package ton.tlb
 
-import ton.bitstring.BitString
+import kotlinx.serialization.encoding.Decoder
+import ton.cell.buildCell
+import ton.cell.slice
 import kotlin.test.Test
 
-class TestNew : InbuiltTypes {
+class TestNew {
 
     @Test
     fun test() {
-        println(unary())
+        val cs = buildCell {
+            writeBit(false)  // hml_short$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;
+            writeBits(true, true, true, true, true, true, true, true, false) // Unary 8
+            writeUInt(0xfa.toUInt(), 8)
+        }.slice()
 
-        val a = BitPrefix(BitString(false), BitString(true, false), BitString(true, true))
-        println(a)
+        val cs2 = buildCell {
+            writeBits(true, true, true, false) // Unary 3
+        }.slice()
+
+
+        val result = cs.hmLabel({
+            println(it)
+        }, value(0))
+        println(result)
     }
 }
