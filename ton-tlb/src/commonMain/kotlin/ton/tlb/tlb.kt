@@ -84,7 +84,19 @@ fun CellReader.bits(typeExpression: TypeExpression) = object : TypeExpressionImp
 }
 
 fun CellReader.leq(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value: Any get() = readUInt(typeExpression.toInt()).toInt()
+    override val value: Any get() {
+        val countLeadingZeroBits = typeExpression.toInt().countLeadingZeroBits()
+        val bits = UInt.SIZE_BITS - countLeadingZeroBits
+        return readUInt(bits).toInt()
+    }
+}
+
+fun CellReader.les(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
+    override val value: Any get() {
+        val countLeadingZeroBits = (typeExpression.toInt() - 1).countLeadingZeroBits()
+        val bits = UInt.SIZE_BITS - countLeadingZeroBits
+        return readUInt(bits).toInt()
+    }
 }
 
 fun CellReader.cellReference(typeExpression: CellReader.() -> TypeExpression) = object : TypeExpressionImpl() {
