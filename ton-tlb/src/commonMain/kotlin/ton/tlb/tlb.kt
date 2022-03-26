@@ -1,7 +1,6 @@
 package ton.tlb
 
 import ton.bitstring.toInt
-import ton.cell.Cell
 import ton.cell.CellReader
 import ton.cell.slice
 
@@ -67,8 +66,8 @@ operator fun TypeExpression.plus(other: TypeExpression) = object : TypeExpressio
     override val value: Int get() = this@plus.toInt() + other.toInt()
 }
 
-fun value(value: Any = 0) = object : TypeExpressionImpl() {
-    override val value: Any = value
+fun value(value: Int = 0) = object : TypeExpressionImpl() {
+    override val value = value
 }
 
 fun value(fields: List<Field>) = object : TypeExpressionImpl() {
@@ -76,27 +75,28 @@ fun value(fields: List<Field>) = object : TypeExpressionImpl() {
 }
 
 fun CellReader.bit() = object : TypeExpressionImpl() {
-    override val value: Any get() = readBit().toInt()
+    override val value by lazy { readBit().toInt() }
 }
 
 fun CellReader.bits(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value: Any get() = readBitString(typeExpression.toInt())
+    override val value by lazy { readBitString(typeExpression.toInt()) }
 }
 
 fun CellReader.leq(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value: Any get() {
+    override val value by lazy {
         val countLeadingZeroBits = typeExpression.toInt().countLeadingZeroBits()
         val bits = UInt.SIZE_BITS - countLeadingZeroBits
-        return readUInt(bits).toInt()
+        readUInt(bits).toInt()
     }
 }
 
 fun CellReader.les(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value: Any get() {
+    override val value by lazy {
         val countLeadingZeroBits = (typeExpression.toInt() - 1).countLeadingZeroBits()
         val bits = UInt.SIZE_BITS - countLeadingZeroBits
-        return readUInt(bits).toInt()
+        readUInt(bits).toInt()
     }
+
 }
 
 fun CellReader.cellReference(typeExpression: CellReader.() -> TypeExpression) = object : TypeExpressionImpl() {
@@ -105,8 +105,9 @@ fun CellReader.cellReference(typeExpression: CellReader.() -> TypeExpression) = 
     override val fields: MutableList<Field> get() = type.fields
 }
 
-fun CellReader.type(block: TypeExpression.() -> Unit = {}): TypeExpression = object : TypeExpressionImpl() {
-    init {
-        block(this)
+fun CellReader.type(name: String, block: TypeExpression.() -> Unit = {}): TypeExpression =
+    object : TypeExpressionImpl() {
+        init {
+            block(this)
+        }
     }
-}

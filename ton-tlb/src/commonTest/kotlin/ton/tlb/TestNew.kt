@@ -1,6 +1,5 @@
 package ton.tlb
 
-import kotlinx.serialization.encoding.Decoder
 import ton.cell.buildCell
 import ton.cell.slice
 import kotlin.test.Test
@@ -23,6 +22,7 @@ class TestNew {
         val result = cs.hmLabel({
             println(it)
         }, value(0))
+
         println(result)
     }
 }
