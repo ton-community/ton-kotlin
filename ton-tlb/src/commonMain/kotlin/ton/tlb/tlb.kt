@@ -1,11 +1,7 @@
 package ton.tlb
 
-import ton.bitstring.toInt
-import ton.cell.CellReader
-import ton.cell.slice
-
 data class Field(
-    val name: String,
+    override val name: String,
     val typeExpression: TypeExpression,
 ) : TypeExpression by typeExpression {
 
@@ -19,12 +15,13 @@ data class Field(
 }
 
 interface TypeExpression {
+    val name: String
     val value: Any
     val fields: MutableList<Field>
 
     operator fun contains(name: String) = fields.any { it.name == name }
     operator fun get(name: String) = fields.find { it.name == name }!!
-    operator fun set(name: String, typeExpression: TypeExpression) {
+    private fun set(name: String, typeExpression: TypeExpression) {
         if (contains(name)) {
             val oldField = get(name)
             val index = fields.indexOf(oldField)
@@ -35,79 +32,53 @@ interface TypeExpression {
     }
 
     operator fun set(name: String, typeExpression: () -> TypeExpression) {
-        val value = object : TypeExpressionImpl() {
+        val value = object : TypeExpressionImpl("") {
             val typeValue_ by lazy { typeExpression() }
+            override val name: String
+                get() = typeValue_.name
             override val value: Any
                 get() = typeValue_.value
             override val fields: MutableList<Field>
                 get() = typeValue_.fields
         }
         set(name, value)
-        value.typeValue_
+        value.value
     }
 
-    fun toInt(): Int = value as Int
+    fun toInt(): Int = when(val value = value) {
+        is Number -> value.toInt()
+        is ULong -> value.toInt()
+        is UInt -> value.toInt()
+        else -> throw IllegalArgumentException(value.toString())
+    }
+    fun toLong(): Long = when(val value = value) {
+            is Number -> value.toLong()
+            is ULong -> value.toLong()
+            is UInt -> value.toLong()
+            else -> throw IllegalArgumentException(value.toString())
+        }
 }
 
-abstract class TypeExpressionImpl : TypeExpression {
-    override val value: Any = 0
+abstract class TypeExpressionImpl(override val name: String) : TypeExpression {
+    override val value: Any = Any()
     override val fields: MutableList<Field> = ArrayList()
 
     override fun toString(): String {
         return if (fields.isNotEmpty()) {
-            fields.joinToString(prefix = "(", postfix = ")")
+            buildString {
+                append(name)
+                append(fields.joinToString(prefix = "{", postfix = "}"))
+            }
         } else {
-            value.toString()
+            if (value::class == Any::class) name
+            else value.toString()
         }
     }
 }
 
-operator fun TypeExpression.plus(other: TypeExpression) = object : TypeExpressionImpl() {
+operator fun TypeExpression.plus(other: TypeExpression) = object : TypeExpressionImpl("+") {
     override val value: Int get() = this@plus.toInt() + other.toInt()
 }
 
-fun value(value: Int = 0) = object : TypeExpressionImpl() {
-    override val value = value
-}
-
-fun value(fields: List<Field>) = object : TypeExpressionImpl() {
-    override val fields: MutableList<Field> = fields.toMutableList()
-}
-
-fun CellReader.bit() = object : TypeExpressionImpl() {
-    override val value by lazy { readBit().toInt() }
-}
-
-fun CellReader.bits(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value by lazy { readBitString(typeExpression.toInt()) }
-}
-
-fun CellReader.leq(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value by lazy {
-        val countLeadingZeroBits = typeExpression.toInt().countLeadingZeroBits()
-        val bits = UInt.SIZE_BITS - countLeadingZeroBits
-        readUInt(bits).toInt()
-    }
-}
-
-fun CellReader.les(typeExpression: TypeExpression) = object : TypeExpressionImpl() {
-    override val value by lazy {
-        val countLeadingZeroBits = (typeExpression.toInt() - 1).countLeadingZeroBits()
-        val bits = UInt.SIZE_BITS - countLeadingZeroBits
-        readUInt(bits).toInt()
-    }
-
-}
-
-fun CellReader.cellReference(typeExpression: CellReader.() -> TypeExpression) = object : TypeExpressionImpl() {
-    val type = typeExpression(readCell().slice())
-    override val value: Any get() = type.value
-    override val fields: MutableList<Field> get() = type.fields
-}
-
-fun CellReader.type(name: String, block: TypeExpression.() -> Unit = {}): TypeExpression =
-    object : TypeExpressionImpl() {
-        init {
-            block(this)
-        }
-    }
+class TypeExpressionIntConstant(override val value: Int = 0) : TypeExpressionImpl(value.toString())
+class TypeExpressionObjectConstant(name: String, override val fields: MutableList<Field>) : TypeExpressionImpl(name)

@@ -5,7 +5,6 @@ import ton.bitstring.BitStringReader
 import ton.bitstring.buildBitString
 
 interface CellSlice : CellReader {
-    val cell: Cell
     val indices: IntRange
 
     fun readSlice(): CellSlice
@@ -21,6 +20,8 @@ private class CellSliceImpl(
     override val cellReferences: Array<Cell> get() = cell.cellReferences
     override var cellReadPosition: Int = 0
     override var readPosition: Int = indices.first
+    override val remainingBits: Int
+        get() = indices.last - readPosition
 
     override fun get(index: Int): Boolean =
         if (index in indices) {

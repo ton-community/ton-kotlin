@@ -7,6 +7,7 @@ data class Cell(
     val cellReferences: Array<Cell>,
 ) {
     constructor(data: BitString, cellReferences: Iterable<Cell>) : this(data, cellReferences.toList().toTypedArray())
+    constructor(data: String, vararg cellReferences: Cell) : this(BitString(data), cellReferences.toList())
 
     fun get(index: Int): Boolean = bitString[index]
 

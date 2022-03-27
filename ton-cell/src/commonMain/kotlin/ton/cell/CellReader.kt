@@ -3,6 +3,7 @@ package ton.cell
 import ton.bitstring.BitStringReader
 
 interface CellReader : BitStringReader {
+    val cell: Cell
     val cellReferences: Array<Cell>
     var cellReadPosition: Int
 

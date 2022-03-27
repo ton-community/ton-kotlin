@@ -3,6 +3,7 @@ package ton.bitstring
 interface BitStringReader {
     val bitString: BitString
     var readPosition: Int
+    val remainingBits: Int
 
     operator fun get(index: Int): Boolean
 
@@ -43,6 +44,9 @@ private data class BitStringReaderImpl(
     override val bitString: BitString,
     override var readPosition: Int = 0,
 ) : BitStringReader {
+    override val remainingBits: Int
+        get() = bitString.size - readPosition
+
     override fun get(index: Int): Boolean = bitString[index]
 
     override fun toString() = "BitStringReader(bitString=$bitString, readPosition=$readPosition)"
