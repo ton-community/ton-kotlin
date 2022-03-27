@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("org.jetbrains.kotlinx.benchmark")
     `maven-publish`
 }
 
@@ -8,9 +9,9 @@ allprojects {
     group = "com.github.andreypfau"
     version = "1.0-SNAPSHOT"
 
-    apply(plugin="kotlin-multiplatform")
-    apply(plugin="kotlinx-serialization")
-    apply(plugin="maven-publish")
+    apply(plugin = "kotlin-multiplatform")
+    apply(plugin = "kotlinx-serialization")
+    apply(plugin = "maven-publish")
 
     repositories {
         mavenCentral()

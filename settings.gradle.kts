@@ -9,6 +9,7 @@ pluginManagement {
     plugins {
         kotlin("multiplatform") version "1.6.10"
         kotlin("plugin.serialization") version "1.6.0"
+        id("org.jetbrains.kotlinx.benchmark") version "0.4.2"
     }
 }
 
@@ -23,9 +24,11 @@ dependencyResolutionManagement {
     }
 }
 
+include(":curve25519")
 include(":ton-bitstring")
 include(":ton-cell")
 include(":ton-fift")
+include(":ton-adnl")
 include(":ton-tlb")
 include(":ton-types")
 include(":ton-common-biginteger")
