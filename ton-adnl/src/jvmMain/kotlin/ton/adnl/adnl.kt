@@ -2,8 +2,16 @@ package ton.adnl
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.*
-import java.security.SecureRandom
+import ton.crypto.Crypto
+import ton.crypto.hex
+
+suspend fun main() {
+    AdnlClient(
+        publicKey = hex("2615edec7d5d6538314132321a2615e1ff5550046e0f1165ff59150632d2301f"),
+        host = "65.21.74.140",
+        port = 46427,
+    ).connect()
+}
 
 class AdnlClient(
     val publicKey: ByteArray,
@@ -17,51 +25,16 @@ class AdnlClient(
             .tcp()
             .connect(host, port)
 
-        val localSecret = ByteArray(256)
-        SecureRandom.getInstanceStrong().nextBytes(localSecret)
+        val localSecret = hex("70580ff7063f80a0b2bd968de5f3465b94de6180c96d6b74502e64f39309ff5e")
+        val (privateKey, publicKey) = Crypto.generateKeyPair(localSecret)
+        println("private: ${hex(privateKey)}")
+        println("public: ${hex(publicKey)}")
 
-
+        val serverTimeQuery =
+            hex("7af98bb435263e6c95d6fecb497dfd0aa5f031e7d412986b5ce720496db512052e8f2d100cdf068c7904345aad16000000000000")
     }
 }
 
-/**
- * Public key can be provided using raw slice
- */
-@JvmInline
-value class AdnlPublicKey(val value: ByteArray = ByteArray(32)) {
-    suspend fun address(): AdnlAddress {
-        val digest = Digest("SHA-256")
-        digest += ED25519_MAGIC
-        digest += value
-        return AdnlAddress(digest.build())
-    }
 
-    companion object {
-        val ED25519_MAGIC = byteArrayOf(0xc6.toByte(), 0xb4.toByte(), 0x13, 0x48)
-    }
-}
 
-/**
- * Trait which must be implemented to perform key agreement inside [`AdnlHandshake`]
- */
-class AdnlPrivateKey {
-    /**
-     * Get public key corresponding to this private
-     */
-    fun public(): AdnlPublicKey {
-        TODO()
-    }
-}
-
-/**
- * Wrapper struct to hold ADNL address, which is a hash of public key
- */
-@JvmInline
-value class AdnlAddress(val bytes: ByteArray = ByteArray(32))
-
-/**
- * Wrapper struct to hold the secret, result of ECDH between peers
- */
-@JvmInline
-value class AdnlSecret(val bytes: ByteArray = ByteArray(32))
 

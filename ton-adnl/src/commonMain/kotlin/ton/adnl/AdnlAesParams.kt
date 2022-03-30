@@ -1,6 +1,6 @@
 package ton.adnl
 
-import java.security.SecureRandom
+import kotlin.random.Random
 
 /**
  * Session parameters for AES-CTR encryption of datagrams
@@ -14,7 +14,7 @@ data class AdnlAesParams(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as AdnlAesParams
 
@@ -37,13 +37,14 @@ data class AdnlAesParams(
     }
 
     companion object {
-        fun random() = AdnlAesParams().apply {
-            val secureRandom = SecureRandom.getInstanceStrong()
-            secureRandom.nextBytes(rxKey)
-            secureRandom.nextBytes(txKey)
-            secureRandom.nextBytes(rxNonce)
-            secureRandom.nextBytes(txNonce)
-            secureRandom.nextBytes(padding)
+        fun random(random: Random): AdnlAesParams {
+            val adnlAesParams = AdnlAesParams()
+            random.nextBytes(adnlAesParams.rxKey)
+            random.nextBytes(adnlAesParams.txKey)
+            random.nextBytes(adnlAesParams.rxNonce)
+            random.nextBytes(adnlAesParams.txNonce)
+            random.nextBytes(adnlAesParams.padding)
+            return adnlAesParams
         }
     }
 }

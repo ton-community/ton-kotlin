@@ -24,7 +24,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":curve25519")
+include(":ton-crypto")
 include(":ton-bitstring")
 include(":ton-cell")
 include(":ton-fift")
