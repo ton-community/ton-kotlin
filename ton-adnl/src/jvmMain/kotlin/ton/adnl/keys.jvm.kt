@@ -22,7 +22,9 @@ actual fun AdnlPublicKey(bytes: ByteArray): AdnlPublicKey = AdnlPublicKeyJvmImpl
 @JvmInline
 value class AdnlPrivateKeyJvmImpl(override val bytes: ByteArray) : AdnlPrivateKey {
 
-    override suspend fun public(): AdnlPublicKey = AdnlPublicKey(Crypto.generateKeyPair(bytes).publicKey)
+    override suspend fun public(): AdnlPublicKey = AdnlPublicKey(
+        Crypto.generateKeyPair(bytes).publicKey
+    )
 
     /**
      * Perform key agreement protocol (usually x25519) between our private key and their public
