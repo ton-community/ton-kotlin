@@ -1,6 +1,7 @@
 package ton.adnl
 
 import io.ktor.utils.io.core.*
+import ton.crypto.hex
 import ton.crypto.sha256
 
 /**
@@ -12,24 +13,32 @@ data class AdnlHandshake(
     val aesParams: AdnlAesParams,
     val sharedKey: AdnlSharedKey,
 ) {
-    suspend fun build() = buildPacket(256) {
+    suspend fun build() = buildPacket {
         writeFully(receiver.bytes)
         writeFully(sender.bytes)
 
         val rawAesParams = aesParams.build().readBytes()
         val hash = sha256(rawAesParams)
 
-        val key = ByteArray(32)
-        sharedKey.bytes.copyInto(key)
-        hash.copyInto(key, destinationOffset = 16, startIndex = 16, endIndex = 32)
-        val nonce = ByteArray(16)
-        hash.copyInto(nonce, endIndex = 4)
-        sharedKey.bytes.copyInto(nonce, destinationOffset = 4, startIndex = 20, endIndex = 32)
+        val key = ByteArray(32).apply {
+            sharedKey.bytes.copyInto(this)
+            hash.copyInto(this, destinationOffset = 16, startIndex = 16, endIndex = 32)
+        }
+        val nonce = ByteArray(16).apply {
+            hash.copyInto(this, endIndex = 4)
+            sharedKey.bytes.copyInto(this, destinationOffset = 4, startIndex = 20, endIndex = 32)
+        }
 
         val aes = AdnlAes(key, nonce)
         val encryptedAesParams = aes.encrypt(rawAesParams)
 
         writeFully(hash)
         writeFully(encryptedAesParams)
+
+        println("receiver=${hex(receiver.bytes)}")
+        println("sender=${hex(receiver.bytes)}")
+        println("hash=${hex(hash)}")
+        println("unencrypted=${hex(rawAesParams)}")
+        println("encrypted=${hex(rawAesParams)}")
     }
 }

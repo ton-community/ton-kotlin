@@ -28,13 +28,13 @@
  */
 package ton.common.biginteger
 
+import ton.common.biginteger.*
 import kotlin.experimental.and
 import kotlin.js.JsName
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 import kotlin.math.*
 import kotlin.random.Random
-import ton.common.biginteger.*
 
 /**
  * Immutable arbitrary-precision integers.  All operations behave as if
@@ -983,8 +983,8 @@ class BigInteger : Comparable<BigInteger> {
             carry = 0
             rstart = rmag.size - 2
             for (i in xlen - 1 downTo 0) {
-                val product = (value[i].toLong()and LONG_MASK) * dh +
-                        (rmag[rstart].toLong()and LONG_MASK) + carry
+                val product = (value[i].toLong() and LONG_MASK) * dh +
+                        (rmag[rstart].toLong() and LONG_MASK) + carry
                 rmag[rstart--] = product.toInt()
                 carry = product.ushr(32)
             }
@@ -1072,7 +1072,7 @@ class BigInteger : Comparable<BigInteger> {
         var borrow: Long
         borrow = 0L
         for (i in len - 1 downTo 0) {
-            x = _mag[i].toLong()and LONG_MASK
+            x = _mag[i].toLong() and LONG_MASK
             w = x - borrow
             if (borrow > x) {      // Did we make the number go negative?
                 borrow = 1L
@@ -1436,7 +1436,7 @@ class BigInteger : Comparable<BigInteger> {
             // Small number algorithm.  Everything fits into a long.
             val newSign = if (_signum < 0 && exponent and 1 == 1) -1 else 1
             var result: Long = 1
-            var baseToPow2 = partToSquare._mag[0].toLong()and LONG_MASK
+            var baseToPow2 = partToSquare._mag[0].toLong() and LONG_MASK
 
             var workingExponent = exponent
 
@@ -1815,11 +1815,11 @@ class BigInteger : Comparable<BigInteger> {
         val tblmask = 1 shl wbits
 
         // Allocate table for precomputed odd powers of base in Montgomery form
-        val table = (0 until tblmask).map { IntArray(modLen) } .toTypedArray()
+        val table = (0 until tblmask).map { IntArray(modLen) }.toTypedArray()
 
         // Compute the modular inverse of the least significant 64-bit
         // digit of the modulus
-        val n0 = (mod[modLen - 1].toLong()and LONG_MASK) + (mod[modLen - 2].toLong()and LONG_MASK shl 32)
+        val n0 = (mod[modLen - 1].toLong() and LONG_MASK) + (mod[modLen - 2].toLong() and LONG_MASK shl 32)
         val inv = -MutableBigInteger.inverseMod64(n0)
 
         // Convert base to Montgomery form
@@ -2496,7 +2496,7 @@ class BigInteger : Comparable<BigInteger> {
             val a = m1[i]
             val b = m2[i]
             if (a != b)
-                return if (a.toLong()and LONG_MASK < b.toLong()and LONG_MASK) -1 else 1
+                return if (a.toLong() and LONG_MASK < b.toLong() and LONG_MASK) -1 else 1
         }
         return 0
     }
@@ -2525,7 +2525,7 @@ class BigInteger : Comparable<BigInteger> {
             val a = m1[0]
             val b = `val`.toInt()
             return if (a != b) {
-                if (a.toLong()and LONG_MASK < b.toLong()and LONG_MASK) -1 else 1
+                if (a.toLong() and LONG_MASK < b.toLong() and LONG_MASK) -1 else 1
             } else 0
         } else {
             if (len < 2)
@@ -2533,12 +2533,12 @@ class BigInteger : Comparable<BigInteger> {
             var a = m1[0]
             var b = highWord
             if (a != b) {
-                return if (a.toLong()and LONG_MASK < b.toLong()and LONG_MASK) -1 else 1
+                return if (a.toLong() and LONG_MASK < b.toLong() and LONG_MASK) -1 else 1
             }
             a = m1[1]
             b = `val`.toInt()
             return if (a != b) {
-                if (a.toLong()and LONG_MASK < b.toLong()and LONG_MASK) -1 else 1
+                if (a.toLong() and LONG_MASK < b.toLong() and LONG_MASK) -1 else 1
             } else 0
         }
     }
@@ -2611,7 +2611,7 @@ class BigInteger : Comparable<BigInteger> {
         var hashCode = 0
 
         for (i in _mag.indices)
-            hashCode = 31 * hashCode + (_mag[i].toLong()and LONG_MASK).toInt()
+            hashCode = 31 * hashCode + (_mag[i].toLong() and LONG_MASK).toInt()
 
         return hashCode * _signum
     }
@@ -2792,11 +2792,12 @@ class BigInteger : Comparable<BigInteger> {
     @JsName("toLong")
             /*override*/ fun toLong(): Long {
         var result: Long = 0
-
-        for (i in 1 downTo 0)
-            result = (result shl 32) + (getInt(i).toLong() and LONG_MASK)
+        result = (result shl 32) + (getInt(1).toLong() and LONG_MASK)
+        result = (result shl 32) + (getInt(0).toLong() and LONG_MASK)
         return result
     }
+
+    fun toULong(): ULong = toLong().toULong()
 
     @JsName("toByte")
             /*override*/ fun toByte(): Byte {
@@ -3443,6 +3444,14 @@ class BigInteger : Comparable<BigInteger> {
             return BigInteger(`val`)
         }
 
+        fun of(value: ULong): BigInteger {
+            if (value == 0uL) return ZERO
+            val intValue = value.toInt()
+            if (intValue in 1..MAX_CONSTANT) return posConst[intValue] ?: throw IllegalStateException()
+            if (intValue.toLong() in MAX_CONSTANT..Long.MAX_VALUE) return BigInteger(value.toLong())
+            return of(value.toString())
+        }
+
         @JsName("of")
         @JvmStatic
         fun of(value: Int): BigInteger {
@@ -3526,7 +3535,7 @@ class BigInteger : Comparable<BigInteger> {
             powerCache = arrayOfNulls(CHAR_MAX_RADIX + 1)
             logCache = DoubleArray(CHAR_MAX_RADIX + 1)
 
-            for (i in CHAR_MIN_RADIX .. CHAR_MAX_RADIX) {
+            for (i in CHAR_MIN_RADIX..CHAR_MAX_RADIX) {
                 powerCache[i] = arrayOf(of(i.toLong()))
                 logCache[i] = ln(i.toDouble())
             }
@@ -3588,20 +3597,20 @@ class BigInteger : Comparable<BigInteger> {
             val highWord = `val`.ushr(32).toInt()
             if (highWord == 0) {
                 result = IntArray(xIndex)
-                sum = (x[--xIndex].toLong()and LONG_MASK) + `val`
+                sum = (x[--xIndex].toLong() and LONG_MASK) + `val`
                 result[xIndex] = sum.toInt()
             } else {
                 if (xIndex == 1) {
                     result = IntArray(2)
-                    sum = `val` + (x[0].toLong()and LONG_MASK)
+                    sum = `val` + (x[0].toLong() and LONG_MASK)
                     result[1] = sum.toInt()
                     result[0] = sum.ushr(32).toInt()
                     return result
                 } else {
                     result = IntArray(xIndex)
-                    sum = (x[--xIndex].toLong()and LONG_MASK) + (`val`.toLong()and LONG_MASK)
+                    sum = (x[--xIndex].toLong() and LONG_MASK) + (`val`.toLong() and LONG_MASK)
                     result[xIndex] = sum.toInt()
-                    sum = (x[--xIndex].toLong()and LONG_MASK) + (highWord.toLong()and LONG_MASK) + sum.ushr(32)
+                    sum = (x[--xIndex].toLong() and LONG_MASK) + (highWord.toLong() and LONG_MASK) + sum.ushr(32)
                     result[xIndex] = sum.toInt()
                 }
             }
@@ -3645,13 +3654,13 @@ class BigInteger : Comparable<BigInteger> {
             var sum: Long = 0
             if (yIndex == 1) {
                 xIndex--
-                sum = (x[xIndex].toLong()and LONG_MASK) + (y[0].toLong()and LONG_MASK)
+                sum = (x[xIndex].toLong() and LONG_MASK) + (y[0].toLong() and LONG_MASK)
                 result[xIndex] = sum.toInt()
             } else {
                 // Add common parts of both numbers
                 while (yIndex > 0) {
-                    sum = (x[--xIndex].toLong()and LONG_MASK) +
-                            (y[--yIndex].toLong()and LONG_MASK) + sum.ushr(32)
+                    sum = (x[--xIndex].toLong() and LONG_MASK) +
+                            (y[--yIndex].toLong() and LONG_MASK) + sum.ushr(32)
                     result[xIndex] = sum.toInt()
                 }
             }
@@ -3699,7 +3708,8 @@ class BigInteger : Comparable<BigInteger> {
                 } else { // little.length == 2
                     var difference = (`val`.toInt().toLong() and LONG_MASK) - (little[1].toLong() and LONG_MASK)
                     result[1] = difference.toInt()
-                    difference = (highWord.toLong() and LONG_MASK) - (little[0].toLong() and LONG_MASK) + (difference shr 32)
+                    difference =
+                        (highWord.toLong() and LONG_MASK) - (little[0].toLong() and LONG_MASK) + (difference shr 32)
                     result[0] = difference.toInt()
                     return result
                 }
@@ -3725,7 +3735,8 @@ class BigInteger : Comparable<BigInteger> {
             } else {
                 difference = (big[--bigIndex].toLong() and LONG_MASK) - (`val` and LONG_MASK)
                 result[bigIndex] = difference.toInt()
-                difference = (big[--bigIndex].toLong() and LONG_MASK) - (highWord.toLong() and LONG_MASK) + (difference shr 32)
+                difference =
+                    (big[--bigIndex].toLong() and LONG_MASK) - (highWord.toLong() and LONG_MASK) + (difference shr 32)
                 result[bigIndex] = difference.toInt()
             }
 

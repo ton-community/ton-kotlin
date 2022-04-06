@@ -118,6 +118,7 @@ data class BitString constructor(
     }
 }
 
+fun BitString(byteArray: ByteArray) = BitString(byteArray.size * Byte.SIZE_BITS, byteArray.toUByteArray())
 fun BitString(bitSize: Int) = BitString(bitSize, UByteArray(ceil(bitSize / UByte.SIZE_BITS.toDouble()).toInt()))
 fun BitString(vararg bits: Boolean) = buildBitString {
     writeBits(*bits)

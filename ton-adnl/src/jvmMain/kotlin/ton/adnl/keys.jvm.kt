@@ -23,7 +23,7 @@ actual fun AdnlPublicKey(bytes: ByteArray): AdnlPublicKey = AdnlPublicKeyJvmImpl
 value class AdnlPrivateKeyJvmImpl(override val bytes: ByteArray) : AdnlPrivateKey {
 
     override suspend fun public(): AdnlPublicKey = AdnlPublicKey(
-        Crypto.generateKeyPair(bytes).publicKey
+        Crypto.publicKey(bytes)
     )
 
     /**

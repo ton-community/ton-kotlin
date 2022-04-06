@@ -1,4 +1,5 @@
 plugins {
+    java
     id("org.jetbrains.kotlinx.benchmark")
 }
 
@@ -6,6 +7,14 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(projects.tonBitstring)
+                implementation(projects.tonCommonBiginteger)
+                api("com.github.andreypfau:curve25519-kotlin:1122884f40")
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation("org.bouncycastle:bcprov-jdk15on:1.70")
             }
         }
         commonTest {

@@ -19,7 +19,7 @@ internal open class Benchmark {
     fun setup() {
         seed = Random.nextBytes(32)
         random = Random.nextBytes(64)
-        keyPair = Crypto.generateKeyPair(seed)
+        keyPair = Crypto.publicKey(seed)
         msg = ByteArray(256)
         sig = Crypto.sign(keyPair.privateKey, msg, null)
     }
@@ -34,7 +34,7 @@ internal open class Benchmark {
     fun verify() = Crypto.verify(keyPair.publicKey, msg, sig)
 
     @Benchmark
-    fun generateKeyPair() = Crypto.generateKeyPair(seed)
+    fun generateKeyPair() = Crypto.publicKey(seed)
 
     @Benchmark
     fun sharedKey() = Crypto.sharedKey(keyPair.publicKey, keyPair.privateKey)

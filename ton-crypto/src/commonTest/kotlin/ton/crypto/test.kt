@@ -9,14 +9,14 @@ class Test {
 
     @Test
     fun generateKeys() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         assertEquals(keys.privateKey.size, 32)
         assertEquals(keys.publicKey.size, 32)
     }
 
     @Test
     fun signAndVerify() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig = Crypto.sign(keys.privateKey, msg, null)
 
@@ -30,7 +30,7 @@ class Test {
 
     @Test
     fun deterministicSignaturesIfNotRandomized() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig1 = Crypto.sign(keys.privateKey, msg, null)
         val sig2 = Crypto.sign(keys.privateKey, msg, null)
@@ -39,7 +39,7 @@ class Test {
 
     @Test
     fun differentSignaturesIfRandomized() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig0 = Crypto.sign(keys.privateKey, msg, null) // not randomized
         val sig1 = Crypto.sign(keys.privateKey, msg, Random.nextBytes(64))
@@ -53,7 +53,7 @@ class Test {
     @Test
     fun signRandomizedAndVerify() {
         val random = Random.nextBytes(64)
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig = Crypto.sign(keys.privateKey, msg, random)
 
@@ -63,7 +63,7 @@ class Test {
 
     @Test
     fun notVerifyBadSignature() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig = Crypto.sign(keys.privateKey, msg, null)
 
@@ -79,7 +79,7 @@ class Test {
 
     @Test
     fun notVerifyBadMessage() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         var msg = byteArrayOf(1, 2, 3, 4, 5)
         val sig = Crypto.sign(keys.privateKey, msg, null)
 
@@ -92,7 +92,7 @@ class Test {
 
     @Test
     fun signMessageAndOpenMessage() {
-        val keys = Crypto.generateKeyPair()
+        val keys = Crypto.publicKey()
         val msg = "the essential is invisible to the eyes"
         val signedMsg = Crypto.signMessage(keys.privateKey, msg.encodeToByteArray(), null)
 
@@ -105,8 +105,8 @@ class Test {
         val seed1 = Random.nextBytes(32)
         val seed2 = Random.nextBytes(32)
 
-        val k1 = Crypto.generateKeyPair(seed1)
-        val k2 = Crypto.generateKeyPair(seed2)
+        val k1 = Crypto.publicKey(seed1)
+        val k2 = Crypto.publicKey(seed2)
 
         val sk1 = Crypto.sharedKey(k2.privateKey, k1.publicKey)
         val sk2 = Crypto.sharedKey(k1.privateKey, k2.publicKey)

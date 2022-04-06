@@ -2,21 +2,36 @@ package ton.adnl
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
-import ton.crypto.Crypto
 import ton.crypto.hex
 import ton.crypto.sha256
 import kotlin.random.Random
 
 suspend fun main() {
-    AdnlClient(
-        serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a2615e1ff5550046e0f1165ff59150632d2301f")),
-        host = "65.21.74.140",
-        port = 46427,
-    ).connect()
+    test()
+}
+
+private suspend fun test() {
+//    val private = hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364")
+//    println("private: ${hex(private)}")
+//    val public3 = Crypto.convertPublicKey(Crypto.generateKeyPair(private).publicKey)
+//    println("public3 ${hex(public3)}")
+
+    val clientPrivateKey = AdnlPrivateKey(hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364"))
+    val clientPublicKey = clientPrivateKey.public()
+
+
+//    println("ECDH secret: ${hex(sharedKey.bytes)}")
+
+}
+
+private fun connectAndSend() {
+    //    AdnlClient(
+//        serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a++++++++***2615e1ff5550046e0f1165ff59150632d2301f")),
+//        host = "65.21.74.140",
+//        port = 46427,
+//    ).connect()
 }
 
 class AdnlClient(
@@ -29,21 +44,20 @@ class AdnlClient(
     lateinit var rxAes: AdnlAes
 
     suspend fun connect() {
-        val clientPrivateKey = AdnlPrivateKey(hex("70580ff7063f80a0b2bd968de5f3465b94de6180c96d6b74502e64f39309ff5e"))
+        val clientPrivateKey = AdnlPrivateKey(hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364"))
         val clientPublicKey = clientPrivateKey.public()
         val sharedKey = clientPrivateKey.sharedKey(serverPublicKey)
 
-
-        println("secret: ${hex(clientPrivateKey.bytes)}")
-        println("public: ${hex(clientPublicKey.bytes)}")
-        println("ed25519 public: ${hex(Crypto.convertEd25519(clientPublicKey.bytes))}")
+        println("local private: ${hex(clientPrivateKey.bytes)}")
+        println("local public: ${hex(clientPublicKey.bytes)}")
+        println("server public: ${hex(serverPublicKey.bytes)}")
+        println("ECDH secret: ${hex(sharedKey.bytes)}")
 
         connection = aSocket(SelectorManager())
             .tcp()
             .connect(host, port)
             .connection()
 
-        println("connected!")
 
         val aesParams = AdnlAesParams()
         val handshake =

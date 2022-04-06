@@ -6,46 +6,6 @@ import kotlin.math.floor
 import kotlin.random.Random
 
 object Crypto {
-    fun sharedKey(secretKey: ByteArray, publicKey: ByteArray): ByteArray {
-        val sharedKey = IntArray(32)
-        crypto_scalarmult(sharedKey, secretKey.toIntArray(), publicKey.toIntArray())
-        return sharedKey.toByteArray()
-    }
-
-    fun signMessage(secretKey: ByteArray, msg: ByteArray, nonce: ByteArray? = null): ByteArray {
-        return if (nonce != null) {
-            val buf = IntArray(128 + msg.size)
-            curve25519_sign(buf, msg.toIntArray(), msg.size, secretKey.toIntArray(), nonce.toIntArray())
-            buf.copyOfRange(0, 64 + msg.size)
-        } else {
-            val signedMsg = IntArray(64 + msg.size)
-            curve25519_sign(signedMsg, msg.toIntArray(), msg.size, secretKey.toIntArray(), null)
-            signedMsg
-        }.toByteArray()
-    }
-
-    fun openMessageStr(publicKey: ByteArray, signedMsg: ByteArray): String? {
-        val m = openMessage(publicKey, signedMsg) ?: return null
-        return buildString {
-            for (element in m) {
-                append(element.toInt().toChar())
-            }
-        }
-    }
-
-    fun openMessage(publicKey: ByteArray, signedMsg: ByteArray): ByteArray? {
-        val tmp = IntArray(signedMsg.size)
-        val mlen = curve25519_sign_open(tmp, signedMsg.toIntArray(), signedMsg.size, publicKey.toIntArray())
-        if (mlen < 0) {
-            return null
-        }
-        val m = IntArray(mlen)
-        for (i in m.indices) {
-            m[i] = tmp[i]
-        }
-        return m.toByteArray()
-    }
-
     fun sign(secretKey: ByteArray, msg: ByteArray, opt_random: ByteArray?): ByteArray {
         var len = 64
         if (opt_random != null) {
@@ -72,8 +32,9 @@ object Crypto {
         return curve25519_sign_open(m, sm, sm.size, publicKey.toIntArray()) >= 0
     }
 
-    fun generateKeyPair(random: Random = Random.Default) = generateKeyPair(random.nextBytes(32))
-    fun generateKeyPair(seed: ByteArray): KeyPair {
+    fun privateKey(random: Random = Random.Default) = random.nextBytes(32)
+
+    fun publicKey(seed: ByteArray): ByteArray {
         val sk = IntArray(32)
         val pk = IntArray(32)
 
@@ -89,27 +50,13 @@ object Crypto {
         // Remove sign bit from public key.
         pk[31] = pk[31] and 127
 
-        return KeyPair(sk.toByteArray(), pk.toByteArray())
+        return pk.toByteArray()
     }
 
-    data class KeyPair(val privateKey: ByteArray, val publicKey: ByteArray) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as KeyPair
-
-            if (!privateKey.contentEquals(other.privateKey)) return false
-            if (!publicKey.contentEquals(other.publicKey)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = privateKey.contentHashCode()
-            result = 31 * result + publicKey.contentHashCode()
-            return result
-        }
+    fun sharedKey(secretKey: ByteArray, publicKey: ByteArray): ByteArray {
+        val sharedKey = IntArray(32)
+        crypto_scalarmult(sharedKey, secretKey.toIntArray(), publicKey.toIntArray())
+        return sharedKey.toByteArray()
     }
 }
 
