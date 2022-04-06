@@ -13,11 +13,21 @@ suspend fun main() {
 }
 
 private suspend fun connectAndSend() {
-    AdnlClient(
+    val adnlClient = AdnlClient(
         serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a2615e1ff5550046e0f1165ff59150632d2301f")),
         host = "65.21.74.140",
         port = 46427,
     ).connect()
+
+    val serverTimeQuery =
+        hex("7af98bb435263e6c95d6fecb497dfd0aa5f031e7d412986b5ce720496db512052e8f2d100cdf068c7904345aad16000000000000")
+
+    adnlClient.send(serverTimeQuery)
+    adnlClient.receive {
+        discard(remaining - 7)
+        val time = readIntLittleEndian()
+        println("server time: $time (${Instant.ofEpochSecond(time.toLong())})")
+    }
 }
 
 class AdnlClient(
@@ -29,23 +39,12 @@ class AdnlClient(
     lateinit var input: ByteReadChannel
     lateinit var output: ByteWriteChannel
 
-    suspend fun connect() {
+    suspend fun connect() = apply {
         connection = aSocket(SelectorManager())
             .tcp()
             .connect(host, port)
             .connection()
         performHandshake()
-
-        val serverTimeQuery =
-            hex("7af98bb435263e6c95d6fecb497dfd0aa5f031e7d412986b5ce720496db512052e8f2d100cdf068c7904345aad16000000000000")
-
-        send(serverTimeQuery)
-        val result = receive().readBytes()
-        ByteReadPacket(result).apply {
-            discard(result.size - 7)
-            val time = readIntLittleEndian()
-            println("server time: $time (${Instant.ofEpochSecond(time.toLong())})")
-        }
     }
 
     suspend fun send(packet: ByteArray, nonce: ByteArray = ByteArray(32), flush: Boolean = true) {
@@ -63,7 +62,7 @@ class AdnlClient(
         }
     }
 
-    suspend fun receive(): ByteReadPacket {
+    suspend fun receive(block: ByteReadPacket.() -> Unit = {}): ByteReadPacket {
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
@@ -76,7 +75,7 @@ class AdnlClient(
         val actualHash = sha256(nonce, payload)
         check(hash.contentEquals(actualHash)) { "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)}" }
 
-        return ByteReadPacket(payload)
+        return ByteReadPacket(payload).apply(block)
     }
 
     private suspend fun performHandshake(
