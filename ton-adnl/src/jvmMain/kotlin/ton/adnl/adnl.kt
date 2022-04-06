@@ -100,7 +100,3 @@ class AdnlClient(
         check(receive().isEmpty) { "Invalid handshake response" }
     }
 }
-
-
-
-
