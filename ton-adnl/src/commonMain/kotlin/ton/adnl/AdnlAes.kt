@@ -1,19 +1,23 @@
 package ton.adnl
 
 import io.ktor.utils.io.core.*
+import ton.crypto.AesCtr
 
-interface AdnlAes {
-    val key: ByteArray
-    val nonce: ByteArray
+class AdnlAes(
+    key: ByteArray,
+    iv: ByteArray,
+) {
+    private val backend = AesCtr(key, iv)
 
-    suspend fun encrypt(packet: BytePacketBuilder.() -> Unit): ByteArray =
-        encrypt(buildPacket(block = packet).readBytes())
+    suspend fun encrypt(packet: suspend BytePacketBuilder.() -> Unit): ByteReadPacket {
+        val builder = BytePacketBuilder()
+        packet(builder)
+        val encrypted = encrypt(builder.build().readBytes())
+        return ByteReadPacket(encrypted)
+    }
 
-    suspend fun encrypt(byteArray: ByteArray): ByteArray
-    suspend fun decrypt(packet: BytePacketBuilder.() -> Unit): ByteArray =
-        decrypt(buildPacket(block = packet).readBytes())
-
-    suspend fun decrypt(byteArray: ByteArray): ByteArray
+    fun encrypt(byteArray: ByteArray): ByteArray {
+        if (byteArray.isEmpty()) return byteArray
+        return backend.encrypt(byteArray)
+    }
 }
-
-expect fun AdnlAes(key: ByteArray, nonce: ByteArray): AdnlAes

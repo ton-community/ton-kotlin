@@ -1,6 +1,7 @@
 package ton.adnl
 
 import io.ktor.utils.io.core.*
+import ton.crypto.SecureRandom
 import kotlin.random.Random
 
 /**
@@ -46,7 +47,7 @@ data class AdnlAesParams(
     }
 
     companion object {
-        fun random(random: Random = Random.Default): AdnlAesParams {
+        fun random(random: Random = SecureRandom): AdnlAesParams {
             val adnlAesParams = AdnlAesParams()
             random.nextBytes(adnlAesParams.rxKey)
             random.nextBytes(adnlAesParams.txKey)

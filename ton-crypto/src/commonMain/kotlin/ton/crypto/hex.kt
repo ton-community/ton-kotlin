@@ -1,8 +1,6 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package ton.crypto
 
-private val DIGITS = "0123456789ABCDEF".toCharArray()
+private val DIGITS = "0123456789abcdef".toCharArray()
 
 /**
  * Encode [bytes] as a HEX string with no spaces, newlines and `0x` prefixes.

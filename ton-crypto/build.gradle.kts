@@ -7,9 +7,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.tonBitstring)
-                implementation(projects.tonCommonBiginteger)
-                api("com.github.andreypfau:curve25519-kotlin:1122884f40")
+                implementation("com.github.andreypfau:curve25519-kotlin:f008dbc2c0")
             }
         }
         jvmMain {

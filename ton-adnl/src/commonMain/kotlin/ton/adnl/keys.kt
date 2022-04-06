@@ -1,39 +1,43 @@
 package ton.adnl
 
-/**
- * Trait which must be implemented to perform key agreement inside [`AdnlHandshake`]
- */
-interface AdnlPrivateKey {
-    val bytes: ByteArray
+import ton.crypto.Ed25519
+import ton.crypto.X25519
+import ton.crypto.hex
+import ton.crypto.sha256
 
-    /**
-     * Get public key corresponding to this private
-     */
-    suspend fun public(): AdnlPublicKey
+@JvmInline
+value class AdnlPrivateKey(
+    val value: ByteArray,
+) {
+    fun public(): AdnlPublicKey =
+        AdnlPublicKey(X25519.convertToEd25519(X25519.publicKey(value)))
 
-    /**
-     * Perform key agreement protocol (usually x25519) between our private key
-     * and their public
-     */
-    suspend fun sharedKey(publicKey: AdnlPublicKey): AdnlSharedKey
+    fun sharedKey(publicKey: AdnlPublicKey): AdnlSharedKey =
+        AdnlSharedKey(X25519.sharedKey(value, Ed25519.convertToX25519(publicKey.value)))
+
+    override fun toString(): String = hex(value)
+
+    companion object {
+        fun random(): AdnlPrivateKey = AdnlPrivateKey(X25519.privateKey())
+    }
 }
 
-expect fun AdnlPrivateKey(bytes: ByteArray): AdnlPrivateKey
+@JvmInline
+value class AdnlPublicKey(
+    val value: ByteArray,
+) {
+    fun address(): AdnlAddress = AdnlAddress(sha256(ED25519_MAGIC, value))
 
-/**
- * Public key can be provided using raw slice
- */
-interface AdnlPublicKey {
-    val bytes: ByteArray
+    override fun toString(): String = hex(value)
 
-    suspend fun address(): AdnlAddress
+    companion object {
+        val ED25519_MAGIC = byteArrayOf(0xc6.toByte(), 0xb4.toByte(), 0x13, 0x48)
+    }
 }
 
-expect fun AdnlPublicKey(bytes: ByteArray): AdnlPublicKey
-
-/**
- * Wrapper struct to hold the secret, result of ECDH between peers
- */
-interface AdnlSharedKey {
-    val bytes: ByteArray
+@JvmInline
+value class AdnlSharedKey(
+    val value: ByteArray,
+) {
+    override fun toString(): String = hex(value)
 }

@@ -6,32 +6,18 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import ton.crypto.hex
 import ton.crypto.sha256
-import kotlin.random.Random
+import java.time.Instant
 
 suspend fun main() {
-    test()
+    connectAndSend()
 }
 
-private suspend fun test() {
-//    val private = hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364")
-//    println("private: ${hex(private)}")
-//    val public3 = Crypto.convertPublicKey(Crypto.generateKeyPair(private).publicKey)
-//    println("public3 ${hex(public3)}")
-
-    val clientPrivateKey = AdnlPrivateKey(hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364"))
-    val clientPublicKey = clientPrivateKey.public()
-
-
-//    println("ECDH secret: ${hex(sharedKey.bytes)}")
-
-}
-
-private fun connectAndSend() {
-    //    AdnlClient(
-//        serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a++++++++***2615e1ff5550046e0f1165ff59150632d2301f")),
-//        host = "65.21.74.140",
-//        port = 46427,
-//    ).connect()
+private suspend fun connectAndSend() {
+    AdnlClient(
+        serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a2615e1ff5550046e0f1165ff59150632d2301f")),
+        host = "65.21.74.140",
+        port = 46427,
+    ).connect()
 }
 
 class AdnlClient(
@@ -40,89 +26,79 @@ class AdnlClient(
     val port: Int,
 ) {
     lateinit var connection: Connection
-    lateinit var txAes: AdnlAes
-    lateinit var rxAes: AdnlAes
+    lateinit var input: ByteReadChannel
+    lateinit var output: ByteWriteChannel
 
     suspend fun connect() {
-        val clientPrivateKey = AdnlPrivateKey(hex("d08fb02f0dc3e167d6ff114721c4456079310c3141f46f11bdd148fc8c7ef364"))
-        val clientPublicKey = clientPrivateKey.public()
-        val sharedKey = clientPrivateKey.sharedKey(serverPublicKey)
-
-        println("local private: ${hex(clientPrivateKey.bytes)}")
-        println("local public: ${hex(clientPublicKey.bytes)}")
-        println("server public: ${hex(serverPublicKey.bytes)}")
-        println("ECDH secret: ${hex(sharedKey.bytes)}")
-
         connection = aSocket(SelectorManager())
             .tcp()
             .connect(host, port)
             .connection()
+        performHandshake()
 
-
-        val aesParams = AdnlAesParams()
-        val handshake =
-            AdnlHandshake(serverPublicKey.address(), clientPublicKey, aesParams, sharedKey).build().readBytes()
-        println("handshake: ${hex(handshake)}")
-
-        connection.output.writeFully(handshake)
-        connection.output.flush()
-        println("handshake!")
-
-        txAes = AdnlAes(aesParams.txKey, aesParams.txNonce)
-        rxAes = AdnlAes(aesParams.rxKey, aesParams.rxNonce)
-
-//        println("bytes: ${readRemaining.size} ${readRemaining.decodeToString()}")
         val serverTimeQuery =
             hex("7af98bb435263e6c95d6fecb497dfd0aa5f031e7d412986b5ce720496db512052e8f2d100cdf068c7904345aad16000000000000")
 
         send(serverTimeQuery)
-        println("send query...")
-        val receive = receive().readBytes()
-        println("receive: ${hex(receive)}")
+        val result = receive().readBytes()
+        ByteReadPacket(result).apply {
+            discard(result.size - 7)
+            val time = readIntLittleEndian()
+            println("server time: $time (${Instant.ofEpochSecond(time.toLong())})")
+        }
     }
 
-    suspend fun send(packet: ByteArray, nonce: ByteArray = Random.nextBytes(32), flush: Boolean = true) {
+    suspend fun send(packet: ByteArray, nonce: ByteArray = ByteArray(32), flush: Boolean = true) {
         val length = packet.size + 64
         val hash = sha256(nonce, packet)
-
-        val encryptedPacket = txAes.encrypt {
-            writeInt(length)
+        val encryptedPacket = buildPacket {
+            writeIntLittleEndian(length)
             writeFully(nonce)
             writeFully(packet)
             writeFully(hash)
         }
-        connection.output.writeFully(encryptedPacket)
+        output.writePacket(encryptedPacket)
         if (flush) {
-            connection.output.flush()
+            output.flush()
         }
     }
 
-    suspend fun receive() = buildPacket {
-        var length = connection.input.readInt()
-        length = rxAes.decrypt {
-            writeInt(length)
-        }.toInt()
-        println("length = ${length}")
+    suspend fun receive(): ByteReadPacket {
+        val length = input.readIntLittleEndian()
 
-        var nonce = ByteArray(32)
-        connection.input.readFully(nonce)
-        nonce = rxAes.decrypt(nonce)
-        println("nonce = ${hex(nonce)}")
+        check(length >= 64) { "Too small packet: $length" }
+        check(length <= Short.MAX_VALUE) { "Too big packet: $length" }
 
-        var packetBytes = ByteArray(length - 64)
-        connection.input.readFully(packetBytes)
-        packetBytes = rxAes.decrypt(packetBytes)
-        println("packetBytes = ${hex(packetBytes)}")
+        val nonce = input.readPacket(32).readBytes()
+        val payload = input.readPacket(length - 64).readBytes()
+        val hash = input.readPacket(32).readBytes()
 
-        var hash = ByteArray(32)
-        connection.input.readFully(hash)
-        hash = rxAes.decrypt(hash)
-        println("hash = ${hex(hash)}")
+        val actualHash = sha256(nonce, payload)
+        check(hash.contentEquals(actualHash)) { "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)}" }
 
-        val actualHash = sha256(nonce, packetBytes)
-        println("actualHash = ${hex(actualHash)}")
+        return ByteReadPacket(payload)
+    }
 
-        writeFully(packetBytes)
+    private suspend fun performHandshake(
+        clientPrivateKey: AdnlPrivateKey = AdnlPrivateKey.random(),
+        aesParams: AdnlAesParams = AdnlAesParams.random(),
+    ) {
+        val clientPublicKey = clientPrivateKey.public()
+        val sharedKey = clientPrivateKey.sharedKey(serverPublicKey)
+        val handshake =
+            AdnlHandshake(
+                serverPublicKey.address(),
+                clientPublicKey,
+                aesParams,
+                sharedKey
+            ).build().readBytes()
+        connection.output.writeFully(handshake)
+        connection.output.flush()
+
+        input = EncryptedByteReadChannel(connection.input, AdnlAes(aesParams.rxKey, aesParams.rxNonce))
+        output = EncryptedByteWriteChannel(connection.output, AdnlAes(aesParams.txKey, aesParams.txNonce))
+
+        check(receive().isEmpty) { "Invalid handshake response" }
     }
 }
 
