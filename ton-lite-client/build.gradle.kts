@@ -3,6 +3,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.tonAdnl)
+                implementation(projects.tonTlb)
+                implementation(projects.tonCrypto)
             }
         }
         commonTest {

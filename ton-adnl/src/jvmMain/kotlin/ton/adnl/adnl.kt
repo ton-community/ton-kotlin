@@ -6,29 +6,6 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import ton.crypto.hex
 import ton.crypto.sha256
-import java.time.Instant
-
-suspend fun main() {
-    connectAndSend()
-}
-
-private suspend fun connectAndSend() {
-    val adnlClient = AdnlClient(
-        serverPublicKey = AdnlPublicKey(hex("2615edec7d5d6538314132321a2615e1ff5550046e0f1165ff59150632d2301f")),
-        host = "65.21.74.140",
-        port = 46427,
-    ).connect()
-
-    val serverTimeQuery =
-        hex("7af98bb435263e6c95d6fecb497dfd0aa5f031e7d412986b5ce720496db512052e8f2d100cdf068c7904345aad16000000000000")
-
-    adnlClient.send(serverTimeQuery)
-    adnlClient.receive {
-        discard(remaining - 7)
-        val time = readIntLittleEndian()
-        println("server time: $time (${Instant.ofEpochSecond(time.toLong())})")
-    }
-}
 
 class AdnlClient(
     val serverPublicKey: AdnlPublicKey,
