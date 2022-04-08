@@ -41,26 +41,31 @@ interface TLCodec<T> {
 
     fun Output.writeByteArray(byteArray: ByteArray) {
         val padding = calcPadding(byteArray.size)
-        writeByte((byteArray.size + padding).toByte())
+        val size = byteArray.size + padding
+        if (size <= 253) {
+            writeByte(size.toByte())
+        } else {
+            writeByte(254.toByte())
+            writeByte((size and 0xFF).toByte())
+            writeByte(((size and 0xFF00) shr 8).toByte())
+            writeByte(((size and 0xFF0000) shr 16).toByte())
+        }
         writeFully(byteArray)
         repeat(padding) {
             writeByte(0)
         }
     }
 
-    fun Output.calcPadding(size: Int): Int {
-        return (size % 4).let { if (it > 0) 4 - it else 0 }
-    }
-
     fun Input.readByteArray(): ByteArray {
         var size = readByte().toInt() and 0xFF
         if (size >= 254) {
-            TODO()
+            size = (readByte().toInt() and 0xFF) or
+                    ((readByte().toInt() and 0xFF) shl 8) or
+                    ((readByte().toInt() and 0xFF) shl 16)
         }
-        println("remaining: $remaining")
-        println("BYTES size: $size")
-        val byteArray = ByteArray(size)
-        readFully(byteArray)
-        return byteArray
+        size += calcPadding(size)
+        return readBytes(size)
     }
+
+    private fun calcPadding(size: Int): Int = (size % 4).let { if (it > 0) 4 - it else 0 }
 }

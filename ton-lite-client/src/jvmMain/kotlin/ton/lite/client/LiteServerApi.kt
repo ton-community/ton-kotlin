@@ -3,7 +3,6 @@ package ton.lite.client
 import io.ktor.utils.io.core.*
 import ton.adnl.AdnlClient
 import ton.adnl.TLCodec
-import ton.crypto.hex
 
 interface LiteServerApi {
     val adnlClient: AdnlClient
@@ -17,7 +16,6 @@ interface LiteServerApi {
         if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
             throw LiteServerError.decode(errorByteInput)
         }
-        println("answer: ${hex(answerBytes)}")
         return answerCodec.decodeBoxed(answerBytes)
     }
 
