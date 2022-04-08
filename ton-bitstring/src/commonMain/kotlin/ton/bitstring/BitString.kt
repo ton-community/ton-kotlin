@@ -138,12 +138,12 @@ fun BitString(hex: String) = buildBitString {
             '7' -> writeUInt(7u, 4)
             '8' -> writeUInt(8u, 4)
             '9' -> writeUInt(9u, 4)
-            'A' -> writeUInt(10u, 4)
-            'B' -> writeUInt(11u, 4)
-            'C' -> writeUInt(12u, 4)
-            'D' -> writeUInt(13u, 4)
-            'E' -> writeUInt(14u, 4)
-            'F' -> writeUInt(15u, 4)
+            'A', 'a' -> writeUInt(10u, 4)
+            'B', 'b' -> writeUInt(11u, 4)
+            'C', 'c' -> writeUInt(12u, 4)
+            'D', 'd' -> writeUInt(13u, 4)
+            'E', 'e' -> writeUInt(14u, 4)
+            'F', 'f' -> writeUInt(15u, 4)
         }
     }
 }

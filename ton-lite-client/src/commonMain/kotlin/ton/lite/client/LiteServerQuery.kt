@@ -1,6 +1,7 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import ton.adnl.TLCodec
 
 data class LiteServerQuery(
     val data: ByteArray

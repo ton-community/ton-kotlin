@@ -1,9 +1,11 @@
-package ton.lite.client
+package ton.adnl.message
 
 import io.ktor.utils.io.core.*
+import ton.adnl.TLCodec
+import ton.crypto.hex
 
 data class AdnlMessageQuery(
-    val queryId: LongArray,
+    val queryId: ByteArray,
     val query: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -24,6 +26,8 @@ data class AdnlMessageQuery(
         return result
     }
 
+    override fun toString() = "AdnlMessageQuery(queryId=${hex(queryId)}, query=${hex(query)})"
+
     companion object : TLCodec<AdnlMessageQuery> {
         override val id = -1265895046
 
@@ -33,7 +37,7 @@ data class AdnlMessageQuery(
         }
 
         override fun decode(input: Input): AdnlMessageQuery {
-            val queryId = LongArray(4).also { input.readFully(it) }
+            val queryId = input.readBytes(32)
             val query = input.readByteArray()
             return AdnlMessageQuery(queryId, query)
         }

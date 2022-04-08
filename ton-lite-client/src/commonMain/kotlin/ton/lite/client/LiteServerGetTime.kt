@@ -1,15 +1,13 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import ton.adnl.TLCodec
 
-class LiteServerGetTime {
+object LiteServerGetTime : TLCodec<LiteServerGetTime> {
+    override val id: Int = 380459572
 
-    companion object : TLCodec<LiteServerGetTime> {
-        override val id: Int = 380459572
+    override fun decode(input: Input): LiteServerGetTime = LiteServerGetTime
 
-        override fun decode(input: Input): LiteServerGetTime = LiteServerGetTime()
-
-        override fun encode(output: Output, message: LiteServerGetTime) {
-        }
+    override fun encode(output: Output, message: LiteServerGetTime) {
     }
 }

@@ -1,8 +1,9 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import ton.adnl.TLCodec
 
-class LiteServerCurrentTime(
+data class LiteServerCurrentTime(
     val now: Long
 ) {
     companion object : TLCodec<LiteServerCurrentTime> {

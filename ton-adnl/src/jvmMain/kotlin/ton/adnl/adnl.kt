@@ -2,29 +2,70 @@ package ton.adnl
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
+import io.ktor.util.collections.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import ton.adnl.message.AdnlMessageAnswer
+import ton.adnl.message.AdnlMessageQuery
 import ton.crypto.hex
 import ton.crypto.sha256
+import kotlin.coroutines.CoroutineContext
+import kotlin.random.Random
 
 class AdnlClient(
-    val serverPublicKey: AdnlPublicKey,
     val host: String,
     val port: Int,
+    val publicKey: AdnlPublicKey,
+    private val dispatcher: CoroutineContext
 ) {
+    private lateinit var job: Job
+    private val sendFlow = MutableSharedFlow<AdnlMessageQuery>()
+    private val queryMap = ConcurrentMap<String, CompletableDeferred<AdnlMessageAnswer>>()
+
     lateinit var connection: Connection
     lateinit var input: ByteReadChannel
     lateinit var output: ByteWriteChannel
 
     suspend fun connect() = apply {
-        connection = aSocket(SelectorManager())
+        connection = aSocket(SelectorManager(dispatcher))
             .tcp()
             .connect(host, port)
             .connection()
         performHandshake()
+
+        job = CoroutineScope(dispatcher).launch {
+            while (isActive) {
+                sendFlow.collect { adnlMessageQuery ->
+                    val encoededPacket = AdnlMessageQuery.encodeBoxed(adnlMessageQuery)
+                    sendRaw(encoededPacket)
+                    val packet = receiveRaw()
+                    when (packet.readIntLittleEndian()) {
+                        AdnlMessageAnswer.id -> {
+                            val adnlMessageAnswer = AdnlMessageAnswer.decode(packet)
+                            val deferred = queryMap.remove(hex(adnlMessageAnswer.queryId))
+                            deferred?.complete(adnlMessageAnswer)
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    suspend fun send(packet: ByteArray, nonce: ByteArray = ByteArray(32), flush: Boolean = true) {
+    suspend fun sendQuery(query: ByteArray): ByteArray {
+        val queryId = Random.nextBytes(32)
+        val adnlMessageQuery = AdnlMessageQuery(queryId, query)
+        val deferred = CompletableDeferred<AdnlMessageAnswer>()
+        queryMap[hex(queryId)] = deferred
+
+        sendFlow.emit(adnlMessageQuery)
+
+        return deferred.await().answer
+    }
+
+    suspend fun sendRaw(packet: ByteArray, nonce: ByteArray = Random.nextBytes(32), flush: Boolean = true) {
         val length = packet.size + 64
         val hash = sha256(nonce, packet)
         val encryptedPacket = buildPacket {
@@ -39,7 +80,7 @@ class AdnlClient(
         }
     }
 
-    suspend fun receive(block: ByteReadPacket.() -> Unit = {}): ByteReadPacket {
+    private suspend fun receiveRaw(): ByteReadPacket {
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
@@ -52,7 +93,7 @@ class AdnlClient(
         val actualHash = sha256(nonce, payload)
         check(hash.contentEquals(actualHash)) { "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)}" }
 
-        return ByteReadPacket(payload).apply(block)
+        return ByteReadPacket(payload)
     }
 
     private suspend fun performHandshake(
@@ -60,10 +101,10 @@ class AdnlClient(
         aesParams: AdnlAesParams = AdnlAesParams.random(),
     ) {
         val clientPublicKey = clientPrivateKey.public()
-        val sharedKey = clientPrivateKey.sharedKey(serverPublicKey)
+        val sharedKey = clientPrivateKey.sharedKey(publicKey)
         val handshake =
             AdnlHandshake(
-                serverPublicKey.address(),
+                publicKey.address(),
                 clientPublicKey,
                 aesParams,
                 sharedKey
@@ -74,6 +115,6 @@ class AdnlClient(
         input = EncryptedByteReadChannel(connection.input, AdnlAes(aesParams.rxKey, aesParams.rxNonce))
         output = EncryptedByteWriteChannel(connection.output, AdnlAes(aesParams.txKey, aesParams.txNonce))
 
-        check(receive().isEmpty) { "Invalid handshake response" }
+        check(receiveRaw().isEmpty) { "Invalid handshake response" }
     }
 }

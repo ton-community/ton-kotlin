@@ -4,6 +4,7 @@ kotlin {
             dependencies {
                 implementation(projects.tonAdnl)
                 implementation(projects.tonTlb)
+                implementation(projects.tonBitstring)
                 implementation(projects.tonCrypto)
             }
         }

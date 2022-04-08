@@ -1,4 +1,4 @@
-package ton.lite.client
+package ton.adnl
 
 import io.ktor.utils.io.core.*
 
@@ -33,6 +33,12 @@ interface TLCodec<T> {
         return decode(input)
     }
 
+    fun <R> Input.readTl(codec: TLCodec<R>) = codec.decode(this)
+    fun <R> Input.readBoxedTl(codec: TLCodec<R>) = codec.decodeBoxed(this)
+
+    fun <R> Output.writeTl(message: R, codec: TLCodec<R>) = codec.encode(this, message)
+    fun <R> Output.writeBoxedTl(message: R, codec: TLCodec<R>) = codec.encodeBoxed(this, message)
+
     fun Output.writeByteArray(byteArray: ByteArray) {
         val padding = calcPadding(byteArray.size)
         writeByte((byteArray.size + padding).toByte())
@@ -47,7 +53,13 @@ interface TLCodec<T> {
     }
 
     fun Input.readByteArray(): ByteArray {
-        val byteArray = ByteArray(readByte().toInt())
+        var size = readByte().toInt() and 0xFF
+        if (size >= 254) {
+            TODO()
+        }
+        println("remaining: $remaining")
+        println("BYTES size: $size")
+        val byteArray = ByteArray(size)
         readFully(byteArray)
         return byteArray
     }
