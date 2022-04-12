@@ -7,27 +7,29 @@ import ton.bitstring.BitString
 data class Cell(
     val bitString: BitString,
     val cellReferences: Array<Cell>,
-    val isExotic: Boolean = false
+    val type: CellType = CellType.ORDINARY
 ) {
     constructor(
         data: BitString,
         cellReferences: Iterable<Cell>,
-        isExotic: Boolean = false
+        type: CellType = CellType.ORDINARY
     ) : this(
         data,
         cellReferences.toList().toTypedArray(),
-        isExotic
+        type
     )
 
     constructor(
         data: String,
         vararg cellReferences: Cell,
-        isExotic: Boolean = false
+        type: CellType = CellType.ORDINARY
     ) : this(
         BitString(data),
         cellReferences.toList(),
-        isExotic
+        type
     )
+
+    val isExotic: Boolean get() = type.isExotic
 
     fun get(index: Int): Boolean = bitString[index]
 

@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.serialization.json.JsonObject
 import ton.adnl.AdnlClient
 import ton.adnl.AdnlPublicKey
 import ton.cell.BagOfCells
@@ -32,7 +31,7 @@ suspend fun LiteClient.getAccountTransactions(workchain: Int, address: String): 
     val lastBlock = getMasterchainInfo().last
     val state = getAccountState(lastBlock, LiteServerAccountId(workchain, hex(address)))
     val cell = BagOfCells(state.state).roots.first()
-    val json = cell.slice().Account().toJsonElement() as JsonObject
+    val json = cell.slice().Account().toJsonString()
     TODO()
 }
 
