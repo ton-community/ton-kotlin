@@ -1,14 +1,20 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 import ton.crypto.hex
+import ton.types.util.HexByteArraySerializer
 
+@Serializable
 data class LiteServerAccountState(
     val id: TonNodeBlockIdExt,
     val shardblk: TonNodeBlockIdExt,
+    @Serializable(HexByteArraySerializer::class)
     val shardProof: ByteArray,
+    @Serializable(HexByteArraySerializer::class)
     val proof: ByteArray,
+    @Serializable(HexByteArraySerializer::class)
     val state: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -31,7 +37,7 @@ data class LiteServerAccountState(
         result = 31 * result + shardblk.hashCode()
         result = 31 * result + shardProof.contentHashCode()
         result = 31 * result + proof.contentHashCode()
-        result = 31 * result + state.contentHashCode()
+        result = 31 * result + state.hashCode()
         return result
     }
 

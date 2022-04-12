@@ -1,11 +1,15 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 import ton.crypto.hex
+import ton.types.util.HexByteArraySerializer
 
+@Serializable
 data class LiteServerAccountId(
     val workchain: Int,
+    @Serializable(HexByteArraySerializer::class)
     val id: ByteArray
 ) {
     init {

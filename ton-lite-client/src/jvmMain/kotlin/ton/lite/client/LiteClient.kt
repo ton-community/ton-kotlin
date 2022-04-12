@@ -4,9 +4,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.serialization.json.JsonObject
 import ton.adnl.AdnlClient
 import ton.adnl.AdnlPublicKey
+import ton.cell.BagOfCells
+import ton.cell.slice
 import ton.crypto.hex
+import ton.tlb.Account
+import ton.types.block.Account
 import java.time.Instant
 
 suspend fun main() = coroutineScope {
@@ -16,16 +21,19 @@ suspend fun main() = coroutineScope {
         publicKey = hex("a5e253c3f6ab9517ecb204ee7fd04cca9273a8e8bb49712a48f496884c365353")
     ).connect()
     val time = liteClient.getTime()
-    println("[server time: $time (${Instant.ofEpochSecond(time.now)})")
+    println("[server time: $time] (${Instant.ofEpochSecond(time.now)})")
 
-    val lastBlock = liteClient.getMasterchainInfo()
-    println("last block: $lastBlock")
-    val getAccountState = LiteServerGetAccountState(
-        lastBlock.last,
-        LiteServerAccountId(0, hex("0AB558F4DB84FD31F61A273535C670C091FFC619B1CDBBE5769A0BF28D3B8FEA"))
-    )
-    val accountState = liteClient.getAccountState(getAccountState)
-    println("account state: $accountState")
+    val tr = liteClient.getAccountTransactions(0, "0AB558F4DB84FD31F61A273535C670C091FFC619B1CDBBE5769A0BF28D3B8FEA")
+    println(tr)
+}
+
+
+suspend fun LiteClient.getAccountTransactions(workchain: Int, address: String): Account? {
+    val lastBlock = getMasterchainInfo().last
+    val state = getAccountState(lastBlock, LiteServerAccountId(workchain, hex(address)))
+    val cell = BagOfCells(state.state).roots.first()
+    val json = cell.slice().Account().toJsonElement() as JsonObject
+    TODO()
 }
 
 suspend fun LiteClient.lastBlockTask() = coroutineScope {

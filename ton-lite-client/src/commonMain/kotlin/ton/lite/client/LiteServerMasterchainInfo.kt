@@ -1,11 +1,14 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 import ton.crypto.hex
+import ton.types.util.HexByteArraySerializer
 
 data class LiteServerMasterchainInfo(
     val last: TonNodeBlockIdExt,
+    @Serializable(HexByteArraySerializer::class)
     val stateRootHash: ByteArray,
     val init: TonNodeZeroStateIdExt
 ) {

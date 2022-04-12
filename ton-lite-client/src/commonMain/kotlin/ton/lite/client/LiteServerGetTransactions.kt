@@ -1,13 +1,16 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 import ton.crypto.hex
+import ton.types.util.HexByteArraySerializer
 
 data class LiteServerGetTransactions(
     val count: Int,
     val account: LiteServerAccountId,
     val lt: Long,
+    @Serializable(HexByteArraySerializer::class)
     val hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -45,6 +48,5 @@ data class LiteServerGetTransactions(
         override fun encode(output: Output, message: LiteServerGetTransactions) {
             TODO("Not yet implemented")
         }
-
     }
 }

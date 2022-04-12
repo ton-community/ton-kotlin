@@ -144,15 +144,18 @@ fun CellReader.SimpleLib() = type("simple_lib") {
     set("root") { cellReference { cell() } }
 }
 
-// _ split_depth:(Maybe (## 5)) special:(Maybe TickTock)
-//  code:(Maybe ^Cell) data:(Maybe ^Cell)
+// _ split_depth:(Maybe (## 5))
+//  special:(Maybe TickTock)
+//  code:(Maybe ^Cell)
+//  data:(Maybe ^Cell)
 //  library:(HashmapE 256 SimpleLib) = StateInit;
 fun CellReader.StateInit() = type("_") {
     set("split_depth") { Maybe { uint(5) } }
     set("special") { Maybe(::TickTock) }
+    set("code") { Maybe { cellReference { cell() } } }
+    set("data") { Maybe { cellReference { cell() } } }
     set("library") { HashmapE(value(256), ::SimpleLib) }
 }
-
 
 // message$_ {X:Type} info:CommonMsgInfo
 //  init:(Maybe (Either StateInit ^StateInit))

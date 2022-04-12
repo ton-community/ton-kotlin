@@ -1,13 +1,33 @@
 package ton.cell
 
+import kotlinx.serialization.Serializable
 import ton.bitstring.BitString
 
+@Serializable
 data class Cell(
     val bitString: BitString,
     val cellReferences: Array<Cell>,
+    val isExotic: Boolean = false
 ) {
-    constructor(data: BitString, cellReferences: Iterable<Cell>) : this(data, cellReferences.toList().toTypedArray())
-    constructor(data: String, vararg cellReferences: Cell) : this(BitString(data), cellReferences.toList())
+    constructor(
+        data: BitString,
+        cellReferences: Iterable<Cell>,
+        isExotic: Boolean = false
+    ) : this(
+        data,
+        cellReferences.toList().toTypedArray(),
+        isExotic
+    )
+
+    constructor(
+        data: String,
+        vararg cellReferences: Cell,
+        isExotic: Boolean = false
+    ) : this(
+        BitString(data),
+        cellReferences.toList(),
+        isExotic
+    )
 
     fun get(index: Int): Boolean = bitString[index]
 

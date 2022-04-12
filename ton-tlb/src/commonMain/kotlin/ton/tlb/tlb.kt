@@ -31,7 +31,7 @@ interface TypeExpression {
         }
     }
 
-    operator fun set(name: String, typeExpression: () -> TypeExpression) {
+    operator fun set(name: String, typeExpression: () -> TypeExpression): Any {
         val value = object : TypeExpressionImpl("") {
             val typeValue_ by lazy { typeExpression() }
             override val name: String
@@ -42,21 +42,46 @@ interface TypeExpression {
                 get() = typeValue_.fields
         }
         set(name, value)
-        value.value
+        return value.value
     }
 
-    fun toInt(): Int = when(val value = value) {
+    fun toInt(): Int = when (val value = value) {
         is Number -> value.toInt()
         is ULong -> value.toInt()
         is UInt -> value.toInt()
         else -> throw IllegalArgumentException(value.toString())
     }
-    fun toLong(): Long = when(val value = value) {
-            is Number -> value.toLong()
-            is ULong -> value.toLong()
-            is UInt -> value.toLong()
-            else -> throw IllegalArgumentException(value.toString())
+
+    fun toLong(): Long = when (val value = value) {
+        is Number -> value.toLong()
+        is ULong -> value.toLong()
+        is UInt -> value.toLong()
+        else -> throw IllegalArgumentException(value.toString())
+    }
+
+    fun toJsonString(): String = if (fields.isNotEmpty()) {
+        buildString {
+            append('{')
+            fields.forEachIndexed { index, field ->
+                append('"')
+                append(field.name)
+                append('"')
+                append('=')
+                append(field.toJsonString())
+                if (index != fields.lastIndex) {
+                    append(',')
+                }
+            }
         }
+    } else {
+        val stringValue = value.toString()
+        when {
+            stringValue == "true" -> stringValue
+            stringValue == "false" -> stringValue
+            stringValue.contains('.') -> stringValue.toDoubleOrNull()?.let { stringValue } ?: "\"$stringValue\""
+            else -> stringValue.toLongOrNull()?.let { stringValue } ?: "\"$stringValue\""
+        }
+    }
 }
 
 abstract class TypeExpressionImpl(override val name: String) : TypeExpression {

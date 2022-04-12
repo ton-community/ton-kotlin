@@ -2,6 +2,7 @@ package ton.cell
 
 import ton.bitstring.BitStringBuilder
 import ton.bitstring.BitStringWriter
+import kotlin.js.JsName
 
 interface CellBuilder : CellWriter {
     override var writePosition: Int
@@ -22,6 +23,7 @@ private class CellBuilderImpl(
     override fun toCell() = Cell(data.toBitString(), cellReferences)
 }
 
+@JsName("createCellBuilder")
 fun CellBuilder(): CellBuilder = CellBuilderImpl()
 
 fun buildCell(builder: CellBuilder.() -> Unit): Cell = CellBuilder().apply(builder).toCell()

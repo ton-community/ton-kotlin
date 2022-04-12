@@ -1,12 +1,17 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 import ton.crypto.hex
+import ton.types.util.HexByteArraySerializer
 
+@Serializable
 data class TonNodeBlockIdExt(
     val id: TonNodeBlockId,
+    @Serializable(HexByteArraySerializer::class)
     val rootHash: ByteArray,
+    @Serializable(HexByteArraySerializer::class)
     val fileHash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

@@ -7,4 +7,8 @@ kotlin {
             }
         }
     }
+
+    js {
+        browser()
+    }
 }

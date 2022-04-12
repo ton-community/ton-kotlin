@@ -1,8 +1,10 @@
 package ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import ton.adnl.TLCodec
 
+@Serializable
 data class TonNodeBlockId(
     val workchain: Int,
     val shard: Long,
