@@ -17,7 +17,7 @@ private class CellSliceImpl(
     private val bitStringReader = BitStringReader(cell.bitString)
 
     override val bitString: BitString get() = bitStringReader.bitString
-    override val cellReferences: Array<Cell> get() = cell.cellReferences
+    override val cellReferences: List<Cell> get() = cell.references
     override var cellReadPosition: Int = 0
     override var readPosition: Int = indices.first
     override val remainingBits: Int

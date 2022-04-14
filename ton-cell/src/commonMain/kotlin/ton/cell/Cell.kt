@@ -6,19 +6,9 @@ import ton.bitstring.BitString
 @Serializable
 data class Cell(
     val bitString: BitString,
-    val cellReferences: Array<Cell>,
+    val references: List<Cell>,
     val type: CellType = CellType.ORDINARY
 ) {
-    constructor(
-        data: BitString,
-        cellReferences: Iterable<Cell>,
-        type: CellType = CellType.ORDINARY
-    ) : this(
-        data,
-        cellReferences.toList().toTypedArray(),
-        type
-    )
-
     constructor(
         data: String,
         vararg cellReferences: Cell,
@@ -31,7 +21,19 @@ data class Cell(
 
     val isExotic: Boolean get() = type.isExotic
 
+    val maxLevel: Int by lazy {
+        // TODO: level calculation differ for exotic cells
+        references.maxOfOrNull { it.maxLevel } ?: 0
+    }
+
     fun get(index: Int): Boolean = bitString[index]
+
+    fun treeWalk(): Sequence<Cell> = sequence {
+        yieldAll(references)
+        references.forEach { reference ->
+            yieldAll(reference.treeWalk())
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -40,14 +42,16 @@ data class Cell(
         other as Cell
 
         if (bitString != other.bitString) return false
-        if (!cellReferences.contentEquals(other.cellReferences)) return false
+        if (references != other.references) return false
+        if (type != other.type) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = bitString.hashCode()
-        result = 31 * result + cellReferences.contentHashCode()
+        result = 31 * result + references.hashCode()
+        result = 31 * result + type.hashCode()
         return result
     }
 }

@@ -1,5 +1,7 @@
 package ton.tlb
 
+import ton.cell.Cell
+
 data class Field(
     override val name: String,
     val typeExpression: TypeExpression,
@@ -62,19 +64,21 @@ interface TypeExpression {
     fun toJsonString(): String = if (fields.isNotEmpty()) {
         buildString {
             append('{')
+            append("\"@type\":\"$name\",")
             fields.forEachIndexed { index, field ->
                 append('"')
                 append(field.name)
                 append('"')
-                append('=')
+                append(':')
                 append(field.toJsonString())
                 if (index != fields.lastIndex) {
                     append(',')
                 }
             }
+            append('}')
         }
     } else {
-        val stringValue = value.toString()
+        val stringValue = (value as? Cell)?.bitString?.toString() ?: value.toString()
         when {
             stringValue == "true" -> stringValue
             stringValue == "false" -> stringValue

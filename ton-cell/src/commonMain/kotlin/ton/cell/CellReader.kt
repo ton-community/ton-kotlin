@@ -4,7 +4,7 @@ import ton.bitstring.BitStringReader
 
 interface CellReader : BitStringReader {
     val cell: Cell
-    val cellReferences: Array<Cell>
+    val cellReferences: List<Cell>
     var cellReadPosition: Int
 
     fun readCell() = cellReferences[cellReadPosition++]

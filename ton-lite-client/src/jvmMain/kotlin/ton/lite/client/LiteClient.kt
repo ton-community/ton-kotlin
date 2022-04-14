@@ -1,5 +1,6 @@
 package ton.lite.client
 
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -7,10 +8,8 @@ import kotlinx.coroutines.isActive
 import ton.adnl.AdnlClient
 import ton.adnl.AdnlPublicKey
 import ton.cell.BagOfCells
-import ton.cell.slice
+import ton.cell.writeBagOfCells
 import ton.crypto.hex
-import ton.tlb.Account
-import ton.types.block.Account
 import java.time.Instant
 
 suspend fun main() = coroutineScope {
@@ -27,12 +26,17 @@ suspend fun main() = coroutineScope {
 }
 
 
-suspend fun LiteClient.getAccountTransactions(workchain: Int, address: String): Account? {
+suspend fun LiteClient.getAccountTransactions(workchain: Int, address: String): String {
     val lastBlock = getMasterchainInfo().last
     val state = getAccountState(lastBlock, LiteServerAccountId(workchain, hex(address)))
     val cell = BagOfCells(state.state).roots.first()
-    val json = cell.slice().Account().toJsonString()
-    TODO()
+
+
+    println(hex(state.state))
+    println(hex(buildPacket { writeBagOfCells(BagOfCells(cell)) }.readBytes()))
+
+//    val json = cell.slice().Account().toJsonString()
+    return "json"
 }
 
 suspend fun LiteClient.lastBlockTask() = coroutineScope {
