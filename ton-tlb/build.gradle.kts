@@ -2,7 +2,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.tonCell)
+                api(projects.tonCell)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
             }
         }
