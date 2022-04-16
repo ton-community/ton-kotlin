@@ -1,22 +1,31 @@
-package ton.types.block
+@file:Suppress("OPT_IN_USAGE")
 
+package ton.block
+
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+import ton.crypto.HexByteArraySerializer
 import ton.crypto.hex
-import ton.types.util.HexByteArraySerializer
 
+@JsonClassDiscriminator("@type")
 @Serializable
 sealed interface AccountState {
-
+    @SerialName("account_uninit")
     @Serializable
     object AccountUninit : AccountState
 
+    @SerialName("account_active")
     @Serializable
     data class AccountActive(
+        @SerialName("_")
         val init: StateInit
     ) : AccountState
 
+    @SerialName("account_frozen")
     @Serializable
     data class AccountFrozen(
+        @SerialName("state_hash")
         @Serializable(HexByteArraySerializer::class)
         val stateHash: ByteArray
     ) {
@@ -35,6 +44,6 @@ sealed interface AccountState {
             return stateHash.contentHashCode()
         }
 
-        override fun toString(): String = "AccountState.AccountFrozen(stateHash=${hex(stateHash)})"
+        override fun toString(): String = "account_frozen(stateHash=${hex(stateHash)})"
     }
 }

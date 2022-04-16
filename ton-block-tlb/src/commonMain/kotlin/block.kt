@@ -1,6 +1,5 @@
-package ton.tlb
-
 import ton.cell.CellReader
+import ton.tlb.*
 
 fun CellReader.MsgAddressExt(): TypeExpression {
     check(!readBit())
@@ -79,7 +78,8 @@ fun CellReader.Grams() = type("nanograms") {
 
 // extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;
 fun CellReader.ExtraCurrencyCollection() = type("extra_currencies") {
-    set("dict") { HashmapE(value(32)) { VarUInteger(value(32)) } }
+//    set("dict") { HashmapE(value(32)) { VarUInteger(value(32)) } }
+    TODO("use ton-block")
 }
 
 // currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
@@ -154,7 +154,8 @@ fun CellReader.StateInit() = type("_") {
     set("special") { Maybe(::TickTock) }
     set("code") { Maybe { cellReference { cell() } } }
     set("data") { Maybe { cellReference { cell() } } }
-    set("library") { HashmapE(value(256), ::SimpleLib) }
+//    set("library") { HashmapE(value(256), ::SimpleLib) }
+    TODO("use ton-block")
 }
 
 // message$_ {X:Type} info:CommonMsgInfo
@@ -496,7 +497,8 @@ fun CellReader.Transaction(): TypeExpression {
             cellReference {
                 type("_") {
                     set("in_msg") { Maybe { cellReference { Message(::Any) } } }
-                    set("out_msg") { HashmapE(value(15)) { cellReference { Message(::Any) } } }
+//                    set("out_msg") { HashmapE(value(15)) { cellReference { Message(::Any) } } }
+                    TODO("use ton-block")
                 }
             }
         }

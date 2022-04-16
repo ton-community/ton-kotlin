@@ -2,7 +2,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.tonHashmap)
+                implementation(projects.tonBlock)
+                implementation(projects.tonHashmapTlb)
                 implementation(projects.tonTlb)
             }
         }

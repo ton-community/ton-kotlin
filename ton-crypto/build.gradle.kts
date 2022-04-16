@@ -8,6 +8,7 @@ kotlin {
         commonMain {
             dependencies {
                 api("io.ktor:ktor-utils:2.0.0-beta-1")
+                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
             }
         }
         jvmMain {
