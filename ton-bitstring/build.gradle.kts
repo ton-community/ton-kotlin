@@ -2,13 +2,14 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
             }
         }
     }
 
     js {
-        browser()
+        nodejs()
+        useCommonJs()
         binaries.executable()
     }
 }

@@ -1,16 +1,18 @@
+@file:UseSerializers(HexByteArraySerializer::class)
+
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.ton.adnl.TLCodec
+import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.hex
-import ton.types.util.HexByteArraySerializer
 
+@Serializable
 data class TonNodeZeroStateIdExt(
     val workchain: Int,
-    @Serializable(HexByteArraySerializer::class)
     val rootHash: ByteArray,
-    @Serializable(HexByteArraySerializer::class)
     val fileHash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

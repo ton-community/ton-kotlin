@@ -1,16 +1,17 @@
+@file:UseSerializers(HexByteArraySerializer::class)
+
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.ton.adnl.TLCodec
+import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.hex
-import ton.types.util.HexByteArraySerializer
 
 data class LiteServerGetTransactions(
     val count: Int,
     val account: LiteServerAccountId,
     val lt: Long,
-    @Serializable(HexByteArraySerializer::class)
     val hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

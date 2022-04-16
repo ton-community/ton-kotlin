@@ -30,7 +30,7 @@ private class CellSliceImpl(
             throw IndexOutOfBoundsException("index: $index, indices: $indices")
         }
 
-    override fun readSlice(): CellSlice = readCell().slice()
+    override fun readSlice(): CellSlice = readCell().cell.slice()
 
     override fun toString() = buildBitString {
         indices.forEach { index ->

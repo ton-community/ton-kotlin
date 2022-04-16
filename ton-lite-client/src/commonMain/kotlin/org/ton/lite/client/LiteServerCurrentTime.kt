@@ -1,8 +1,10 @@
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import org.ton.adnl.TLCodec
 
+@Serializable
 data class LiteServerCurrentTime(
     val now: Long
 ) {

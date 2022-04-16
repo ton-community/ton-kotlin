@@ -1,12 +1,11 @@
-@file:OptIn(ExperimentalSerializationApi::class)
+@file:Suppress("OPT_IN_USAGE")
 
 package org.ton.hashmap
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import ton.bitstring.BitString
+import org.ton.bitstring.BitString
 
 @Serializable
 @JsonClassDiscriminator("@type")

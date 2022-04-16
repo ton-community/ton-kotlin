@@ -8,7 +8,6 @@ kotlin {
                 implementation(projects.tonCrypto)
                 implementation(projects.tonCell)
                 implementation(projects.tonTlb)
-                implementation(projects.tonTypes)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
             }
         }

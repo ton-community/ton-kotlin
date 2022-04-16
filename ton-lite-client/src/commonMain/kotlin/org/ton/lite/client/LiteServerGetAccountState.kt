@@ -1,9 +1,10 @@
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import org.ton.adnl.TLCodec
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class LiteServerGetAccountState(
     val id: TonNodeBlockIdExt,
     val account: LiteServerAccountId,

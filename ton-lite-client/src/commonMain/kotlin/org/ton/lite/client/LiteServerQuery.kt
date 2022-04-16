@@ -1,12 +1,14 @@
+@file:UseSerializers(HexByteArraySerializer::class)
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.ton.adnl.TLCodec
-import ton.types.util.HexByteArraySerializer
+import org.ton.crypto.HexByteArraySerializer
 
+@Serializable
 data class LiteServerQuery(
-    @Serializable(HexByteArraySerializer::class)
     val data: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

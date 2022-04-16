@@ -6,8 +6,8 @@ kotlin {
                 implementation(projects.tonHashmap)
                 implementation(projects.tonCrypto)
                 implementation(projects.tonPrimitives)
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.2")
+                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.2")
             }
         }
         val commonTest by getting
