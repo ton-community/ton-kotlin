@@ -2,7 +2,6 @@ package ton.tlb
 
 import ton.bitstring.toInt
 import ton.cell.CellReader
-import ton.cell.slice
 
 fun CellReader.value(value: Int = 0) = TypeExpressionIntConstant(value)
 
@@ -70,7 +69,7 @@ fun CellReader.Any() = type("Any")
 fun CellReader.cellReference(typeExpression: CellReader.() -> TypeExpression) = object : TypeExpressionImpl("^") {
     val type by lazy {
         val cell = readCell()
-        typeExpression(cell.slice())
+        typeExpression(cell)
     }
     override val value: Any get() = type.value
     override val fields: MutableList<Field> get() = type.fields

@@ -7,5 +7,5 @@ interface CellReader : BitStringReader {
     val cellReferences: List<Cell>
     var cellReadPosition: Int
 
-    fun readCell() = cellReferences[cellReadPosition++]
+    fun readCell(): CellReader = cellReferences[cellReadPosition++].slice()
 }
