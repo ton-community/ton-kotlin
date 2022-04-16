@@ -44,6 +44,10 @@ sealed interface AccountState {
             return stateHash.contentHashCode()
         }
 
-        override fun toString(): String = "account_frozen(stateHash=${hex(stateHash)})"
+        override fun toString(): String = buildString {
+            append("AccountFrozen(stateHash=")
+            append(hex(stateHash))
+            append(")")
+        }
     }
 }

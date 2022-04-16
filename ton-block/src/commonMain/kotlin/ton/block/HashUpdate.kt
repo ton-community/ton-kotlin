@@ -32,6 +32,11 @@ data class HashUpdate<T>(
         return result
     }
 
-    override fun toString(): String =
-        "HashUpdate(old_hash=${hex(old_hash)}, new_hash=${hex(new_hash)})"
+    override fun toString(): String = buildString {
+        append("HashUpdate(old_hash=")
+        append(hex(old_hash))
+        append(", new_hash=")
+        append(hex(new_hash))
+        append(")")
+    }
 }

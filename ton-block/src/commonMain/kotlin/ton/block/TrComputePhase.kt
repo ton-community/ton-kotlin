@@ -76,11 +76,34 @@ sealed interface TrComputePhase {
             return result
         }
 
-        override fun toString(): String =
-            "TrPhaseComputeVm(success=$success, msg_state_used=$msg_state_used, account_activated=$account_activated, gas_fees=$gas_fees, gas_used=$gas_used, gas_limit=$gas_limit, gas_credit=$gas_credit, mode=$mode, exit_code=$exit_code, exit_arg=$exit_arg, vm_steps=$vm_steps, vm_init_state_hash=${
-                hex(
-                    vm_init_state_hash
-                )
-            }, vm_final_state_hash=${hex(vm_final_state_hash)})"
+        override fun toString(): String = buildString {
+            append("TrPhaseComputeVm(success=")
+            append(success)
+            append(", msg_state_used=")
+            append(msg_state_used)
+            append(", account_activated=")
+            append(account_activated)
+            append(", gas_fees=")
+            append(gas_fees)
+            append(", gas_used=")
+            append(gas_used)
+            append(", gas_limit=")
+            append(gas_limit)
+            append(", gas_credit=")
+            append(gas_credit)
+            append(", mode=")
+            append(mode)
+            append(", exit_code=")
+            append(exit_code)
+            append(", exit_arg=")
+            append(exit_arg)
+            append(", vm_steps=")
+            append(vm_steps)
+            append(", vm_init_state_hash=")
+            append(hex(vm_init_state_hash))
+            append(", vm_final_state_hash=")
+            append(hex(vm_final_state_hash))
+            append(")")
+        }
     }
 }

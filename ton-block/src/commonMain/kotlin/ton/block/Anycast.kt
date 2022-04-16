@@ -30,5 +30,11 @@ data class Anycast(
         return result
     }
 
-    override fun toString() = "anycast_info(depth=$depth, rewrite_pfx=${hex(rewrite_pfx)})"
+    override fun toString() = buildString {
+        append("Anycast(depth=")
+        append(depth)
+        append(", rewrite_pfx=")
+        append(hex(rewrite_pfx))
+        append(")")
+    }
 }

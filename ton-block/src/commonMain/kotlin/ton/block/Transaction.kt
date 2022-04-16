@@ -66,6 +66,33 @@ data class Transaction(
         return result
     }
 
-    override fun toString(): String =
-        "Transaction(account_addr=${hex(account_addr)}, lt=$lt, prev_trans_hash=${hex(prev_trans_hash)}, prev_trans_lt=$prev_trans_lt, now=$now, outmsg_cnt=$outmsg_cnt, orig_status=$orig_status, end_status=$end_status, in_msg=$in_msg, out_msgs=$out_msgs, total_fees=$total_fees, state_update=$state_update, description=$description)"
+    override fun toString(): String = buildString {
+        append("Transaction(account_addr=")
+        append(hex(account_addr))
+        append(", lt=")
+        append(lt)
+        append(", prev_trans_hash=")
+        append(hex(prev_trans_hash))
+        append(", prev_trans_lt=")
+        append(prev_trans_lt)
+        append(", now=")
+        append(now)
+        append(", outmsg_cnt=")
+        append(outmsg_cnt)
+        append(", orig_status=")
+        append(orig_status)
+        append(", end_status=")
+        append(end_status)
+        append(", in_msg=")
+        append(in_msg)
+        append(", out_msgs=")
+        append(out_msgs)
+        append(", total_fees=")
+        append(total_fees)
+        append(", state_update=")
+        append(state_update)
+        append(", description=")
+        append(description)
+        append(")")
+    }
 }

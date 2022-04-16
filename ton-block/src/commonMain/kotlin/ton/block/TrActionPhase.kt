@@ -68,10 +68,35 @@ data class TrActionPhase(
         return result
     }
 
-    override fun toString(): String =
-        "TrActionPhase(success=$success, valid=$valid, no_funds=$no_funds, status_change=$status_change, total_fwd_fees=$total_fwd_fees, total_action_fees=$total_action_fees, result_code=$result_code, result_arg=$result_arg, tot_actions=$tot_actions, spec_actions=$spec_actions, skipped_actions=$skipped_actions, msgs_created=$msgs_created, action_list_hash=${
-            hex(
-                action_list_hash
-            )
-        }, tot_msg_size=$tot_msg_size)"
+    override fun toString(): String = buildString {
+        append("TrActionPhase(success=")
+        append(success)
+        append(", valid=")
+        append(valid)
+        append(", no_funds=")
+        append(no_funds)
+        append(", status_change=")
+        append(status_change)
+        append(", total_fwd_fees=")
+        append(total_fwd_fees)
+        append(", total_action_fees=")
+        append(total_action_fees)
+        append(", result_code=")
+        append(result_code)
+        append(", result_arg=")
+        append(result_arg)
+        append(", tot_actions=")
+        append(tot_actions)
+        append(", spec_actions=")
+        append(spec_actions)
+        append(", skipped_actions=")
+        append(skipped_actions)
+        append(", msgs_created=")
+        append(msgs_created)
+        append(", action_list_hash=")
+        append(hex(action_list_hash))
+        append(", tot_msg_size=")
+        append(tot_msg_size)
+        append(")")
+    }
 }

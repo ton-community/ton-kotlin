@@ -39,8 +39,15 @@ sealed interface MsgAddressInt {
             return result
         }
 
-        override fun toString() =
-            "MsgAddressInt.AddrStd(anycast=$anycast, workchainId=$workchain_id, address=${hex(address)})"
+        override fun toString() = buildString {
+            append("MsgAddressInt.AddrStd(anycast=")
+            append(anycast)
+            append(", workchainId=")
+            append(workchain_id)
+            append(", address=")
+            append(hex(address))
+            append(")")
+        }
     }
 
     @SerialName("addr_var")
@@ -74,7 +81,16 @@ sealed interface MsgAddressInt {
             return result
         }
 
-        override fun toString() =
-            "MsgAddressInt.AddrVar(anycast=$anycast, addrLen=$addr_len, workchainId=$workchain_id, address=${hex(address)})"
+        override fun toString() = buildString {
+            append("MsgAddressInt.AddrVar(anycast=")
+            append(anycast)
+            append(", addrLen=")
+            append(addr_len)
+            append(", workchainId=")
+            append(workchain_id)
+            append(", address=")
+            append(hex(address))
+            append(")")
+        }
     }
 }
