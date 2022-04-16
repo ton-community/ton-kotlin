@@ -6,8 +6,8 @@ plugins {
 }
 
 allprojects {
-    group = "com.github.andreypfau"
-    version = "1.0-SNAPSHOT"
+    group = "org.ton"
+    version = "0.1.0-SNAPSHOT"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -22,7 +22,7 @@ allprojects {
         jvm {
             withJava()
             compilations.all {
-                kotlinOptions.jvmTarget = "17"
+                kotlinOptions.jvmTarget = "11"
             }
             testRuns["test"].executionTask.configure {
                 useJUnitPlatform()

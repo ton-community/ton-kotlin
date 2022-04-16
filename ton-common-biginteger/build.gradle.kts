@@ -1,11 +1,4 @@
 kotlin {
-    macosX64() {
-        binaries {
-            executable {
-                entryPoint = "ton.test.main"
-            }
-        }
-    }
     sourceSets {
         val commonMain by getting {
             dependencies {
