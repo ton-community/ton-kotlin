@@ -1,7 +1,5 @@
 package org.ton.hashmap.tlb
 
-import org.ton.cell.CellReader
-import org.ton.cell.CellWriter
 import org.ton.hashmap.Unary
 import org.ton.hashmap.UnarySuccess
 import org.ton.hashmap.UnaryZero
@@ -22,11 +20,11 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
     ) {
         when (value) {
             is UnarySuccess -> {
-                cellWriter.writeBit(true)
+                cellWriter.storeBit(true)
                 UnarySuccessTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
             }
             is UnaryZero -> {
-                cellWriter.writeBit(false)
+                cellWriter.storeBit(false)
                 UnaryZeroTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
             }
         }

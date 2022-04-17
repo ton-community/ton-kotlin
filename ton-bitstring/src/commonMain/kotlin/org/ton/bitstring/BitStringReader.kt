@@ -1,56 +1,64 @@
 package org.ton.bitstring
 
+import org.ton.primitives.BigInt
+import org.ton.primitives.plus
+import org.ton.primitives.times
+import org.ton.primitives.toBigInt
+
 interface BitStringReader {
+    val remaining: Int
     val bitString: BitString
-    var readPosition: Int
-    val remainingBits: Int
+    var offset: Int
 
-    operator fun get(index: Int): Boolean
+    operator fun get(index: Int): Boolean = bitString[offset]
 
-    fun readBit(): Boolean = get(readPosition++)
+    fun readBit(): Boolean = get(offset++)
 
-    fun readInt(bits: Int = Int.SIZE_BITS): Int {
+    fun readInt(length: Int): BigInt
+    fun readUInt(length: Int): BigInt
+    fun readBits(length: Int): BitString
+
+    companion object {
+        @JvmStatic
+        fun of(bitString: BitString): BitStringReader = BitStringReader(bitString)
+    }
+}
+
+fun BitStringReader(bitString: BitString): BitStringReader = BitStringReaderImpl(bitString)
+
+private class BitStringReaderImpl(
+    override val bitString: BitString,
+    override var offset: Int = 0
+) : BitStringReader {
+    override val remaining: Int get() = bitString.length - offset
+
+    override fun readInt(length: Int): BigInt {
         val isNegative = readBit()
-        val int = readUInt(bits - 1).toInt()
+        val int = readUInt(length - 1)
         return if (isNegative) int * -1 else int
     }
 
-    fun readUInt(bits: Int = UInt.SIZE_BITS): UInt {
-        var int = 0u
-        for (i in 0 until bits) {
-            int *= 2u
-            int += if (readBit()) 1u else 0u
+    override fun readUInt(length: Int): BigInt {
+        require(length in 0..256) { "invalid integer length, expected: 0..256, actual: $length" }
+        return if (length <= Long.SIZE_BITS) {
+            var value = 0L
+            for (i in 0 until length) {
+                value *= 2
+                value += if (readBit()) 1 else 0
+            }
+            value.toBigInt()
+        } else {
+            var value = BigInt(0L)
+            for (i in 0 until length) {
+                value *= 2
+                value += if (readBit()) 1 else 0
+            }
+            value
         }
-        return int
     }
 
-    fun readULong(bits: Int = ULong.SIZE_BITS): ULong {
-        var long: ULong = 0u
-        for (i in 0 until bits) {
-            long *= 2u
-            long += if (readBit()) 1u else 0u
-        }
-        return long
-    }
-
-    fun readBitString(bits: Int): BitString = buildBitString {
-        repeat(bits) {
-            writeBit(readBit())
-        }
+    override fun readBits(length: Int): BitString {
+        val bits = BooleanArray(length) { readBit() }
+        return BitString(*bits)
     }
 }
-
-private data class BitStringReaderImpl(
-    override val bitString: BitString,
-    override var readPosition: Int = 0,
-) : BitStringReader {
-    override val remainingBits: Int
-        get() = bitString.size - readPosition
-
-    override fun get(index: Int): Boolean = bitString[index]
-
-    override fun toString() = "BitStringReader(bitString=$bitString, readPosition=$readPosition)"
-}
-
-fun BitStringReader(data: BitString): BitStringReader = BitStringReaderImpl(data)
-fun BitString.reader() = BitStringReader(this)

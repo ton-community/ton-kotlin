@@ -1,7 +1,5 @@
 package org.ton.hashmap.tlb
 
-import org.ton.cell.CellReader
-import org.ton.cell.CellWriter
 import org.ton.hashmap.HashMapLabel
 import org.ton.hashmap.HashMapLabelLong
 import org.ton.hashmap.HashMapLabelSame
@@ -20,15 +18,15 @@ object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
     ) {
         when (value) {
             is HashMapLabelSame -> {
-                cellWriter.writeBits(true, true)
+                cellWriter.storeBits(true, true)
                 HashMapLabelSameTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
             }
             is HashMapLabelLong -> {
-                cellWriter.writeBits(true, false)
+                cellWriter.storeBits(true, false)
                 HashMapLabelLongTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
             }
             is HashMapLabelShort -> {
-                cellWriter.writeBits(false)
+                cellWriter.storeBits(false)
                 HashMapLabelShortTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
             }
         }
@@ -126,7 +124,7 @@ object HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
         param: Int,
         negativeParam: ((Int) -> Unit)?
     ) {
-        cellWriter.writeBit(value.v)
+        cellWriter.storeBit(value.v)
         cellWriter.writeIntLeq(value.n, param)
         negativeParam?.invoke(value.n)
     }

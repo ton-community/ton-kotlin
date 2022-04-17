@@ -152,7 +152,6 @@ fun Input.readBagOfCell(): BagOfCells {
 }
 
 
-@OptIn(ExperimentalUnsignedTypes::class)
 fun Output.writeBagOfCells(
     bagOfCells: BagOfCells,
     hasIndex: Boolean = false,
@@ -172,9 +171,9 @@ fun Output.writeBagOfCells(
         buildPacket {
             val d1 = cell.references.size + (if (cell.isExotic) 1 else 0) * 8 + cell.maxLevel * 32
             writeByte(d1.toByte())
-            val d2 = ceil(cell.bitString.size / 8.0) + floor(cell.bitString.size / 8.0)
+            val d2 = ceil(cell.data.length / 8.0) + floor(cell.data.length / 8.0)
             writeByte(d2.toInt().toByte())
-            writeFully(cell.bitString.bits)
+            writeFully(cell.data.toByteArray())
             cell.references.forEach { reference ->
                 writeInt(cells.indexOf(reference), sizeBytes)
             }

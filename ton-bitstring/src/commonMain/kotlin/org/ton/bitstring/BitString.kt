@@ -1,151 +1,149 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
+@file:Suppress("OPT_IN_USAGE")
 
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
-import kotlin.math.ceil
+import kotlin.experimental.and
+import kotlin.experimental.inv
+import kotlin.experimental.or
 import kotlin.math.min
 
-@Serializable(with = BitStringSerializer::class)
-data class BitString constructor(
-    val size: Int,
-    val bits: UByteArray,
+@Serializable(with = FiftHexBitStringSerializer::class)
+class BitString constructor(
+    val length: Int = MAX_LENGTH,
+    private val words: ByteArray = ByteArray(length / Byte.SIZE_BITS + if (length % Byte.SIZE_BITS == 0) 0 else 1)
 ) : Iterable<Boolean>, Comparable<BitString> {
-    private inline val Int.byteIndex get() = this / 8 or 0
 
-    operator fun set(index: Int, value: Boolean) {
-        bits[index.byteIndex] = if (value) {
-            bits[index.byteIndex] or (1 shl 7 - index % 8).toUByte()
+    init {
+        require(length <= MAX_LENGTH) { "BitString expected max length: $MAX_LENGTH, actual: $length" }
+    }
+
+    constructor(byteArray: ByteArray) : this(byteArray.size * Byte.SIZE_BITS, byteArray)
+
+    operator fun set(index: Int, bit: Int) = set(index, bit != 0)
+
+    operator fun set(index: Int, bit: Boolean) {
+        val wordIndex = index.wordIndex
+        val bitMask = index.bitMask
+        if (bit) {
+            words[wordIndex] = words[wordIndex] or bitMask
         } else {
-            bits[index.byteIndex] and (1 shl 7 - index % 8).inv().toUByte()
+            words[wordIndex] = words[wordIndex] and bitMask.inv()
         }
     }
 
-    operator fun get(index: Int): Boolean = (bits[(index / 8) or 0] and (1 shl (7 - (index % 8))).toUByte()) > 0u
-
-    operator fun plus(other: BitString): BitString = buildBitString {
-        writeBitString(this@BitString)
-        writeBitString(other)
+    operator fun get(index: Int): Boolean {
+        val wordIndex = index.wordIndex
+        val bitMask = index.bitMask
+        return (words[wordIndex] and bitMask) != 0.toByte()
     }
 
-    operator fun plus(bit: Boolean) = buildBitString {
-        writeBitString(this@BitString)
-        writeBit(bit)
-    }
+    fun toByteArray(): ByteArray = words.copyOf()
 
-    override fun toString(): String = toString(false)
-    fun toString(debug: Boolean): String = buildString {
-        if (debug) {
-            append("[")
-        }
-        toString(this)
-        if (debug) {
-            append(" ")
-            this@BitString.forEachIndexed { index, bit ->
-                append(bit.toInt())
-            }
-            append(']')
-        }
-    }
-
-    private fun toString(sb: StringBuilder) {
-        if (size % 4 == 0) {
-            val slice = bits.slice(0 until ceil(size / 8.0).toInt())
-            slice.forEach {
-                val hex = it.toString(16).uppercase()
-                if (hex.length < 2) {
-                    sb.append('0')
-                }
-                sb.append(hex)
-            }
-            if (size % 8 != 0) {
-                sb.setLength(sb.length - 1)
-            }
-        } else {
-            val temp = buildBitString {
-                writeBitString(this@BitString)
-                writeBit(true)
-                while (writePosition % 4 != 0) {
-                    writeBit(false)
-                }
-            }
-            temp.toString(sb)
-            sb.append('_')
-        }
-    }
+    override fun iterator(): Iterator<Boolean> = BitStringIterator(this)
 
     override fun compareTo(other: BitString): Int {
-        val limit = min(size, other.size)
+        val limit = min(length, other.length)
         repeat(limit) {
             val thisValue = this[it]
             val otherValue = other[it]
             if (thisValue != otherValue) {
-                if (thisValue) {
-                    return 1
-                }
-                if (otherValue) {
-                    return -1
+                return if (thisValue) {
+                    1
+                } else {
+                    -1
                 }
             }
         }
-        return size-other.size
+        return length - other.length
+    }
+
+    override fun toString(): String = buildString {
+        this@BitString.forEach { bit ->
+            if (bit) {
+                append('1')
+            } else {
+                append('0')
+            }
+        }
+    }
+
+    fun toFiftHex(): String {
+        val stringBuilder = StringBuilder()
+
+        val l = length % 4
+        if (l == 0) {
+            words.forEach { byte ->
+                val hex = (byte.toInt() and 0xFF).toString(16).uppercase()
+                stringBuilder.append(hex)
+            }
+            if (length % 8 != 0) {
+                stringBuilder.setLength(stringBuilder.length - 1)
+            }
+        } else {
+            words.forEach { byte ->
+                val hex = (byte.toInt() and 0xFF).toString(16).uppercase()
+                stringBuilder.append(hex)
+            }
+            val bitMask = length.bitMask
+            val value = words.last() or bitMask
+            val hex = (value.toInt() and 0xFF).toString(16)
+            if (bitMask > 0b0000_1111.toByte()) {
+                val char = hex.first().uppercaseChar()
+                stringBuilder[stringBuilder.lastIndex - 1] = char
+                stringBuilder[stringBuilder.lastIndex] = '_'
+            } else {
+                val char = hex.last().uppercaseChar()
+                stringBuilder[stringBuilder.lastIndex] = char
+                stringBuilder.append('_')
+            }
+        }
+        return stringBuilder.toString()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
+        if (javaClass != other?.javaClass) return false
 
         other as BitString
 
-        if (size != other.size) return false
-        if (!bits.contentEquals(other.bits)) return false
+        if (length != other.length) return false
+        if (!words.contentEquals(other.words)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = size
-        result = 31 * result + bits.contentHashCode()
+        var result = length
+        result = 31 * result + words.contentHashCode()
         return result
     }
 
-    override fun iterator(): Iterator<Boolean> = BitStringIterator()
-
-    inner class BitStringIterator : BooleanIterator() {
+    class BitStringIterator(val bitString: BitString) : BooleanIterator() {
         private var index = 0
-        override fun hasNext(): Boolean = index < size
-        override fun nextBoolean(): Boolean = get(index++)
+        override fun hasNext(): Boolean = index < bitString.length
+        override fun nextBoolean(): Boolean = bitString[index++]
     }
-}
 
-fun BitString(byteArray: ByteArray) = BitString(byteArray.size * Byte.SIZE_BITS, byteArray.toUByteArray())
-fun BitString(bitSize: Int) = BitString(bitSize, UByteArray(ceil(bitSize / UByte.SIZE_BITS.toDouble()).toInt()))
-fun BitString(vararg bits: Boolean) = buildBitString {
-    writeBits(*bits)
-}
+    companion object {
+        const val MAX_LENGTH = 1023
 
-fun BitString(bitSize: Int, builder: BitString.() -> Unit) = BitString(bitSize).apply(builder)
-fun BitString(hex: String) = buildBitString {
-    hex.forEach {
-        when (it) {
-            '0' -> writeUInt(0u, 4)
-            '1' -> writeUInt(1u, 4)
-            '2' -> writeUInt(2u, 4)
-            '3' -> writeUInt(3u, 4)
-            '4' -> writeUInt(4u, 4)
-            '5' -> writeUInt(5u, 4)
-            '6' -> writeUInt(6u, 4)
-            '7' -> writeUInt(7u, 4)
-            '8' -> writeUInt(8u, 4)
-            '9' -> writeUInt(9u, 4)
-            'A', 'a' -> writeUInt(10u, 4)
-            'B', 'b' -> writeUInt(11u, 4)
-            'C', 'c' -> writeUInt(12u, 4)
-            'D', 'd' -> writeUInt(13u, 4)
-            'E', 'e' -> writeUInt(14u, 4)
-            'F', 'f' -> writeUInt(15u, 4)
+        fun of(vararg bits: Boolean): BitString {
+            val bitString = BitString(bits.size)
+            bits.forEachIndexed { index, bit ->
+                bitString[index] = bit
+            }
+            return bitString
+        }
+
+        fun of(fiftHex: String): BitString {
+            TODO()
         }
     }
 }
 
-fun Boolean.toInt() = if (this) 1 else 0
+fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
+fun BitString(fiftHex: String): BitString = BitString.of(fiftHex)
+
+private inline val Int.wordIndex get() = (this / Byte.SIZE_BITS) or 0
+private inline val Int.bitMask get() = (1 shl (7 - (this % Byte.SIZE_BITS))).toByte()

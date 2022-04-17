@@ -1,7 +1,5 @@
 package org.ton.hashmap.tlb
 
-import org.ton.cell.CellReader
-import org.ton.cell.CellWriter
 import org.ton.hashmap.HashMapNode
 import org.ton.hashmap.HashMapNodeFork
 import org.ton.hashmap.HashMapNodeLeaf

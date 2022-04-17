@@ -1,8 +1,5 @@
 package org.ton.tlb
 
-import org.ton.cell.CellReader
-import org.ton.cell.CellWriter
-
 interface TlbEncoder<T> {
     fun encode(
         cellWriter: CellWriter,
