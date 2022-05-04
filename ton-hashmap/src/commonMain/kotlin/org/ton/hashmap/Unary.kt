@@ -24,6 +24,7 @@ object UnaryZero : Unary() {
     override fun toString() = "unary_zero"
 }
 
+@Suppress("FunctionName")
 fun Unary(x: Int): UnarySuccess {
     var unary = UnarySuccess(UnaryZero)
     repeat(x - 1) {

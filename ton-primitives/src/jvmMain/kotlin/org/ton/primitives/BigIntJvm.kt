@@ -2,7 +2,7 @@ package org.ton.primitives
 
 import java.math.BigInteger
 
-typealias BigInt = BigInteger
+actual typealias BigInt = BigInteger
 
 actual fun Number.toBigInt(): BigInt = when (this) {
     is Long -> BigInteger.valueOf(this)
