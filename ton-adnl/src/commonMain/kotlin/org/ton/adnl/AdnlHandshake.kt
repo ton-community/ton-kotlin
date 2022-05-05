@@ -7,10 +7,10 @@ import org.ton.crypto.sha256
  * Handshake packet, must be sent from client to server prior to any datagrams
  */
 data class AdnlHandshake(
-    val receiver: AdnlAddress,
-    val sender: AdnlPublicKey,
-    val aesParams: AdnlAesParams,
-    val sharedKey: AdnlSharedKey,
+        val receiver: AdnlAddress,
+        val sender: AdnlPublicKey,
+        val aesParams: AdnlAesParams,
+        val sharedKey: AdnlSharedKey,
 ) {
     fun build() = buildPacket {
         writeFully(receiver.value)

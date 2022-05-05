@@ -21,7 +21,7 @@ class Nothing<X> : Maybe<X> {
 @SerialName("just")
 @Serializable
 class Just<X>(
-    override val value: X
+        override val value: X
 ) : Maybe<X>
 
 fun <X> X?.toMaybe(): Maybe<X> = if (this != null) Just(this) else Nothing()

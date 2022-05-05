@@ -3,8 +3,8 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@SerialName("nanograms")
+@SerialName("nanocoins")
 @Serializable
-data class Grams(
-    val amount: VarUInteger
+data class Coins(
+        val amount: VarUInteger
 )

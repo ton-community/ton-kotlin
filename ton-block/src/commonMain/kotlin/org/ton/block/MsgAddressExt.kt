@@ -17,7 +17,7 @@ sealed interface MsgAddressExt {
     @SerialName("addr_extern")
     @Serializable
     data class AddrExtern(
-        val len: Int,
-        val external_address: BitString
+            val len: Int,
+            val external_address: BitString
     ) : MsgAddressExt
 }

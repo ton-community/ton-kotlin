@@ -16,9 +16,9 @@ actual object Ed25519 {
     }
 
     actual fun verify(
-        signature: ByteArray,
-        publicKey: ByteArray,
-        message: ByteArray
+            signature: ByteArray,
+            publicKey: ByteArray,
+            message: ByteArray
     ): Boolean {
         TODO("Not yet implemented")
     }

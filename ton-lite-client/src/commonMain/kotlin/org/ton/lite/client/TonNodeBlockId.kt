@@ -6,9 +6,9 @@ import org.ton.adnl.TLCodec
 
 @Serializable
 data class TonNodeBlockId(
-    val workchain: Int,
-    val shard: Long,
-    val seqno: Int
+        val workchain: Int,
+        val shard: Long,
+        val seqno: Int
 ) {
     companion object : TLCodec<TonNodeBlockId> {
         override val id: Int = -1211256473

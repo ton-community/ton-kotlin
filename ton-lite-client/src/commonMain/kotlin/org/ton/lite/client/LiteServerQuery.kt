@@ -1,4 +1,5 @@
 @file:UseSerializers(HexByteArraySerializer::class)
+
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
@@ -9,7 +10,7 @@ import org.ton.crypto.HexByteArraySerializer
 
 @Serializable
 data class LiteServerQuery(
-    val data: ByteArray
+        val data: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

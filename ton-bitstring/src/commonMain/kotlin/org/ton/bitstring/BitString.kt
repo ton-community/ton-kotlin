@@ -17,6 +17,7 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
     operator fun get(index: Int): Boolean
     fun toByteArray(): ByteArray
     fun toBooleanArray(): BooleanArray
+    fun isEmpty(): Boolean = length == 0
 
     override fun toString(): String
 
@@ -42,6 +43,9 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(byteArray: ByteArray): BitString = BitString(byteArray)
+
+        @JvmStatic
+        fun of(length: Int): BitString = BitString(length)
     }
 }
 
@@ -173,6 +177,8 @@ fun BitString(hex: String): BitString {
 
 fun BitString(byteArray: ByteArray): BitString =
         ByteArrayBitStringImpl(length = byteArray.size * Byte.SIZE_BITS, bytes = byteArray)
+
+fun BitString(length: Int): BitString = ByteArrayBitStringImpl(length)
 
 private inline val Int.wordIndex get() = (this / Byte.SIZE_BITS) or 0
 private inline val Int.bitMask get() = (1 shl (7 - (this % Byte.SIZE_BITS))).toByte()

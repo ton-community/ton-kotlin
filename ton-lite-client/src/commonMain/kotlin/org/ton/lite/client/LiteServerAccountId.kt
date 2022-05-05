@@ -11,8 +11,8 @@ import org.ton.crypto.hex
 
 @Serializable
 data class LiteServerAccountId(
-    val workchain: Int,
-    val id: ByteArray
+        val workchain: Int,
+        val id: ByteArray
 ) {
     init {
         check(id.size == 32)

@@ -9,14 +9,14 @@ import org.ton.tlb.TlbDecoder
 import org.ton.tlb.TlbEncoder
 
 object UnaryTlbCombinator : TlbCombinator<Unary>(
-    constructors = listOf(UnaryZero.tlbCodec, UnarySuccess.tlbCodec)
+        constructors = listOf(UnaryZero.tlbCodec, UnarySuccess.tlbCodec)
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: Unary,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellWriter: CellBuilder,
+            value: Unary,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
         when (value) {
             is UnarySuccess -> {
@@ -31,10 +31,10 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellReader: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): Unary {
         return if (cellReader.readBit()) {
             UnarySuccessTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
@@ -47,14 +47,14 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
 val Unary.Companion.tlbCodec get() = UnaryTlbCombinator
 
 object UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
-    schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
+        schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: UnarySuccess,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellWriter: CellBuilder,
+            value: UnarySuccess,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
         var n = 0
         UnaryTlbCombinator.encode(cellWriter, value.x) { n = it }
@@ -62,10 +62,10 @@ object UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?,
+            cellReader: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?,
     ): UnarySuccess {
         var n = 0
         val x = UnaryTlbCombinator.decode(cellReader) { n = it }
@@ -77,23 +77,23 @@ object UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
 val UnarySuccess.Companion.tlbCodec get() = UnarySuccessTlbConstructor
 
 object UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
-    schema = "unary_zero\$0 = Unary ~0;"
+        schema = "unary_zero\$0 = Unary ~0;"
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: UnaryZero,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellWriter: CellBuilder,
+            value: UnaryZero,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
         negativeParam?.invoke(0)
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellReader: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): UnaryZero {
         negativeParam?.invoke(0)
         return UnaryZero

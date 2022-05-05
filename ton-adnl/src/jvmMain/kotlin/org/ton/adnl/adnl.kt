@@ -16,10 +16,10 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 class AdnlClient(
-    val host: String,
-    val port: Int,
-    val publicKey: AdnlPublicKey,
-    private val dispatcher: CoroutineContext
+        val host: String,
+        val port: Int,
+        val publicKey: AdnlPublicKey,
+        private val dispatcher: CoroutineContext
 ) {
     private lateinit var job: Job
     private val sendFlow = MutableSharedFlow<AdnlMessageQuery>()
@@ -31,9 +31,9 @@ class AdnlClient(
 
     suspend fun connect() = apply {
         connection = aSocket(SelectorManager(dispatcher))
-            .tcp()
-            .connect(host, port)
-            .connection()
+                .tcp()
+                .connect(host, port)
+                .connection()
         performHandshake()
 
         job = CoroutineScope(dispatcher).launch {
@@ -97,18 +97,18 @@ class AdnlClient(
     }
 
     private suspend fun performHandshake(
-        clientPrivateKey: AdnlPrivateKey = AdnlPrivateKey.random(),
-        aesParams: AdnlAesParams = AdnlAesParams.random(),
+            clientPrivateKey: AdnlPrivateKey = AdnlPrivateKey.random(),
+            aesParams: AdnlAesParams = AdnlAesParams.random(),
     ) {
         val clientPublicKey = clientPrivateKey.public()
         val sharedKey = clientPrivateKey.sharedKey(publicKey)
         val handshake =
-            AdnlHandshake(
-                publicKey.address(),
-                clientPublicKey,
-                aesParams,
-                sharedKey
-            ).build().readBytes()
+                AdnlHandshake(
+                        publicKey.address(),
+                        clientPublicKey,
+                        aesParams,
+                        sharedKey
+                ).build().readBytes()
         connection.output.writeFully(handshake)
         connection.output.flush()
 

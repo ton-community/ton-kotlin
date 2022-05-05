@@ -18,16 +18,16 @@ sealed interface AccountState {
     @SerialName("account_active")
     @Serializable
     data class AccountActive(
-        @SerialName("_")
-        val init: org.ton.block.StateInit
+            @SerialName("_")
+            val init: org.ton.block.StateInit
     ) : org.ton.block.AccountState
 
     @SerialName("account_frozen")
     @Serializable
     data class AccountFrozen(
-        @SerialName("state_hash")
-        @Serializable(HexByteArraySerializer::class)
-        val stateHash: ByteArray
+            @SerialName("state_hash")
+            @Serializable(HexByteArraySerializer::class)
+            val stateHash: ByteArray
     ) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

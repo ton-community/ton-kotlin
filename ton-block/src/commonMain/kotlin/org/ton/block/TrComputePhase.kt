@@ -16,25 +16,25 @@ sealed interface TrComputePhase {
     @SerialName("tr_phase_compute_skipped")
     @Serializable
     data class TrPhaseComputeSkipped(
-        val reason: ComputeSkipReason
+            val reason: ComputeSkipReason
     ) : TrComputePhase
 
     @SerialName("tr_phase_compute_vm")
     @Serializable
     data class TrPhaseComputeVm(
-        val success: Boolean,
-        val msg_state_used: Boolean,
-        val account_activated: Boolean,
-        val gas_fees: Grams,
-        val gas_used: VarUInteger,
-        val gas_limit: VarUInteger,
-        val gas_credit: VarUInteger?,
-        val mode: Int,
-        val exit_code: Int,
-        val exit_arg: Int?,
-        val vm_steps: Long,
-        val vm_init_state_hash: ByteArray,
-        val vm_final_state_hash: ByteArray,
+            val success: Boolean,
+            val msg_state_used: Boolean,
+            val account_activated: Boolean,
+            val gas_fees: Coins,
+            val gas_used: VarUInteger,
+            val gas_limit: VarUInteger,
+            val gas_credit: VarUInteger?,
+            val mode: Int,
+            val exit_code: Int,
+            val exit_arg: Int?,
+            val vm_steps: Long,
+            val vm_init_state_hash: ByteArray,
+            val vm_final_state_hash: ByteArray,
     ) : TrComputePhase {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

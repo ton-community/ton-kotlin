@@ -11,11 +11,11 @@ import org.ton.crypto.hex
 
 @Serializable
 data class LiteServerAccountState(
-    val id: TonNodeBlockIdExt,
-    val shardblk: TonNodeBlockIdExt,
-    val shardProof: ByteArray,
-    val proof: ByteArray,
-    val state: ByteArray
+        val id: TonNodeBlockIdExt,
+        val shardblk: TonNodeBlockIdExt,
+        val shardProof: ByteArray,
+        val proof: ByteArray,
+        val state: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -42,11 +42,11 @@ data class LiteServerAccountState(
     }
 
     override fun toString() =
-        "LiteServerAccountState(id=$id, shardblk=$shardblk, shardProof=${hex(shardProof)}, proof=${hex(proof)}, state=${
-            hex(
-                state
-            )
-        })"
+            "LiteServerAccountState(id=$id, shardblk=$shardblk, shardProof=${hex(shardProof)}, proof=${hex(proof)}, state=${
+                hex(
+                        state
+                )
+            })"
 
     companion object : TLCodec<LiteServerAccountState> {
         override val id: Int = 1887029073

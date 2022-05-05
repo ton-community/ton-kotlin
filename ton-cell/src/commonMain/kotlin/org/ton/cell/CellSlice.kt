@@ -1,19 +1,14 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
-import org.ton.bitstring.BitStringReader
 import org.ton.primitives.BigInt
-import kotlin.jvm.JvmStatic
+import org.ton.primitives.minus
+import org.ton.primitives.times
 
 interface CellSlice {
-
-    val refs: Int
-    val bits: Int
-    val bitsRefs: Int
+    val bits: BitString
+    val refs: List<Cell>
     val depth: Int
-    val isDataEmpty: Boolean
-    val isRefsEmpty: Boolean
-    val isEmpty: Boolean get() = isDataEmpty && isRefsEmpty
 
     /**
      * Checks if slice is empty. If not, throws an exception.
@@ -26,37 +21,25 @@ interface CellSlice {
     fun loadRef(): Cell
     fun preloadRef(): Cell
 
-    fun loadInt(length: Int): BigInt
-    fun loadUInt(length: Int): BigInt
+    fun loadBit(): Boolean
+    fun preloadBit(): Boolean
 
+    fun loadBits(length: Int): BooleanArray
+    fun preloadBits(length: Int): BooleanArray
+
+    fun loadBitString(length: Int): BitString
+    fun preloadBitString(length: Int): BitString
+
+    fun loadInt(length: Int): BigInt
     fun preloadInt(length: Int): BigInt
+
+    fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
 
-    fun loadBits(length: Int): CellSlice
-    fun preloadBits(length: Int): CellSlice
+    fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    fun loadGrams(): BigInt
-
-    fun skipBits(length: Int): CellSlice
-
-    fun firstBits(length: Int): CellSlice
-
-    fun skipLastBits(length: Int): CellSlice
-
-    fun sliceLast(length: Int): CellSlice
-
-    fun loadDict(): Cell
-
-    fun preloadDict(): Cell
-
-    fun skipDict(): Cell
-
-    /**
-     * Computes the hash of a slice s and returns it as a 256-bit byte array.
-     * The result is the same as if an ordinary cell containing only data and references from slice
-     * had been created and its hash computed by [Cell.hash].
-     */
-    fun hash(): ByteArray
+    operator fun component1(): BitString = bits
+    operator fun component2(): List<Cell> = refs
 
     companion object {
         @JvmStatic
@@ -65,94 +48,92 @@ interface CellSlice {
 }
 
 private class CellSliceImpl(
-    val data: BitString,
-    val references: List<Cell>
+        override val bits: BitString,
+        override val refs: List<Cell>,
+        private var bitsPosition: Int = 0,
+        private var refsPosition: Int = 0
 ) : CellSlice {
-    constructor(cell: Cell) : this(cell.data, cell.references)
+    constructor(cell: Cell) : this(cell.bits, cell.references)
 
-    private val bitStringReader = BitStringReader(data)
-    private var referenceIndex = 0
+    override val depth: Int by lazy {
+        refs.maxOfOrNull { it.maxDepth } ?: 0
+    }
 
-    override val refs: Int
-        get() = references.size
-    override val bits: Int
-        get() = data.length
-    override val bitsRefs: Int
-        get() = TODO("Not yet implemented")
-    override val depth: Int
-        get() = TODO("Not yet implemented")
-    override val isDataEmpty: Boolean
-        get() = TODO("Not yet implemented")
-    override val isRefsEmpty: Boolean
-        get() = TODO("Not yet implemented")
-
-    override fun endParse() = check(bitStringReader.remaining == 0)
+    override fun endParse() = check(bitsPosition == bits.length)
 
     override fun loadRef(): Cell {
+        checkRefsOverflow()
         val cell = preloadRef()
-        referenceIndex++
+        refsPosition++
         return cell
     }
 
-    override fun preloadRef(): Cell = references[referenceIndex]
+    override fun preloadRef(): Cell = refs[refsPosition]
 
-    override fun loadInt(length: Int): BigInt = bitStringReader.readInt(length)
+    override fun loadBit(): Boolean {
+        val bit = preloadBit()
+        bitsPosition++
+        return bit
+    }
 
-    override fun loadUInt(length: Int): BigInt = bitStringReader.readUInt(length)
+    override fun preloadBit(): Boolean = bits[bitsPosition]
+
+    override fun loadBits(length: Int): BooleanArray {
+        val bits = preloadBits(length)
+        bitsPosition += length
+        return bits
+    }
+
+    override fun loadBitString(length: Int): BitString {
+        val bitString = preloadBitString(length)
+        bitsPosition += length
+        return bitString
+    }
+
+    override fun preloadBitString(length: Int): BitString = BitString(*preloadBits(length))
+
+    override fun preloadBits(length: Int): BooleanArray {
+        checkBitsOverflow(length)
+        return BooleanArray(length) { index ->
+            bits[bitsPosition + index]
+        }
+    }
+
+    override fun loadInt(length: Int): BigInt {
+        val int = preloadInt(length)
+        bitsPosition += length
+        return int
+    }
 
     override fun preloadInt(length: Int): BigInt {
-        val int = bitStringReader.readInt(length)
-        bitStringReader.offset -= length
-        return int
+        val uint = preloadUInt(length)
+        val int = BigInt(1 shl (length - 1))
+        return if (uint >= int) uint - (int * 2) else uint
+    }
+
+    override fun loadUInt(length: Int): BigInt {
+        val uint = preloadUInt(length)
+        bitsPosition += length
+        return uint
     }
 
     override fun preloadUInt(length: Int): BigInt {
-        val int = bitStringReader.readUInt(length)
-        bitStringReader.offset -= length
-        return int
+        val bits = preloadBits(length)
+        val intBits = bits.reversed().joinToString(separator = "") { if (it) "1" else "0" }
+        return BigInt(intBits, 2)
     }
 
-    override fun loadBits(length: Int): CellSlice = CellSliceImpl(bitStringReader.readBits(length), references)
-
-    override fun preloadBits(length: Int): CellSlice {
-        val slice = loadBits(length)
-        bitStringReader.offset -= length
-        return slice
+    private fun checkBitsOverflow(length: Int) {
+        val remaining = bits.length - bitsPosition
+        require(length <= remaining) {
+            "Bits overflow. Can't load $length bits. $remaining bits left."
+        }
     }
 
-    override fun loadGrams(): BigInt {
-        TODO("Not yet implemented")
-    }
-
-    override fun skipBits(length: Int): CellSlice = apply {
-        bitStringReader.offset += length
-    }
-
-    override fun firstBits(length: Int): CellSlice {
-        TODO("Not yet implemented")
-    }
-
-    override fun skipLastBits(length: Int): CellSlice {
-        TODO("Not yet implemented")
-    }
-
-    override fun sliceLast(length: Int): CellSlice {
-        TODO("Not yet implemented")
-    }
-
-    override fun loadDict(): Cell {
-        TODO("Not yet implemented")
-    }
-
-    override fun preloadDict(): Cell {
-        TODO("Not yet implemented")
-    }
-
-    override fun skipDict(): Cell {
-        TODO("Not yet implemented")
-    }
-
-    override fun hash(): ByteArray {
-        TODO("Not yet implemented")
+    private fun checkRefsOverflow() {
+        val remaining = 4 - refsPosition
+        require(1 <= remaining) {
+            "Refs overflow. Can't load ref. $remaining refs left."
+        }
     }
 }

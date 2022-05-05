@@ -12,19 +12,19 @@ import org.ton.hashmap.HashMapE
 @SerialName("transaction")
 @Serializable
 data class Transaction(
-    val account_addr: ByteArray,
-    val lt: Long,
-    val prev_trans_hash: ByteArray,
-    val prev_trans_lt: Long,
-    val now: Long,
-    val outmsg_cnt: Int,
-    val orig_status: AccountStatus,
-    val end_status: AccountStatus,
-    val in_msg: Message<ByteArray>?,
-    val out_msgs: HashMapE<Message<ByteArray>>,
-    val total_fees: CurrencyCollection,
-    val state_update: HashUpdate<org.ton.block.Account>,
-    val description: TransactionDescr
+        val account_addr: ByteArray,
+        val lt: Long,
+        val prev_trans_hash: ByteArray,
+        val prev_trans_lt: Long,
+        val now: Long,
+        val outmsg_cnt: Int,
+        val orig_status: AccountStatus,
+        val end_status: AccountStatus,
+        val in_msg: Message<ByteArray>?,
+        val out_msgs: HashMapE<Message<ByteArray>>,
+        val total_fees: CurrencyCollection,
+        val state_update: HashUpdate<org.ton.block.Account>,
+        val description: TransactionDescr
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

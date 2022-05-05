@@ -9,10 +9,10 @@ import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.hex
 
 data class LiteServerGetTransactions(
-    val count: Int,
-    val account: LiteServerAccountId,
-    val lt: Long,
-    val hash: ByteArray
+        val count: Int,
+        val account: LiteServerAccountId,
+        val lt: Long,
+        val hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -37,7 +37,7 @@ data class LiteServerGetTransactions(
     }
 
     override fun toString() =
-        "LiteServerGetTransactions(count=$count, account=$account, lt=$lt, hash=${hex(hash)})"
+            "LiteServerGetTransactions(count=$count, account=$account, lt=$lt, hash=${hex(hash)})"
 
     companion object : TLCodec<LiteServerGetTransactions> {
         override val id: Int = 474015649

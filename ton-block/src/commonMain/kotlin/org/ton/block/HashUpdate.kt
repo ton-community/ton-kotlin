@@ -11,8 +11,8 @@ import org.ton.crypto.hex
 @SerialName("update_hashes")
 @Serializable
 data class HashUpdate<T>(
-    val old_hash: ByteArray,
-    val new_hash: ByteArray
+        val old_hash: ByteArray,
+        val new_hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

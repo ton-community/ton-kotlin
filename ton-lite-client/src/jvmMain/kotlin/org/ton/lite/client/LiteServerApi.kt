@@ -20,14 +20,14 @@ interface LiteServerApi {
     }
 
     suspend fun getTime() =
-        sendQuery(LiteServerGetTime, LiteServerGetTime, LiteServerCurrentTime)
+            sendQuery(LiteServerGetTime, LiteServerGetTime, LiteServerCurrentTime)
 
     suspend fun getMasterchainInfo() =
-        sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
+            sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
 
     suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId) =
-        getAccountState(LiteServerGetAccountState(id, account))
+            getAccountState(LiteServerGetAccountState(id, account))
 
     suspend fun getAccountState(query: LiteServerGetAccountState) =
-        sendQuery(query, LiteServerGetAccountState, LiteServerAccountState)
+            sendQuery(query, LiteServerGetAccountState, LiteServerAccountState)
 }

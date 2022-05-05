@@ -17,7 +17,7 @@ sealed interface Either<X, Y> {
     @SerialName("left")
     @Serializable
     class Left<X, Y>(
-        val value: X
+            val value: X
     ) : Either<X, Y> {
         override val x: X? = value
         override val y: Y? = null
@@ -44,7 +44,7 @@ sealed interface Either<X, Y> {
     @SerialName("right")
     @Serializable
     class Right<X, Y>(
-        val value: Y
+            val value: Y
     ) : Either<X, Y> {
         override val x: X? = null
         override val y: Y? = value

@@ -7,13 +7,13 @@ import org.ton.crypto.sha256
 
 @JvmInline
 value class AdnlPrivateKey(
-    val value: ByteArray,
+        val value: ByteArray,
 ) {
     fun public(): AdnlPublicKey =
-        AdnlPublicKey(X25519.convertToEd25519(X25519.publicKey(value)))
+            AdnlPublicKey(X25519.convertToEd25519(X25519.publicKey(value)))
 
     fun sharedKey(publicKey: AdnlPublicKey): AdnlSharedKey =
-        AdnlSharedKey(X25519.sharedKey(value, Ed25519.convertToX25519(publicKey.value)))
+            AdnlSharedKey(X25519.sharedKey(value, Ed25519.convertToX25519(publicKey.value)))
 
     override fun toString(): String = hex(value)
 
@@ -24,7 +24,7 @@ value class AdnlPrivateKey(
 
 @JvmInline
 value class AdnlPublicKey(
-    val value: ByteArray,
+        val value: ByteArray,
 ) {
     fun address(): AdnlAddress = AdnlAddress(sha256(ED25519_MAGIC, value))
 
@@ -37,7 +37,7 @@ value class AdnlPublicKey(
 
 @JvmInline
 value class AdnlSharedKey(
-    val value: ByteArray,
+        val value: ByteArray,
 ) {
     override fun toString(): String = hex(value)
 }

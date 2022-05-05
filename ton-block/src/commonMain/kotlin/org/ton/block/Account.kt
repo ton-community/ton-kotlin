@@ -12,9 +12,9 @@ sealed interface Account {
     @SerialName("account")
     @Serializable
     data class AccountImpl(
-        val addr: org.ton.block.MsgAddressInt,
-        val storage_stat: org.ton.block.StorageInfo,
-        val storage: org.ton.block.AccountStorage
+            val addr: org.ton.block.MsgAddressInt,
+            val storage_stat: org.ton.block.StorageInfo,
+            val storage: org.ton.block.AccountStorage
     ) : org.ton.block.Account
 
     @SerialName("account_none")

@@ -6,7 +6,7 @@ import org.ton.adnl.TLCodec
 
 @Serializable
 data class LiteServerCurrentTime(
-    val now: Long
+        val now: Long
 ) {
     companion object : TLCodec<LiteServerCurrentTime> {
         override val id: Int = -380436467

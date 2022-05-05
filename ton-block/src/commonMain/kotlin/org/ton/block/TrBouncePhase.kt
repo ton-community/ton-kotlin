@@ -16,15 +16,15 @@ sealed interface TrBouncePhase {
     @SerialName("tr_phase_bounce_nofunds")
     @Serializable
     data class TrPhaseBounceNoFunds(
-        val msg_size: StorageUsedShort,
-        val req_fwd_fees: Grams
+            val msg_size: StorageUsedShort,
+            val req_fwd_fees: Coins
     ) : TrBouncePhase
 
     @SerialName("tr_phase_bounce_ok")
     @Serializable
     data class TrPhaseBounceOk(
-        val msg_size: StorageUsedShort,
-        val msg_fees: Grams,
-        val fwd_fees: Grams
+            val msg_size: StorageUsedShort,
+            val msg_fees: Coins,
+            val fwd_fees: Coins
     )
 }

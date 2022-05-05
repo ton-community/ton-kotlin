@@ -11,20 +11,20 @@ import org.ton.crypto.hex
 @SerialName("tr_phase_action")
 @Serializable
 data class TrActionPhase(
-    val success: Boolean,
-    val valid: Boolean,
-    val no_funds: Boolean,
-    val status_change: org.ton.block.AccStatusChange,
-    val total_fwd_fees: Grams?,
-    val total_action_fees: Grams?,
-    val result_code: Int,
-    val result_arg: Int?,
-    val tot_actions: Int,
-    val spec_actions: Int,
-    val skipped_actions: Int,
-    val msgs_created: Int,
-    val action_list_hash: ByteArray,
-    val tot_msg_size: StorageUsedShort
+        val success: Boolean,
+        val valid: Boolean,
+        val no_funds: Boolean,
+        val status_change: org.ton.block.AccStatusChange,
+        val total_fwd_fees: Coins?,
+        val total_action_fees: Coins?,
+        val result_code: Int,
+        val result_arg: Int?,
+        val tot_actions: Int,
+        val spec_actions: Int,
+        val skipped_actions: Int,
+        val msgs_created: Int,
+        val action_list_hash: ByteArray,
+        val tot_msg_size: StorageUsedShort
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @SerialName("pair")
 @Serializable
 data class Both<X, Y>(
-    val first: X,
-    val second: Y
+        val first: X,
+        val second: Y
 )
 
 fun <X, Y> Pair<X, Y>.toBoth(): Both<X, Y> = Both(first, second)

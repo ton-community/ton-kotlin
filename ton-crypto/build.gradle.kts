@@ -23,10 +23,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.2")
             }
         }
-        js {
-            browser()
-            binaries.executable()
-        }
     }
 }
 

@@ -14,9 +14,9 @@ import java.time.Instant
 
 suspend fun main() = coroutineScope {
     val liteClient = LiteClient(
-        host = "67.207.74.182",
-        port = 4924,
-        publicKey = hex("a5e253c3f6ab9517ecb204ee7fd04cca9273a8e8bb49712a48f496884c365353")
+            host = "67.207.74.182",
+            port = 4924,
+            publicKey = hex("a5e253c3f6ab9517ecb204ee7fd04cca9273a8e8bb49712a48f496884c365353")
     ).connect()
     val time = liteClient.getTime()
     println("[server time: $time] (${Instant.ofEpochSecond(time.now)})")
@@ -52,9 +52,9 @@ suspend fun LiteClient.lastBlockTask() = coroutineScope {
 }
 
 class LiteClient(
-    host: String,
-    port: Int,
-    publicKey: ByteArray,
+        host: String,
+        port: Int,
+        publicKey: ByteArray,
 ) : LiteServerApi {
     override val adnlClient = AdnlClient(host, port, AdnlPublicKey(publicKey), Dispatchers.Default)
 

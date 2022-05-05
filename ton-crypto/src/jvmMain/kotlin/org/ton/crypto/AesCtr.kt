@@ -6,8 +6,8 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 actual class AesCtr actual constructor(
-    key: ByteArray,
-    iv: ByteArray,
+        key: ByteArray,
+        iv: ByteArray,
 ) {
     private val secretKey: SecretKey = SecretKeySpec(key, "AES")
     private val iv = IvParameterSpec(iv)

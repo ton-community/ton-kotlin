@@ -12,14 +12,14 @@ private const val BOC_INDEXED_MAGIC = 0x68FF65F3
 private const val BOC_INDEXED_CRC32C_MAGIC = 0xACC3A728.toInt()
 
 data class BagOfCells(
-    val roots: List<Cell>,
-    val isIndexed: Boolean = false,
-    val crc32hash: ByteArray? = null
+        val roots: List<Cell>,
+        val isIndexed: Boolean = false,
+        val crc32hash: ByteArray? = null
 ) : Iterable<Cell> by roots {
     constructor(
-        root: Cell,
-        isIndexed: Boolean = false,
-        crc32hash: ByteArray? = null
+            root: Cell,
+            isIndexed: Boolean = false,
+            crc32hash: ByteArray? = null
     ) : this(listOf(root), isIndexed, crc32hash)
 
     fun treeWalk(): Sequence<Cell> = sequence {
@@ -53,7 +53,7 @@ data class BagOfCells(
     }
 
     override fun toString(): String =
-        "BagOfCells(roots=$roots, isIndexed=$isIndexed, crc32hash=${crc32hash?.let { hex(it) }})"
+            "BagOfCells(roots=$roots, isIndexed=$isIndexed, crc32hash=${crc32hash?.let { hex(it) }})"
 }
 
 fun BagOfCells(byteArray: ByteArray) = ByteReadPacket(byteArray).readBagOfCell()
@@ -153,11 +153,11 @@ fun Input.readBagOfCell(): BagOfCells {
 
 
 fun Output.writeBagOfCells(
-    bagOfCells: BagOfCells,
-    hasIndex: Boolean = false,
-    hasCrc32c: Boolean = false,
-    hasCacheBits: Boolean = false,
-    flags: Int = 0
+        bagOfCells: BagOfCells,
+        hasIndex: Boolean = false,
+        hasCrc32c: Boolean = false,
+        hasCacheBits: Boolean = false,
+        flags: Int = 0
 ) {
     val cells = bagOfCells.treeWalk().distinct().toList()
     val cellsCount = cells.size
@@ -171,9 +171,9 @@ fun Output.writeBagOfCells(
         buildPacket {
             val d1 = cell.references.size + (if (cell.isExotic) 1 else 0) * 8 + cell.maxLevel * 32
             writeByte(d1.toByte())
-            val d2 = ceil(cell.data.length / 8.0) + floor(cell.data.length / 8.0)
+            val d2 = ceil(cell.bits.length / 8.0) + floor(cell.bits.length / 8.0)
             writeByte(d2.toInt().toByte())
-            writeFully(cell.data.toByteArray())
+            writeFully(cell.bits.toByteArray())
             cell.references.forEach { reference ->
                 writeInt(cells.indexOf(reference), sizeBytes)
             }
@@ -226,5 +226,25 @@ fun Output.writeBagOfCells(
     }
     if (hasCrc32c) {
         TODO()
+    }
+}
+
+private fun Input.readInt(bytes: Int): Int {
+    var result = 0
+    var b = bytes
+    while (b > 0) {
+        result = (result shl 8) + readByte()
+        b--
+    }
+    return result
+}
+
+private fun Output.writeInt(value: Int, bytes: Int) {
+    var v = value
+    var b = bytes
+    while (b > 0) {
+        writeByte((v and 0xff).toByte())
+        v = v shr 8
+        b--
     }
 }

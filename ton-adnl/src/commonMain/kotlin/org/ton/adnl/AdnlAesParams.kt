@@ -8,11 +8,11 @@ import kotlin.random.Random
  * Session parameters for AES-CTR encryption of datagrams
  */
 data class AdnlAesParams(
-    val rxKey: ByteArray = ByteArray(32),
-    val txKey: ByteArray = ByteArray(32),
-    val rxNonce: ByteArray = ByteArray(16),
-    val txNonce: ByteArray = ByteArray(16),
-    val padding: ByteArray = ByteArray(64),
+        val rxKey: ByteArray = ByteArray(32),
+        val txKey: ByteArray = ByteArray(32),
+        val rxNonce: ByteArray = ByteArray(16),
+        val txNonce: ByteArray = ByteArray(16),
+        val padding: ByteArray = ByteArray(64),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -6,8 +6,8 @@ import org.ton.adnl.TLCodec
 
 @Serializable
 data class LiteServerGetAccountState(
-    val id: TonNodeBlockIdExt,
-    val account: LiteServerAccountId,
+        val id: TonNodeBlockIdExt,
+        val account: LiteServerAccountId,
 ) {
     companion object : TLCodec<LiteServerGetAccountState> {
         override val id: Int = 1804144165

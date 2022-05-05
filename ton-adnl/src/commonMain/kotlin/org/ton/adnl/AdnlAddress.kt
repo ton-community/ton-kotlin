@@ -5,5 +5,5 @@ package org.ton.adnl
  */
 @JvmInline
 value class AdnlAddress(
-    val value: ByteArray,
+        val value: ByteArray,
 )

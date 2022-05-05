@@ -1,36 +1,32 @@
 package org.ton.cell
 
-import org.ton.primitives.BigInt
-import kotlin.jvm.JvmStatic
-
+import org.ton.bitstring.BitString
+import org.ton.primitives.*
 
 interface CellBuilder {
-
-    /**
-     * @return the number of cell references already stored in builder.
-     */
-    val builderRefs: Int
-
-    /**
-     * @return the number of data bits already stored in builder.
-     */
-    val builderBits: Int
+    var bits: BitString
+    var refs: MutableList<Cell>
 
     /**
      * @return the depth of builder. If no cell references are stored in builder, then returns `0`;
      * otherwise the returned value is one plus the maximum of depths of cells referred to from builder.
      */
-    val builderDepth: Int
+    val depth: Int get() = refs.maxOfOrNull { it.maxDepth } ?: 0
 
     /**
      * Converts a builder into an ordinary cell.
      */
     fun endCell(): Cell
 
+    fun storeBit(bit: Boolean): CellBuilder
+    fun storeBits(vararg bits: Boolean): CellBuilder
+    fun storeBits(bits: Iterable<Boolean>): CellBuilder
+
     /**
      * Stores a reference to cell into builder.
      */
-    fun storeRef(cell: Cell): CellBuilder
+    fun storeRef(ref: Cell): CellBuilder
+    fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder
 
     /**
      * Stores an unsigned [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 256.
@@ -40,6 +36,18 @@ interface CellBuilder {
     fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(BigInt(value), length)
     fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(BigInt(value), length)
     fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(BigInt(value), length)
+
+    fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
+    fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+
+    fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
+    fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
 
     /**
      * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
@@ -55,84 +63,79 @@ interface CellBuilder {
      */
     fun storeSlice(slice: CellSlice): CellBuilder
 
-    /**
-     * Stores (serializes) an integer [value] in the range `0..2^128 − 1` into builder.
-     * The serialization of [value] consists of a 4-bit unsigned big-endian integer `l`,
-     * which is the smallest integer `l ≥ 0`, such that `x < 2^8*l`,
-     * followed by an `8*l`-bit unsigned big-endian representation of [value].
-     * If [value] does not belong to the supported range, a range check exception is thrown.
-     */
-    fun storeGrams(value: BigInt): CellBuilder
-    fun storeGrams(value: Long): CellBuilder = storeGrams(BigInt(value))
-    fun storeGrams(value: Int): CellBuilder = storeGrams(BigInt(value))
-    fun storeGrams(value: Short): CellBuilder = storeGrams(BigInt(value))
-    fun storeGrams(value: Byte): CellBuilder = storeGrams(BigInt(value))
-
-    /**
-     * Stores dictionary represented by cell [cell] or null into builder.
-     * In other words, stores a `1`-bit and a reference to [cell]. If [cell] is not null and `0`-bit otherwise.
-     */
-    fun storeDict(cell: Cell?): CellBuilder
-
     companion object {
         @JvmStatic
-        fun beginCell(): CellBuilder = CellBuilderImpl()
+        fun beginCell(length: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(length)
+
+        @JvmStatic
+        fun createCell(length: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell = CellBuilderImpl(length).apply(builder).endCell()
     }
 }
 
 private class CellBuilderImpl(
-
+        length: Int
 ) : CellBuilder {
-    override val builderRefs: Int
-        get() = TODO("Not yet implemented")
-    override val builderBits: Int
-        get() = TODO("Not yet implemented")
-    override val builderDepth: Int
-        get() = TODO("Not yet implemented")
+    override var bits: BitString = BitString(length)
+    override var refs: MutableList<Cell> = ArrayList()
 
-    override fun endCell(): Cell {
-        TODO("Not yet implemented")
+    private val remainder: Int get() = bits.length - writePosition
+    private var writePosition: Int = 0
+
+    override fun endCell(): Cell = Cell(bits, refs)
+
+    override fun storeBit(bit: Boolean): CellBuilder = apply {
+        checkBitsOverflow(1)
+        bits[writePosition++] = bit
     }
 
-    override fun storeRef(cell: Cell): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeBits(vararg bits: Boolean): CellBuilder = apply {
+        checkBitsOverflow(bits.size)
+        bits.forEach { bit ->
+            this.bits[writePosition++] = bit
+        }
     }
 
-    override fun storeUInt(value: BigInt, length: Int): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(*bits.toList().toBooleanArray())
+
+    override fun storeRef(ref: Cell): CellBuilder = apply {
+        checkRefsOverflow(1)
+        refs.add(ref)
     }
 
-    override fun storeInt(value: BigInt, length: Int): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
+        storeRef(CellBuilder.beginCell().apply(refBuilder).endCell())
     }
 
-    override fun storeSlice(slice: CellSlice): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {
+        val bits = BooleanArray(length) { index ->
+            ((value shr index) and BigInt(1)).toInt() == 1
+        }.reversedArray()
+        storeBits(*bits)
     }
 
-    override fun storeGrams(value: BigInt): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeInt(value: BigInt, length: Int): CellBuilder = apply {
+        val intBits = BigInt(1) shl (length - 1)
+        require(value >= -intBits && value < intBits) { "Can't store an Int, because its value allocates more space than provided." }
+        storeInt(value, length)
     }
 
-    override fun storeDict(cell: Cell?): CellBuilder {
-        TODO("Not yet implemented")
+    override fun storeSlice(slice: CellSlice): CellBuilder = apply {
+        val (bits, refs) = slice
+
+        checkBitsOverflow(bits.length)
+        checkRefsOverflow(refs.size)
+
+        storeBits(bits)
+        refs.forEach { ref ->
+            storeRef(ref)
+        }
+    }
+
+    private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
+        "Bits overflow. Can't add $length bits. $remainder bits left."
+    }
+
+    private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {
+        "Refs overflow. Can't add $count refs. ${4 - refs.size} refs left."
     }
 }
-
-//private class CellBuilderImpl(
-//    private val data: BitStringBuilder = BitStringBuilder(),
-//    override var cellReferences: MutableList<Cell> = ArrayList(),
-//) : CellBuilder, BitStringBuilder by data {
-//    override var writePosition: Int
-//        get() = data.writePosition
-//        set(value) {
-//            data.writePosition = value
-//        }
-//
-//    override fun toCell() = Cell(data.build(), cellReferences)
-//}
-//
-//@JsName("createCellBuilder")
-//fun CellBuilder(): CellBuilder = CellBuilderImpl()
-//
-//fun buildCell(builder: CellBuilder.() -> Unit): Cell = CellBuilder().apply(builder).toCell()

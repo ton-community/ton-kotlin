@@ -14,10 +14,10 @@ sealed interface MsgAddressInt {
     @SerialName("addr_std")
     @Serializable
     data class AddrStd(
-        val anycast: Anycast?,
-        val workchain_id: Int,
-        @Serializable(HexByteArraySerializer::class)
-        val address: ByteArray
+            val anycast: Anycast?,
+            val workchain_id: Int,
+            @Serializable(HexByteArraySerializer::class)
+            val address: ByteArray
     ) : MsgAddressInt {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -53,11 +53,11 @@ sealed interface MsgAddressInt {
     @SerialName("addr_var")
     @Serializable
     data class AddrVar(
-        val anycast: Anycast?,
-        val addr_len: Int,
-        val workchain_id: Int,
-        @Serializable(HexByteArraySerializer::class)
-        val address: ByteArray
+            val anycast: Anycast?,
+            val addr_len: Int,
+            val workchain_id: Int,
+            @Serializable(HexByteArraySerializer::class)
+            val address: ByteArray
     ) : MsgAddressInt {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 @SerialName("tr_phase_credit")
 @Serializable
 data class TrCreditPhase(
-    val due_fees_collected: Grams,
-    val credit: CurrencyCollection
+        val due_fees_collected: Coins,
+        val credit: CurrencyCollection
 )

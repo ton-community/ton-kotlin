@@ -19,7 +19,7 @@ class EmptyHashMapE<T> : HashMapE<T>() {
 @Serializable
 @SerialName("hme_root")
 data class RootHashMapE<T>(
-    val root: HashMapEdge<T>
+        val root: HashMapEdge<T>
 ) : HashMapE<T>() {
     override fun toString(): String = "hme_root(root=$root)"
 }

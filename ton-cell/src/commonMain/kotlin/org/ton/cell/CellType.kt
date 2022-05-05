@@ -1,7 +1,7 @@
 package org.ton.cell;
 
 enum class CellType(
-    val value: Int
+        val value: Int
 ) {
     /**
      * Contains up to 1023 bits of data and up to four cell references.

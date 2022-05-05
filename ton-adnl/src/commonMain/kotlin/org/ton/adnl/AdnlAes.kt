@@ -4,8 +4,8 @@ import io.ktor.utils.io.core.*
 import org.ton.crypto.AesCtr
 
 class AdnlAes(
-    key: ByteArray,
-    iv: ByteArray,
+        key: ByteArray,
+        iv: ByteArray,
 ) {
     private val backend = AesCtr(key, iv)
 

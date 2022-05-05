@@ -14,8 +14,8 @@ sealed class HashMapLabel
 @Serializable
 @SerialName("hml_short")
 data class HashMapLabelShort(
-    val len: Unary,
-    val s: BitString
+        val len: Unary,
+        val s: BitString
 ) : HashMapLabel() {
     constructor(s: BitString) : this(Unary(s.length), s)
 
@@ -25,8 +25,8 @@ data class HashMapLabelShort(
 @Serializable
 @SerialName("hml_long")
 data class HashMapLabelLong(
-    val n: Int,
-    val s: BitString
+        val n: Int,
+        val s: BitString
 ) : HashMapLabel() {
     constructor(s: BitString) : this(s.length, s)
 
@@ -36,8 +36,8 @@ data class HashMapLabelLong(
 @Serializable
 @SerialName("hml_same")
 data class HashMapLabelSame(
-    val v: Boolean,
-    val n: Int
+        val v: Boolean,
+        val n: Int
 ) : HashMapLabel() {
     override fun toString() = "hml_same(v=$v, n=$n)"
 }

@@ -8,9 +8,9 @@ import org.ton.crypto.hex
 @SerialName("anycast_info")
 @Serializable
 data class Anycast(
-    val depth: Int,
-    @Serializable(HexByteArraySerializer::class)
-    val rewrite_pfx: ByteArray
+        val depth: Int,
+        @Serializable(HexByteArraySerializer::class)
+        val rewrite_pfx: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

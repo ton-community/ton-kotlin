@@ -1,51 +1,57 @@
 package org.ton.hashmap.tlb
 
+import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapLabel
 import org.ton.hashmap.HashMapLabelLong
 import org.ton.hashmap.HashMapLabelSame
 import org.ton.hashmap.HashMapLabelShort
-import org.ton.tlb.*
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbDecoder
+import org.ton.tlb.TlbEncoder
 
 object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
-    constructors = listOf(HashMapLabelShort.tlbCodec, HashMapLabelLong.tlbCodec, HashMapLabelSame.tlbCodec)
+        constructors = listOf(HashMapLabelShort.tlbCodec, HashMapLabelLong.tlbCodec, HashMapLabelSame.tlbCodec)
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: HashMapLabel,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellBuilder: CellBuilder,
+            value: HashMapLabel,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
         when (value) {
             is HashMapLabelSame -> {
-                cellWriter.storeBits(true, true)
-                HashMapLabelSameTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
+                cellBuilder.storeBits(true, true)
+                HashMapLabelSameTlbConstructor.encode(cellBuilder, value, typeParam, param, negativeParam)
             }
             is HashMapLabelLong -> {
-                cellWriter.storeBits(true, false)
-                HashMapLabelLongTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
+                cellBuilder.storeBits(true, false)
+                HashMapLabelLongTlbConstructor.encode(cellBuilder, value, typeParam, param, negativeParam)
             }
             is HashMapLabelShort -> {
-                cellWriter.storeBits(false)
-                HashMapLabelShortTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
+                cellBuilder.storeBits(false)
+                HashMapLabelShortTlbConstructor.encode(cellBuilder, value, typeParam, param, negativeParam)
             }
         }
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellSlice: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): HashMapLabel {
-        return if (cellReader.readBit()) {
-            if (cellReader.readBit()) {
-                HashMapLabelSameTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
+        return if (cellSlice.loadBit()) {
+            if (cellSlice.loadBit()) {
+                HashMapLabelSameTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
             } else {
-                HashMapLabelLongTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
+                HashMapLabelLongTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
             }
         } else {
-            HashMapLabelShortTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
+            HashMapLabelShortTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
         }
     }
 }
@@ -53,30 +59,30 @@ object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
 val HashMapLabel.Companion.tlbCodec get() = HashMapLabelTlbCombinator
 
 object HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
-    schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;"
+        schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;"
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: HashMapLabelShort,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellBuilder: CellBuilder,
+            value: HashMapLabelShort,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
         var n = 0
-        UnaryTlbCombinator.encode(cellWriter, value.len, typeParam, param) { n = it }
-        cellWriter.writeBitString(value.s)
+        UnaryTlbCombinator.encode(cellBuilder, value.len, typeParam, param) { n = it }
+        cellBuilder.storeBits(value.s)
         negativeParam?.invoke(n)
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellSlice: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): HashMapLabelShort {
         var n = 0
-        val len = UnaryTlbCombinator.decode(cellReader) { n = it }
-        val s = cellReader.readBitString(n)
+        val len = UnaryTlbCombinator.decode(cellSlice) { n = it }
+        val s = BitString(*cellSlice.loadBits(n))
         negativeParam?.invoke(n)
         return HashMapLabelShort(len, s)
     }
@@ -85,28 +91,28 @@ object HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
 val HashMapLabelShort.Companion.tlbCodec get() = HashMapLabelShortTlbConstructor
 
 object HashMapLabelLongTlbConstructor : TlbConstructor<HashMapLabelLong>(
-    schema = "hml_long\$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;"
+        schema = "hml_long\$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;"
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: HashMapLabelLong,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellBuilder: CellBuilder,
+            value: HashMapLabelLong,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
-        cellWriter.writeIntLeq(value.n, param)
-        cellWriter.writeBitString(value.s)
+        cellBuilder.storeUIntLeq(value.n, param)
+        cellBuilder.storeBits(value.s)
         negativeParam?.invoke(value.n)
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellSlice: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): HashMapLabelLong {
-        val n = cellReader.readIntLeq(param)
-        val s = cellReader.readBitString(n)
+        val n = cellSlice.loadInt(param).toInt()
+        val s = cellSlice.loadBitString(n)
         negativeParam?.invoke(n)
         return HashMapLabelLong(n, s)
     }
@@ -115,28 +121,28 @@ object HashMapLabelLongTlbConstructor : TlbConstructor<HashMapLabelLong>(
 val HashMapLabelLong.Companion.tlbCodec get() = HashMapLabelLongTlbConstructor
 
 object HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
-    schema = "hml_same\$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;"
+        schema = "hml_same\$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;"
 ) {
     override fun encode(
-        cellWriter: CellWriter,
-        value: HashMapLabelSame,
-        typeParam: TlbEncoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellBuilder: CellBuilder,
+            value: HashMapLabelSame,
+            typeParam: TlbEncoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ) {
-        cellWriter.storeBit(value.v)
-        cellWriter.writeIntLeq(value.n, param)
+        cellBuilder.storeBit(value.v)
+        cellBuilder.storeUIntLeq(value.n, param)
         negativeParam?.invoke(value.n)
     }
 
     override fun decode(
-        cellReader: CellReader,
-        typeParam: TlbDecoder<Any>?,
-        param: Int,
-        negativeParam: ((Int) -> Unit)?
+            cellSlice: CellSlice,
+            typeParam: TlbDecoder<Any>?,
+            param: Int,
+            negativeParam: ((Int) -> Unit)?
     ): HashMapLabelSame {
-        val v = cellReader.readBit()
-        val n = cellReader.readIntLeq(param)
+        val v = cellSlice.loadBit()
+        val n = cellSlice.loadInt(param).toInt()
         negativeParam?.invoke(n)
         return HashMapLabelSame(v, n)
     }

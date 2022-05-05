@@ -6,8 +6,8 @@ import org.ton.adnl.TLCodec
 
 @Serializable
 data class LiteServerError(
-    val code: Int,
-    override val message: String
+        val code: Int,
+        override val message: String
 ) : RuntimeException("$code $message") {
     override fun fillInStackTrace(): Throwable? = null
 

@@ -13,7 +13,7 @@ sealed class HashMapNode<T>
 @Serializable
 @SerialName("hmn_leaf")
 data class HashMapNodeLeaf<T>(
-    val value: T
+        val value: T
 ) : HashMapNode<T>() {
     override fun toString() = "hmn_leaf(value=$value)"
 }
@@ -21,8 +21,8 @@ data class HashMapNodeLeaf<T>(
 @Serializable
 @SerialName("hmn_fork")
 class HashMapNodeFork<T>(
-    val left: HashMapEdge<T>,
-    val right: HashMapEdge<T>
+        val left: HashMapEdge<T>,
+        val right: HashMapEdge<T>
 ) : HashMapNode<T>() {
     override fun toString() = "hmn_fork(left=$left, right=$right)"
 }

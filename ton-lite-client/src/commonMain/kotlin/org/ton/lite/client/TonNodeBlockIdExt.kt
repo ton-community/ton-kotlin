@@ -11,9 +11,9 @@ import org.ton.crypto.hex
 
 @Serializable
 data class TonNodeBlockIdExt(
-    val id: TonNodeBlockId,
-    val rootHash: ByteArray,
-    val fileHash: ByteArray
+        val id: TonNodeBlockId,
+        val rootHash: ByteArray,
+        val fileHash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -36,7 +36,7 @@ data class TonNodeBlockIdExt(
     }
 
     override fun toString() =
-        "TonNodeBlockIdExt(id=$id, rootHash=${hex(rootHash)}, fileHash=${hex(fileHash)})"
+            "TonNodeBlockIdExt(id=$id, rootHash=${hex(rootHash)}, fileHash=${hex(fileHash)})"
 
     companion object : TLCodec<TonNodeBlockIdExt> {
         override val id: Int = 1733487480

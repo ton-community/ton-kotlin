@@ -5,8 +5,8 @@ import org.ton.adnl.TLCodec
 import org.ton.crypto.hex
 
 data class AdnlMessageQuery(
-    val queryId: ByteArray,
-    val query: ByteArray
+        val queryId: ByteArray,
+        val query: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -11,9 +11,9 @@ import org.ton.crypto.hex
 
 @Serializable
 data class LiteServerMasterchainInfo(
-    val last: TonNodeBlockIdExt,
-    val stateRootHash: ByteArray,
-    val init: TonNodeZeroStateIdExt
+        val last: TonNodeBlockIdExt,
+        val stateRootHash: ByteArray,
+        val init: TonNodeZeroStateIdExt
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -36,7 +36,7 @@ data class LiteServerMasterchainInfo(
     }
 
     override fun toString() =
-        "LiteServerMasterchainInfo(last=$last, stateRootHash=${hex(stateRootHash)}, init=$init)"
+            "LiteServerMasterchainInfo(last=$last, stateRootHash=${hex(stateRootHash)}, init=$init)"
 
     companion object : TLCodec<LiteServerMasterchainInfo> {
         override val id: Int = -2055001983
