@@ -1,9 +1,18 @@
+import java.util.*
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("org.jetbrains.kotlinx.benchmark")
     `maven-publish`
     signing
+}
+
+val localPropsFile = project.rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    val p = Properties()
+    localPropsFile.inputStream().use { p.load(it) }
+    p.forEach { name, value -> ext.set(name.toString(), value) }
 }
 
 allprojects {
@@ -13,6 +22,7 @@ allprojects {
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     repositories {
         mavenCentral()
@@ -50,11 +60,26 @@ allprojects {
             }
         }
     }
-}
 
-publishing {
-    publications {
-        create<MavenPublication>("ton-kotlin") {
+    val javadocJar by tasks.registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+    }
+
+    publishing {
+        repositories {
+            maven {
+                val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                url = if (version.toString().contains("SNAPSHOT")) snapshotsUrl else releasesUrl
+                credentials {
+                    username = project.properties["ossrhUsername"].toString()
+                    password = project.properties["ossrhPassword"].toString()
+                }
+            }
+        }
+
+        publications.withType<MavenPublication> {
+            artifact(javadocJar.get())
             pom {
                 name.set("ton-kotlin")
                 description.set("Pure Kotlin implementation of The Open Network")
@@ -81,19 +106,11 @@ publishing {
         }
     }
 
-    repositories {
-        maven {
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().contains("SNAPSHOT")) snapshotsUrl else releasesUrl
-            credentials {
-                username = project.properties["ossrh_username"].toString()
-                password = project.properties["ossrh_password"].toString()
-            }
-        }
+    signing {
+        sign(publishing.publications)
+        val keyId = project.properties["signing.keyId"].toString()
+        val secretKey = project.properties["signing.secretKey"].toString()
+        val password = project.properties["signing.password"].toString()
+        useInMemoryPgpKeys(keyId, secretKey, password)
     }
-}
-
-signing {
-    sign(publishing.publications)
 }

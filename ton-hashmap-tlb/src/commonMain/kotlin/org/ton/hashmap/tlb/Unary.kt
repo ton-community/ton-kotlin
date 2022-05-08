@@ -1,5 +1,7 @@
 package org.ton.hashmap.tlb
 
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.hashmap.Unary
 import org.ton.hashmap.UnarySuccess
 import org.ton.hashmap.UnaryZero
@@ -36,7 +38,7 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
             param: Int,
             negativeParam: ((Int) -> Unit)?
     ): Unary {
-        return if (cellReader.readBit()) {
+        return if (cellReader.loadBit()) {
             UnarySuccessTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
         } else {
             UnaryZeroTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
@@ -50,25 +52,25 @@ object UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
         schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
 ) {
     override fun encode(
-            cellWriter: CellBuilder,
+            cellBuilder: CellBuilder,
             value: UnarySuccess,
             typeParam: TlbEncoder<Any>?,
             param: Int,
             negativeParam: ((Int) -> Unit)?
     ) {
         var n = 0
-        UnaryTlbCombinator.encode(cellWriter, value.x) { n = it }
+        UnaryTlbCombinator.encode(cellBuilder, value.x) { n = it }
         negativeParam?.invoke(n + 1)
     }
 
     override fun decode(
-            cellReader: CellSlice,
+            cellSlice: CellSlice,
             typeParam: TlbDecoder<Any>?,
             param: Int,
             negativeParam: ((Int) -> Unit)?,
     ): UnarySuccess {
         var n = 0
-        val x = UnaryTlbCombinator.decode(cellReader) { n = it }
+        val x = UnaryTlbCombinator.decode(cellSlice) { n = it }
         negativeParam?.invoke(n + 1)
         return UnarySuccess(x)
     }
@@ -80,7 +82,7 @@ object UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
         schema = "unary_zero\$0 = Unary ~0;"
 ) {
     override fun encode(
-            cellWriter: CellBuilder,
+            cellBuilder: CellBuilder,
             value: UnaryZero,
             typeParam: TlbEncoder<Any>?,
             param: Int,
@@ -90,7 +92,7 @@ object UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
     }
 
     override fun decode(
-            cellReader: CellSlice,
+            cellSlice: CellSlice,
             typeParam: TlbDecoder<Any>?,
             param: Int,
             negativeParam: ((Int) -> Unit)?
