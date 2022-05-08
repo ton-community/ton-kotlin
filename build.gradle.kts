@@ -17,7 +17,7 @@ if (localPropsFile.exists()) {
 
 allprojects {
     group = "org.ton"
-    version = "0.0.1-SNAPSHOT"
+    version = "0.0.1"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
