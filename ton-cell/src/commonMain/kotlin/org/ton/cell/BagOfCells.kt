@@ -16,10 +16,12 @@ data class BagOfCells(
         val isIndexed: Boolean = false,
         val crc32hash: ByteArray? = null
 ) : Iterable<Cell> by roots {
+    constructor(root: Cell) : this(roots = listOf(root))
+
     constructor(
             root: Cell,
-            isIndexed: Boolean = false,
-            crc32hash: ByteArray? = null
+            isIndexed: Boolean,
+            crc32hash: ByteArray?
     ) : this(listOf(root), isIndexed, crc32hash)
 
     fun treeWalk(): Sequence<Cell> = sequence {

@@ -1,9 +1,9 @@
 package org.ton.cell
 
+import org.ton.bigint.BigInt
+import org.ton.bigint.minus
+import org.ton.bigint.times
 import org.ton.bitstring.BitString
-import org.ton.primitives.BigInt
-import org.ton.primitives.minus
-import org.ton.primitives.times
 
 interface CellSlice {
     val bits: BitString

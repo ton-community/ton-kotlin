@@ -1,8 +1,8 @@
 package org.ton.adnl.message
 
 import io.ktor.utils.io.core.*
-import org.ton.adnl.TLCodec
 import org.ton.crypto.hex
+import org.ton.tl.TLCodec
 
 data class AdnlMessageAnswer(
         val queryId: ByteArray,

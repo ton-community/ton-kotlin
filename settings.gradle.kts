@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 }
 
 include(":ton-adnl")
+include(":ton-bigint")
 include(":ton-bitstring")
 include(":ton-block")
 include(":ton-block-tlb")
@@ -32,6 +33,7 @@ include(":ton-cell")
 include(":ton-crypto")
 include(":ton-hashmap")
 include(":ton-hashmap-tlb")
+include(":ton-lite-api")
 include(":ton-lite-client")
-include(":ton-primitives")
+include(":ton-tl")
 include(":ton-tlb")

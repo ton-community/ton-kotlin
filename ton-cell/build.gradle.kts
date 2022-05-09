@@ -3,7 +3,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.tonBitstring)
-                api(projects.tonPrimitives)
+                api(projects.tonBigint)
                 api(projects.tonCrypto)
                 implementation(libs.ktor.utils)
                 compileOnly(libs.serialization.json)

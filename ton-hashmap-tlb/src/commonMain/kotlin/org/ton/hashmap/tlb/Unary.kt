@@ -14,7 +14,7 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
         constructors = listOf(UnaryZero.tlbCodec, UnarySuccess.tlbCodec)
 ) {
     override fun encode(
-            cellWriter: CellBuilder,
+            cellBuilder: CellBuilder,
             value: Unary,
             typeParam: TlbEncoder<Any>?,
             param: Int,
@@ -22,26 +22,26 @@ object UnaryTlbCombinator : TlbCombinator<Unary>(
     ) {
         when (value) {
             is UnarySuccess -> {
-                cellWriter.storeBit(true)
-                UnarySuccessTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
+                cellBuilder.storeBit(true)
+                UnarySuccessTlbConstructor.encode(cellBuilder, value, typeParam, param, negativeParam)
             }
             is UnaryZero -> {
-                cellWriter.storeBit(false)
-                UnaryZeroTlbConstructor.encode(cellWriter, value, typeParam, param, negativeParam)
+                cellBuilder.storeBit(false)
+                UnaryZeroTlbConstructor.encode(cellBuilder, value, typeParam, param, negativeParam)
             }
         }
     }
 
     override fun decode(
-            cellReader: CellSlice,
+            cellSlice: CellSlice,
             typeParam: TlbDecoder<Any>?,
             param: Int,
             negativeParam: ((Int) -> Unit)?
     ): Unary {
-        return if (cellReader.loadBit()) {
-            UnarySuccessTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
+        return if (cellSlice.loadBit()) {
+            UnarySuccessTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
         } else {
-            UnaryZeroTlbConstructor.decode(cellReader, typeParam, param, negativeParam)
+            UnaryZeroTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
         }
     }
 }

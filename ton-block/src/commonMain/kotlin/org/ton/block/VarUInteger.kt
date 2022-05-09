@@ -2,9 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.primitives.BigInt
-import org.ton.primitives.BigIntSerializer
-import org.ton.primitives.bitLength
+import org.ton.bigint.BigInt
+import org.ton.bigint.BigIntSerializer
+import org.ton.bigint.bitLength
 
 @SerialName("var_uint")
 @Serializable

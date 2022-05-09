@@ -1,7 +1,7 @@
 package org.ton.cell
 
+import org.ton.bigint.*
 import org.ton.bitstring.BitString
-import org.ton.primitives.*
 
 interface CellBuilder {
     var bits: BitString

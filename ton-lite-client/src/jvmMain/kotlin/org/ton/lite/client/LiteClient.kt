@@ -6,10 +6,13 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.ton.adnl.AdnlClient
+import org.ton.adnl.AdnlClientImpl
 import org.ton.adnl.AdnlPublicKey
 import org.ton.cell.BagOfCells
 import org.ton.cell.writeBagOfCells
 import org.ton.crypto.hex
+import org.ton.lite.api.LiteServerAccountId
+import org.ton.lite.api.LiteServerMasterchainInfo
 import java.time.Instant
 
 suspend fun main() = coroutineScope {
@@ -56,7 +59,7 @@ class LiteClient(
         port: Int,
         publicKey: ByteArray,
 ) : LiteServerApi {
-    override val adnlClient = AdnlClient(host, port, AdnlPublicKey(publicKey), Dispatchers.Default)
+    override val adnlClient: AdnlClient = AdnlClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default)
 
     suspend fun connect() = apply {
         adnlClient.connect()

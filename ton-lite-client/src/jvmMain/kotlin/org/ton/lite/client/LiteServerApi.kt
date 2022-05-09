@@ -2,7 +2,8 @@ package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
 import org.ton.adnl.AdnlClient
-import org.ton.adnl.TLCodec
+import org.ton.lite.api.*
+import org.ton.tl.TLCodec
 
 interface LiteServerApi {
     val adnlClient: AdnlClient
