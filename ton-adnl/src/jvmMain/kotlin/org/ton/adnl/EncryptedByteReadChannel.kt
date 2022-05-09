@@ -34,11 +34,11 @@ class EncryptedByteReadChannel(
         writeLong(encrypted.readLong())
     }.readLong()
 
-    override suspend fun readPacket(size: Int, headerSizeHint: Int): ByteReadPacket = aes.encrypt {
-        writePacket(encrypted.readPacket(size, headerSizeHint))
+    override suspend fun readPacket(size: Int): ByteReadPacket = aes.encrypt {
+        writePacket(encrypted.readPacket(size))
     }
 
-    override suspend fun readRemaining(limit: Long, headerSizeHint: Int): ByteReadPacket = aes.encrypt {
-        writePacket(encrypted.readRemaining(limit, headerSizeHint))
+    override suspend fun readRemaining(limit: Long): ByteReadPacket = aes.encrypt {
+        writePacket(encrypted.readRemaining(limit))
     }
 }

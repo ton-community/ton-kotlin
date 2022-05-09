@@ -7,20 +7,20 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api("io.ktor:ktor-utils:2.0.0-beta-1")
-                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                api(libs.ktor.utils)
+                compileOnly(libs.serialization.core)
             }
         }
         jvmMain {
             dependencies {
-                implementation("com.github.andreypfau:curve25519-kotlin:f008dbc2c0")
-                implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+                implementation(libs.curve25519)
+                implementation(libs.bouncycastle)
             }
         }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.2")
+                implementation(libs.benchmark.runtime)
             }
         }
     }

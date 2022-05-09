@@ -3,7 +3,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.tonCrypto)
-                compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                compileOnly(libs.serialization.json)
                 compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.3.2")
             }
         }

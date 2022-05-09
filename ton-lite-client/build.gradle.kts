@@ -8,7 +8,7 @@ kotlin {
                 implementation(projects.tonCrypto)
                 implementation(projects.tonCell)
                 implementation(projects.tonTlb)
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+                implementation(libs.serialization.json)
             }
         }
         commonTest {
