@@ -11,6 +11,7 @@ import org.ton.adnl.AdnlPublicKey
 import org.ton.cell.BagOfCells
 import org.ton.cell.writeBagOfCells
 import org.ton.crypto.hex
+import org.ton.lite.api.LiteApi
 import org.ton.lite.api.LiteServerAccountId
 import org.ton.lite.api.LiteServerMasterchainInfo
 import java.time.Instant
@@ -55,13 +56,18 @@ suspend fun LiteClient.lastBlockTask() = coroutineScope {
 }
 
 class LiteClient(
-        host: String,
-        port: Int,
-        publicKey: ByteArray,
-) : LiteServerApi {
-    override val adnlClient: AdnlClient = AdnlClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default)
+        val adnlClient: AdnlClient
+) : LiteApi {
+    constructor(
+            host: String,
+            port: Int,
+            publicKey: ByteArray
+    ) : this(AdnlClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default))
 
     suspend fun connect() = apply {
         adnlClient.connect()
     }
+
+    override suspend fun sendRawQuery(byteArray: ByteArray): ByteArray =
+            adnlClient.sendQuery(byteArray)
 }
