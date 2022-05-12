@@ -6,12 +6,12 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlin.coroutines.CoroutineContext
 
-class AdnlClientImpl(
+class AdnlTcpClientImpl(
         host: String,
         port: Int,
         publicKey: AdnlPublicKey,
         dispatcher: CoroutineContext
-) : AdnlClient(host, port, publicKey, dispatcher) {
+) : AdnlTcpClient(host, port, publicKey, dispatcher) {
     private lateinit var connection: Connection
 
     override suspend fun connect() = apply {

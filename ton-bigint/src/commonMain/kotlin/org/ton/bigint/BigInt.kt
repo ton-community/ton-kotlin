@@ -11,6 +11,9 @@ import kotlinx.serialization.encoding.Encoder
 expect class BigInt : Number, Comparable<BigInt> {
     constructor(string: String)
     constructor(string: String, radix: Int)
+    constructor(byteArray: ByteArray)
+
+    fun toByteArray(): ByteArray
 }
 
 expect fun Number.toBigInt(): BigInt

@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 }
 
 include(":ton-adnl")
+include(":ton-api")
 include(":ton-bigint")
 include(":ton-bitstring")
 include(":ton-block")
