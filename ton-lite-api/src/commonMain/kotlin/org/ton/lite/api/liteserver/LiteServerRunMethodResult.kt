@@ -114,7 +114,7 @@ data class LiteServerRunMethodResult(
         }
 
         override fun decode(input: Input): LiteServerRunMethodResult {
-            val mode = input.readInt()
+            val mode = input.readIntLittleEndian()
             val modeBits = mode.toBits()
             val id = input.readTl(TonNodeBlockIdExt)
             val shardblk = input.readTl(TonNodeBlockIdExt)
