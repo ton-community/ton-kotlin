@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.intellij.lang.annotations.Language
 import org.ton.crypto.crc32
 import kotlin.reflect.KClass
 
@@ -95,8 +96,9 @@ private fun calcPadding(size: Int): Int = (size % 4).let { if (it > 0) 4 - it el
 interface TlCodec<T> : TlEncoder<T>, TlDecoder<T>
 
 abstract class TlConstructor<T : Any>(
-        val type: KClass<T>,
-        val schema: String
+    val type: KClass<T>,
+    @Language("TL")
+    val schema: String
 ) : TlCodec<T> {
     val id: Int = crc32(schema)
 

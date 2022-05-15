@@ -1,7 +1,9 @@
 package org.ton.tlb
 
+import org.intellij.lang.annotations.Language
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.crypto.crc32
 
 interface TlbEncoder<T> {
     fun encode(
@@ -27,8 +29,11 @@ abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
 }
 
 abstract class TlbConstructor<T>(
-        val schema: String
+    @Language("TL-B")
+    val schema: String
 ) : TlbCodec<T>() {
+    val id: Int = crc32(schema)
+
     override fun toString(): String = schema
 }
 

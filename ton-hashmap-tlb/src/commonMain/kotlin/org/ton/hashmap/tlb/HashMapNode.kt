@@ -75,7 +75,7 @@ object HashMapNodeLeafTlbConstructor : TlbConstructor<HashMapNodeLeaf<Any>>(
 val HashMapNodeLeaf.Companion.tlbCodec get() = HashMapNodeLeafTlbConstructor
 
 object HashMapNodeForkTlbCodec : TlbConstructor<HashMapNodeFork<Any>>(
-        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;"
+        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X"
 ) {
     override fun encode(
             cellBuilder: CellBuilder,
