@@ -106,11 +106,14 @@ allprojects {
         }
     }
 
-    signing {
-        sign(publishing.publications)
-        val keyId = project.properties["signing.keyId"].toString()
-        val secretKey = project.properties["signing.secretKey"].toString()
-        val password = project.properties["signing.password"].toString()
-        useInMemoryPgpKeys(keyId, secretKey, password)
+    val signingKeyId = project.properties["signing.keyId"]?.toString()
+    val signingSecretKey = project.properties["signing.secretKey"]?.toString()
+    val signingPassword = project.properties["signing.password"]?.toString()
+
+    if (signingKeyId != null && signingSecretKey != null && signingPassword != null) {
+        signing {
+            sign(publishing.publications)
+            useInMemoryPgpKeys(signingKeyId, signingSecretKey, signingPassword)
+        }
     }
 }
