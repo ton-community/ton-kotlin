@@ -6,11 +6,11 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.api.tonnode.TonNodeZeroStateIdExt
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
-import org.ton.lite.api.tonnode.TonNodeBlockIdExt
-import org.ton.lite.api.tonnode.TonNodeZeroStateIdExt
 import org.ton.tl.TlConstructor
 
 @Serializable

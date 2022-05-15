@@ -1,4 +1,4 @@
-package org.ton.lite.api.tonnode
+package org.ton.api.tonnode
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable

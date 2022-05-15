@@ -19,9 +19,9 @@ data class BagOfCells(
     constructor(root: Cell) : this(roots = listOf(root))
 
     constructor(
-            root: Cell,
-            isIndexed: Boolean,
-            crc32hash: ByteArray?
+        root: Cell,
+        isIndexed: Boolean,
+        crc32hash: ByteArray?
     ) : this(listOf(root), isIndexed, crc32hash)
 
     fun treeWalk(): Sequence<Cell> = sequence {
@@ -30,6 +30,10 @@ data class BagOfCells(
             yieldAll(root.treeWalk())
         }
     }.distinct()
+
+    fun toByteArray(): ByteArray = buildPacket {
+        writeBagOfCells(this@BagOfCells)
+    }.readBytes()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

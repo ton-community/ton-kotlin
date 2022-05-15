@@ -7,7 +7,7 @@ kotlin {
                 implementation(projects.tonBitstring)
                 implementation(projects.tonCrypto)
                 implementation(projects.tonCell)
-                implementation(projects.tonTlb)
+                implementation(projects.tonApi)
                 implementation(libs.serialization.json)
             }
         }

@@ -1,8 +1,9 @@
 package org.ton.lite.api
 
 import io.ktor.utils.io.core.*
+import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.cell.BagOfCells
 import org.ton.lite.api.liteserver.*
-import org.ton.lite.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.TlConstructor
 
 interface LiteApi {
@@ -20,15 +21,34 @@ interface LiteApi {
         return answerCodec.decodeBoxed(answerBytes)
     }
 
-    suspend fun getTime() =
-            sendQuery(LiteServerGetTime, LiteServerGetTime, LiteServerCurrentTime)
+    suspend fun getTime(): LiteServerCurrentTime =
+        sendQuery(LiteServerGetTime, LiteServerGetTime, LiteServerCurrentTime)
 
-    suspend fun getMasterchainInfo() =
-            sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
+    suspend fun getMasterchainInfo(): LiteServerMasterchainInfo =
+        sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
 
-    suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId) =
-            getAccountState(LiteServerGetAccountState(id, account))
+    suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId): LiteServerAccountState =
+        getAccountState(LiteServerGetAccountState(id, account))
 
-    suspend fun getAccountState(query: LiteServerGetAccountState) =
-            sendQuery(query, LiteServerGetAccountState, LiteServerAccountState)
+    suspend fun getAccountState(query: LiteServerGetAccountState): LiteServerAccountState =
+        sendQuery(query, LiteServerGetAccountState, LiteServerAccountState)
+
+    suspend fun runSmcMethod(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        methodId: Long,
+        params: ByteArray
+    ): LiteServerRunMethodResult = runSmcMethod(LiteServerRunSmcMethod(mode, id, account, methodId, params))
+
+    suspend fun runSmcMethod(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        methodName: String,
+        params: BagOfCells
+    ): LiteServerRunMethodResult = runSmcMethod(LiteServerRunSmcMethod(mode, id, account, methodName, params))
+
+    suspend fun runSmcMethod(query: LiteServerRunSmcMethod): LiteServerRunMethodResult =
+        sendQuery(query, LiteServerRunSmcMethod, LiteServerRunMethodResult)
 }
