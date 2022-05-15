@@ -56,7 +56,7 @@ sealed interface Either<X, Y> {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as Left<*, *>
+            other as Right<*, *>
 
             if (value != other.value) return false
 
