@@ -17,13 +17,13 @@ data class LiteServerError(
     ) {
         override fun decode(input: Input): LiteServerError {
             val code = input.readIntLittleEndian()
-            val message = input.readByteArray().decodeToString()
+            val message = input.readString()
             return LiteServerError(code, message)
         }
 
         override fun encode(output: Output, message: LiteServerError) {
             output.writeIntLittleEndian(message.code)
-            output.writeByteArray(message.message.encodeToByteArray())
+            output.writeString(message.message)
         }
     }
 }

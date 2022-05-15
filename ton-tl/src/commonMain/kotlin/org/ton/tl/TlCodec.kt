@@ -33,6 +33,20 @@ interface TlEncoder<T> {
         }
     }
 
+    fun Output.writeString(string: String) {
+        val byteArray = string.encodeToByteArray()
+        val size = byteArray.size
+        if (size <= 253) {
+            writeByte(size.toByte())
+        } else {
+            writeByte(254.toByte())
+            writeByte((size and 0xFF).toByte())
+            writeByte(((size and 0xFF00) shr 8).toByte())
+            writeByte(((size and 0xFF0000) shr 16).toByte())
+        }
+        writeFully(byteArray)
+    }
+
     fun Output.writeBits256(byteArray: ByteArray) {
         check(byteArray.size == 32)
         writeFully(byteArray)
@@ -70,6 +84,16 @@ interface TlDecoder<T> {
         }
         size += calcPadding(size)
         return readBytes(size)
+    }
+
+    fun Input.readString(): String {
+        var size = readByte().toInt() and 0xFF
+        if (size >= 254) {
+            size = (readByte().toInt() and 0xFF) or
+                    ((readByte().toInt() and 0xFF) shl 8) or
+                    ((readByte().toInt() and 0xFF) shl 16)
+        }
+        return readBytes(size).decodeToString()
     }
 
     fun Input.readBits256(): ByteArray = readBytes(32)
