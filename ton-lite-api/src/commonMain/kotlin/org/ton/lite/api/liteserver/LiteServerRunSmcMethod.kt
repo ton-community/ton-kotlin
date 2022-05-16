@@ -55,7 +55,7 @@ data class LiteServerRunSmcMethod(
         type = LiteServerRunSmcMethod::class,
         schema = "liteServer.runSmcMethod mode:# id:tonNode.blockIdExt account:liteServer.accountId method_id:long params:bytes = liteServer.RunMethodResult"
     ) {
-        fun methodId(methodName: String): Long = Crc16.XMODEM(methodName.encodeToByteArray()).toLong() or 0x10000
+        fun methodId(methodName: String): Long = Crc16.CCITT_FALSE(methodName.encodeToByteArray()).toLong() or 0x10000
 
         override fun encode(output: Output, message: LiteServerRunSmcMethod) {
             output.writeIntLittleEndian(message.mode)
