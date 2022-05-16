@@ -10,6 +10,8 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
 
 @JsonClassDiscriminator("@type")
 interface PublicKey {
@@ -52,12 +54,12 @@ data class PublicKeyUnencrypted(
             type = PublicKeyUnencrypted::class,
             schema = "pub.unenc data:bytes = PublicKey"
     ) {
-        override fun encode(output: Output, message: PublicKeyUnencrypted) {
-            output.writeByteArray(message.data)
+        override fun encode(output: Output, value: PublicKeyUnencrypted) {
+            output.writeBytesTl(value.data)
         }
 
         override fun decode(input: Input): PublicKeyUnencrypted {
-            val data = input.readByteArray()
+            val data = input.readBytesTl()
             return PublicKeyUnencrypted(data)
         }
     }
@@ -94,8 +96,8 @@ data class PublicKeyEd25519(
             type = PublicKeyEd25519::class,
             schema = "pub.ed25519 key:int256 = PublicKey"
     ) {
-        override fun encode(output: Output, message: PublicKeyEd25519) {
-            output.writeFully(message.key)
+        override fun encode(output: Output, value: PublicKeyEd25519) {
+            output.writeFully(value.key)
         }
 
         override fun decode(input: Input): PublicKeyEd25519 {
@@ -136,8 +138,8 @@ data class PublicKeyAes(
             type = PublicKeyAes::class,
             schema = "pub.aes key:int256 = PublicKey"
     ) {
-        override fun encode(output: Output, message: PublicKeyAes) {
-            output.writeFully(message.key)
+        override fun encode(output: Output, value: PublicKeyAes) {
+            output.writeFully(value.key)
         }
 
         override fun decode(input: Input): PublicKeyAes {
@@ -156,12 +158,12 @@ data class PublicKeyOverlay(
             type = PublicKeyOverlay::class,
             schema = "pub.overlay name:bytes = PublicKey"
     ) {
-        override fun encode(output: Output, message: PublicKeyOverlay) {
-            output.writeByteArray(message.name.encodeToByteArray())
+        override fun encode(output: Output, value: PublicKeyOverlay) {
+            output.writeBytesTl(value.name.encodeToByteArray())
         }
 
         override fun decode(input: Input): PublicKeyOverlay {
-            val name = input.readByteArray().decodeToString()
+            val name = input.readBytesTl().decodeToString()
             return PublicKeyOverlay(name)
         }
     }

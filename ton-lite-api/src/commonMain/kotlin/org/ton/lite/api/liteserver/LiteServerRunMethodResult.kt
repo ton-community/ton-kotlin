@@ -7,6 +7,10 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.toBits
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerRunMethodResult(
@@ -88,28 +92,28 @@ data class LiteServerRunMethodResult(
         type = LiteServerRunMethodResult::class,
         schema = "liteServer.runMethodResult mode:# id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:mode.0?bytes proof:mode.0?bytes state_proof:mode.1?bytes init_c7:mode.3?bytes lib_extras:mode.4?bytes exit_code:int result:mode.2?bytes = liteServer.RunMethodResult"
     ) {
-        override fun encode(output: Output, message: LiteServerRunMethodResult) {
-            output.writeIntLittleEndian(message.mode)
-            output.writeTl(message.id, TonNodeBlockIdExt)
-            output.writeTl(message.shardblk, TonNodeBlockIdExt)
-            message.shardProof?.let { shardProof ->
-                output.writeByteArray(shardProof)
+        override fun encode(output: Output, value: LiteServerRunMethodResult) {
+            output.writeIntLittleEndian(value.mode)
+            output.writeTl(value.id, TonNodeBlockIdExt)
+            output.writeTl(value.shardblk, TonNodeBlockIdExt)
+            value.shardProof?.let { shardProof ->
+                output.writeBytesTl(shardProof)
             }
-            message.shardProof?.let { proof ->
-                output.writeByteArray(proof)
+            value.shardProof?.let { proof ->
+                output.writeBytesTl(proof)
             }
-            message.stateProof?.let { stateProof ->
-                output.writeByteArray(stateProof)
+            value.stateProof?.let { stateProof ->
+                output.writeBytesTl(stateProof)
             }
-            message.initC7?.let { initC7 ->
-                output.writeByteArray(initC7)
+            value.initC7?.let { initC7 ->
+                output.writeBytesTl(initC7)
             }
-            message.libExtras?.let { libExtras ->
-                output.writeByteArray(libExtras)
+            value.libExtras?.let { libExtras ->
+                output.writeBytesTl(libExtras)
             }
-            output.writeIntLittleEndian(message.exitCode)
-            message.result?.let { result ->
-                output.writeByteArray(result)
+            output.writeIntLittleEndian(value.exitCode)
+            value.result?.let { result ->
+                output.writeBytesTl(result)
             }
         }
 
@@ -118,13 +122,13 @@ data class LiteServerRunMethodResult(
             val modeBits = mode.toBits()
             val id = input.readTl(TonNodeBlockIdExt)
             val shardblk = input.readTl(TonNodeBlockIdExt)
-            val shardProof = if (modeBits[0]) input.readByteArray() else null
-            val proof = if (modeBits[0]) input.readByteArray() else null
-            val stateProof = if (modeBits[1]) input.readByteArray() else null
-            val initC7 = if (modeBits[3]) input.readByteArray() else null
-            val libExtras = if (modeBits[4]) input.readByteArray() else null
+            val shardProof = if (modeBits[0]) input.readBytesTl() else null
+            val proof = if (modeBits[0]) input.readBytesTl() else null
+            val stateProof = if (modeBits[1]) input.readBytesTl() else null
+            val initC7 = if (modeBits[3]) input.readBytesTl() else null
+            val libExtras = if (modeBits[4]) input.readBytesTl() else null
             val exitCode = input.readIntLittleEndian()
-            val result = if (modeBits[2]) input.readByteArray() else null
+            val result = if (modeBits[2]) input.readBytesTl() else null
             return LiteServerRunMethodResult(
                 mode,
                 id,

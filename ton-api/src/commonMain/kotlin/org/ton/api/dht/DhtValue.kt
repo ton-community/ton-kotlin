@@ -5,6 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class DhtValue(
@@ -53,18 +59,18 @@ data class DhtValue(
             type = DhtValue::class,
             schema = "dht.value key:dht.keyDescription value:bytes ttl:int signature:bytes = dht.Value"
     ) {
-        override fun encode(output: Output, message: DhtValue) {
-            output.writeTl(message.key, DhtKeyDescription)
-            output.writeByteArray(message.value)
-            output.writeIntLittleEndian(message.ttl)
-            output.writeByteArray(message.signature)
+        override fun encode(output: Output, value: DhtValue) {
+            output.writeTl(value.key, DhtKeyDescription)
+            output.writeBytesTl(value.value)
+            output.writeIntTl(value.ttl)
+            output.writeBytesTl(value.signature)
         }
 
         override fun decode(input: Input): DhtValue {
             val key = input.readTl(DhtKeyDescription)
-            val value = input.readByteArray()
-            val ttl = input.readIntLittleEndian()
-            val signature = input.readByteArray()
+            val value = input.readBytesTl()
+            val ttl = input.readIntTl()
+            val signature = input.readBytesTl()
             return DhtValue(key, value, ttl, signature)
         }
     }

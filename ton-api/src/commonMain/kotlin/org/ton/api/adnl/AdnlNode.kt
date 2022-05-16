@@ -5,6 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKey
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class AdnlNode(
@@ -16,9 +18,9 @@ data class AdnlNode(
             type = AdnlNode::class,
             schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
     ) {
-        override fun encode(output: Output, message: AdnlNode) {
-            output.writeTl(message.id, PublicKey)
-            output.writeTl(message.addrList, AdnlAddressList)
+        override fun encode(output: Output, value: AdnlNode) {
+            output.writeTl(value.id, PublicKey)
+            output.writeTl(value.addrList, AdnlAddressList)
         }
 
         override fun decode(input: Input): AdnlNode {

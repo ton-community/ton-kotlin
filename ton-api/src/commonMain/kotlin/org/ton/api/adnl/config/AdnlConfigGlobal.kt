@@ -5,6 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlNodes
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @SerialName("adnl.config.global")
 @Serializable
@@ -16,8 +18,8 @@ data class AdnlConfigGlobal(
         type = AdnlConfigGlobal::class,
         schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
     ) {
-        override fun encode(output: Output, message: AdnlConfigGlobal) {
-            output.writeTl(message.staticNodes, AdnlNodes)
+        override fun encode(output: Output, value: AdnlConfigGlobal) {
+            output.writeTl(value.staticNodes, AdnlNodes)
         }
 
         override fun decode(input: Input): AdnlConfigGlobal {

@@ -6,6 +6,10 @@ import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class AdnlProxyTo(
@@ -61,20 +65,20 @@ data class AdnlProxyTo(
             type = AdnlProxyTo::class,
             schema = "adnl.proxyToFastHash ip:int port:int date:int data_hash:int256 shared_secret:int256 = adnl.ProxyTo"
     ) {
-        override fun encode(output: Output, message: AdnlProxyTo) {
-            output.writeIntLittleEndian(message.ip)
-            output.writeIntLittleEndian(message.port)
-            output.writeIntLittleEndian(message.date)
-            output.writeBits256(message.dateHash)
-            output.writeBits256(message.sharedSecret)
+        override fun encode(output: Output, value: AdnlProxyTo) {
+            output.writeIntTl(value.ip)
+            output.writeIntTl(value.port)
+            output.writeIntTl(value.date)
+            output.writeInt256Tl(value.dateHash)
+            output.writeInt256Tl(value.sharedSecret)
         }
 
         override fun decode(input: Input): AdnlProxyTo {
-            val ip = input.readIntLittleEndian()
-            val port = input.readIntLittleEndian()
-            val date = input.readIntLittleEndian()
-            val dateHash = input.readBits256()
-            val sharedSecret = input.readBits256()
+            val ip = input.readIntTl()
+            val port = input.readIntTl()
+            val date = input.readIntTl()
+            val dateHash = input.readInt256Tl()
+            val sharedSecret = input.readInt256Tl()
             return AdnlProxyTo(ip, port, date, dateHash, sharedSecret)
         }
     }

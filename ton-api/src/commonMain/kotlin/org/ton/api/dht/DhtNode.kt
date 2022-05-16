@@ -8,6 +8,12 @@ import org.ton.api.pub.PublicKey
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class DhtNode(
@@ -56,18 +62,18 @@ data class DhtNode(
             type = DhtNode::class,
             schema = "dht.node id:PublicKey addr_list:adnl.addressList version:int signature:bytes = dht.Node"
     ) {
-        override fun encode(output: Output, message: DhtNode) {
-            output.writeTl(message.id, PublicKey)
-            output.writeTl(message.addrList, AdnlAddressList)
-            output.writeIntLittleEndian(message.version)
-            output.writeByteArray(message.signature)
+        override fun encode(output: Output, value: DhtNode) {
+            output.writeTl(value.id, PublicKey)
+            output.writeTl(value.addrList, AdnlAddressList)
+            output.writeIntTl(value.version)
+            output.writeBytesTl(value.signature)
         }
 
         override fun decode(input: Input): DhtNode {
             val id = input.readTl(PublicKey)
             val addrList = input.readTl(AdnlAddressList)
-            val version = input.readIntLittleEndian()
-            val signature = input.readByteArray()
+            val version = input.readIntTl()
+            val signature = input.readBytesTl()
             return DhtNode(id, addrList, version, signature)
         }
     }

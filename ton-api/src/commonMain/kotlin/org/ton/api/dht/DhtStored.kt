@@ -7,7 +7,7 @@ object DhtStored : TlConstructor<DhtStored>(
         type = DhtStored::class,
         schema = "dht.stored = dht.Stored"
 ) {
-    override fun encode(output: Output, message: DhtStored) {
+    override fun encode(output: Output, value: DhtStored) {
     }
 
     override fun decode(input: Input): DhtStored = DhtStored

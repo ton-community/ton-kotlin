@@ -10,6 +10,10 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.constructors.writeInt256Tl
 
 @JsonClassDiscriminator("@type")
 interface AdnlProxy {
@@ -50,12 +54,12 @@ data class AdnlProxyNone(
             type = AdnlProxyNone::class,
             schema = "adnl.proxy.none id:int256 = adnl.Proxy"
     ) {
-        override fun encode(output: Output, message: AdnlProxyNone) {
-            output.writeBits256(message.id)
+        override fun encode(output: Output, value: AdnlProxyNone) {
+            output.writeInt256Tl(value.id)
         }
 
         override fun decode(input: Input): AdnlProxyNone {
-            val id = input.readBits256()
+            val id = input.readInt256Tl()
             return AdnlProxyNone(id)
         }
     }
@@ -100,14 +104,14 @@ data class AdnlProxyFast(
             type = AdnlProxyFast::class,
             schema = "adnl.proxy.fast id:int256 shared_secret:bytes = adnl.Proxy"
     ) {
-        override fun encode(output: Output, message: AdnlProxyFast) {
-            output.writeBits256(message.id)
-            output.writeByteArray(message.sharedSecret)
+        override fun encode(output: Output, value: AdnlProxyFast) {
+            output.writeInt256Tl(value.id)
+            output.writeBytesTl(value.sharedSecret)
         }
 
         override fun decode(input: Input): AdnlProxyFast {
-            val id = input.readBits256()
-            val sharedSecret = input.readByteArray()
+            val id = input.readInt256Tl()
+            val sharedSecret = input.readBytesTl()
             return AdnlProxyFast(id, sharedSecret)
         }
     }

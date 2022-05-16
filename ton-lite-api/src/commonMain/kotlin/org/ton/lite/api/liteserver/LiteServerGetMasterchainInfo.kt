@@ -9,6 +9,6 @@ object LiteServerGetMasterchainInfo : TlConstructor<LiteServerGetMasterchainInfo
 ) {
     override fun decode(input: Input): LiteServerGetMasterchainInfo = this
 
-    override fun encode(output: Output, message: LiteServerGetMasterchainInfo) {
+    override fun encode(output: Output, value: LiteServerGetMasterchainInfo) {
     }
 }

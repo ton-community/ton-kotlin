@@ -9,6 +9,6 @@ object LiteServerGetTime : TlConstructor<LiteServerGetTime>(
 ) {
     override fun decode(input: Input): LiteServerGetTime = LiteServerGetTime
 
-    override fun encode(output: Output, message: LiteServerGetTime) {
+    override fun encode(output: Output, value: LiteServerGetTime) {
     }
 }

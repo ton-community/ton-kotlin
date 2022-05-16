@@ -8,6 +8,9 @@ import org.ton.cell.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.crc16
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.*
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerRunSmcMethod(
@@ -57,20 +60,20 @@ data class LiteServerRunSmcMethod(
     ) {
         fun methodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
 
-        override fun encode(output: Output, message: LiteServerRunSmcMethod) {
-            output.writeIntLittleEndian(message.mode)
-            output.writeTl(message.id, TonNodeBlockIdExt)
-            output.writeTl(message.account, LiteServerAccountId)
-            output.writeLongLittleEndian(message.methodId)
-            output.writeByteArray(message.params)
+        override fun encode(output: Output, value: LiteServerRunSmcMethod) {
+            output.writeIntTl(value.mode)
+            output.writeTl(value.id, TonNodeBlockIdExt)
+            output.writeTl(value.account, LiteServerAccountId)
+            output.writeLongTl(value.methodId)
+            output.writeBytesTl(value.params)
         }
 
         override fun decode(input: Input): LiteServerRunSmcMethod {
-            val mode = input.readIntLittleEndian()
+            val mode = input.readIntTl()
             val id = input.readTl(TonNodeBlockIdExt)
             val account = input.readTl(LiteServerAccountId)
-            val methodId = input.readLongLittleEndian()
-            val params = input.readByteArray()
+            val methodId = input.readLongTl()
+            val params = input.readBytesTl()
             return LiteServerRunSmcMethod(mode, id, account, methodId, params)
         }
     }

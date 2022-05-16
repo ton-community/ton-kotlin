@@ -5,6 +5,10 @@ import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class AdnlProxyToSign(
@@ -52,18 +56,18 @@ data class AdnlProxyToSign(
             type = AdnlProxyToSign::class,
             schema = "adnl.proxyToFast ip:int port:int date:int signature:int256 = adnl.ProxyToSign"
     ) {
-        override fun encode(output: Output, message: AdnlProxyToSign) {
-            output.writeIntLittleEndian(message.ip)
-            output.writeIntLittleEndian(message.port)
-            output.writeIntLittleEndian(message.date)
-            output.writeBits256(message.signature)
+        override fun encode(output: Output, value: AdnlProxyToSign) {
+            output.writeIntTl(value.ip)
+            output.writeIntTl(value.port)
+            output.writeIntTl(value.date)
+            output.writeInt256Tl(value.signature)
         }
 
         override fun decode(input: Input): AdnlProxyToSign {
-            val ip = input.readIntLittleEndian()
-            val port = input.readIntLittleEndian()
-            val date = input.readIntLittleEndian()
-            val signature = input.readBits256()
+            val ip = input.readIntTl()
+            val port = input.readIntTl()
+            val date = input.readIntTl()
+            val signature = input.readInt256Tl()
             return AdnlProxyToSign(ip, port, date, signature)
         }
     }

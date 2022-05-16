@@ -7,6 +7,8 @@ import org.ton.api.adnl.config.AdnlConfigGlobal
 import org.ton.api.dht.config.DhtConfigGlobal
 import org.ton.api.validator.config.ValidatorConfigGlobal
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @SerialName("config.global")
 @Serializable
@@ -19,10 +21,10 @@ data class ConfigGlobal(
         type = ConfigGlobal::class,
         schema = "config.global adnl:adnl.config.global dht:dht.config.global validator:validator.config.global = config.Global"
     ) {
-        override fun encode(output: Output, message: ConfigGlobal) {
-            output.writeTl(message.adnl, AdnlConfigGlobal)
-            output.writeTl(message.dht, DhtConfigGlobal)
-            output.writeTl(message.validator, ValidatorConfigGlobal)
+        override fun encode(output: Output, value: ConfigGlobal) {
+            output.writeTl(value.adnl, AdnlConfigGlobal)
+            output.writeTl(value.dht, DhtConfigGlobal)
+            output.writeTl(value.validator, ValidatorConfigGlobal)
         }
 
         override fun decode(input: Input): ConfigGlobal {

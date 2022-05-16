@@ -4,6 +4,8 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerGetAccountState(
@@ -20,9 +22,9 @@ data class LiteServerGetAccountState(
             return LiteServerGetAccountState(id, account)
         }
 
-        override fun encode(output: Output, message: LiteServerGetAccountState) {
-            output.writeTl(message.id, TonNodeBlockIdExt)
-            output.writeTl(message.account, LiteServerAccountId)
+        override fun encode(output: Output, value: LiteServerGetAccountState) {
+            output.writeTl(value.id, TonNodeBlockIdExt)
+            output.writeTl(value.account, LiteServerAccountId)
         }
     }
 }

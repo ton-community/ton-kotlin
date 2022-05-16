@@ -7,6 +7,10 @@ import org.ton.api.pub.PublicKey
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class DhtKeyDescription(
@@ -55,18 +59,18 @@ data class DhtKeyDescription(
             type = DhtKeyDescription::class,
             schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
     ) {
-        override fun encode(output: Output, message: DhtKeyDescription) {
-            output.writeTl(message.key, DhtKey)
-            output.writeTl(message.id, PublicKey)
-            output.writeTl(message.updateRule, DhtUpdateRule)
-            output.writeByteArray(message.signature)
+        override fun encode(output: Output, value: DhtKeyDescription) {
+            output.writeTl(value.key, DhtKey)
+            output.writeTl(value.id, PublicKey)
+            output.writeTl(value.updateRule, DhtUpdateRule)
+            output.writeBytesTl(value.signature)
         }
 
         override fun decode(input: Input): DhtKeyDescription {
             val key = input.readTl(DhtKey)
             val id = input.readTl(PublicKey)
             val updateRule = input.readTl(DhtUpdateRule)
-            val signature = input.readByteArray()
+            val signature = input.readBytesTl()
             return DhtKeyDescription(key, id, updateRule, signature)
         }
     }

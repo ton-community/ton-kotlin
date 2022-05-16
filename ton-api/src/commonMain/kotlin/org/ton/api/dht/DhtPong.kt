@@ -14,8 +14,8 @@ data class DhtPong(
             type = DhtPong::class,
             schema = "dht.pong random_id:long = dht.Pong"
     ) {
-        override fun encode(output: Output, message: DhtPong) {
-            output.writeLongLittleEndian(message.randomId)
+        override fun encode(output: Output, value: DhtPong) {
+            output.writeLongLittleEndian(value.randomId)
         }
 
         override fun decode(input: Input): DhtPong {

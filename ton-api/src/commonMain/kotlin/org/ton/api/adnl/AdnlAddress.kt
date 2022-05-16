@@ -11,6 +11,12 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @JsonClassDiscriminator("@type")
 interface AdnlAddress {
@@ -31,14 +37,14 @@ data class AdnlAddressUdp(
             type = AdnlAddressUdp::class,
             schema = "adnl.address.udp ip:int port:int = adnl.Address"
     ) {
-        override fun encode(output: Output, message: AdnlAddressUdp) {
-            output.writeIntLittleEndian(message.ip)
-            output.writeIntLittleEndian(message.port)
+        override fun encode(output: Output, value: AdnlAddressUdp) {
+            output.writeIntTl(value.ip)
+            output.writeIntTl(value.port)
         }
 
         override fun decode(input: Input): AdnlAddressUdp {
-            val ip = input.readIntLittleEndian()
-            val port = input.readIntLittleEndian()
+            val ip = input.readIntTl()
+            val port = input.readIntTl()
             return AdnlAddressUdp(ip, port)
         }
     }
@@ -82,14 +88,14 @@ data class AdnlAddressUdp6(
             schema = "adnl.address.udp6 ip:int128 port:int = adnl.Address"
     ) {
         override fun decode(input: Input): AdnlAddressUdp6 {
-            val ip = input.readBits256()
-            val port = input.readIntLittleEndian()
+            val ip = input.readInt256Tl()
+            val port = input.readIntTl()
             return AdnlAddressUdp6(ip, port)
         }
 
-        override fun encode(output: Output, message: AdnlAddressUdp6) {
-            output.writeBits256(message.ip)
-            output.writeIntLittleEndian(message.port)
+        override fun encode(output: Output, value: AdnlAddressUdp6) {
+            output.writeInt256Tl(value.ip)
+            output.writeIntTl(value.port)
         }
     }
 }
@@ -132,13 +138,13 @@ data class AdnlAddressTunnel(
             type = AdnlAddressTunnel::class,
             schema = "adnl.address.tunnel to:int256 pubkey:PublicKey = adnl.Address"
     ) {
-        override fun encode(output: Output, message: AdnlAddressTunnel) {
-            output.writeBits256(message.to)
-            output.writeTl(message.pubKey, PublicKey)
+        override fun encode(output: Output, value: AdnlAddressTunnel) {
+            output.writeInt256Tl(value.to)
+            output.writeTl(value.pubKey, PublicKey)
         }
 
         override fun decode(input: Input): AdnlAddressTunnel {
-            val to = input.readBits256()
+            val to = input.readInt256Tl()
             val pubKey = input.readTl(PublicKey)
             return AdnlAddressTunnel(to, pubKey)
         }

@@ -9,6 +9,10 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class LiteServerAccountId(
@@ -51,14 +55,14 @@ data class LiteServerAccountId(
             schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
     ) {
         override fun decode(input: Input): LiteServerAccountId {
-            val workchain = input.readIntLittleEndian()
-            val id = input.readBits256()
+            val workchain = input.readIntTl()
+            val id = input.readBytesTl()
             return LiteServerAccountId(workchain, id)
         }
 
-        override fun encode(output: Output, message: LiteServerAccountId) {
-            output.writeIntLittleEndian(message.workchain)
-            output.writeBits256(message.id)
+        override fun encode(output: Output, value: LiteServerAccountId) {
+            output.writeIntTl(value.workchain)
+            output.writeInt256Tl(value.id)
         }
     }
 }

@@ -10,6 +10,7 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.*
 
 @Serializable
 data class TonNodeBlockIdExt(
@@ -66,20 +67,20 @@ data class TonNodeBlockIdExt(
             schema = "tonNode.blockIdExt workchain:int shard:long seqno:int root_hash:int256 file_hash:int256 = tonNode.BlockIdExt"
     ) {
         override fun decode(input: Input): TonNodeBlockIdExt {
-            val workchain = input.readIntLittleEndian()
-            val shard = input.readLongLittleEndian()
-            val seqno = input.readIntLittleEndian()
-            val rootHash = input.readBits256()
-            val fileHash = input.readBits256()
+            val workchain = input.readIntTl()
+            val shard = input.readLongTl()
+            val seqno = input.readIntTl()
+            val rootHash = input.readInt256Tl()
+            val fileHash = input.readInt256Tl()
             return TonNodeBlockIdExt(workchain, shard, seqno, rootHash, fileHash)
         }
 
-        override fun encode(output: Output, message: TonNodeBlockIdExt) {
-            output.writeIntLittleEndian(message.workchain)
-            output.writeLongLittleEndian(message.shard)
-            output.writeIntLittleEndian(message.seqno)
-            output.writeBits256(message.rootHash)
-            output.writeBits256(message.fileHash)
+        override fun encode(output: Output, value: TonNodeBlockIdExt) {
+            output.writeIntTl(value.workchain)
+            output.writeLongTl(value.shard)
+            output.writeIntTl(value.seqno)
+            output.writeInt256Tl(value.rootHash)
+            output.writeInt256Tl(value.fileHash)
         }
     }
 }

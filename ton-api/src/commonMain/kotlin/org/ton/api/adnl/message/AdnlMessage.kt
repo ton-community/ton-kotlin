@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.*
 
 @JsonClassDiscriminator("@type")
 interface AdnlMessage
@@ -50,14 +51,14 @@ data class AdnlMessageCreateChannel(
             type = AdnlMessageCreateChannel::class,
             schema = "adnl.message.createChannel key:int256 date:int = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageCreateChannel) {
-            output.writeBits256(message.key)
-            output.writeIntLittleEndian(message.date)
+        override fun encode(output: Output, value: AdnlMessageCreateChannel) {
+            output.writeInt256Tl(value.key)
+            output.writeIntTl(value.date)
         }
 
         override fun decode(input: Input): AdnlMessageCreateChannel {
-            val key = input.readBits256()
-            val date = input.readIntLittleEndian()
+            val key = input.readInt256Tl()
+            val date = input.readIntTl()
             return AdnlMessageCreateChannel(key, date)
         }
     }
@@ -107,16 +108,16 @@ data class AdnlMessageConfirmChannel(
             type = AdnlMessageConfirmChannel::class,
             schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageConfirmChannel) {
-            output.writeBits256(message.key)
-            output.writeBits256(message.peerKey)
-            output.writeIntLittleEndian(message.date)
+        override fun encode(output: Output, value: AdnlMessageConfirmChannel) {
+            output.writeInt256Tl(value.key)
+            output.writeInt256Tl(value.peerKey)
+            output.writeIntTl(value.date)
         }
 
         override fun decode(input: Input): AdnlMessageConfirmChannel {
-            val key = input.readBits256()
-            val peerKey = input.readBits256()
-            val date = input.readIntLittleEndian()
+            val key = input.readInt256Tl()
+            val peerKey = input.readInt256Tl()
+            val date = input.readIntTl()
             return AdnlMessageConfirmChannel(key, peerKey, date)
         }
     }
@@ -153,12 +154,12 @@ data class AdnlMessageCustom(
             type = AdnlMessageCustom::class,
             schema = "adnl.message.custom data:bytes = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageCustom) {
-            output.writeByteArray(message.data)
+        override fun encode(output: Output, value: AdnlMessageCustom) {
+            output.writeBytesTl(value.data)
         }
 
         override fun decode(input: Input): AdnlMessageCustom {
-            val data = input.readByteArray()
+            val data = input.readBytesTl()
             return AdnlMessageCustom(data)
         }
     }
@@ -171,7 +172,7 @@ class AdnlMessageNop : AdnlMessage {
             type = AdnlMessageNop::class,
             schema = "adnl.message.nop = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageNop) {
+        override fun encode(output: Output, value: AdnlMessageNop) {
         }
 
         override fun decode(input: Input): AdnlMessageNop = AdnlMessageNop()
@@ -187,12 +188,12 @@ data class AdnlMessageReinit(
             type = AdnlMessageReinit::class,
             schema = "adnl.message.reinit date:int = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageReinit) {
-            output.writeIntLittleEndian(message.date)
+        override fun encode(output: Output, value: AdnlMessageReinit) {
+            output.writeIntTl(value.date)
         }
 
         override fun decode(input: Input): AdnlMessageReinit {
-            val date = input.readIntLittleEndian()
+            val date = input.readIntTl()
             return AdnlMessageReinit(date)
         }
     }
@@ -237,14 +238,14 @@ data class AdnlMessageQuery(
             type = AdnlMessageQuery::class,
             schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageQuery) {
-            output.writeFully(message.queryId)
-            output.writeByteArray(message.query)
+        override fun encode(output: Output, value: AdnlMessageQuery) {
+            output.writeInt256Tl(value.queryId)
+            output.writeBytesTl(value.query)
         }
 
         override fun decode(input: Input): AdnlMessageQuery {
-            val queryId = input.readBytes(32)
-            val query = input.readByteArray()
+            val queryId = input.readInt256Tl()
+            val query = input.readBytesTl()
             return AdnlMessageQuery(queryId, query)
         }
     }
@@ -289,14 +290,14 @@ data class AdnlMessageAnswer(
             type = AdnlMessageAnswer::class,
             schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message"
     ) {
-        override fun encode(output: Output, message: AdnlMessageAnswer) {
-            output.writeBits256(message.queryId)
-            output.writeByteArray(message.answer)
+        override fun encode(output: Output, value: AdnlMessageAnswer) {
+            output.writeInt256Tl(value.queryId)
+            output.writeBytesTl(value.answer)
         }
 
         override fun decode(input: Input): AdnlMessageAnswer {
-            val queryId = input.readBits256()
-            val answer = input.readByteArray()
+            val queryId = input.readInt256Tl()
+            val answer = input.readBytesTl()
             return AdnlMessageAnswer(queryId, answer)
         }
     }

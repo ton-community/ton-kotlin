@@ -9,6 +9,9 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.*
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerGetTransactions(
@@ -57,18 +60,18 @@ data class LiteServerGetTransactions(
             schema = "liteServer.getTransactions count:# account:liteServer.accountId lt:long hash:int256 = liteServer.TransactionList"
     ) {
         override fun decode(input: Input): LiteServerGetTransactions {
-            val count = input.readIntLittleEndian()
+            val count = input.readIntTl()
             val account = input.readTl(LiteServerAccountId)
-            val lt = input.readLongLittleEndian()
-            val hash = input.readBits256()
+            val lt = input.readLongTl()
+            val hash = input.readInt256Tl()
             return LiteServerGetTransactions(count, account, lt, hash)
         }
 
-        override fun encode(output: Output, message: LiteServerGetTransactions) {
-            output.writeIntLittleEndian(message.count)
-            output.writeTl(message.account, LiteServerAccountId)
-            output.writeLongLittleEndian(message.lt)
-            output.writeBits256(message.hash)
+        override fun encode(output: Output, value: LiteServerGetTransactions) {
+            output.writeIntTl(value.count)
+            output.writeTl(value.account, LiteServerAccountId)
+            output.writeLongTl(value.lt)
+            output.writeInt256Tl(value.hash)
         }
     }
 }

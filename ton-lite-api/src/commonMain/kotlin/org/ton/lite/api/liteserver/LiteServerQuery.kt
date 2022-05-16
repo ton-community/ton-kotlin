@@ -9,6 +9,8 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
 
 @Serializable
 data class LiteServerQuery(
@@ -39,12 +41,12 @@ data class LiteServerQuery(
             schema = "liteServer.query data:bytes = Object"
     ) {
         override fun decode(input: Input): LiteServerQuery {
-            val data = input.readByteArray()
+            val data = input.readBytesTl()
             return LiteServerQuery(data)
         }
 
-        override fun encode(output: Output, message: LiteServerQuery) {
-            output.writeByteArray(message.data)
+        override fun encode(output: Output, value: LiteServerQuery) {
+            output.writeBytesTl(value.data)
         }
     }
 }

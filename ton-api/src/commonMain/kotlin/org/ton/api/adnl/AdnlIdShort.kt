@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.writeInt256Tl
 
 @Serializable
 data class AdnlIdShort(
@@ -37,12 +39,12 @@ data class AdnlIdShort(
             schema = "adnl.id.short id:int256 = adnl.id.Short"
     ) {
         override fun decode(input: Input): AdnlIdShort {
-            val id = input.readBits256()
+            val id = input.readInt256Tl()
             return AdnlIdShort(id)
         }
 
-        override fun encode(output: Output, message: AdnlIdShort) {
-            output.writeBits256(message.id)
+        override fun encode(output: Output, value: AdnlIdShort) {
+            output.writeInt256Tl(value.id)
         }
     }
 }

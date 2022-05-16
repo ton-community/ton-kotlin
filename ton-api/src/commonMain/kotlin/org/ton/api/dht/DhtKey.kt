@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.*
 
 @Serializable
 data class DhtKey(
@@ -47,16 +48,16 @@ data class DhtKey(
             type = DhtKey::class,
             schema = "dht.key id:int256 name:bytes idx:int = dht.Key"
     ) {
-        override fun encode(output: Output, message: DhtKey) {
-            output.writeBits256(message.id)
-            output.writeByteArray(message.name.encodeToByteArray())
-            output.writeIntLittleEndian(message.idx)
+        override fun encode(output: Output, value: DhtKey) {
+            output.writeInt256Tl(value.id)
+            output.writeBytesTl(value.name.encodeToByteArray())
+            output.writeIntTl(value.idx)
         }
 
         override fun decode(input: Input): DhtKey {
-            val id = input.readBits256()
-            val name = input.readByteArray().decodeToString()
-            val idx = input.readIntLittleEndian()
+            val id = input.readInt256Tl()
+            val name = input.readBytesTl().decodeToString()
+            val idx = input.readIntTl()
             return DhtKey(id, name, idx)
         }
     }

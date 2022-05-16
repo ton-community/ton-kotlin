@@ -5,6 +5,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readVectorTl
+import org.ton.tl.constructors.writeVectorTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @SerialName("validator.config.global")
 @Serializable
@@ -19,16 +23,16 @@ data class ValidatorConfigGlobal(
         type = ValidatorConfigGlobal::class,
         schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
     ) {
-        override fun encode(output: Output, message: ValidatorConfigGlobal) {
-            output.writeTl(message.zeroState, TonNodeBlockIdExt)
-            output.writeTl(message.initBlock, TonNodeBlockIdExt)
-            output.writeVector(message.hardforks, TonNodeBlockIdExt)
+        override fun encode(output: Output, value: ValidatorConfigGlobal) {
+            output.writeTl(value.zeroState, TonNodeBlockIdExt)
+            output.writeTl(value.initBlock, TonNodeBlockIdExt)
+            output.writeVectorTl(value.hardforks, TonNodeBlockIdExt)
         }
 
         override fun decode(input: Input): ValidatorConfigGlobal {
             val zeroState = input.readTl(TonNodeBlockIdExt)
             val initBlock = input.readTl(TonNodeBlockIdExt)
-            val hardforks = input.readVector(TonNodeBlockIdExt)
+            val hardforks = input.readVectorTl(TonNodeBlockIdExt)
             return ValidatorConfigGlobal(zeroState, initBlock, hardforks)
         }
     }

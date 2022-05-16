@@ -3,6 +3,8 @@ package org.ton.api.dht
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class DhtMessage(
@@ -12,8 +14,8 @@ data class DhtMessage(
             type = DhtMessage::class,
             schema = "dht.message node:dht.node = dht.Message"
     ) {
-        override fun encode(output: Output, message: DhtMessage) {
-            output.writeTl(message.node, DhtNode)
+        override fun encode(output: Output, value: DhtMessage) {
+            output.writeTl(value.node, DhtNode)
         }
 
         override fun decode(input: Input): DhtMessage {

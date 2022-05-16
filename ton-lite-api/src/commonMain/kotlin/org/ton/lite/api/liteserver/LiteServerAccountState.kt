@@ -11,6 +11,10 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerAccountState(
@@ -70,18 +74,18 @@ data class LiteServerAccountState(
         override fun decode(input: Input): LiteServerAccountState {
             val id = input.readTl(TonNodeBlockIdExt)
             val shardBlk = input.readTl(TonNodeBlockIdExt)
-            val shardProof = input.readByteArray()
-            val proof = input.readByteArray()
-            val state = input.readByteArray()
+            val shardProof = input.readBytesTl()
+            val proof = input.readBytesTl()
+            val state = input.readBytesTl()
             return LiteServerAccountState(id, shardBlk, shardProof, proof, state)
         }
 
-        override fun encode(output: Output, message: LiteServerAccountState) {
-            output.writeTl(message.id, TonNodeBlockIdExt)
-            output.writeTl(message.shardBlk, TonNodeBlockIdExt)
-            output.writeByteArray(message.shardProof)
-            output.writeByteArray(message.proof)
-            output.writeByteArray(message.state)
+        override fun encode(output: Output, value: LiteServerAccountState) {
+            output.writeTl(value.id, TonNodeBlockIdExt)
+            output.writeTl(value.shardBlk, TonNodeBlockIdExt)
+            output.writeBytesTl(value.shardProof)
+            output.writeBytesTl(value.proof)
+            output.writeBytesTl(value.state)
         }
     }
 }

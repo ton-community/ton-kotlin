@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.writeBytesTl
 
 @JsonClassDiscriminator("@type")
 interface PrivateKey {
@@ -43,12 +45,12 @@ data class PrivateKeyUnencrypted(
             type = PrivateKeyUnencrypted::class,
             schema = "pk.unenc data:bytes = PrivateKey"
     ) {
-        override fun encode(output: Output, message: PrivateKeyUnencrypted) {
-            output.writeByteArray(message.data)
+        override fun encode(output: Output, value: PrivateKeyUnencrypted) {
+            output.writeBytesTl(value.data)
         }
 
         override fun decode(input: Input): PrivateKeyUnencrypted {
-            val data = input.readByteArray()
+            val data = input.readBytesTl()
             return PrivateKeyUnencrypted(data)
         }
     }
@@ -78,8 +80,8 @@ data class PrivateKeyEd25519(
             type = PrivateKeyEd25519::class,
             schema = "pk.ed25519 key:int256 = PrivateKey"
     ) {
-        override fun encode(output: Output, message: PrivateKeyEd25519) {
-            output.writeFully(message.key)
+        override fun encode(output: Output, value: PrivateKeyEd25519) {
+            output.writeFully(value.key)
         }
 
         override fun decode(input: Input): PrivateKeyEd25519 {
@@ -113,8 +115,8 @@ data class PrivateKeyAes(
             type = PrivateKeyAes::class,
             schema = "pk.aes key:int256 = PrivateKey"
     ) {
-        override fun encode(output: Output, message: PrivateKeyAes) {
-            output.writeFully(message.key)
+        override fun encode(output: Output, value: PrivateKeyAes) {
+            output.writeFully(value.key)
         }
 
         override fun decode(input: Input): PrivateKeyAes {
@@ -133,12 +135,12 @@ data class PrivateKeyOverlay(
             type = PrivateKeyOverlay::class,
             schema = "pk.overlay name:bytes = PrivateKey"
     ) {
-        override fun encode(output: Output, message: PrivateKeyOverlay) {
-            output.writeByteArray(message.name.encodeToByteArray())
+        override fun encode(output: Output, value: PrivateKeyOverlay) {
+            output.writeBytesTl(value.name.encodeToByteArray())
         }
 
         override fun decode(input: Input): PrivateKeyOverlay {
-            val name = input.readByteArray().decodeToString()
+            val name = input.readBytesTl().decodeToString()
             return PrivateKeyOverlay(name)
         }
     }

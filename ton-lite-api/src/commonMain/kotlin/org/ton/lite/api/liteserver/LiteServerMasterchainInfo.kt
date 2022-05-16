@@ -12,6 +12,10 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readInt256Tl
+import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class LiteServerMasterchainInfo(
@@ -57,15 +61,15 @@ data class LiteServerMasterchainInfo(
     ) {
         override fun decode(input: Input): LiteServerMasterchainInfo {
             val last = input.readTl(TonNodeBlockIdExt)
-            val stateRootHash = input.readBits256()
+            val stateRootHash = input.readInt256Tl()
             val init = input.readTl(TonNodeZeroStateIdExt)
             return LiteServerMasterchainInfo(last, stateRootHash, init)
         }
 
-        override fun encode(output: Output, message: LiteServerMasterchainInfo) {
-            output.writeTl(message.last, TonNodeBlockIdExt)
-            output.writeBits256(message.stateRootHash)
-            output.writeTl(message.init, TonNodeZeroStateIdExt)
+        override fun encode(output: Output, value: LiteServerMasterchainInfo) {
+            output.writeTl(value.last, TonNodeBlockIdExt)
+            output.writeInt256Tl(value.stateRootHash)
+            output.writeTl(value.init, TonNodeZeroStateIdExt)
         }
     }
 }

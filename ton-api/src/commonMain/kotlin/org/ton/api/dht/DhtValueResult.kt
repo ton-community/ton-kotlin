@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @JsonClassDiscriminator("@type")
 interface DhtValueResult {
@@ -26,8 +28,8 @@ data class DhtValueNotFound(
             type = DhtValueNotFound::class,
             schema = "dht.valueNotFound nodes:dht.nodes = dht.ValueResult"
     ) {
-        override fun encode(output: Output, message: DhtValueNotFound) {
-            output.writeTl(message.nodes, DhtNodes)
+        override fun encode(output: Output, value: DhtValueNotFound) {
+            output.writeTl(value.nodes, DhtNodes)
         }
 
         override fun decode(input: Input): DhtValueNotFound {
@@ -46,8 +48,8 @@ data class DhtValueFound(
             type = DhtValueFound::class,
             schema = "dht.valueFound value:dht.Value = dht.ValueResult"
     ) {
-        override fun encode(output: Output, message: DhtValueFound) {
-            output.writeTl(message.value, DhtValue)
+        override fun encode(output: Output, value: DhtValueFound) {
+            output.writeTl(value.value, DhtValue)
         }
 
         override fun decode(input: Input): DhtValueFound {

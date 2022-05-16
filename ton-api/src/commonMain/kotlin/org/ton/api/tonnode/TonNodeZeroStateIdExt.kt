@@ -10,6 +10,8 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.readIntTl
+import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class TonNodeZeroStateIdExt(
@@ -56,16 +58,16 @@ data class TonNodeZeroStateIdExt(
             schema = "tonNode.zeroStateIdExt workchain:int root_hash:int256 file_hash:int256 = tonNode.ZeroStateIdExt"
     ) {
         override fun decode(input: Input): TonNodeZeroStateIdExt {
-            val workchain = input.readIntLittleEndian()
+            val workchain = input.readIntTl()
             val rootHash = input.readBytes(32)
             val fileHash = input.readBytes(32)
             return TonNodeZeroStateIdExt(workchain, rootHash, fileHash)
         }
 
-        override fun encode(output: Output, message: TonNodeZeroStateIdExt) {
-            output.writeIntLittleEndian(message.workchain)
-            output.writeFully(message.rootHash)
-            output.writeFully(message.fileHash)
+        override fun encode(output: Output, value: TonNodeZeroStateIdExt) {
+            output.writeIntTl(value.workchain)
+            output.writeFully(value.rootHash)
+            output.writeFully(value.fileHash)
         }
     }
 }
