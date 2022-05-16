@@ -27,6 +27,12 @@ interface LiteApi {
     suspend fun getMasterchainInfo(): LiteServerMasterchainInfo =
         sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
 
+    suspend fun sendMessage(body: ByteArray): LiteServerSendMsgStatus =
+        sendMessage(LiteServerSendMessage(body))
+
+    suspend fun sendMessage(query: LiteServerSendMessage): LiteServerSendMsgStatus =
+        sendQuery(query, LiteServerSendMessage, LiteServerSendMsgStatus)
+
     suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId): LiteServerAccountState =
         getAccountState(LiteServerGetAccountState(id, account))
 
