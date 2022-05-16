@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.cell.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.crc16.Crc16
+import org.ton.crypto.crc16
 import org.ton.tl.TlConstructor
 
 @Serializable
@@ -55,7 +55,7 @@ data class LiteServerRunSmcMethod(
         type = LiteServerRunSmcMethod::class,
         schema = "liteServer.runSmcMethod mode:# id:tonNode.blockIdExt account:liteServer.accountId method_id:long params:bytes = liteServer.RunMethodResult"
     ) {
-        fun methodId(methodName: String): Long = Crc16.XMODEM(methodName.encodeToByteArray()).toLong() or 0x10000
+        fun methodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
 
         override fun encode(output: Output, message: LiteServerRunSmcMethod) {
             output.writeIntLittleEndian(message.mode)
