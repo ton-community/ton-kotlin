@@ -1,6 +1,6 @@
 package org.ton.bitstring
 
-fun Int.toBits(): BooleanArray = toString(2).map { it != '0' }.toBooleanArray()
+fun Int.toBits(minSize: Int = 0): BooleanArray = toString(2).padStart(minSize, '0').map { it != '0' }.toBooleanArray()
 
 /**
  * Augment bits with 1 and leading 0 to be divisible by 8 or 4 without remainder.
