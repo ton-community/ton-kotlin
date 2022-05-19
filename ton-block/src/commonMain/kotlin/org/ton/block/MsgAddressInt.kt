@@ -8,10 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
-import org.ton.crypto.crc16
-import org.ton.crypto.hex
+import org.ton.crypto.*
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -83,13 +80,17 @@ sealed interface MsgAddressInt {
             @JvmStatic
             fun parseUserFriendly(address: String): AddrStd {
                 var raw: ByteArray
-                raw = base64(address)
+                try {
+                    raw = base64url(address)
+                } catch (E: Exception) {
+                    raw = base64(address)
+                }
 
                 require(raw.size == 36)
                 return AddrStd(
                     anycast = null,
                     workchain_id = raw[1].toInt(),
-                    address = raw.sliceArray(2..34)
+                    address = raw.sliceArray(2..33)
                 ).apply {
                     val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
                     if (testOnly) {
@@ -100,13 +101,12 @@ sealed interface MsgAddressInt {
                     require((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) { "unknown address tag" }
 
                     val bounceable = raw[0] == 0x11.toByte()
-
                     require(
                         (crc(
                             this,
                             testOnly,
                             bounceable
-                        ).toBigInt() == BigInt(raw.sliceArray(35..36)))
+                        ).toBigInt() == BigInt(raw.sliceArray(34..35)))
                     ) { "CRC check failed" }
                 }
             }
