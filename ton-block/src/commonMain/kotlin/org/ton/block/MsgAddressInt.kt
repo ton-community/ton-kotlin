@@ -22,10 +22,10 @@ sealed interface MsgAddressInt {
     @SerialName("addr_std")
     @Serializable
     data class AddrStd(
-            val anycast: Anycast?,
-            val workchain_id: Int,
-            @Serializable(HexByteArraySerializer::class)
-            val address: ByteArray
+        val anycast: Anycast?,
+        val workchain_id: Int,
+        @Serializable(HexByteArraySerializer::class)
+        val address: ByteArray
     ) : MsgAddressInt {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -58,13 +58,9 @@ sealed interface MsgAddressInt {
         }
 
         companion object {
-            var userFriendly: Boolean = true
-            var urlSafe: Boolean = true
-            var testOnly: Boolean = false
-            var bounceable: Boolean = false
             @JvmStatic
-            fun parse(address: String) : AddrStd {
-                if(address.contains(':')) {
+            fun parse(address: String): AddrStd {
+                if (address.contains(':')) {
                     return parseRaw(address)
                 } else {
                     return parseUserFriendly(address)
@@ -74,23 +70,19 @@ sealed interface MsgAddressInt {
             @JvmStatic
             fun parseRaw(address: String): AddrStd {
                 require(address.contains(':'))
-                require(address.substringAfter(':').length == 32)
+                // 32 bytes, each represented as 2 characters
+                require(address.substringAfter(':').length == 32 * 2)
                 return AddrStd(
                     anycast = null,
-                    workchain_id = address.substringBefore(':').toByte().toInt(),
                     // toByte() to make sure it fits into 8 bits
+                    workchain_id = address.substringBefore(':').toByte().toInt(),
                     address = hex(address.substringAfter(':'))
-                ).apply {
-                    userFriendly = false
-                    urlSafe = false
-                    testOnly = false
-                    bounceable = false
-                }
+                )
             }
 
             @JvmStatic
             fun parseUserFriendly(address: String): AddrStd {
-                var raw:ByteArray
+                var raw: ByteArray
                 raw = base64(address)
 
                 require(raw.size == 36)
@@ -99,40 +91,49 @@ sealed interface MsgAddressInt {
                     workchain_id = raw[1].toInt(),
                     address = raw.sliceArray(2..34)
                 ).apply {
-                    userFriendly = true
-                    urlSafe = false
-
-                    if(raw[0] and 0x80.toByte() != 0.toByte()) {
-                        testOnly = true
-                        raw[0] = raw[0] and 0x7F.toByte() // not 0x80 = 0x7F; here we clean the test only flag
+                    val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
+                    if (testOnly) {
+                        // not 0x80 = 0x7F; here we clean the test only flag
+                        raw[0] = raw[0] and 0x7F.toByte()
                     }
 
-                    require((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) {"unknown address tag"}
+                    require((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) { "unknown address tag" }
 
-                    bounceable = raw[0] == 0x11.toByte()
+                    val bounceable = raw[0] == 0x11.toByte()
 
-                    require((crc(this).toBigInt() == BigInt(raw.sliceArray(35..36)))) {"CRC check failed"}
+                    require(
+                        (crc(
+                            this,
+                            testOnly,
+                            bounceable
+                        ).toBigInt() == BigInt(raw.sliceArray(35..36)))
+                    ) { "CRC check failed" }
                 }
             }
 
-            fun crc(address: AddrStd): Int =
-                crc16(byteArrayOf(tag(), address.workchain_id.toByte()),
-                            address.address)
+            @JvmStatic
+            private fun crc(address: AddrStd, testOnly: Boolean, bounceable: Boolean): Int =
+                crc16(
+                    byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()),
+                    address.address
+                )
 
+            @JvmStatic
             // Get the tag byte based on set flags
-            private fun tag(): Byte = (if(testOnly) 0x80.toByte() else 0.toByte()) or
-                    (if(bounceable) 0x11.toByte() else 0x51.toByte())
+            private fun tag(testOnly: Boolean, bounceable: Boolean): Byte =
+                (if (testOnly) 0x80.toByte() else 0.toByte()) or
+                        (if (bounceable) 0x11.toByte() else 0x51.toByte())
         }
     }
 
     @SerialName("addr_var")
     @Serializable
     data class AddrVar(
-            val anycast: Anycast?,
-            val addr_len: Int,
-            val workchain_id: Int,
-            @Serializable(HexByteArraySerializer::class)
-            val address: ByteArray
+        val anycast: Anycast?,
+        val addr_len: Int,
+        val workchain_id: Int,
+        @Serializable(HexByteArraySerializer::class)
+        val address: ByteArray
     ) : MsgAddressInt {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
