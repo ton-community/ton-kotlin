@@ -65,23 +65,23 @@ interface CellBuilder {
 
     companion object {
         @JvmStatic
-        fun beginCell(length: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(length)
+        fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
 
         @JvmStatic
-        fun createCell(length: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell = CellBuilderImpl(length).apply(builder).endCell()
+        fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell = CellBuilderImpl(maxLength).apply(builder).endCell()
     }
 }
 
 private class CellBuilderImpl(
-        length: Int
+    maxLength: Int
 ) : CellBuilder {
-    override var bits: BitString = BitString(length)
+    override var bits: BitString = BitString(maxLength)
     override var refs: MutableList<Cell> = ArrayList()
 
     private val remainder: Int get() = bits.length - writePosition
     private var writePosition: Int = 0
 
-    override fun endCell(): Cell = Cell(bits, refs)
+    override fun endCell(): Cell = Cell(bits.slice(0 .. writePosition - 1), refs)
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
