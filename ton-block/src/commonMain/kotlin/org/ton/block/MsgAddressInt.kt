@@ -54,6 +54,25 @@ sealed interface MsgAddressInt {
             append(")")
         }
 
+        fun toString(
+            userFriendly: Boolean = true,
+            urlSafe: Boolean = true,
+            testOnly: Boolean = false,
+            bounceable: Boolean = true
+        ): String {
+            if (userFriendly) {
+                val raw = byteArrayOf(tag(testOnly, bounceable), workchain_id.toByte()) +
+                        address + crc(this, testOnly, bounceable).toShort().toBigInt().toByteArray()
+                if (urlSafe) {
+                    return base64url(raw)
+                } else {
+                    return base64(raw)
+                }
+            } else {
+                return workchain_id.toString() + ":" + hex(address)
+            }
+        }
+
         companion object {
             @JvmStatic
             fun parse(address: String): AddrStd {
