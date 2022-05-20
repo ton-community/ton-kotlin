@@ -1,10 +1,10 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
+import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import kotlin.test.assertFailsWith
 
 class CellBuilderTest {
     @Test
@@ -43,5 +43,24 @@ class CellBuilderTest {
         assertFails {
             builder.storeBit(false)
         }
+    }
+
+    @Test
+    fun `build a number`() {
+        var cell = CellBuilder.beginCell()
+            .storeUInt(1, 8)
+            .endCell()
+        assertEquals(Cell("01"), cell)
+    }
+
+    @Test
+    fun `build multiple numbers`() {
+        var cell = CellBuilder.beginCell()
+            .storeUInt(0, 16)
+            .storeUInt(1, 8)
+            .storeUInt(1, 8)
+            .storeUInt(69, 64)
+            .endCell()
+        assertEquals("000001010000000000000045", hex(cell.bits.toByteArray()))
     }
 }
