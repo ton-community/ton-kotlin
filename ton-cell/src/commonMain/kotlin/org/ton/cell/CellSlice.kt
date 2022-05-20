@@ -48,10 +48,10 @@ interface CellSlice {
 }
 
 private class CellSliceImpl(
-        override val bits: BitString,
-        override val refs: List<Cell>,
-        private var bitsPosition: Int = 0,
-        private var refsPosition: Int = 0
+    override val bits: BitString,
+    override val refs: List<Cell>,
+    private var bitsPosition: Int = 0,
+    private var refsPosition: Int = 0
 ) : CellSlice {
     constructor(cell: Cell) : this(cell.bits, cell.references)
 
@@ -119,7 +119,7 @@ private class CellSliceImpl(
 
     override fun preloadUInt(length: Int): BigInt {
         val bits = preloadBits(length)
-        val intBits = bits.reversed().joinToString(separator = "") { if (it) "1" else "0" }
+        val intBits = bits.joinToString(separator = "") { if (it) "1" else "0" }
         return BigInt(intBits, 2)
     }
 
