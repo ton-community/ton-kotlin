@@ -10,7 +10,7 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
 ) {
     override fun decode(input: Input): ByteArray {
         var size = input.readByteLength()
-        size += calculatePadding(size)
+        size = (size shr 2) shl 2
         return input.readBytes(size)
     }
 
