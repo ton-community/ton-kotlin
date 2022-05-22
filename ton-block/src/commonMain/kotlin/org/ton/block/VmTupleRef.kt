@@ -22,4 +22,19 @@ sealed interface VmTupleRef {
     data class Any(
         val ref: VmTuple
     ) : VmTupleRef
+
+    companion object {
+        @JvmStatic
+        fun of(): VmTupleRef = VmTupleRef()
+
+        @JvmStatic
+        fun of(entry: VmStackValue): VmTupleRef = VmTupleRef(entry)
+
+        @JvmStatic
+        fun of(ref: VmTuple): VmTupleRef = VmTupleRef(ref)
+    }
 }
+
+fun VmTupleRef(): VmTupleRef = VmTupleRef.Nil
+fun VmTupleRef(entry: VmStackValue): VmTupleRef = VmTupleRef.Single(entry)
+fun VmTupleRef(ref: VmTuple): VmTupleRef = VmTupleRef.Any(ref)
