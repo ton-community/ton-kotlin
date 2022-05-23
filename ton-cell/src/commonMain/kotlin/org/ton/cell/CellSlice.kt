@@ -1,6 +1,7 @@
 package org.ton.cell
 
 import org.ton.bigint.BigInt
+import org.ton.bigint.bitLength
 import org.ton.bigint.minus
 import org.ton.bigint.times
 import org.ton.bitstring.BitString
@@ -37,6 +38,12 @@ interface CellSlice {
 
     fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
+
+    fun loadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
+    fun preloadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
+
+    fun loadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
+    fun preloadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
 
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 

@@ -9,7 +9,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
+fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstructor
+
+private object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
     schema = "_ cregs:(HashmapE 4 VmStackValue) = VmSaveList;"
 ) {
     private val hashmapCombinator = HashMapETlbCombinator(VmStackValueTlbCombinator)
@@ -32,5 +34,3 @@ object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
         VmSaveList(creg)
     }
 }
-
-fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstructor

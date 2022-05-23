@@ -1,6 +1,8 @@
 package org.ton.block.tlb
 
+import org.ton.block.Maybe
 import org.ton.block.VmControlData
+import org.ton.block.VmSaveList
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
@@ -10,12 +12,15 @@ import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
+fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataTlbConstructor
+
+private object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     schema = "vm_ctl_data\$_ nargs:(Maybe uint13) stack:(Maybe VmStack) save:VmSaveList cp:(Maybe int16) = VmControlData;"
 ) {
-    private val maybeUint13Constructor = MaybeTlbCombinator(UIntTlbConstructor.int(13))
-    private val maybeVmStackConstructor = MaybeTlbCombinator(VmStackTlbConstructor)
-    private val maybeInt16Constructor = MaybeTlbCombinator(IntTlbConstructor.int(16))
+    private val maybeUint13Constructor = Maybe.tlbCodec(UIntTlbConstructor.int(13))
+    private val maybeVmStackConstructor = Maybe.tlbCodec(VmStackTlbConstructor)
+    private val vmSaveListCodec = VmSaveList.tlbCodec()
+    private val maybeInt16Constructor = Maybe.tlbCodec(IntTlbConstructor.int(16))
 
     override fun encode(
         cellBuilder: CellBuilder,
@@ -25,7 +30,7 @@ object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     ) = cellBuilder {
         storeTlb(value.nargs, maybeUint13Constructor)
         storeTlb(value.stack, maybeVmStackConstructor)
-        storeTlb(value.save, VmSaveListTlbConstructor)
+        storeTlb(value.save, vmSaveListCodec)
         storeTlb(value.cp, maybeInt16Constructor)
     }
 
@@ -36,10 +41,8 @@ object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     ): VmControlData = cellSlice {
         val nargs = loadTlb(maybeUint13Constructor)
         val stack = loadTlb(maybeVmStackConstructor)
-        val save = loadTlb(VmSaveListTlbConstructor)
+        val save = loadTlb(vmSaveListCodec)
         val cp = loadTlb(maybeInt16Constructor)
         VmControlData(nargs, stack, save, cp)
     }
 }
-
-fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataTlbConstructor

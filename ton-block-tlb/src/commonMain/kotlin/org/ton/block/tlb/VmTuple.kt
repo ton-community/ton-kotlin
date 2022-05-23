@@ -1,14 +1,15 @@
 package org.ton.block.tlb
 
+import org.ton.block.VmStackValue
 import org.ton.block.VmTuple
+import org.ton.block.VmTupleRef
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
-object VmTupleCombinator : TlbCombinator<VmTuple>(
+fun VmTuple.Companion.tlbCodec(): TlbCodec<VmTuple> = VmTupleCombinator
+
+private object VmTupleCombinator : TlbCombinator<VmTuple>(
     NilTlbConstructor, TConsTlbConstructor
 ) {
     override fun getConstructor(value: VmTuple): TlbConstructor<out VmTuple> = when (value) {
@@ -17,7 +18,7 @@ object VmTupleCombinator : TlbCombinator<VmTuple>(
     }
 
     object NilTlbConstructor : TlbConstructor<VmTuple.Nil>(
-        schema = "vm_tuple_nil${'_'} = VmTuple 0;"
+        schema = "vm_tuple_nil\$_ = VmTuple 0;"
     ) {
         override fun encode(cellBuilder: CellBuilder, value: VmTuple.Nil, param: Int, negativeParam: (Int) -> Unit) {
         }
@@ -27,16 +28,19 @@ object VmTupleCombinator : TlbCombinator<VmTuple>(
         }
     }
 
-    object TConsTlbConstructor : TlbConstructor<VmTuple.TCons>(
-        schema = "vm_tuple_tcons${'_'} {n:#} head:(VmTupleRef n) tail:^VmStackValue = VmTuple (n + 1);"
+    private object TConsTlbConstructor : TlbConstructor<VmTuple.TCons>(
+        schema = "vm_tuple_tcons\$_ {n:#} head:(VmTupleRef n) tail:^VmStackValue = VmTuple (n + 1);"
     ) {
+        private val vmTupleRefCodec = VmTupleRef.tlbCodec()
+        private val vmStackValueCodec = VmStackValue.tlbCodec()
+
         override fun encode(
             cellBuilder: CellBuilder, value: VmTuple.TCons, param: Int, negativeParam: (Int) -> Unit
         ) = cellBuilder {
             val n = param - 1
-            storeTlb(value.head, VmTupleRefTlbCombinator, n)
+            storeTlb(value.head, vmTupleRefCodec, n)
             storeRef {
-                storeTlb(value.tail, VmStackValueTlbCombinator)
+                storeTlb(value.tail, vmStackValueCodec)
             }
         }
 
@@ -44,13 +48,11 @@ object VmTupleCombinator : TlbCombinator<VmTuple>(
             cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
         ): VmTuple.TCons = cellSlice {
             val n = param - 1
-            val head = loadTlb(VmTupleRefTlbCombinator, n)
+            val head = loadTlb(vmTupleRefCodec, n)
             val tail = loadRef {
-                loadTlb(VmStackValueTlbCombinator)
+                loadTlb(vmStackValueCodec)
             }
             VmTuple.TCons(head, tail)
         }
     }
 }
-
-fun VmTuple.Companion.tlbCodec() = VmTupleCombinator

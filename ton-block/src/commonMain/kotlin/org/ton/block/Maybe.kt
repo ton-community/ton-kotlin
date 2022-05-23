@@ -20,7 +20,7 @@ class Nothing<X : Any> : Maybe<X> {
 
 @SerialName("just")
 @Serializable
-class Just<X : Any>(
+data class Just<X : Any>(
     override val value: X
 ) : Maybe<X>
 

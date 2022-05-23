@@ -6,7 +6,9 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
+fun VmCellSlice.Companion.tlbCodec(): TlbCodec<VmCellSlice> = VmCellSliceTlbConstructor
+
+private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
     schema = "_ cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
             "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
 ) {
@@ -28,13 +30,11 @@ object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         param: Int,
         negativeParam: (Int) -> Unit
     ): VmCellSlice = cellSlice {
-        val cell = cellSlice.loadRef()
-        val stBits = cellSlice.loadUInt(10).toInt()
-        val endBits = cellSlice.loadUInt(10).toInt()
-        val stRef = cellSlice.loadUInt(4).toInt()
-        val endRef = cellSlice.loadUInt(4).toInt()
+        val cell = loadRef()
+        val stBits = loadUInt(10).toInt()
+        val endBits = loadUInt(10).toInt()
+        val stRef = loadUIntLeq(4).toInt()
+        val endRef = loadUIntLeq(4).toInt()
         VmCellSlice(cell, stBits, endBits, stRef, endRef)
     }
 }
-
-fun VmCellSlice.Companion.tlbCodec(): TlbCodec<VmCellSlice> = VmCellSliceTlbConstructor

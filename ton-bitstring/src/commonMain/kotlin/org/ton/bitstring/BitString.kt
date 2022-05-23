@@ -8,6 +8,37 @@ import kotlin.experimental.inv
 import kotlin.experimental.or
 import kotlin.math.min
 
+fun BitString(bits: Iterable<Boolean>): BitString {
+    val bitsList = bits.toList()
+    val bitString = ByteArrayBitStringImpl(bitsList.size)
+    bitsList.forEachIndexed { index, bit ->
+        bitString[index] = bit
+    }
+    return bitString
+}
+
+fun BitString(vararg bits: Boolean): BitString {
+    val bitString = ByteArrayBitStringImpl(bits.size)
+    bits.forEachIndexed { index, bit ->
+        bitString[index] = bit
+    }
+    return bitString
+}
+
+fun BitString(hex: String): BitString {
+    val bits = hex.asSequence().map { char ->
+        char.digitToInt(16).toString(2).padStart(4, '0').map { it == '1' }
+    }.flatten().asIterable()
+    return BitString(bits)
+}
+
+fun BitString(byteArray: ByteArray): BitString =
+    ByteArrayBitStringImpl(length = byteArray.size * Byte.SIZE_BITS, bytes = byteArray)
+
+fun BitString(length: Int): BitString = ByteArrayBitStringImpl(length)
+
+fun ByteArray.toBitString(): BitString = BitString(this)
+
 @Serializable(with = FiftHexBitStringSerializer::class)
 interface BitString : Iterable<Boolean>, Comparable<BitString> {
     val length: Int
@@ -15,7 +46,7 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
     operator fun set(index: Int, bit: Int)
     operator fun set(index: Int, bit: Boolean)
     operator fun get(index: Int): Boolean
-    fun slice(indices: IntRange) : BitString
+    fun slice(indices: IntRange): BitString
     fun toByteArray(): ByteArray
     fun toBooleanArray(): BooleanArray
     fun isEmpty(): Boolean = length == 0
@@ -54,8 +85,8 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 }
 
 internal class ByteArrayBitStringImpl constructor(
-        override val length: Int = BitString.MAX_LENGTH,
-        private val bytes: ByteArray = ByteArray(length / Byte.SIZE_BITS + if (length % Byte.SIZE_BITS == 0) 0 else 1)
+    override val length: Int = BitString.MAX_LENGTH,
+    private val bytes: ByteArray = ByteArray(length / Byte.SIZE_BITS + if (length % Byte.SIZE_BITS == 0) 0 else 1)
 ) : BitString {
     init {
         checkLength()
@@ -163,35 +194,7 @@ internal class ByteArrayBitStringImpl constructor(
     }
 }
 
-fun BitString(bits: Iterable<Boolean>): BitString {
-    val bitsList = bits.toList()
-    val bitString = ByteArrayBitStringImpl(bitsList.size)
-    bitsList.forEachIndexed { index, bit ->
-        bitString[index] = bit
-    }
-    return bitString
-}
-
-fun BitString(vararg bits: Boolean): BitString {
-    val bitString = ByteArrayBitStringImpl(bits.size)
-    bits.forEachIndexed { index, bit ->
-        bitString[index] = bit
-    }
-    return bitString
-}
-
-fun BitString(hex: String): BitString {
-    val bits = hex.asSequence().map { char ->
-        char.digitToInt(16).toString(2).padStart(4, '0').map { it == '1' }
-    }.flatten().asIterable()
-    return BitString(bits)
-}
-
-fun BitString(byteArray: ByteArray): BitString =
-        ByteArrayBitStringImpl(length = byteArray.size * Byte.SIZE_BITS, bytes = byteArray)
-
-fun BitString(length: Int): BitString = ByteArrayBitStringImpl(length)
-
 private inline val Int.wordIndex get() = (this / Byte.SIZE_BITS) or 0
 private inline val Int.bitMask get() = (1 shl (7 - (this % Byte.SIZE_BITS))).toByte()
-private fun BitString.checkLength() = require(length <= BitString.MAX_LENGTH) { "BitString length expected: 0..${BitString.MAX_LENGTH}, actual: $length" }
+private fun BitString.checkLength() =
+    require(length <= BitString.MAX_LENGTH) { "BitString length expected: 0..${BitString.MAX_LENGTH}, actual: $length" }

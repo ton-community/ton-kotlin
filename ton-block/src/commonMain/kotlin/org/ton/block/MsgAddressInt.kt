@@ -15,15 +15,23 @@ import kotlin.experimental.or
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface MsgAddressInt {
+sealed interface MsgAddressInt : MsgAddress {
     @SerialName("addr_std")
     @Serializable
     data class AddrStd(
-        val anycast: Anycast?,
-        val workchain_id: Int,
+        val anycast: Maybe<Anycast>,
+        @SerialName("workchain_id")
+        val workchainId: Int,
         @Serializable(HexByteArraySerializer::class)
         val address: ByteArray
     ) : MsgAddressInt {
+        constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
+        constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
+            anycast.toMaybe(),
+            workchainId,
+            address
+        )
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -31,15 +39,15 @@ sealed interface MsgAddressInt {
             other as AddrStd
 
             if (anycast != other.anycast) return false
-            if (workchain_id != other.workchain_id) return false
+            if (workchainId != other.workchainId) return false
             if (!address.contentEquals(other.address)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = anycast?.hashCode() ?: 0
-            result = 31 * result + workchain_id
+            var result = anycast.hashCode()
+            result = 31 * result + workchainId
             result = 31 * result + address.contentHashCode()
             return result
         }
@@ -48,7 +56,7 @@ sealed interface MsgAddressInt {
             append("MsgAddressInt.AddrStd(anycast=")
             append(anycast)
             append(", workchainId=")
-            append(workchain_id)
+            append(workchainId)
             append(", address=")
             append(hex(address))
             append(")")
@@ -59,18 +67,16 @@ sealed interface MsgAddressInt {
             urlSafe: Boolean = true,
             testOnly: Boolean = false,
             bounceable: Boolean = true
-        ): String {
-            if (userFriendly) {
-                val raw = byteArrayOf(tag(testOnly, bounceable), workchain_id.toByte()) +
-                        address + crc(this, testOnly, bounceable).toShort().toBigInt().toByteArray()
-                if (urlSafe) {
-                    return base64url(raw)
-                } else {
-                    return base64(raw)
-                }
+        ): String = if (userFriendly) {
+            val raw = byteArrayOf(tag(testOnly, bounceable), workchainId.toByte()) +
+                    address + crc(this, testOnly, bounceable).toShort().toBigInt().toByteArray()
+            if (urlSafe) {
+                base64url(raw)
             } else {
-                return workchain_id.toString() + ":" + hex(address)
+                base64(raw)
             }
+        } else {
+            workchainId.toString() + ":" + hex(address)
         }
 
         companion object {
@@ -89,9 +95,8 @@ sealed interface MsgAddressInt {
                 // 32 bytes, each represented as 2 characters
                 require(address.substringAfter(':').length == 32 * 2)
                 return AddrStd(
-                    anycast = null,
                     // toByte() to make sure it fits into 8 bits
-                    workchain_id = address.substringBefore(':').toByte().toInt(),
+                    workchainId = address.substringBefore(':').toByte().toInt(),
                     address = hex(address.substringAfter(':'))
                 )
             }
@@ -107,8 +112,7 @@ sealed interface MsgAddressInt {
 
                 require(raw.size == 36)
                 return AddrStd(
-                    anycast = null,
-                    workchain_id = raw[1].toInt(),
+                    workchainId = raw[1].toInt(),
                     address = raw.sliceArray(2..33)
                 ).apply {
                     val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
@@ -117,10 +121,10 @@ sealed interface MsgAddressInt {
                         raw[0] = raw[0] and 0x7F.toByte()
                     }
 
-                    require((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) { "unknown address tag" }
+                    check((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) { "unknown address tag" }
 
                     val bounceable = raw[0] == 0x11.toByte()
-                    require(
+                    check(
                         (crc(
                             this,
                             testOnly,
@@ -133,7 +137,7 @@ sealed interface MsgAddressInt {
             @JvmStatic
             private fun crc(address: AddrStd, testOnly: Boolean, bounceable: Boolean): Int =
                 crc16(
-                    byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()),
+                    byteArrayOf(tag(testOnly, bounceable), address.workchainId.toByte()),
                     address.address
                 )
 
@@ -142,50 +146,6 @@ sealed interface MsgAddressInt {
             private fun tag(testOnly: Boolean, bounceable: Boolean): Byte =
                 (if (testOnly) 0x80.toByte() else 0.toByte()) or
                         (if (bounceable) 0x11.toByte() else 0x51.toByte())
-        }
-    }
-
-    @SerialName("addr_var")
-    @Serializable
-    data class AddrVar(
-        val anycast: Anycast?,
-        val addr_len: Int,
-        val workchain_id: Int,
-        @Serializable(HexByteArraySerializer::class)
-        val address: ByteArray
-    ) : MsgAddressInt {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as AddrVar
-
-            if (anycast != other.anycast) return false
-            if (addr_len != other.addr_len) return false
-            if (workchain_id != other.workchain_id) return false
-            if (!address.contentEquals(other.address)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = anycast?.hashCode() ?: 0
-            result = 31 * result + addr_len
-            result = 31 * result + workchain_id
-            result = 31 * result + address.contentHashCode()
-            return result
-        }
-
-        override fun toString() = buildString {
-            append("MsgAddressInt.AddrVar(anycast=")
-            append(anycast)
-            append(", addrLen=")
-            append(addr_len)
-            append(", workchainId=")
-            append(workchain_id)
-            append(", address=")
-            append(hex(address))
-            append(")")
         }
     }
 }

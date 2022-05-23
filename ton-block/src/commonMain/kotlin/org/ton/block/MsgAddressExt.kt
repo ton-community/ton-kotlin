@@ -9,7 +9,7 @@ import org.ton.bitstring.BitString
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface MsgAddressExt {
+sealed interface MsgAddressExt : MsgAddress {
     @SerialName("addr_none")
     @Serializable
     object AddrNone : MsgAddressExt
@@ -17,7 +17,26 @@ sealed interface MsgAddressExt {
     @SerialName("addr_extern")
     @Serializable
     data class AddrExtern(
-            val len: Int,
-            val external_address: BitString
-    ) : MsgAddressExt
+        val len: Int,
+        @SerialName("external_address")
+        val externalAddress: BitString
+    ) : MsgAddressExt {
+        init {
+            require(len == externalAddress.length)
+        }
+
+        constructor(externalAddress: BitString) : this(externalAddress.length, externalAddress)
+    }
+
+    companion object {
+        @JvmStatic
+        fun of(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt(externalAddress)
+    }
 }
+
+fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt =
+    if (externalAddress == null || externalAddress.isEmpty()) {
+        MsgAddressExt.AddrNone
+    } else {
+        MsgAddressExt.AddrExtern(externalAddress)
+    }

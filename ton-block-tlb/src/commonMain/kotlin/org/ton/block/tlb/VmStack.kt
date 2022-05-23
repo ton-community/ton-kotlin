@@ -1,6 +1,7 @@
 package org.ton.block.tlb
 
 import org.ton.block.VmStack
+import org.ton.block.VmStackList
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
@@ -8,9 +9,13 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-object VmStackTlbConstructor : TlbConstructor<VmStack>(
+fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor
+
+private object VmStackTlbConstructor : TlbConstructor<VmStack>(
     schema = "vm_stack#_ depth:(## 24) stack:(VmStackList depth) = VmStack;"
 ) {
+    private val vmStackListCodec = VmStackList.tlbCodec()
+
     override fun encode(
         cellBuilder: CellBuilder,
         value: VmStack,
@@ -18,7 +23,7 @@ object VmStackTlbConstructor : TlbConstructor<VmStack>(
         negativeParam: (Int) -> Unit
     ) = cellBuilder {
         storeUInt(value.depth, 24)
-        storeTlb(value.stack, VmStackListCombinator, value.depth)
+        storeTlb(value.stack, vmStackListCodec, value.depth)
     }
 
     override fun decode(
@@ -27,9 +32,7 @@ object VmStackTlbConstructor : TlbConstructor<VmStack>(
         negativeParam: (Int) -> Unit
     ): VmStack = cellSlice {
         val depth = loadUInt(24).toInt()
-        val stack = loadTlb(VmStackListCombinator, depth)
+        val stack = loadTlb(vmStackListCodec, depth)
         VmStack(depth, stack)
     }
 }
-
-fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor

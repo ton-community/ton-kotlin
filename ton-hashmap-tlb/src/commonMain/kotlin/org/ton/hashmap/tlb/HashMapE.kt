@@ -4,10 +4,11 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.EmptyHashMapE
 import org.ton.hashmap.HashMapE
+import org.ton.hashmap.HashMapEdge
 import org.ton.hashmap.RootHashMapE
 import org.ton.tlb.*
 
-class HashMapETlbCombinator<T : Any>(
+private class HashMapETlbCombinator<T : Any>(
     typeCodec: TlbCodec<T>
 ) : TlbCombinator<HashMapE<T>>() {
     private val rootConstructor = RootHashMapETlbConstructor(typeCodec)
@@ -19,52 +20,52 @@ class HashMapETlbCombinator<T : Any>(
         is RootHashMapE -> rootConstructor
         is EmptyHashMapE -> emptyConstructor
     }
-}
 
-class EmptyHashMapETlbConstructor<X : Any> : TlbConstructor<EmptyHashMapE<X>>(
-    schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
-) {
-    override fun encode(
-        cellBuilder: CellBuilder,
-        value: EmptyHashMapE<X>,
-        param: Int,
-        negativeParam: (Int) -> Unit
-    ) = Unit
-
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
-    ): EmptyHashMapE<X> = EmptyHashMapE()
-}
-
-class RootHashMapETlbConstructor<X : Any>(
-    typeCodec: TlbCodec<X>
-) : TlbConstructor<RootHashMapE<X>>(
-    schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;"
-) {
-    private val hashmapConstructor = HashMapEdgeTlbConstructor(typeCodec)
-
-    override fun encode(
-        cellBuilder: CellBuilder,
-        value: RootHashMapE<X>,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    class EmptyHashMapETlbConstructor<X : Any> : TlbConstructor<EmptyHashMapE<X>>(
+        schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
     ) {
-        cellBuilder.storeRef {
-            storeTlb(value.root, hashmapConstructor, param)
-        }
+        override fun encode(
+            cellBuilder: CellBuilder,
+            value: EmptyHashMapE<X>,
+            param: Int,
+            negativeParam: (Int) -> Unit
+        ) = Unit
+
+        override fun decode(
+            cellSlice: CellSlice,
+            param: Int,
+            negativeParam: (Int) -> Unit
+        ): EmptyHashMapE<X> = EmptyHashMapE()
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
-    ): RootHashMapE<X> {
-        val root = cellSlice.loadRef {
-            cellSlice.loadTlb(hashmapConstructor, param)
+    class RootHashMapETlbConstructor<X : Any>(
+        typeCodec: TlbCodec<X>
+    ) : TlbConstructor<RootHashMapE<X>>(
+        schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;"
+    ) {
+        private val hashmapConstructor = HashMapEdge.tlbCodec(typeCodec)
+
+        override fun encode(
+            cellBuilder: CellBuilder,
+            value: RootHashMapE<X>,
+            param: Int,
+            negativeParam: (Int) -> Unit
+        ) {
+            cellBuilder.storeRef {
+                storeTlb(value.root, hashmapConstructor, param)
+            }
         }
-        return RootHashMapE(root)
+
+        override fun decode(
+            cellSlice: CellSlice,
+            param: Int,
+            negativeParam: (Int) -> Unit
+        ): RootHashMapE<X> {
+            val root = cellSlice.loadRef {
+                cellSlice.loadTlb(hashmapConstructor, param)
+            }
+            return RootHashMapE(root)
+        }
     }
 }
 

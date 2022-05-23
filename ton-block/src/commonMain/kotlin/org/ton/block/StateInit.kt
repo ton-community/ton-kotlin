@@ -8,9 +8,20 @@ import org.ton.hashmap.HashMapE
 @SerialName("state_init")
 @Serializable
 data class StateInit(
-        val split_depth: Int?,
-        val special: TickTock?,
-        val code: Cell?,
-        val data: Cell?,
-        val library: HashMapE<SimpleLib>
-)
+    @SerialName("split_depth")
+    val splitDepth: Maybe<Int>,
+    val special: Maybe<TickTock>,
+    val code: Maybe<Cell>,
+    val data: Maybe<Cell>,
+    val library: HashMapE<SimpleLib>
+) {
+    constructor(
+        library: HashMapE<SimpleLib>,
+        splitDepth: Int? = null,
+        special: TickTock? = null,
+        code: Cell? = null,
+        data: Cell? = null
+    ) : this(
+        splitDepth.toMaybe(), special.toMaybe(), code.toMaybe(), data.toMaybe(), library
+    )
+}
