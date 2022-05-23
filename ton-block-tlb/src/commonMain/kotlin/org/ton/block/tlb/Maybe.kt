@@ -7,30 +7,32 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-class MaybeTlbCombinator<T : Any>(
-    typeCodec: TlbCodec<T>
-) : TlbCombinator<Maybe<T>>() {
-    private val nothingConstructor = NothingConstructor<T>()
+class MaybeTlbCombinator<X : Any>(
+    typeCodec: TlbCodec<X>
+) : TlbCombinator<Maybe<X>>() {
+    private val nothingConstructor = NothingConstructor<X>()
     private val justConstructor = JustConstructor(typeCodec)
 
-    override val constructors: List<TlbConstructor<out Maybe<T>>> = listOf(
+    override val constructors: List<TlbConstructor<out Maybe<X>>> = listOf(
         nothingConstructor, justConstructor
     )
 
-    override fun getConstructor(value: Maybe<T>): TlbConstructor<out Maybe<T>> = when (value) {
+    override fun getConstructor(value: Maybe<X>): TlbConstructor<out Maybe<X>> = when (value) {
         is Just -> justConstructor
         is Nothing -> nothingConstructor
     }
 }
 
-class NothingConstructor<T : Any> : TlbConstructor<Nothing<T>>(
+fun <X : Any> Maybe.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(typeCodec)
+
+class NothingConstructor<X : Any> : TlbConstructor<Nothing<X>>(
     schema = "nothing\$0 {X:Type} = Maybe X;"
 ) {
-    private val nothing = Nothing<T>()
+    private val nothing = Nothing<X>()
 
     override fun encode(
         cellBuilder: CellBuilder,
-        value: Nothing<T>,
+        value: Nothing<X>,
         param: Int,
         negativeParam: (Int) -> Unit
     ) {
@@ -40,7 +42,7 @@ class NothingConstructor<T : Any> : TlbConstructor<Nothing<T>>(
         cellSlice: CellSlice,
         param: Int,
         negativeParam: (Int) -> Unit
-    ): Nothing<T> = nothing
+    ): Nothing<X> = nothing
 }
 
 class JustConstructor<X : Any>(

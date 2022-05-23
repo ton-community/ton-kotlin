@@ -53,3 +53,4 @@ object VmTupleCombinator : TlbCombinator<VmTuple>(
     }
 }
 
+fun VmTuple.Companion.tlbCodec() = VmTupleCombinator

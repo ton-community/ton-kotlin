@@ -3,10 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmStackList
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object VmStackListCombinator : TlbCombinator<VmStackList>(
     VmStackListConsConstructor, VmStackListNilConstructor
@@ -66,3 +63,5 @@ object VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
         return VmStackList.Nil
     }
 }
+
+fun VmStackList.Companion.tlbCodec(): TlbCodec<VmStackList> = VmStackListCombinator

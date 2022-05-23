@@ -3,10 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmStackValue
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
     VmStackValueBuilderTlbConstructor,
@@ -213,3 +210,5 @@ object VmStackValueTupleConstructor : TlbConstructor<VmStackValue.Tuple>(
         VmStackValue.Tuple(len, data)
     }
 }
+
+fun VmStackValue.Companion.tlbCodec(): TlbCodec<VmStackValue> = VmStackValueTlbCombinator

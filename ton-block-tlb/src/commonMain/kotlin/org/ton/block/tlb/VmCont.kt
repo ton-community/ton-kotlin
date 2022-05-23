@@ -3,10 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmCont
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object VmContTlbCombinator : TlbCombinator<VmCont>(
     VmContStdTlbConstructor,
@@ -269,3 +266,5 @@ object VmContPushIntTlbConstructor : TlbConstructor<VmCont.PushInt>(
         VmCont.PushInt(value, next)
     }
 }
+
+fun VmCont.Companion.tlbCodec(): TlbCodec<VmCont> = VmContTlbCombinator

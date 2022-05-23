@@ -3,10 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmTupleRef
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
     VmTupleRefNilTlbConstructor,
@@ -76,3 +73,5 @@ object VmTupleRefAnyTlbConstructor : TlbConstructor<VmTupleRef.Any>(
         VmTupleRef.Any(ref)
     }
 }
+
+fun VmTupleRef.Companion.tlbCodec(): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator

@@ -3,6 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmStack
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -30,3 +31,5 @@ object VmStackTlbConstructor : TlbConstructor<VmStack>(
         VmStack(depth, stack)
     }
 }
+
+fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor

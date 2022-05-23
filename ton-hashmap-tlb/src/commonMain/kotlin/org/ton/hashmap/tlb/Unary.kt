@@ -6,10 +6,7 @@ import org.ton.cell.CellSlice
 import org.ton.hashmap.Unary
 import org.ton.hashmap.UnarySuccess
 import org.ton.hashmap.UnaryZero
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object UnaryTlbCombinator : TlbCombinator<Unary>(
     UnaryZeroTlbConstructor,
@@ -70,3 +67,5 @@ object UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
         UnaryZero
     }
 }
+
+fun Unary.Companion.tlbCodec(): TlbCodec<Unary> = UnaryTlbCombinator

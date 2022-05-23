@@ -3,6 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmControlData
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
@@ -40,3 +41,5 @@ object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
         VmControlData(nargs, stack, save, cp)
     }
 }
+
+fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataTlbConstructor

@@ -67,3 +67,6 @@ class RootHashMapETlbConstructor<X : Any>(
         return RootHashMapE(root)
     }
 }
+
+fun <X : Any> HashMapE.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapE<X>> =
+    HashMapETlbCombinator(typeCodec)

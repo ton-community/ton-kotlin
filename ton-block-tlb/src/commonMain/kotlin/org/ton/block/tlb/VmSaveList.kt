@@ -4,6 +4,7 @@ import org.ton.block.VmSaveList
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.tlb.HashMapETlbCombinator
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -31,3 +32,5 @@ object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
         VmSaveList(creg)
     }
 }
+
+fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstructor

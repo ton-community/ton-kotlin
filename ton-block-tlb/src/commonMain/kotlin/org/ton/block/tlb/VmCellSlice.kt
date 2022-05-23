@@ -3,6 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.VmCellSlice
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
@@ -35,3 +36,5 @@ object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         VmCellSlice(cell, stBits, endBits, stRef, endRef)
     }
 }
+
+fun VmCellSlice.Companion.tlbCodec(): TlbCodec<VmCellSlice> = VmCellSliceTlbConstructor

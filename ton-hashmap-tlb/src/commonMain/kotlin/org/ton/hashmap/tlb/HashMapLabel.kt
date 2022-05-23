@@ -6,10 +6,7 @@ import org.ton.hashmap.HashMapLabel
 import org.ton.hashmap.HashMapLabelLong
 import org.ton.hashmap.HashMapLabelSame
 import org.ton.hashmap.HashMapLabelShort
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
     HashMapLabelShortTlbConstructor,
@@ -102,3 +99,5 @@ object HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
         HashMapLabelSame(v, n)
     }
 }
+
+fun HashMapLabel.Companion.tlbCodec(): TlbCodec<HashMapLabel> = HashMapLabelTlbCombinator

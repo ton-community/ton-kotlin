@@ -2,6 +2,7 @@ package org.ton.hashmap.tlb
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashMapEdge
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -39,3 +40,6 @@ class HashMapEdgeTlbConstructor<X : Any>(
         return HashMapEdge(label, node)
     }
 }
+
+fun <X : Any> HashMapEdge.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapE<X>> =
+    HashMapETlbCombinator(typeCodec)

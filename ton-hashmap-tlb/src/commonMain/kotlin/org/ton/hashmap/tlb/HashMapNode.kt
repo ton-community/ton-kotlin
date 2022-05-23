@@ -84,3 +84,6 @@ class HashMapNodeForkTlbConstructor<X : Any>(
         HashMapNodeFork(left, right)
     }
 }
+
+fun <X : Any> HashMapNode.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
+    HashMapNodeTlbCombinator(typeCodec)
