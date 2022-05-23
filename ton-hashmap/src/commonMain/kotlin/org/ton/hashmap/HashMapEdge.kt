@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("hm_edge")
-data class HashMapEdge<T>(
-        val label: HashMapLabel,
-        val node: HashMapNode<T>
+data class HashMapEdge<T : Any>(
+    val label: HashMapLabel,
+    val node: HashMapNode<T>
 ) {
     override fun toString(): String = "hm_edge(label=$label, node=$node)"
 }

@@ -5,105 +5,82 @@ import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapNode
 import org.ton.hashmap.HashMapNodeFork
 import org.ton.hashmap.HashMapNodeLeaf
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbDecoder
-import org.ton.tlb.TlbEncoder
+import org.ton.tlb.*
 
-object HashMapNodeTlbCombinator : TlbCombinator<HashMapNode<Any>>(
-        constructors = listOf(HashMapNodeLeaf.tlbCodec, HashMapNodeFork.tlbCodec)
-) {
-    override fun encode(
-            cellBuilder: CellBuilder,
-            value: HashMapNode<Any>,
-            typeParam: TlbEncoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ) {
-        when (value) {
-            is HashMapNodeLeaf -> HashMapNodeLeafTlbConstructor.encode(
-                    cellBuilder,
-                    value,
-                    typeParam,
-                    param,
-                    negativeParam
-            )
-            is HashMapNodeFork -> HashMapNodeForkTlbCodec.encode(cellBuilder, value, typeParam, param, negativeParam)
-        }
-    }
+class HashMapNodeTlbCombinator<X : Any>(
+    typeCodec: TlbCodec<X>
+) : TlbCombinator<HashMapNode<X>>() {
+    private val leafConstructor = HashMapNodeLeafTlbConstructor(typeCodec)
+    private val forkConstructor = HashMapNodeForkTlbConstructor(typeCodec)
 
-    override fun decode(
-            cellSlice: CellSlice,
-            typeParam: TlbDecoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ): HashMapNode<Any> {
-        return if (param == 0) {
-            HashMapNodeLeafTlbConstructor.decode(cellSlice, typeParam, param, negativeParam)
-        } else {
-            HashMapNodeForkTlbCodec.decode(cellSlice, typeParam, param, negativeParam)
-        }
+    override val constructors: List<TlbConstructor<out HashMapNode<X>>> = listOf(leafConstructor, forkConstructor)
+
+    override fun getConstructor(value: HashMapNode<X>): TlbConstructor<out HashMapNode<X>> = when (value) {
+        is HashMapNodeFork -> forkConstructor
+        is HashMapNodeLeaf -> leafConstructor
     }
 }
 
-val HashMapNode.Companion.tlbCodec get() = HashMapNodeTlbCombinator
-
-object HashMapNodeLeafTlbConstructor : TlbConstructor<HashMapNodeLeaf<Any>>(
-        schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;"
+class HashMapNodeLeafTlbConstructor<X : Any>(
+    val typeCodec: TlbCodec<X>
+) : TlbConstructor<HashMapNodeLeaf<X>>(
+    schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
 ) {
+    @Suppress("UNCHECKED_CAST")
     override fun encode(
-            cellBuilder: CellBuilder,
-            value: HashMapNodeLeaf<Any>,
-            typeParam: TlbEncoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ) {
-        typeParam?.encode(cellBuilder, value.value, typeParam, param, negativeParam)
+        cellBuilder: CellBuilder,
+        value: HashMapNodeLeaf<X>,
+        param: Int,
+        negativeParam: (Int) -> Unit
+    ) = cellBuilder {
+        storeTlb(value.value, typeCodec)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun decode(
-            cellSlice: CellSlice,
-            typeParam: TlbDecoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ): HashMapNodeLeaf<Any> {
-        val value = typeParam?.decode(cellSlice, typeParam, param, negativeParam)
-        return HashMapNodeLeaf(requireNotNull(value))
+        cellSlice: CellSlice,
+        param: Int,
+        negativeParam: (Int) -> Unit
+    ): HashMapNodeLeaf<X> = cellSlice {
+        val value = loadTlb(typeCodec)
+        HashMapNodeLeaf(value)
     }
 }
 
-val HashMapNodeLeaf.Companion.tlbCodec get() = HashMapNodeLeafTlbConstructor
-
-object HashMapNodeForkTlbCodec : TlbConstructor<HashMapNodeFork<Any>>(
-        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X"
+class HashMapNodeForkTlbConstructor<X : Any>(
+    typeCodec: TlbCodec<X>
+) : TlbConstructor<HashMapNodeFork<X>>(
+    schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;"
 ) {
+    private val hashmapConstructor = HashMapEdgeTlbConstructor(typeCodec)
+
     override fun encode(
-            cellBuilder: CellBuilder,
-            value: HashMapNodeFork<Any>,
-            typeParam: TlbEncoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ) {
+        cellBuilder: CellBuilder,
+        value: HashMapNodeFork<X>,
+        param: Int,
+        negativeParam: (Int) -> Unit
+    ) = cellBuilder {
         val n = param - 1
-        cellBuilder.storeRef {
-            HashMapEdgeTlbConstructor.encode(this, value.left, typeParam, n, negativeParam)
+        storeRef {
+            storeTlb(value.left, hashmapConstructor, n, negativeParam)
         }
-        cellBuilder.storeRef {
-            HashMapEdgeTlbConstructor.encode(this, value.right, typeParam, n, negativeParam)
+        storeRef {
+            storeTlb(value.right, hashmapConstructor, n, negativeParam)
         }
     }
 
     override fun decode(
-            cellSlice: CellSlice,
-            typeParam: TlbDecoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ): HashMapNodeFork<Any> {
+        cellSlice: CellSlice,
+        param: Int,
+        negativeParam: (Int) -> Unit
+    ): HashMapNodeFork<X> = cellSlice {
         val n = param - 1
-        val left = HashMapEdgeTlbConstructor.decode(cellSlice.loadRef().beginParse(), typeParam, n, negativeParam)
-        val right = HashMapEdgeTlbConstructor.decode(cellSlice.loadRef().beginParse(), typeParam, n, negativeParam)
-        return HashMapNodeFork(left, right)
+        val left = loadRef {
+            loadTlb(hashmapConstructor, n, negativeParam)
+        }
+        val right = loadRef {
+            loadTlb(hashmapConstructor, n, negativeParam)
+        }
+        HashMapNodeFork(left, right)
     }
 }
-
-val HashMapNodeFork.Companion.tlbCodec get() = HashMapNodeForkTlbCodec

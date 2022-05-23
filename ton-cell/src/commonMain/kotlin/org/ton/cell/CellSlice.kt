@@ -19,7 +19,9 @@ interface CellSlice {
      * Loads the first reference from the slice.
      */
     fun loadRef(): Cell
+    fun <T> loadRef(cellSlice: CellSlice.() -> T): T
     fun preloadRef(): Cell
+    fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
 
     fun loadBit(): Boolean
     fun preloadBit(): Boolean
@@ -40,6 +42,8 @@ interface CellSlice {
 
     operator fun component1(): BitString = bits
     operator fun component2(): List<Cell> = refs
+
+    operator fun <T : Any> invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
 
     companion object {
         @JvmStatic
@@ -68,7 +72,21 @@ private class CellSliceImpl(
         return cell
     }
 
+    override fun <T> loadRef(cellSlice: CellSlice.() -> T): T {
+        val slice = loadRef().beginParse()
+        val result = cellSlice(slice)
+        slice.endParse()
+        return result
+    }
+
     override fun preloadRef(): Cell = refs[refsPosition]
+
+    override fun <T> preloadRef(cellSlice: CellSlice.() -> T): T {
+        val slice = preloadRef().beginParse()
+        val result = cellSlice(slice)
+        slice.endParse()
+        return result
+    }
 
     override fun loadBit(): Boolean {
         val bit = preloadBit()

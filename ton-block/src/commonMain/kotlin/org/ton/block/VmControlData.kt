@@ -7,7 +7,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VmControlData(
     val nargs: Maybe<Int>,
-    val stack: Maybe<VmStack>
+    val stack: Maybe<VmStack>,
+    val save: VmSaveList,
+    val cp: Maybe<Int>
 ) {
-    constructor(nargs: Int?, stack: VmStack?) : this(nargs.toMaybe(), stack.toMaybe())
+    constructor(nargs: Int?, stack: VmStack?, save: VmSaveList, cp: Int?) : this(
+        nargs.toMaybe(),
+        stack.toMaybe(),
+        save,
+        cp.toMaybe()
+    )
 }

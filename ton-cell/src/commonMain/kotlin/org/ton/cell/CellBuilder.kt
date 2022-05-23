@@ -63,12 +63,17 @@ interface CellBuilder {
      */
     fun storeSlice(slice: CellSlice): CellBuilder
 
+    operator fun invoke(builder: CellBuilder.() -> Unit) {
+        builder(this)
+    }
+
     companion object {
         @JvmStatic
         fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
 
         @JvmStatic
-        fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell = CellBuilderImpl(maxLength).apply(builder).endCell()
+        fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
+            CellBuilderImpl(maxLength).apply(builder).endCell()
     }
 }
 

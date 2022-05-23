@@ -47,6 +47,9 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(length: Int): BitString = BitString(length)
+
+        @JvmStatic
+        fun binary(bits: String): BitString = BitString(bits.map { char -> char == '1' })
     }
 }
 

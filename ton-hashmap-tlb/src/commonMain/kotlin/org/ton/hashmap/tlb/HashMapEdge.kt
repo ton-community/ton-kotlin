@@ -3,38 +3,39 @@ package org.ton.hashmap.tlb
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapEdge
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbDecoder
-import org.ton.tlb.TlbEncoder
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 
-object HashMapEdgeTlbConstructor : TlbConstructor<HashMapEdge<Any>>(
-        schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
+class HashMapEdgeTlbConstructor<X : Any>(
+    typeCodec: TlbCodec<X>
+) : TlbConstructor<HashMapEdge<X>>(
+    schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
 ) {
+    private val nodeCombinator = HashMapNodeTlbCombinator(typeCodec)
+
     override fun encode(
-            cellBuilder: CellBuilder,
-            value: HashMapEdge<Any>,
-            typeParam: TlbEncoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
+        cellBuilder: CellBuilder,
+        value: HashMapEdge<X>,
+        param: Int,
+        negativeParam: (Int) -> Unit
     ) {
         var l = 0
-        HashMapLabelTlbCombinator.encode(cellBuilder, value.label, typeParam, param) { l = it }
+        cellBuilder.storeTlb(value.label, HashMapLabelTlbCombinator, param) { l = it }
         val m = param - l
-        HashMapNodeTlbCombinator.encode(cellBuilder, value.node, typeParam, m, negativeParam)
+        cellBuilder.storeTlb(value.node, nodeCombinator, m)
     }
 
     override fun decode(
-            cellSlice: CellSlice,
-            typeParam: TlbDecoder<Any>?,
-            param: Int,
-            negativeParam: ((Int) -> Unit)?
-    ): HashMapEdge<Any> {
+        cellSlice: CellSlice,
+        param: Int,
+        negativeParam: (Int) -> Unit
+    ): HashMapEdge<X> {
         var l = 0
-        val label = HashMapLabelTlbCombinator.decode(cellSlice, param = param) { l = it }
+        val label = cellSlice.loadTlb(HashMapLabelTlbCombinator, param) { l = it }
         val m = param - l
-        val node = HashMapNodeTlbCombinator.decode(cellSlice, typeParam, m, negativeParam)
+        val node = cellSlice.loadTlb(nodeCombinator, m)
         return HashMapEdge(label, node)
     }
 }
-
-val HashMapEdge.Companion.tlbCodec get() = HashMapEdgeTlbConstructor

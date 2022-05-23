@@ -8,20 +8,20 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface Maybe<X> {
+sealed interface Maybe<X : Any> {
     val value: X?
 }
 
 @SerialName("nothing")
 @Serializable
-class Nothing<X> : Maybe<X> {
+class Nothing<X : Any> : Maybe<X> {
     override val value: X? = null
 }
 
 @SerialName("just")
 @Serializable
-class Just<X>(
-        override val value: X
+class Just<X : Any>(
+    override val value: X
 ) : Maybe<X>
 
-fun <X> X?.toMaybe(): Maybe<X> = if (this != null) Just(this) else Nothing()
+fun <X : Any> X?.toMaybe(): Maybe<X> = if (this != null) Just(this) else Nothing()
