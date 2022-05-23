@@ -3,6 +3,7 @@ package org.ton.block.tlb
 import org.ton.block.Maybe
 import org.ton.block.VmControlData
 import org.ton.block.VmSaveList
+import org.ton.block.VmStack
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
@@ -18,7 +19,7 @@ private object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     schema = "vm_ctl_data\$_ nargs:(Maybe uint13) stack:(Maybe VmStack) save:VmSaveList cp:(Maybe int16) = VmControlData;"
 ) {
     private val maybeUint13Constructor = Maybe.tlbCodec(UIntTlbConstructor.int(13))
-    private val maybeVmStackConstructor = Maybe.tlbCodec(VmStackTlbConstructor)
+    private val maybeVmStackConstructor = Maybe.tlbCodec(VmStack.tlbCodec())
     private val vmSaveListCodec = VmSaveList.tlbCodec()
     private val maybeInt16Constructor = Maybe.tlbCodec(IntTlbConstructor.int(16))
 

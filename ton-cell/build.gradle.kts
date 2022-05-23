@@ -6,7 +6,7 @@ kotlin {
                 api(projects.tonBigint)
                 api(projects.tonCrypto)
                 implementation(libs.ktor.utils)
-                compileOnly(libs.serialization.json)
+                implementation(libs.serialization.json)
             }
         }
     }

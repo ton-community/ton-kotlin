@@ -16,6 +16,8 @@ sealed interface Maybe<X : Any> {
 @Serializable
 class Nothing<X : Any> : Maybe<X> {
     override val value: X? = null
+    override fun hashCode(): Int = 0
+    override fun equals(other: Any?): Boolean = other is Nothing<*>
 }
 
 @SerialName("just")

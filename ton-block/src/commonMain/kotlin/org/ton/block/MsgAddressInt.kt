@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
+import org.ton.bitstring.BitString
 import org.ton.crypto.*
 import kotlin.experimental.and
 import kotlin.experimental.or
@@ -82,10 +83,10 @@ sealed interface MsgAddressInt : MsgAddress {
         companion object {
             @JvmStatic
             fun parse(address: String): AddrStd {
-                if (address.contains(':')) {
-                    return parseRaw(address)
+                return if (address.contains(':')) {
+                    parseRaw(address)
                 } else {
-                    return parseUserFriendly(address)
+                    parseUserFriendly(address)
                 }
             }
 
@@ -103,11 +104,10 @@ sealed interface MsgAddressInt : MsgAddress {
 
             @JvmStatic
             fun parseUserFriendly(address: String): AddrStd {
-                var raw: ByteArray
-                try {
-                    raw = base64url(address)
+                val raw = try {
+                    base64url(address)
                 } catch (E: Exception) {
-                    raw = base64(address)
+                    base64(address)
                 }
 
                 require(raw.size == 36)
@@ -147,5 +147,22 @@ sealed interface MsgAddressInt : MsgAddress {
                 (if (testOnly) 0x80.toByte() else 0.toByte()) or
                         (if (bounceable) 0x11.toByte() else 0x51.toByte())
         }
+    }
+
+    @SerialName("addr_var")
+    @Serializable
+    data class AddrVar(
+        val anycast: Maybe<Anycast>,
+        val addrLen: Int,
+        val workchainId: Int,
+        val address: BitString
+    ) : MsgAddressInt {
+        constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
+        constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
+            anycast.toMaybe(),
+            address.length,
+            workchainId,
+            address
+        )
     }
 }
