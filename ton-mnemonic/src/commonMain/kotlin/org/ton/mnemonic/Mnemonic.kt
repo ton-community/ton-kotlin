@@ -34,22 +34,43 @@ interface Mnemonic {
             return isPasswordSeed(entropy) && !isBasicSeed(entropy)
         }
 
+        fun isValid(mnemonic: Array<String>, password: String = "", wordlist: Array<String> = DEFAULT_WORDLIST): Boolean {
+            if(!mnemonic.all { wordlist.contains(it) }) {
+                return false
+            }
+
+            if(password.length > 0 && !isPasswordNeeded(mnemonic)) {
+                return false
+            }
+
+            return isBasicSeed(toEntropy(mnemonic, password))
+        }
+
+        fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray
+        = pbkdf2_sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0 .. 31)
+
         private fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
             hmac_sha512(mnemonic.joinToString(" "), password)
 
         private fun isBasicSeed(entropy: ByteArray): Boolean =
-            pbkdf2_sha512(entropy, DEFAULT_SALT, DEFAULT_ITERATIONS).first() == 0.toByte()
+            pbkdf2_sha512(entropy, DEFAULT_BASIC_SALT, DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
 
         private fun isPasswordSeed(entropy: ByteArray): Boolean =
-            pbkdf2_sha512(entropy, DEFAULT_FAST_SALT, DEFAULT_ITERATIONS).first() == 1.toByte()
+            pbkdf2_sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
     }
 }
 
-private const val PBKDF_ITERATIONS = 100000
-private const val DEFAULT_SALT = "TON seed version"
-private const val DEFAULT_ITERATIONS = 390 // max(1, floor(PBKDF_ITERATIONS / 256))
-private const val DEFAULT_FAST_SALT = "TON fast seed version"
-private const val DEFAULT_FAST_ITERATIONS = 1
+// Used to generate seed
+private const val DEFAULT_ITERATIONS = 100000
+private const val DEFAULT_SALT = "TON default seed"
+
+// Used to check if mnemonic produces basic seed, i.e. it's valid
+private const val DEFAULT_BASIC_ITERATIONS = 390 // max(1, floor(DEFAULT_ITERATIONS / 256))
+private const val DEFAULT_BASIC_SALT = "TON seed version"
+
+// Used to check if mnemonic requires a password
+private const val DEFAULT_PASSWORD_ITERATIONS = 1
+private const val DEFAULT_PASSWORD_SALT = "TON fast seed version"
 
 
 private val DEFAULT_WORDLIST = arrayOf(
