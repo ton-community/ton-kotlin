@@ -9,15 +9,15 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
 object VmTupleCombinator : TlbCombinator<VmTuple>(
-    Nil, TCons
+    NilTlbConstructor, TConsTlbConstructor
 ) {
     override fun getConstructor(value: VmTuple): TlbConstructor<out VmTuple> = when (value) {
-        is VmTuple.Nil -> Nil
-        is VmTuple.TCons -> TCons
+        is VmTuple.Nil -> NilTlbConstructor
+        is VmTuple.TCons -> TConsTlbConstructor
     }
 
-    object Nil : TlbConstructor<VmTuple.Nil>(
-        schema = "vm_tuple_nil$_ = VmTuple 0;"
+    object NilTlbConstructor : TlbConstructor<VmTuple.Nil>(
+        schema = "vm_tuple_nil${'_'} = VmTuple 0;"
     ) {
         override fun encode(cellBuilder: CellBuilder, value: VmTuple.Nil, param: Int, negativeParam: (Int) -> Unit) {
         }
@@ -27,8 +27,8 @@ object VmTupleCombinator : TlbCombinator<VmTuple>(
         }
     }
 
-    object TCons : TlbConstructor<VmTuple.TCons>(
-        schema = "vm_tuple_tcons$_ {n:#} head:(VmTupleRef n) tail:^VmStackValue = VmTuple (n + 1);"
+    object TConsTlbConstructor : TlbConstructor<VmTuple.TCons>(
+        schema = "vm_tuple_tcons${'_'} {n:#} head:(VmTupleRef n) tail:^VmStackValue = VmTuple (n + 1);"
     ) {
         override fun encode(
             cellBuilder: CellBuilder, value: VmTuple.TCons, param: Int, negativeParam: (Int) -> Unit

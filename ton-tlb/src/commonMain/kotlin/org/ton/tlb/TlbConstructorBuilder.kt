@@ -9,10 +9,8 @@ class TlbConstructorBuilder<T : Any>(
     var id: BitString = BitString(0)
 ) {
     var negativeParam: () -> Int = { 0 }
-    var encoder: TlbEncoder<T> = TlbEncoder { cellBuilder, value, param, negativeParam ->
-
-    }
-    var decoder: TlbDecoder<T> = decode { TODO() }
+    lateinit var encoder: TlbEncoder<T>
+    lateinit var decoder: TlbDecoder<T>
 
     fun encode(builder: CellBuilder.(T, Int, ((Int) -> Unit)) -> Unit): TlbEncoder<T> {
         val encoder = TlbEncoder(builder)

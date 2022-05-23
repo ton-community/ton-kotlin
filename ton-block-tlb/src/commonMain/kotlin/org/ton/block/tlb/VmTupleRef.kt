@@ -21,7 +21,7 @@ object VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
 }
 
 object VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRef.Nil>(
-    schema = "vm_tupref_nil$_ = VmTupleRef 0;"
+    schema = "vm_tupref_nil${'_'} = VmTupleRef 0;"
 ) {
     override fun encode(
         cellBuilder: CellBuilder, value: VmTupleRef.Nil, param: Int, negativeParam: (Int) -> Unit
@@ -34,7 +34,7 @@ object VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRef.Nil>(
 }
 
 object VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRef.Single>(
-    schema = "vm_tupref_single$_ entry:^VmStackValue = VmTupleRef 1;"
+    schema = "vm_tupref_single${'_'} entry:^VmStackValue = VmTupleRef 1;"
 ) {
     override fun encode(
         cellBuilder: CellBuilder, value: VmTupleRef.Single, param: Int, negativeParam: (Int) -> Unit
@@ -55,7 +55,7 @@ object VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRef.Single>(
 }
 
 object VmTupleRefAnyTlbConstructor : TlbConstructor<VmTupleRef.Any>(
-    schema = "vm_tupref_any$_ {n:#} ref:^(VmTuple (n + 2)) = VmTupleRef (n + 2);"
+    schema = "vm_tupref_any${'_'} {n:#} ref:^(VmTuple (n + 2)) = VmTupleRef (n + 2);"
 ) {
     override fun encode(
         cellBuilder: CellBuilder, value: VmTupleRef.Any, param: Int, negativeParam: (Int) -> Unit
