@@ -3,8 +3,14 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Message<T>(
-        val info: CommonMsgInfo,
-        val init: Pair<StateInit?, StateInit?>?,
-        val body: Pair<T?, T?>
-)
+data class Message<X : Any>(
+    val info: CommonMsgInfo,
+    val init: Maybe<Either<StateInit?, StateInit?>>,
+    val body: Either<X?, X?>
+) {
+    constructor(
+        info: CommonMsgInfo,
+        init: Pair<StateInit?, StateInit?>? = null,
+        body: Pair<X?, X?>
+    ) : this(info, init?.toEither().toMaybe(), body.toEither())
+}

@@ -15,6 +15,7 @@ abstract class TlbConstructor<T : Any>(
     companion object {
         // TODO: tests for `vm_stk_int#0201_ value:int257 = VmStackValue;`
         fun calculateId(@Language("TL-B") schema: String): BitString {
+            if (schema.isEmpty()) return BitString(0)
             try {
                 val prefix = schema.split(" ").first()
                 if (prefix.contains('$')) {
@@ -23,7 +24,7 @@ abstract class TlbConstructor<T : Any>(
                         return BitString.binary(id)
                     }
                 } else if (prefix.contains('#')) {
-                    val (_, id) = prefix.split('$')
+                    val (_, id) = prefix.split('#')
                     if (id != "_") {
                         BitString(id)
                     }

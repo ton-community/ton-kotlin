@@ -44,5 +44,8 @@ abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
 fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T =
     codec.decode(this, param, negativeParam)
 
-fun <T : Any> CellBuilder.storeTlb(value: T, codec: TlbEncoder<T>, param: Int = 0, negativeParam: (Int) -> Unit = {}) =
+fun <T : Any> CellBuilder.storeTlb(
+    value: T, codec: TlbEncoder<T>, param: Int = 0, negativeParam: (Int) -> Unit = {}
+) = apply {
     codec.encode(this, value, param, negativeParam)
+}

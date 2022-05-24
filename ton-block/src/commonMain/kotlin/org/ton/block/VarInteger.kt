@@ -6,12 +6,12 @@ import org.ton.bigint.BigInt
 import org.ton.bigint.BigIntSerializer
 import org.ton.bigint.bitLength
 
-@SerialName("var_uint")
+@SerialName("var_int")
 @Serializable
-data class VarUInteger(
-        val len: Int,
-        @Serializable(BigIntSerializer::class)
-        val value: BigInt
+data class VarInteger(
+    val len: Int,
+    @Serializable(BigIntSerializer::class)
+    val value: BigInt
 ) : Number() {
     constructor(byte: Byte) : this(BigInt(byte))
     constructor(short: Short) : this(BigInt(short))

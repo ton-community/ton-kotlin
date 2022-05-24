@@ -7,5 +7,5 @@ import org.ton.hashmap.HashMapE
 @Serializable
 @SerialName("extra_currencies")
 data class ExtraCurrencyCollection(
-        val dict: HashMapE<VarUInteger>
+    val dict: HashMapE<VarUInteger>
 )
