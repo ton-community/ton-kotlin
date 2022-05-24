@@ -1,5 +1,6 @@
 package org.ton.mnemonic
 
+import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.hmacSha512
 import org.ton.crypto.pbkdf2Sha512
@@ -69,6 +70,12 @@ interface Mnemonic {
             }
 
             return isBasicSeed(toEntropy(mnemonic, password))
+        }
+
+        @JvmStatic
+        suspend fun toKeyPair(mnemonic: Array<String>, password: String = ""): Pair<ByteArray, ByteArray> {
+            val sk = toSeed(mnemonic, password)
+            return Pair(Ed25519.publicKey(sk), sk)
         }
 
         @JvmStatic
