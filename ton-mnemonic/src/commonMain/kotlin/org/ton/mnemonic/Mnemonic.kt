@@ -34,11 +34,11 @@ interface Mnemonic {
             random: Random = SecureRandom
         ): Array<String> {
             while (true) {
-                val mnemonic = Array<String>(wordCount, {
-                    wordlist.get(Random.nextInt(wordlist.size)) // nextInt() takes exclusive upper limit, we're safe here
-                })
+                val mnemonic = Array(wordCount) {
+                    wordlist[Random.nextInt(wordlist.size)] // nextInt() takes exclusive upper limit, we're safe here
+                }
 
-                if (password.length > 0 && !isPasswordNeeded(mnemonic)) {
+                if (password.isNotEmpty() && !isPasswordNeeded(mnemonic)) {
                     continue
                 }
                 if (!isBasicSeed(toEntropy(mnemonic, password))) {
@@ -65,13 +65,14 @@ interface Mnemonic {
                 return false
             }
 
-            if (password.length > 0 && !isPasswordNeeded(mnemonic)) {
+            if (password.isNotEmpty() && !isPasswordNeeded(mnemonic)) {
                 return false
             }
 
             return isBasicSeed(toEntropy(mnemonic, password))
         }
 
+        // Returns a pair of public and secret keys from the given mnemonic
         @JvmStatic
         suspend fun toKeyPair(mnemonic: Array<String>, password: String = ""): Pair<ByteArray, ByteArray> {
             val sk = toSeed(mnemonic, password)
@@ -2143,6 +2144,6 @@ interface Mnemonic {
             "zero",
             "zone",
             "zoo"
-        );
+        )
     }
 }
