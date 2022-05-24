@@ -7,7 +7,8 @@ import kotlin.random.Random
 
 interface Mnemonic {
     companion object {
-        fun generate(
+        @JvmStatic
+        suspend fun generate(
             wordCount: Int = 24,
             password: String = "",
             wordlist: Array<String> = DEFAULT_WORDLIST,
@@ -29,12 +30,14 @@ interface Mnemonic {
             }
         }
 
-        fun isPasswordNeeded(mnemonic: Array<String>): Boolean {
+        @JvmStatic
+        suspend fun isPasswordNeeded(mnemonic: Array<String>): Boolean {
             val entropy = toEntropy(mnemonic)
             return isPasswordSeed(entropy) && !isBasicSeed(entropy)
         }
 
-        fun isValid(mnemonic: Array<String>, password: String = "", wordlist: Array<String> = DEFAULT_WORDLIST): Boolean {
+        @JvmStatic
+        suspend fun isValid(mnemonic: Array<String>, password: String = "", wordlist: Array<String> = DEFAULT_WORDLIST): Boolean {
             if(!mnemonic.all { wordlist.contains(it) }) {
                 return false
             }
@@ -46,16 +49,20 @@ interface Mnemonic {
             return isBasicSeed(toEntropy(mnemonic, password))
         }
 
-        fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray
+        @JvmStatic
+        suspend fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray
         = pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0 .. 31)
 
-        private fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
+        @JvmStatic
+        suspend fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
             hmacSha512(mnemonic.joinToString(" "), password)
 
-        private fun isBasicSeed(entropy: ByteArray): Boolean =
+        @JvmStatic
+        suspend fun isBasicSeed(entropy: ByteArray): Boolean =
             pbkdf2Sha512(entropy, DEFAULT_BASIC_SALT, DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
 
-        private fun isPasswordSeed(entropy: ByteArray): Boolean =
+        @JvmStatic
+        suspend fun isPasswordSeed(entropy: ByteArray): Boolean =
             pbkdf2Sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
     }
 }
