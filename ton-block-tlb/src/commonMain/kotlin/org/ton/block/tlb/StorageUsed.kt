@@ -12,7 +12,7 @@ import org.ton.tlb.storeTlb
 fun StorageUsed.Companion.tlbCodec(): TlbCodec<StorageUsed> = StorageUsedTlbConstructor()
 
 private class StorageUsedTlbConstructor : TlbConstructor<StorageUsed>(
-    schema = "storage_used$_ cells:(VarUInteger 7) bits:(VarUInteger 7) public_cells:(VarUInteger 7) = StorageUsed;"
+    schema = "storage_used\$_ cells:(VarUInteger 7) bits:(VarUInteger 7) public_cells:(VarUInteger 7) = StorageUsed;"
 ) {
     private val varUInteger7Codec = VarUInteger.tlbCodec(7)
 
