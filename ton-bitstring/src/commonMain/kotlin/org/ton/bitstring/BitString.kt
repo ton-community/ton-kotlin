@@ -26,9 +26,22 @@ fun BitString(vararg bits: Boolean): BitString {
 }
 
 fun BitString(hex: String): BitString {
-    val bits = hex.asSequence().map { char ->
-        char.digitToInt(16).toString(2).padStart(4, '0').map { it == '1' }
-    }.flatten().asIterable()
+    // True if bit string doesn't contain mod 4 number of bits
+    val incomplete = hex.isNotEmpty() && hex.last() == '_'
+
+    val bits = hex.asSequence()
+        .takeWhile { it != '_' } // consume entire hexadecimal string, except for `_`
+        .map {
+            it.digitToInt(16)
+                .toString(2)
+                .padStart(4, '0')
+                .map { it == '1' } // Convert character to bits it represents
+        }
+        .flatten()
+        .toList()
+        .dropLastWhile { incomplete && !it } // drop last elements up to first `1`, if incomplete
+        .dropLast(if(incomplete) 1 else 0) // if incomplete, drop the 1 as well
+
     return BitString(bits)
 }
 
