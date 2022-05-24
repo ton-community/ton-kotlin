@@ -1,8 +1,8 @@
 package org.ton.mnemonic
 
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.hmac_sha512
-import org.ton.crypto.pbkdf2_sha512
+import org.ton.crypto.hmacSha512
+import org.ton.crypto.pbkdf2Sha512
 import kotlin.random.Random
 
 interface Mnemonic {
@@ -47,16 +47,16 @@ interface Mnemonic {
         }
 
         fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray
-        = pbkdf2_sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0 .. 31)
+        = pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0 .. 31)
 
         private fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
-            hmac_sha512(mnemonic.joinToString(" "), password)
+            hmacSha512(mnemonic.joinToString(" "), password)
 
         private fun isBasicSeed(entropy: ByteArray): Boolean =
-            pbkdf2_sha512(entropy, DEFAULT_BASIC_SALT, DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
+            pbkdf2Sha512(entropy, DEFAULT_BASIC_SALT, DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
 
         private fun isPasswordSeed(entropy: ByteArray): Boolean =
-            pbkdf2_sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
+            pbkdf2Sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
     }
 }
 

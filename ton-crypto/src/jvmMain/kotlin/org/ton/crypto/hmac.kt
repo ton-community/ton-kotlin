@@ -3,7 +3,7 @@ package org.ton.crypto
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-actual fun hmac_sha512(key: ByteArray, input: ByteArray): ByteArray {
+actual fun hmacSha512(key: ByteArray, input: ByteArray): ByteArray {
     val algorithm = "HmacSHA512"
 
     val ctx = Mac.getInstance(algorithm)
