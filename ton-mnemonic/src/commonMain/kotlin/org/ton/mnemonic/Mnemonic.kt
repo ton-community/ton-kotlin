@@ -7,6 +7,24 @@ import kotlin.random.Random
 
 interface Mnemonic {
     companion object {
+        // Number of PBKDF2 iterations used to generate seed
+        const val DEFAULT_ITERATIONS = 100000
+
+        // Default salt for PBKDF2 used to generate seed
+        const val DEFAULT_SALT = "TON default seed"
+
+        // Number of PBKDF2 iterations used to check, if mnemonic phrase is valid
+        const val DEFAULT_BASIC_ITERATIONS = 390 // max(1, floor(DEFAULT_ITERATIONS / 256))
+
+        // Default salt used to check mnemonic phrase validity
+        const val DEFAULT_BASIC_SALT = "TON seed version"
+
+        // Number of PBKDF2 iterations used to check, if mnemonic phrase requires a password
+        const val DEFAULT_PASSWORD_ITERATIONS = 1
+
+        // Default salt used to check, if mnemonic phrase requires a password
+        const val DEFAULT_PASSWORD_SALT = "TON fast seed version"
+
         @JvmStatic
         suspend fun generate(
             wordCount: Int = 24,
@@ -14,15 +32,15 @@ interface Mnemonic {
             wordlist: Array<String> = DEFAULT_WORDLIST,
             random: Random = SecureRandom
         ): Array<String> {
-            while(true) {
+            while (true) {
                 val mnemonic = Array<String>(wordCount, {
                     wordlist.get(Random.nextInt(wordlist.size)) // nextInt() takes exclusive upper limit, we're safe here
                 })
 
-                if(password.length > 0 && !isPasswordNeeded(mnemonic)) {
+                if (password.length > 0 && !isPasswordNeeded(mnemonic)) {
                     continue
                 }
-                if(!isBasicSeed(toEntropy(mnemonic, password))) {
+                if (!isBasicSeed(toEntropy(mnemonic, password))) {
                     continue
                 }
 
@@ -37,12 +55,16 @@ interface Mnemonic {
         }
 
         @JvmStatic
-        suspend fun isValid(mnemonic: Array<String>, password: String = "", wordlist: Array<String> = DEFAULT_WORDLIST): Boolean {
-            if(!mnemonic.all { wordlist.contains(it) }) {
+        suspend fun isValid(
+            mnemonic: Array<String>,
+            password: String = "",
+            wordlist: Array<String> = DEFAULT_WORDLIST
+        ): Boolean {
+            if (!mnemonic.all { wordlist.contains(it) }) {
                 return false
             }
 
-            if(password.length > 0 && !isPasswordNeeded(mnemonic)) {
+            if (password.length > 0 && !isPasswordNeeded(mnemonic)) {
                 return false
             }
 
@@ -50,8 +72,8 @@ interface Mnemonic {
         }
 
         @JvmStatic
-        suspend fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray
-        = pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0 .. 31)
+        suspend fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray =
+            pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0..31)
 
         @JvmStatic
         suspend fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
@@ -64,23 +86,8 @@ interface Mnemonic {
         @JvmStatic
         suspend fun isPasswordSeed(entropy: ByteArray): Boolean =
             pbkdf2Sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
-    }
-}
 
-// Used to generate seed
-private const val DEFAULT_ITERATIONS = 100000
-private const val DEFAULT_SALT = "TON default seed"
-
-// Used to check if mnemonic produces basic seed, i.e. it's valid
-private const val DEFAULT_BASIC_ITERATIONS = 390 // max(1, floor(DEFAULT_ITERATIONS / 256))
-private const val DEFAULT_BASIC_SALT = "TON seed version"
-
-// Used to check if mnemonic requires a password
-private const val DEFAULT_PASSWORD_ITERATIONS = 1
-private const val DEFAULT_PASSWORD_SALT = "TON fast seed version"
-
-
-private val DEFAULT_WORDLIST = arrayOf(
+        val DEFAULT_WORDLIST = arrayOf(
             "abandon",
             "ability",
             "able",
@@ -2130,3 +2137,5 @@ private val DEFAULT_WORDLIST = arrayOf(
             "zone",
             "zoo"
         );
+    }
+}
