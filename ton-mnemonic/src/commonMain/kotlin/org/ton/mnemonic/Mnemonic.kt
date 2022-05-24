@@ -35,7 +35,7 @@ interface Mnemonic {
         ): Array<String> {
             while (true) {
                 val mnemonic = Array(wordCount) {
-                    wordlist[Random.nextInt(wordlist.size)] // nextInt() takes exclusive upper limit, we're safe here
+                    wordlist[random.nextInt(wordlist.size)] // nextInt() takes exclusive upper limit, we're safe here
                 }
 
                 if (password.isNotEmpty() && !isPasswordNeeded(mnemonic)) {
@@ -81,19 +81,19 @@ interface Mnemonic {
 
         @JvmStatic
         suspend fun toSeed(mnemonic: Array<String>, password: String = ""): ByteArray =
-            pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT, DEFAULT_ITERATIONS).sliceArray(0..31)
+            pbkdf2Sha512(toEntropy(mnemonic, password), DEFAULT_SALT.toByteArray(), DEFAULT_ITERATIONS).sliceArray(0..31)
 
         @JvmStatic
         suspend fun toEntropy(mnemonic: Array<String>, password: String = ""): ByteArray =
-            hmacSha512(mnemonic.joinToString(" "), password)
+            hmacSha512(mnemonic.joinToString(" ").toByteArray(), password.toByteArray())
 
         @JvmStatic
         suspend fun isBasicSeed(entropy: ByteArray): Boolean =
-            pbkdf2Sha512(entropy, DEFAULT_BASIC_SALT, DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
+            pbkdf2Sha512(entropy, DEFAULT_BASIC_SALT.toByteArray(), DEFAULT_BASIC_ITERATIONS).first() == 0.toByte()
 
         @JvmStatic
         suspend fun isPasswordSeed(entropy: ByteArray): Boolean =
-            pbkdf2Sha512(entropy, DEFAULT_PASSWORD_SALT, DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
+            pbkdf2Sha512(entropy, DEFAULT_PASSWORD_SALT.toByteArray(), DEFAULT_PASSWORD_ITERATIONS).first() == 1.toByte()
 
         val DEFAULT_WORDLIST = arrayOf(
             "abandon",

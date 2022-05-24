@@ -1,5 +1,3 @@
 package org.ton.crypto
 
-expect fun pbkdf2Sha512(key: CharArray, salt: ByteArray, iterations: Int): ByteArray
-
-fun pbkdf2Sha512(key: ByteArray, salt: String, iterations: Int): ByteArray = pbkdf2Sha512(key, salt.toByteArray(), iterations)
+expect fun pbkdf2Sha512(key: ByteArray, salt: ByteArray, iterations: Int): ByteArray
