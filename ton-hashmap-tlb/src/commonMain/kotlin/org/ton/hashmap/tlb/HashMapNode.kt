@@ -14,14 +14,28 @@ fun <X : Any> HashMapNode.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<H
 private class HashMapNodeTlbCombinator<X : Any>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<HashMapNode<X>>() {
-    private val leafConstructor = HashMapNodeLeafTlbConstructor(typeCodec)
-    private val forkConstructor = HashMapNodeForkTlbConstructor(typeCodec)
+    private val leafConstructor by lazy {
+        HashMapNodeLeafTlbConstructor(typeCodec)
+    }
+    private val forkConstructor by lazy {
+        HashMapNodeForkTlbConstructor(typeCodec)
+    }
 
-    override val constructors: List<TlbConstructor<out HashMapNode<X>>> = listOf(leafConstructor, forkConstructor)
+    override val constructors: List<TlbConstructor<out HashMapNode<X>>> by lazy {
+        listOf(leafConstructor, forkConstructor)
+    }
 
     override fun getConstructor(value: HashMapNode<X>): TlbConstructor<out HashMapNode<X>> = when (value) {
         is HashMapNodeFork -> forkConstructor
         is HashMapNodeLeaf -> leafConstructor
+    }
+
+    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): HashMapNode<X> {
+        return if (param == 0) {
+            leafConstructor.decode(cellSlice, param, negativeParam)
+        } else {
+            forkConstructor.decode(cellSlice, param, negativeParam)
+        }
     }
 
     class HashMapNodeLeafTlbConstructor<X : Any>(
@@ -55,7 +69,9 @@ private class HashMapNodeTlbCombinator<X : Any>(
     ) : TlbConstructor<HashMapNodeFork<X>>(
         schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;"
     ) {
-        private val hashmapConstructor = HashMapEdge.tlbCodec(typeCodec)
+        private val hashmapConstructor by lazy {
+            HashMapEdge.tlbCodec(typeCodec)
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,

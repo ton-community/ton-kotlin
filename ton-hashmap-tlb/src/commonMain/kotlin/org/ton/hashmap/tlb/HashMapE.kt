@@ -14,10 +14,16 @@ fun <X : Any> HashMapE.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<Hash
 private class HashMapETlbCombinator<T : Any>(
     typeCodec: TlbCodec<T>
 ) : TlbCombinator<HashMapE<T>>() {
-    private val rootConstructor = RootHashMapETlbConstructor(typeCodec)
-    private val emptyConstructor = EmptyHashMapETlbConstructor<T>()
+    private val rootConstructor by lazy {
+        RootHashMapETlbConstructor(typeCodec)
+    }
+    private val emptyConstructor by lazy {
+        EmptyHashMapETlbConstructor<T>()
+    }
 
-    override val constructors = listOf(rootConstructor, emptyConstructor)
+    override val constructors by lazy {
+        listOf(rootConstructor, emptyConstructor)
+    }
 
     override fun getConstructor(value: HashMapE<T>): TlbConstructor<out HashMapE<T>> = when (value) {
         is RootHashMapE -> rootConstructor
@@ -46,7 +52,9 @@ private class HashMapETlbCombinator<T : Any>(
     ) : TlbConstructor<RootHashMapE<X>>(
         schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;"
     ) {
-        private val hashmapConstructor = HashMapEdge.tlbCodec(typeCodec)
+        private val hashmapConstructor by lazy {
+            HashMapEdge.tlbCodec(typeCodec)
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,

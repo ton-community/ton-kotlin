@@ -16,6 +16,14 @@ private class VmStackListCombinator : TlbCombinator<VmStackList>(
         is VmStackList.Nil -> VmStackListNilConstructor
     }
 
+    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmStackList {
+        return if (param == 0) {
+            VmStackListNilConstructor.decode(cellSlice, param, negativeParam)
+        } else {
+            VmStackListConsConstructor.decode(cellSlice, param, negativeParam)
+        }
+    }
+
     private object VmStackListConsConstructor : TlbConstructor<VmStackList.Cons>(
         schema = "vm_stk_cons#_ {n:#} rest:^(VmStackList n) tos:VmStackValue = VmStackList (n + 1);"
     ) {

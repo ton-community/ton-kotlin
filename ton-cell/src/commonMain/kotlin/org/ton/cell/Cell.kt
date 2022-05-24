@@ -109,10 +109,11 @@ data class Cell(
     private fun toString(appendable: Appendable, indent: String = "") {
         appendable.append(indent)
         appendable.append(bits.toString())
-        appendable.append('\n')
-
-        references.forEach { reference ->
-            reference.toString(appendable, "$indent ")
+        if (references.isNotEmpty()) {
+            appendable.append('\n')
+            references.forEach { reference ->
+                reference.toString(appendable, "$indent ")
+            }
         }
     }
 }

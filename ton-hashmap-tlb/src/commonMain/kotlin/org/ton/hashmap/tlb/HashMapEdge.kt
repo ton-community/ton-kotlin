@@ -18,8 +18,12 @@ private class HashMapEdgeTlbConstructor<X : Any>(
 ) : TlbConstructor<HashMapEdge<X>>(
     schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
 ) {
-    private val hashMapLabelCodec = HashMapLabel.tlbCodec()
-    private val nodeCombinator = HashMapNode.tlbCodec(typeCodec)
+    private val hashMapLabelCodec by lazy {
+        HashMapLabel.tlbCodec()
+    }
+    private val nodeCombinator by lazy {
+        HashMapNode.tlbCodec(typeCodec)
+    }
 
     override fun encode(
         cellBuilder: CellBuilder,

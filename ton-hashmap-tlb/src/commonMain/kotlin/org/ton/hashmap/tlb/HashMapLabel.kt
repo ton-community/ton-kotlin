@@ -21,7 +21,9 @@ private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
     object HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
         schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;"
     ) {
-        private val unaryCodec = Unary.tlbCodec()
+        private val unaryCodec by lazy {
+            Unary.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,
