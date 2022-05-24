@@ -13,27 +13,27 @@ import org.ton.crypto.hex
 sealed interface AccountState {
     @SerialName("account_uninit")
     @Serializable
-    object AccountUninit : org.ton.block.AccountState
+    object AccountUninit : AccountState
 
     @SerialName("account_active")
     @Serializable
     data class AccountActive(
-            @SerialName("_")
-            val init: org.ton.block.StateInit
-    ) : org.ton.block.AccountState
+        @SerialName("_")
+        val init: StateInit
+    ) : AccountState
 
     @SerialName("account_frozen")
     @Serializable
     data class AccountFrozen(
-            @SerialName("state_hash")
-            @Serializable(HexByteArraySerializer::class)
-            val stateHash: ByteArray
+        @SerialName("state_hash")
+        @Serializable(HexByteArraySerializer::class)
+        val stateHash: ByteArray
     ) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as org.ton.block.AccountState.AccountFrozen
+            other as AccountFrozen
 
             if (!stateHash.contentEquals(other.stateHash)) return false
 

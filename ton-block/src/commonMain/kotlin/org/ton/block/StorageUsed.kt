@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 data class StorageUsed(
         val cells: VarUInteger,
         val bits: VarUInteger,
-        val public_cells: VarUInteger,
+        @SerialName("public_cells")
+        val publicCells: VarUInteger,
 )
