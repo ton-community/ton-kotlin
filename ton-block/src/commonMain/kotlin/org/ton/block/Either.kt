@@ -17,7 +17,7 @@ sealed interface Either<X, Y> {
     @SerialName("left")
     @Serializable
     class Left<X, Y>(
-            val value: X
+        val value: X
     ) : Either<X, Y> {
         override val x: X? = value
         override val y: Y? = null
@@ -44,7 +44,7 @@ sealed interface Either<X, Y> {
     @SerialName("right")
     @Serializable
     class Right<X, Y>(
-            val value: Y
+        val value: Y
     ) : Either<X, Y> {
         override val x: X? = null
         override val y: Y? = value
@@ -69,4 +69,14 @@ sealed interface Either<X, Y> {
     }
 }
 
-fun <X, Y> Pair<X?, Y?>.toEither(): Either<X?, Y?> = if (first != null) Either.Left(first) else Either.Right(second)
+fun <X, Y> Pair<X?, Y?>.toEither(): Either<X, Y> {
+    val left = first
+    if (left != null) {
+        return Either.Left(left)
+    }
+    val right = second
+    if (right != null) {
+        return Either.Right(right)
+    }
+    throw IllegalArgumentException("first & second == null; At least one element must be non-null")
+}

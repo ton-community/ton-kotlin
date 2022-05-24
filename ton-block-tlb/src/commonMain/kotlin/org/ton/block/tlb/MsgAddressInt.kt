@@ -8,9 +8,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun MsgAddressInt.Companion.tlbCodec(): TlbCodec<MsgAddressInt> = MsgAddressIntTlbCombinator
+fun MsgAddressInt.Companion.tlbCodec(): TlbCodec<MsgAddressInt> = MsgAddressIntTlbCombinator()
 
-private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
+private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
     AddrStdTlbConstructor, AddrVarTlbConstructor
 ) {
     override fun getConstructor(value: MsgAddressInt): TlbConstructor<out MsgAddressInt> = when (value) {

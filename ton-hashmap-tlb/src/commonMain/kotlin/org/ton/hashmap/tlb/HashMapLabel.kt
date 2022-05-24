@@ -5,7 +5,9 @@ import org.ton.cell.CellSlice
 import org.ton.hashmap.*
 import org.ton.tlb.*
 
-private object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
+fun HashMapLabel.Companion.tlbCodec(): TlbCodec<HashMapLabel> = HashMapLabelTlbCombinator()
+
+private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
     HashMapLabelShortTlbConstructor,
     HashMapLabelLongTlbConstructor,
     HashMapLabelSameTlbConstructor
@@ -98,5 +100,3 @@ private object HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
         }
     }
 }
-
-fun HashMapLabel.Companion.tlbCodec(): TlbCodec<HashMapLabel> = HashMapLabelTlbCombinator

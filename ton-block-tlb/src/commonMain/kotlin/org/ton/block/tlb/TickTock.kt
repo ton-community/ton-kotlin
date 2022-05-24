@@ -6,9 +6,9 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-fun TickTock.Companion.tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor
+fun TickTock.Companion.tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor()
 
-private object TickTockTlbConstructor : TlbConstructor<TickTock>(
+private class TickTockTlbConstructor : TlbConstructor<TickTock>(
     schema = "tick_tock\$_ tick:Bool tock:Bool = TickTock;"
 ) {
     override fun encode(

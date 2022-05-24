@@ -7,9 +7,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmCont.Companion.tlbCodec(): TlbCodec<VmCont> = VmContTlbCombinator
+fun VmCont.Companion.tlbCodec(): TlbCodec<VmCont> = VmContTlbCombinator()
 
-private object VmContTlbCombinator : TlbCombinator<VmCont>(
+private class VmContTlbCombinator : TlbCombinator<VmCont>(
     VmContStdTlbConstructor,
     VmContEnvelopeTlbConstructor,
     VmContQuitTlbConstructor,
@@ -58,13 +58,14 @@ private object VmContTlbCombinator : TlbCombinator<VmCont>(
         schema = "vmc_envelope\$01 cdata:VmControlData next:^VmCont = VmCont;"
     ) {
         private val vmControlDataCodec = VmControlData.tlbCodec()
+        private val vmContCodec = VmCont.tlbCodec()
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Envelope, param: Int, negativeParam: (Int) -> Unit
         ) = cellBuilder {
             storeTlb(value.cdata, vmControlDataCodec)
             cellBuilder.storeRef {
-                storeTlb(value, VmContTlbCombinator)
+                storeTlb(value, vmContCodec)
             }
         }
 
@@ -73,7 +74,7 @@ private object VmContTlbCombinator : TlbCombinator<VmCont>(
         ): VmCont.Envelope = cellSlice {
             val cdata = loadTlb(vmControlDataCodec)
             val next = loadRef {
-                loadTlb(VmContTlbCombinator)
+                loadTlb(vmContCodec)
             }
             VmCont.Envelope(cdata, next)
         }

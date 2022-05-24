@@ -8,6 +8,9 @@ import org.ton.hashmap.HashMapNodeFork
 import org.ton.hashmap.HashMapNodeLeaf
 import org.ton.tlb.*
 
+fun <X : Any> HashMapNode.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
+    HashMapNodeTlbCombinator(typeCodec)
+
 private class HashMapNodeTlbCombinator<X : Any>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<HashMapNode<X>>() {
@@ -85,6 +88,3 @@ private class HashMapNodeTlbCombinator<X : Any>(
         }
     }
 }
-
-fun <X : Any> HashMapNode.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
-    HashMapNodeTlbCombinator(typeCodec)

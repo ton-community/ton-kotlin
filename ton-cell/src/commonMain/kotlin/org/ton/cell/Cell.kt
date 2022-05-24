@@ -47,6 +47,13 @@ data class Cell(
 
     fun beginParse(): CellSlice = CellSlice.beginParse(this)
 
+    fun <T : Any> parse(block: CellSlice.() -> T): T {
+        val slice = beginParse()
+        val result = block(slice)
+        slice.endParse()
+        return result
+    }
+
     /**
      * Computes the representation hash of a cell and returns it as a 256-bit byte array.
      * Useful for signing and checking signatures of arbitrary entities represented by a tree of cells.

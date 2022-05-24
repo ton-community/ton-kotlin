@@ -7,9 +7,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmTuple.Companion.tlbCodec(): TlbCodec<VmTuple> = VmTupleCombinator
+fun VmTuple.Companion.tlbCodec(): TlbCodec<VmTuple> = VmTupleCombinator()
 
-private object VmTupleCombinator : TlbCombinator<VmTuple>(
+private class VmTupleCombinator : TlbCombinator<VmTuple>(
     NilTlbConstructor, TConsTlbConstructor
 ) {
     override fun getConstructor(value: VmTuple): TlbConstructor<out VmTuple> = when (value) {

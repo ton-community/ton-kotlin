@@ -9,9 +9,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun Coins.Companion.tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor
+fun Coins.Companion.tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor()
 
-private object CoinsTlbConstructor : TlbConstructor<Coins>(
+private class CoinsTlbConstructor : TlbConstructor<Coins>(
     schema = "nanocoins\$_ amount:(VarUInteger 16) = Coins;"
 ) {
     private val varUIntegerCodec = VarUInteger.tlbCodec(16)

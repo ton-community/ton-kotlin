@@ -6,9 +6,9 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-fun VmCellSlice.Companion.tlbCodec(): TlbCodec<VmCellSlice> = VmCellSliceTlbConstructor
+fun VmCellSlice.Companion.tlbCodec(): TlbCodec<VmCellSlice> = VmCellSliceTlbConstructor()
 
-private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
+private class VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
     schema = "_ cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
             "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
 ) {

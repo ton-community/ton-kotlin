@@ -10,9 +10,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun CurrencyCollection.Companion.tlbCodec(): TlbCodec<CurrencyCollection> = CurrencyCollectionTlbConstructor
+fun CurrencyCollection.Companion.tlbCodec(): TlbCodec<CurrencyCollection> = CurrencyCollectionTlbConstructor()
 
-private object CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(
+private class CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(
     schema = "currencies\$_ coins:Coins other:ExtraCurrencyCollection = CurrencyCollection;"
 ) {
     private val coinsCodec = Coins.tlbCodec()

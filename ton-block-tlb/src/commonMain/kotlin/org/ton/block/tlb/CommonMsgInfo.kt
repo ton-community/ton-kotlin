@@ -5,9 +5,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun CommonMsgInfo.Companion.tlbCodec(): TlbCodec<CommonMsgInfo> = CommonMsgInfoTlbCombinator
+fun CommonMsgInfo.Companion.tlbCodec(): TlbCodec<CommonMsgInfo> = CommonMsgInfoTlbCombinator()
 
-private object CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
+private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
     IntMsgInfoTlbConstructor,
     ExtInMsgInfoTlbConstructor,
     ExtOutMsgInfoTlbConstructor

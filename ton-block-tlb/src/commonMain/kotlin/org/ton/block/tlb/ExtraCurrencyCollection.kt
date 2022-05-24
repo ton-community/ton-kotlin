@@ -12,9 +12,9 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
 fun ExtraCurrencyCollection.Companion.tlbCodec(): TlbCodec<ExtraCurrencyCollection> =
-    ExtraCurrencyCollectionTlbConstructor
+    ExtraCurrencyCollectionTlbConstructor()
 
-private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
+private class ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
     schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
 ) {
     private val varUInteger32Codec = VarUInteger.tlbCodec(32)

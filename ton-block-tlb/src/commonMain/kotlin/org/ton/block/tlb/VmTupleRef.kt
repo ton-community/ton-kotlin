@@ -7,9 +7,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmTupleRef.Companion.tlbCodec(): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator
+fun VmTupleRef.Companion.tlbCodec(): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator()
 
-private object VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
+private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
     VmTupleRefNilTlbConstructor,
     VmTupleRefSingleTlbConstructor,
     VmTupleRefAnyTlbConstructor

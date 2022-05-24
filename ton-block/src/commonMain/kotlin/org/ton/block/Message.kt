@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Message<X : Any>(
     val info: CommonMsgInfo,
-    val init: Maybe<Either<StateInit?, StateInit?>>,
-    val body: Either<X?, X?>
+    val init: Maybe<Either<StateInit, StateInit>>,
+    val body: Either<X, X>
 ) {
     constructor(
         info: CommonMsgInfo,

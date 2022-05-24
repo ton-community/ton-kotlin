@@ -6,9 +6,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmStackList.Companion.tlbCodec(): TlbCodec<VmStackList> = VmStackListCombinator
+fun VmStackList.Companion.tlbCodec(): TlbCodec<VmStackList> = VmStackListCombinator()
 
-private object VmStackListCombinator : TlbCombinator<VmStackList>(
+private class VmStackListCombinator : TlbCombinator<VmStackList>(
     VmStackListConsConstructor, VmStackListNilConstructor
 ) {
     override fun getConstructor(value: VmStackList): TlbConstructor<out VmStackList> = when (value) {

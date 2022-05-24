@@ -6,9 +6,9 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-fun SimpleLib.Companion.tlbCodec(): TlbCodec<SimpleLib> = SimpleLibTlbConstructor
+fun SimpleLib.Companion.tlbCodec(): TlbCodec<SimpleLib> = SimpleLibTlbConstructor()
 
-private object SimpleLibTlbConstructor : TlbConstructor<SimpleLib>(
+private class SimpleLibTlbConstructor : TlbConstructor<SimpleLib>(
     schema = "simple_lib\$_ public:Bool root:^Cell = SimpleLib;"
 ) {
     override fun encode(

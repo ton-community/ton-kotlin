@@ -6,9 +6,9 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-fun Anycast.Companion.tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor
+fun Anycast.Companion.tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor()
 
-private object AnycastTlbConstructor : TlbConstructor<Anycast>(
+private class AnycastTlbConstructor : TlbConstructor<Anycast>(
     schema = "anycast_info\$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;"
 ) {
     override fun encode(

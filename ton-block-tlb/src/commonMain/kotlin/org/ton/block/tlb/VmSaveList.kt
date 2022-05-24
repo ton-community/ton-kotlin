@@ -11,12 +11,13 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstructor
+fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstructor()
 
-private object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
+private class VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
     schema = "_ cregs:(HashmapE 4 VmStackValue) = VmSaveList;"
 ) {
-    private val hashmapCombinator = HashMapE.tlbCodec(VmStackValue.tlbCodec())
+    private val vmStackValueCodec = VmStackValue.tlbCodec()
+    private val hashmapCombinator = HashMapE.tlbCodec(vmStackValueCodec)
 
     override fun encode(
         cellBuilder: CellBuilder,

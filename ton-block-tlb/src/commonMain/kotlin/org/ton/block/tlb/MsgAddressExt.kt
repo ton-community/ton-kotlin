@@ -7,9 +7,9 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 
-fun MsgAddressExt.Companion.tlbCodec(): TlbCodec<MsgAddressExt> = MsgAddressExtTlbCombinator
+fun MsgAddressExt.Companion.tlbCodec(): TlbCodec<MsgAddressExt> = MsgAddressExtTlbCombinator()
 
-private object MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
+private class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
     AddrNoneTlbConstructor, AddrExternTlbConstructor
 ) {
     override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {

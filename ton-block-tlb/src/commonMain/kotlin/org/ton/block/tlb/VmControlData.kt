@@ -13,9 +13,9 @@ import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataTlbConstructor
+fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataTlbConstructor()
 
-private object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
+private class VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     schema = "vm_ctl_data\$_ nargs:(Maybe uint13) stack:(Maybe VmStack) save:VmSaveList cp:(Maybe int16) = VmControlData;"
 ) {
     private val maybeUint13Constructor = Maybe.tlbCodec(UIntTlbConstructor.int(13))

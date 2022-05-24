@@ -8,7 +8,7 @@ import org.ton.tlb.TlbConstructor
 
 fun VarUInteger.Companion.tlbCodec(n: Int? = null): TlbCodec<VarUInteger> = VarUIntegerTlbConstructor(n)
 
-class VarUIntegerTlbConstructor(
+private class VarUIntegerTlbConstructor(
     val n: Int? = null
 ) : TlbConstructor<VarUInteger>(
     schema = "var_uint\$_ {n:#} len:(#< n) value:(uint (len * 8)) = VarUInteger n;"

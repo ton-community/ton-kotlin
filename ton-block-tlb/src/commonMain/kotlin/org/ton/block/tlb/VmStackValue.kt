@@ -8,9 +8,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmStackValue.Companion.tlbCodec(): TlbCodec<VmStackValue> = VmStackValueTlbCombinator
+fun VmStackValue.Companion.tlbCodec(): TlbCodec<VmStackValue> = VmStackValueTlbCombinator()
 
-private object VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
+private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
     VmStackValueBuilderTlbConstructor,
     VmStackValueCellConstructor,
     VmStackValueContTlbConstructor,

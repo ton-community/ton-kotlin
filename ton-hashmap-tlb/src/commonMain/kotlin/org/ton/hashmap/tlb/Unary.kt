@@ -8,7 +8,9 @@ import org.ton.hashmap.UnarySuccess
 import org.ton.hashmap.UnaryZero
 import org.ton.tlb.*
 
-private object UnaryTlbCombinator : TlbCombinator<Unary>(
+fun Unary.Companion.tlbCodec(): TlbCodec<Unary> = UnaryTlbCombinator()
+
+private class UnaryTlbCombinator : TlbCombinator<Unary>(
     UnaryZeroTlbConstructor,
     UnarySuccessTlbConstructor
 ) {
@@ -21,6 +23,8 @@ private object UnaryTlbCombinator : TlbCombinator<Unary>(
         schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);",
         id = BitString.binary("1")
     ) {
+        private val unaryCodec = Unary.tlbCodec()
+
         override fun encode(
             cellBuilder: CellBuilder,
             value: UnarySuccess,
@@ -28,7 +32,7 @@ private object UnaryTlbCombinator : TlbCombinator<Unary>(
             negativeParam: (Int) -> Unit
         ) = cellBuilder {
             var n = 0
-            storeTlb(value.x, UnaryTlbCombinator) { n = it }
+            storeTlb(value.x, unaryCodec) { n = it }
             negativeParam(n + 1)
         }
 
@@ -38,7 +42,7 @@ private object UnaryTlbCombinator : TlbCombinator<Unary>(
             negativeParam: (Int) -> Unit,
         ): UnarySuccess = cellSlice {
             var n = 0
-            val x = loadTlb(UnaryTlbCombinator) { n = it }
+            val x = loadTlb(unaryCodec) { n = it }
             negativeParam(n + 1)
             UnarySuccess(x)
         }
@@ -67,5 +71,3 @@ private object UnaryTlbCombinator : TlbCombinator<Unary>(
         }
     }
 }
-
-fun Unary.Companion.tlbCodec(): TlbCodec<Unary> = UnaryTlbCombinator

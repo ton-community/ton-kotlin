@@ -10,6 +10,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
+fun <X : Any> HashMapEdge.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
+    HashMapEdgeTlbConstructor(typeCodec)
+
 private class HashMapEdgeTlbConstructor<X : Any>(
     typeCodec: TlbCodec<X>
 ) : TlbConstructor<HashMapEdge<X>>(
@@ -42,6 +45,3 @@ private class HashMapEdgeTlbConstructor<X : Any>(
         return HashMapEdge(label, node)
     }
 }
-
-fun <X : Any> HashMapEdge.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
-    HashMapEdgeTlbConstructor(typeCodec)

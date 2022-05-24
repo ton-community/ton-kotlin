@@ -9,9 +9,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor
+fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor()
 
-private object VmStackTlbConstructor : TlbConstructor<VmStack>(
+private class VmStackTlbConstructor : TlbConstructor<VmStack>(
     schema = "vm_stack#_ depth:(## 24) stack:(VmStackList depth) = VmStack;"
 ) {
     private val vmStackListCodec = VmStackList.tlbCodec()

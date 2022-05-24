@@ -16,9 +16,9 @@ import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun StateInit.Companion.tlbCodec(): TlbCodec<StateInit> = StateInitTlbConstructor
+fun StateInit.Companion.tlbCodec(): TlbCodec<StateInit> = StateInitTlbConstructor()
 
-private object StateInitTlbConstructor : TlbConstructor<StateInit>(
+private class StateInitTlbConstructor : TlbConstructor<StateInit>(
     schema = "_ split_depth:(Maybe (## 5)) special:(Maybe TickTock) code:(Maybe ^Cell) data:(Maybe ^Cell) library:(HashmapE 256 SimpleLib) = StateInit;"
 ) {
     private val maybeUint5Codec = Maybe.tlbCodec(UIntTlbConstructor.int(5))
