@@ -6,9 +6,22 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
+fun Unary(depth: Int): Unary = Unary.of(depth)
+
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed class Unary
+sealed class Unary {
+    companion object {
+        @JvmStatic
+        fun of(depth: Int): Unary {
+            var unary: Unary = UnaryZero
+            repeat(depth) {
+                unary = UnarySuccess(unary)
+            }
+            return unary
+        }
+    }
+}
 
 @Serializable
 @SerialName("unary_succ")
@@ -22,13 +35,4 @@ data class UnarySuccess(
 @SerialName("unary_zero")
 object UnaryZero : Unary() {
     override fun toString() = "unary_zero"
-}
-
-@Suppress("FunctionName")
-fun Unary(x: Int): UnarySuccess {
-    var unary = UnarySuccess(UnaryZero)
-    repeat(x - 1) {
-        unary = UnarySuccess(unary)
-    }
-    return unary
 }

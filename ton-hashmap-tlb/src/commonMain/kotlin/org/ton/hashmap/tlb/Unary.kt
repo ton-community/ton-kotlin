@@ -32,7 +32,7 @@ private class UnaryTlbCombinator : TlbNegatedCombinator<Unary>() {
         private val unaryCodec by lazy { Unary.tlbCodec() }
 
         override fun storeNegatedTlb(cellBuilder: CellBuilder, value: UnarySuccess): Int {
-            return cellBuilder.storeTlb(unaryCodec, value) + 1
+            return cellBuilder.storeTlb(unaryCodec, value.x) + 1
         }
 
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, UnarySuccess> {
