@@ -28,7 +28,7 @@ private class UnaryTlbCombinator : TlbNegatedCombinator<Unary>() {
 
     private class UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(
         schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
-    ), TlbNegatedCodec<UnarySuccess> {
+    ) {
         private val unaryCodec by lazy { Unary.tlbCodec() }
 
         override fun storeNegatedTlb(cellBuilder: CellBuilder, value: UnarySuccess): Int {
