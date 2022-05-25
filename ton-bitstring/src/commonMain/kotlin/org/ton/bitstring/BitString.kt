@@ -152,6 +152,8 @@ internal class ByteArrayBitStringImpl constructor(
     }
 
     override fun toString(): String {
+        if (length == 0) return "_"
+
         val stringBuilder = StringBuilder()
 
         val l = length % 4
