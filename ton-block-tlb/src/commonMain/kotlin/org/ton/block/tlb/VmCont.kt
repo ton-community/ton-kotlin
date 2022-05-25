@@ -72,15 +72,15 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCellSlice.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Std, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Std
         ) = cellBuilder {
-            storeTlb(value.cdata, vmControlDataCodec)
-            storeTlb(value.code, vmCellSliceCodec)
+            storeTlb(vmControlDataCodec, value.cdata)
+            storeTlb(vmCellSliceCodec, value.code)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Std = cellSlice {
             val cdata = loadTlb(vmControlDataCodec)
             val code = loadTlb(vmCellSliceCodec)
@@ -98,17 +98,17 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Envelope, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Envelope
         ) = cellBuilder {
-            storeTlb(value.cdata, vmControlDataCodec)
+            storeTlb(vmControlDataCodec, value.cdata)
             cellBuilder.storeRef {
-                storeTlb(value, vmContCodec)
+                storeTlb(vmContCodec, value)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Envelope = cellSlice {
             val cdata = loadTlb(vmControlDataCodec)
             val next = loadRef {
@@ -121,14 +121,14 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
     private class VmContQuitTlbConstructor : TlbConstructor<VmCont.Quit>(
         schema = "vmc_quit\$1000 exit_code:int32 = VmCont;"
     ) {
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Quit, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Quit
         ) = cellBuilder {
             storeInt(value.exitCode, 32)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Quit = cellSlice {
             val exitCode = loadInt(32).toInt()
             VmCont.Quit(exitCode)
@@ -138,13 +138,13 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
     private class VmContQuitExcTlbConstructor : TlbConstructor<VmCont.QuitExc>(
         schema = "vmc_quit_exc\$1001 = VmCont;"
     ) {
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.QuitExc, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.QuitExc
         ) {
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.QuitExc = VmCont.QuitExc
     }
 
@@ -155,20 +155,20 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Repeat, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Repeat
         ) = cellBuilder {
             storeUInt(value.count, 63)
             storeRef {
-                storeTlb(value.body, vmContCodec)
+                storeTlb(vmContCodec, value.body)
             }
             storeRef {
-                storeTlb(value.after, vmContCodec)
+                storeTlb(vmContCodec, value.after)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Repeat = cellSlice {
             val count = loadUInt(63).toLong()
             val body = loadRef {
@@ -188,19 +188,19 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Until, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Until
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.body, vmContCodec)
+                storeTlb(vmContCodec, value.body)
             }
             storeRef {
-                storeTlb(value.after, vmContCodec)
+                storeTlb(vmContCodec, value.after)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Until = cellSlice {
             val body = loadRef {
                 loadTlb(vmContCodec)
@@ -219,16 +219,16 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.Again, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.Again
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.body, vmContCodec)
+                storeTlb(vmContCodec, value.body)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.Again = cellSlice {
             val body = loadRef {
                 loadTlb(vmContCodec)
@@ -244,22 +244,22 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.WhileCond, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.WhileCond
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.cond, vmContCodec)
+                storeTlb(vmContCodec, value.cond)
             }
             storeRef {
-                storeTlb(value.body, vmContCodec)
+                storeTlb(vmContCodec, value.body)
             }
             storeRef {
-                storeTlb(value.after, vmContCodec)
+                storeTlb(vmContCodec, value.after)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.WhileCond = cellSlice {
             val cond = loadRef {
                 loadTlb(vmContCodec)
@@ -281,22 +281,22 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.WhileBody, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.WhileBody
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.cond, vmContCodec)
+                storeTlb(vmContCodec, value.cond)
             }
             storeRef {
-                storeTlb(value.body, vmContCodec)
+                storeTlb(vmContCodec, value.body)
             }
             storeRef {
-                storeTlb(value.after, vmContCodec)
+                storeTlb(vmContCodec, value.after)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.WhileBody = cellSlice {
             val cond = loadRef {
                 loadTlb(vmContCodec)
@@ -318,17 +318,17 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmCont.PushInt, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmCont.PushInt
         ) = cellBuilder {
             storeInt(value.value, 32)
             storeRef {
-                storeTlb(value.next, vmContCodec)
+                storeTlb(vmContCodec, value.next)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmCont.PushInt = cellSlice {
             val value = loadInt(32).toInt()
             val next = loadTlb(vmContCodec)

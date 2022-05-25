@@ -21,26 +21,18 @@ data class LiteServerRunSmcMethod(
     val mode: Int,
     val id: TonNodeBlockIdExt,
     val account: LiteServerAccountId,
-    @SerialName("method_id")
-    val methodId: Long,
-    @Serializable(Base64ByteArraySerializer::class)
-    val params: ByteArray
+    @SerialName("method_id") val methodId: Long,
+    @Serializable(Base64ByteArraySerializer::class) val params: ByteArray
 ) {
     constructor(
-        mode: Int,
-        id: TonNodeBlockIdExt,
-        account: LiteServerAccountId,
-        methodName: String,
-        params: BagOfCells
+        mode: Int, id: TonNodeBlockIdExt, account: LiteServerAccountId, methodName: String, params: BagOfCells
     ) : this(mode, id, account, methodId(methodName), params.toByteArray())
 
     constructor(
-        mode: Int,
-        id: TonNodeBlockIdExt,
-        account: LiteServerAccountId,
-        methodName: String,
-        params: VmStack
-    ) : this(mode, id, account, methodName, BagOfCells(CellBuilder.createCell { storeTlb(params, vmStackCodec) }))
+        mode: Int, id: TonNodeBlockIdExt, account: LiteServerAccountId, methodName: String, params: VmStack
+    ) : this(mode, id, account, methodName, BagOfCells(CellBuilder.createCell {
+        storeTlb(vmStackCodec, params)
+    }))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -76,8 +68,8 @@ data class LiteServerRunSmcMethod(
 
         override fun encode(output: Output, value: LiteServerRunSmcMethod) {
             output.writeIntTl(value.mode)
-            output.writeTl(value.id, TonNodeBlockIdExt)
-            output.writeTl(value.account, LiteServerAccountId)
+            output.writeTl(TonNodeBlockIdExt, value.id)
+            output.writeTl(LiteServerAccountId, value.account)
             output.writeLongTl(value.methodId)
             output.writeBytesTl(value.params)
         }

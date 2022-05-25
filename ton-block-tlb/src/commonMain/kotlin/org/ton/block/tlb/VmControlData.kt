@@ -31,22 +31,18 @@ private class VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
         Maybe.tlbCodec(IntTlbConstructor.int(16))
     }
 
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: VmControlData,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: VmControlData
     ) = cellBuilder {
-        storeTlb(value.nargs, maybeUint13Constructor)
-        storeTlb(value.stack, maybeVmStackConstructor)
-        storeTlb(value.save, vmSaveListCodec)
-        storeTlb(value.cp, maybeInt16Constructor)
+        storeTlb(maybeUint13Constructor, value.nargs)
+        storeTlb(maybeVmStackConstructor, value.stack)
+        storeTlb(vmSaveListCodec, value.save)
+        storeTlb(maybeInt16Constructor, value.cp)
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): VmControlData = cellSlice {
         val nargs = loadTlb(maybeUint13Constructor)
         val stack = loadTlb(maybeVmStackConstructor)

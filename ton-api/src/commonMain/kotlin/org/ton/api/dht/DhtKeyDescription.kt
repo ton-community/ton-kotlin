@@ -60,9 +60,9 @@ data class DhtKeyDescription(
             schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
     ) {
         override fun encode(output: Output, value: DhtKeyDescription) {
-            output.writeTl(value.key, DhtKey)
-            output.writeTl(value.id, PublicKey)
-            output.writeTl(value.updateRule, DhtUpdateRule)
+            output.writeTl(DhtKey, value.key)
+            output.writeTl(PublicKey, value.id)
+            output.writeTl(DhtUpdateRule, value.updateRule)
             output.writeBytesTl(value.signature)
         }
 

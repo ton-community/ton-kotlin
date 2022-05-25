@@ -81,8 +81,8 @@ data class LiteServerAccountState(
         }
 
         override fun encode(output: Output, value: LiteServerAccountState) {
-            output.writeTl(value.id, TonNodeBlockIdExt)
-            output.writeTl(value.shardBlk, TonNodeBlockIdExt)
+            output.writeTl(TonNodeBlockIdExt, value.id)
+            output.writeTl(TonNodeBlockIdExt, value.shardBlk)
             output.writeBytesTl(value.shardProof)
             output.writeBytesTl(value.proof)
             output.writeBytesTl(value.state)

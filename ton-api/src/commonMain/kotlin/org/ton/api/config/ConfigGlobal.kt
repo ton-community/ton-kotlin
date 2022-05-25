@@ -22,9 +22,9 @@ data class ConfigGlobal(
         schema = "config.global adnl:adnl.config.global dht:dht.config.global validator:validator.config.global = config.Global"
     ) {
         override fun encode(output: Output, value: ConfigGlobal) {
-            output.writeTl(value.adnl, AdnlConfigGlobal)
-            output.writeTl(value.dht, DhtConfigGlobal)
-            output.writeTl(value.validator, ValidatorConfigGlobal)
+            output.writeTl(AdnlConfigGlobal, value.adnl)
+            output.writeTl(DhtConfigGlobal, value.dht)
+            output.writeTl(ValidatorConfigGlobal, value.validator)
         }
 
         override fun decode(input: Input): ConfigGlobal {

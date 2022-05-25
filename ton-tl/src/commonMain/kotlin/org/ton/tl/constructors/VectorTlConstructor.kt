@@ -21,7 +21,7 @@ class VectorTlConstructor<T : Any>(
         fun <T : Any> encode(output: Output, value: List<T>, constructor: TlConstructor<T>) {
             output.writeIntLittleEndian(value.size)
             value.forEach { element ->
-                output.writeTl(element, constructor)
+                output.writeTl(constructor, element)
             }
         }
 
@@ -54,7 +54,7 @@ class VectorTlCombinator<T : Any>(
         fun <T : Any> encode(output: Output, value: List<T>, constructor: TlCombinator<T>) {
             output.writeIntLittleEndian(value.size)
             value.forEach { element ->
-                output.writeTl(element, constructor)
+                output.writeTl(constructor, element)
             }
         }
 

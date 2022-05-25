@@ -19,7 +19,7 @@ data class AdnlConfigGlobal(
         schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
     ) {
         override fun encode(output: Output, value: AdnlConfigGlobal) {
-            output.writeTl(value.staticNodes, AdnlNodes)
+            output.writeTl(AdnlNodes, value.staticNodes)
         }
 
         override fun decode(input: Input): AdnlConfigGlobal {

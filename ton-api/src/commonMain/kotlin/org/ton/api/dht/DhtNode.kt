@@ -63,8 +63,8 @@ data class DhtNode(
             schema = "dht.node id:PublicKey addr_list:adnl.addressList version:int signature:bytes = dht.Node"
     ) {
         override fun encode(output: Output, value: DhtNode) {
-            output.writeTl(value.id, PublicKey)
-            output.writeTl(value.addrList, AdnlAddressList)
+            output.writeTl(PublicKey, value.id)
+            output.writeTl(AdnlAddressList, value.addrList)
             output.writeIntTl(value.version)
             output.writeBytesTl(value.signature)
         }

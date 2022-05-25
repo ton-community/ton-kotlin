@@ -23,16 +23,16 @@ private class StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
         Maybe.tlbCodec(Coins.tlbCodec())
     }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: StorageInfo, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: StorageInfo
     ) = cellBuilder {
-        storeTlb(value.used, storageUsedCodec)
+        storeTlb(storageUsedCodec, value.used)
         storeUInt(value.lastPaid, 32)
-        storeTlb(value.duePayment, maybeCoins)
+        storeTlb(maybeCoins, value.duePayment)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): StorageInfo = cellSlice {
         val used = loadTlb(storageUsedCodec)
         val lastPaid = loadUInt(32).toInt()

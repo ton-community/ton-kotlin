@@ -10,42 +10,34 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun <X : Any> HashMapEdge.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
-    HashMapEdgeTlbConstructor(typeCodec)
+fun <X : Any> HashMapEdge.Companion.tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
+    HashMapEdgeTlbConstructor(n, x)
 
 private class HashMapEdgeTlbConstructor<X : Any>(
-    typeCodec: TlbCodec<X>
+    val n: Int,
+    val x: TlbCodec<X>
 ) : TlbConstructor<HashMapEdge<X>>(
     schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
 ) {
     private val hashMapLabelCodec by lazy {
-        HashMapLabel.tlbCodec()
-    }
-    private val nodeCombinator by lazy {
-        HashMapNode.tlbCodec(typeCodec)
+        HashMapLabel.tlbCodec(n)
     }
 
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: HashMapEdge<X>,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: HashMapEdge<X>
     ) {
-        var l = 0
-        cellBuilder.storeTlb(value.label, hashMapLabelCodec, param) { l = it }
-        val m = param - l
-        cellBuilder.storeTlb(value.node, nodeCombinator, m)
+        val l = cellBuilder.storeTlb(hashMapLabelCodec, value.label)
+        val m = n - l
+        cellBuilder.storeTlb(HashMapNode.tlbCodec(m, x), value.node)
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): HashMapEdge<X> {
-        var l = 0
-        val label = cellSlice.loadTlb(hashMapLabelCodec, param) { l = it }
-        val m = param - l
-        val node = cellSlice.loadTlb(nodeCombinator, m)
+        val (l, label) = cellSlice.loadTlb(hashMapLabelCodec)
+        val m = n - l
+        val node = cellSlice.loadTlb(HashMapNode.tlbCodec(m, x))
         return HashMapEdge(label, node)
     }
 }

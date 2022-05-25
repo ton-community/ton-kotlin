@@ -31,27 +31,27 @@ private class StateInitTlbConstructor : TlbConstructor<StateInit>(
         Maybe.tlbCodec(Cell.tlbCodec())
     }
     private val hashMapESimpleLibCodec by lazy {
-        HashMapE.tlbCodec(SimpleLib.tlbCodec())
+        HashMapE.tlbCodec(256, SimpleLib.tlbCodec())
     }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: StateInit, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: StateInit
     ) = cellBuilder {
-        storeTlb(value.splitDepth, maybeUint5Codec)
-        storeTlb(value.special, maybeTickTockCodec)
-        storeTlb(value.code, maybeCell)
-        storeTlb(value.data, maybeCell)
-        storeTlb(value.library, hashMapESimpleLibCodec, 256)
+        storeTlb(maybeUint5Codec, value.splitDepth)
+        storeTlb(maybeTickTockCodec, value.special)
+        storeTlb(maybeCell, value.code)
+        storeTlb(maybeCell, value.data)
+        storeTlb(hashMapESimpleLibCodec, value.library)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): StateInit = cellSlice {
         val splitDepth = loadTlb(maybeUint5Codec)
         val special = loadTlb(maybeTickTockCodec)
         val code = loadTlb(maybeCell)
         val data = loadTlb(maybeCell)
-        val library = loadTlb(hashMapESimpleLibCodec, 256)
+        val library = loadTlb(hashMapESimpleLibCodec)
         StateInit(splitDepth, special, code, data, library)
     }
 }

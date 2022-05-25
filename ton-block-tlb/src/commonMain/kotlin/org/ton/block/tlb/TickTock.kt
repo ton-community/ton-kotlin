@@ -11,15 +11,15 @@ fun TickTock.Companion.tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor()
 private class TickTockTlbConstructor : TlbConstructor<TickTock>(
     schema = "tick_tock\$_ tick:Bool tock:Bool = TickTock;"
 ) {
-    override fun encode(
-        cellBuilder: CellBuilder, value: TickTock, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: TickTock
     ) = cellBuilder {
         storeBit(value.tick)
         storeBit(value.tock)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): TickTock = cellSlice {
         val tick = loadBit()
         val tock = loadBit()

@@ -12,11 +12,9 @@ private class VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
     schema = "_ cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
             "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
 ) {
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: VmCellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: VmCellSlice
     ) = cellBuilder {
         storeRef(value.cell)
         storeUInt(value.stBits, 10)
@@ -25,10 +23,8 @@ private class VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         storeUIntLeq(value.endRef, 4)
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): VmCellSlice = cellSlice {
         val cell = loadRef()
         val stBits = loadUInt(10).toInt()

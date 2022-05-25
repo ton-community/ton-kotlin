@@ -20,24 +20,20 @@ private class VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
         VmStackValue.tlbCodec()
     }
     private val hashmapCombinator by lazy {
-        HashMapE.tlbCodec(vmStackValueCodec)
+        HashMapE.tlbCodec(4, vmStackValueCodec)
     }
 
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: VmSaveList,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: VmSaveList
     ) = cellBuilder {
-        storeTlb(value.cregs, hashmapCombinator, 4)
+        storeTlb(hashmapCombinator, value.cregs)
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): VmSaveList = cellSlice {
-        val creg = loadTlb(hashmapCombinator, 4)
+        val creg = loadTlb(hashmapCombinator)
         VmSaveList(creg)
     }
 }

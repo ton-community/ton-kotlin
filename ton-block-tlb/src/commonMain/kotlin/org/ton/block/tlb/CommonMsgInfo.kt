@@ -29,10 +29,7 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
     }
 
     private class IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.IntMsgInfo>(
-        schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool " +
-                "src:MsgAddressInt dest:MsgAddressInt " +
-                "value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins " +
-                "created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
+        schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool " + "src:MsgAddressInt dest:MsgAddressInt " + "value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins " + "created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
     ) {
         private val msgAddressIntCodec by lazy {
             MsgAddressInt.tlbCodec()
@@ -44,26 +41,23 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
             Coins.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder,
-            value: CommonMsgInfo.IntMsgInfo,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: CommonMsgInfo.IntMsgInfo
         ) = cellBuilder {
             storeBit(value.ihrDisabled)
             storeBit(value.bounce)
             storeBit(value.bounced)
-            storeTlb(value.src, msgAddressIntCodec)
-            storeTlb(value.dest, msgAddressIntCodec)
-            storeTlb(value.value, currencyCollectionCodec)
-            storeTlb(value.ihrFee, coinsCodec)
-            storeTlb(value.fwdFee, coinsCodec)
+            storeTlb(msgAddressIntCodec, value.src)
+            storeTlb(msgAddressIntCodec, value.dest)
+            storeTlb(currencyCollectionCodec, value.value)
+            storeTlb(coinsCodec, value.ihrFee)
+            storeTlb(coinsCodec, value.fwdFee)
             storeUInt(value.createdLt, 64)
             storeUInt(value.createdAt, 32)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): CommonMsgInfo.IntMsgInfo = cellSlice {
             val ihrDisabled = loadBit()
             val bounce = loadBit()
@@ -76,16 +70,7 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
             val createdLt = loadUInt(64).toLong()
             val createdAt = loadUInt(32).toInt()
             CommonMsgInfo.IntMsgInfo(
-                ihrDisabled,
-                bounce,
-                bounced,
-                src,
-                dest,
-                value,
-                ihrFee,
-                fwdFee,
-                createdLt,
-                createdAt
+                ihrDisabled, bounce, bounced, src, dest, value, ihrFee, fwdFee, createdLt, createdAt
             )
         }
     }
@@ -103,21 +88,16 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
             Coins.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder,
-            value: CommonMsgInfo.ExtInMsgInfo,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: CommonMsgInfo.ExtInMsgInfo
         ) = cellBuilder {
-            storeTlb(value.src, msgAddressExtCodec)
-            storeTlb(value.dest, msgAddressIntCodec)
-            storeTlb(value.importFee, coinsCodec)
+            storeTlb(msgAddressExtCodec, value.src)
+            storeTlb(msgAddressIntCodec, value.dest)
+            storeTlb(coinsCodec, value.importFee)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): CommonMsgInfo.ExtInMsgInfo = cellSlice {
             val src = loadTlb(msgAddressExtCodec)
             val dest = loadTlb(msgAddressIntCodec)
@@ -136,22 +116,17 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
             MsgAddressExt.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder,
-            value: CommonMsgInfo.ExtOutMsgInfo,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: CommonMsgInfo.ExtOutMsgInfo
         ) = cellBuilder {
-            storeTlb(value.src, msgAddressIntCodec)
-            storeTlb(value.dest, msgAddressExtCodec)
+            storeTlb(msgAddressIntCodec, value.src)
+            storeTlb(msgAddressExtCodec, value.dest)
             storeUInt(value.createdLt, 64)
             storeUInt(value.createdAt, 32)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): CommonMsgInfo.ExtOutMsgInfo = cellSlice {
             val src = loadTlb(msgAddressIntCodec)
             val dest = loadTlb(msgAddressExtCodec)

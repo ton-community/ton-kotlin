@@ -35,18 +35,14 @@ private class MaybeTlbCombinator<X : Any>(
     ) {
         private val nothing = Nothing<X>()
 
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: Nothing<X>,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: Nothing<X>
         ) {
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): Nothing<X> = nothing
     }
 
@@ -55,21 +51,17 @@ private class MaybeTlbCombinator<X : Any>(
     ) : TlbConstructor<Just<X>>(
         schema = "just\$1 {X:Type} value:X = Maybe X;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: Just<X>,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: Just<X>
         ) = cellBuilder {
-            storeTlb(value.value, typeCodec, param, negativeParam)
+            storeTlb(typeCodec, value.value)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): Just<X> = cellSlice {
-            val value = cellSlice.loadTlb(typeCodec, param, negativeParam)
+            val value = cellSlice.loadTlb(typeCodec)
             Just(value)
         }
     }

@@ -67,9 +67,9 @@ data class LiteServerMasterchainInfo(
         }
 
         override fun encode(output: Output, value: LiteServerMasterchainInfo) {
-            output.writeTl(value.last, TonNodeBlockIdExt)
+            output.writeTl(TonNodeBlockIdExt, value.last)
             output.writeInt256Tl(value.stateRootHash)
-            output.writeTl(value.init, TonNodeZeroStateIdExt)
+            output.writeTl(TonNodeZeroStateIdExt, value.init)
         }
     }
 }

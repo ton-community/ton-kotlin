@@ -1,8 +1,10 @@
 
 import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.json.Json
 import org.ton.block.MsgAddressInt
 import org.ton.crypto.hex
 import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.lite.api.liteserver.LiteServerAccountState
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
@@ -18,7 +20,7 @@ suspend fun main() = coroutineScope {
     val time = liteClient.getTime()
     println("[server time: $time] (${Instant.ofEpochSecond(time.now.toLong())})")
 
-    val account = MsgAddressInt.AddrStd.parse("EQAKtVj024T9MfYaJzU1xnDAkf_GGbHNu-V2mgvyjTuP6rvC")
+    val account = MsgAddressInt.AddrStd.parse("0:0AB558F4DB84FD31F61A273535C670C091FFC619B1CDBBE5769A0BF28D3B8FEA")
     liteClient.getTransactions(account)
 }
 
@@ -26,5 +28,6 @@ private suspend fun LiteClient.getTransactions(addressInt: MsgAddressInt.AddrStd
     val masterchainInfo = getMasterchainInfo()
     val lastBlock = masterchainInfo.last
     val accountState = getAccountState(lastBlock, LiteServerAccountId(addressInt))
+    Json.encodeToString(LiteServerAccountState.serializer(), accountState)
     println(accountState)
 }

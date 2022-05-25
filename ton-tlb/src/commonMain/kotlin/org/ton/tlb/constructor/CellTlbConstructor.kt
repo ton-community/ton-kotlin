@@ -14,14 +14,14 @@ fun <T : Any> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellRefe
 private object CellTlbConstructor : TlbConstructor<Cell>(
     schema = "_ _:Cell = Cell;"
 ) {
-    override fun encode(
-        cellBuilder: CellBuilder, value: Cell, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: Cell
     ) = cellBuilder {
         storeRef(value)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): Cell = cellSlice {
         loadRef()
     }
@@ -30,16 +30,16 @@ private object CellTlbConstructor : TlbConstructor<Cell>(
 private class CellReferencedTlbConstructor<T : Any>(
     val type: TlbCodec<T>
 ) : TlbConstructor<T>("") {
-    override fun encode(
-        cellBuilder: CellBuilder, value: T, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: T
     ) = cellBuilder {
         storeRef {
-            storeTlb(value, type)
+            storeTlb(type, value)
         }
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): T = cellSlice {
         loadRef {
             loadTlb(type)

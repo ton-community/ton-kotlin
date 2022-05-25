@@ -10,17 +10,17 @@ import org.ton.tl.writeTl
 
 @Serializable
 data class AdnlNode(
-        val id: PublicKey,
-        @SerialName("addr_list")
-        val addrList: AdnlAddressList
+    val id: PublicKey,
+    @SerialName("addr_list")
+    val addrList: AdnlAddressList
 ) {
     companion object : TlConstructor<AdnlNode>(
-            type = AdnlNode::class,
-            schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
+        type = AdnlNode::class,
+        schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
     ) {
         override fun encode(output: Output, value: AdnlNode) {
-            output.writeTl(value.id, PublicKey)
-            output.writeTl(value.addrList, AdnlAddressList)
+            output.writeTl(PublicKey, value.id)
+            output.writeTl(AdnlAddressList, value.addrList)
         }
 
         override fun decode(input: Input): AdnlNode {

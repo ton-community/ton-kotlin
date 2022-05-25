@@ -52,7 +52,7 @@ class VmStackValue {
 
     private fun testStackValue(stackValue: VmStackValue) {
         val cellBuilder = CellBuilder.beginCell()
-        cellBuilder.storeTlb(stackValue, VmStackValue.tlbCodec())
+        cellBuilder.storeTlb(VmStackValue.tlbCodec(), stackValue)
         val cell = cellBuilder.endCell()
 
         val cellSlice = cell.beginParse()

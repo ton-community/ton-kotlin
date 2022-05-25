@@ -140,7 +140,7 @@ data class AdnlAddressTunnel(
     ) {
         override fun encode(output: Output, value: AdnlAddressTunnel) {
             output.writeInt256Tl(value.to)
-            output.writeTl(value.pubKey, PublicKey)
+            output.writeTl(PublicKey, value.pubKey)
         }
 
         override fun decode(input: Input): AdnlAddressTunnel {

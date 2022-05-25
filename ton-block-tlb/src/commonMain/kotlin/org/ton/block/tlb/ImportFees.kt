@@ -22,15 +22,15 @@ private class ImportFeesTlbConstructor : TlbConstructor<ImportFees>(
         CurrencyCollection.tlbCodec()
     }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: ImportFees, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: ImportFees
     ) = cellBuilder {
-        storeTlb(value.feesCollected, coinsCodec)
-        storeTlb(value.valueImported, currencyCollectionCodec)
+        storeTlb(coinsCodec, value.feesCollected)
+        storeTlb(currencyCollectionCodec, value.valueImported)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): ImportFees = cellSlice {
         val feesCollected = loadTlb(coinsCodec)
         val valueImported = loadTlb(currencyCollectionCodec)

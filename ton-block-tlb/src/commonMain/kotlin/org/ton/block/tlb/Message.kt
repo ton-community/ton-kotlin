@@ -27,16 +27,16 @@ private class MessageTlbConstructor<X : Any>(
     private val referencedXCodec by lazy { Cell.tlbCodec(x) }
     private val eitherXCodec by lazy { Either.tlbCodec(x, referencedXCodec) }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: Message<X>, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: Message<X>
     ) = cellBuilder {
-        storeTlb(value.info, commonMsgInfoCodec)
-        storeTlb(value.init, maybeEitherCodec)
-        storeTlb(value.body, eitherXCodec)
+        storeTlb(commonMsgInfoCodec, value.info)
+        storeTlb(maybeEitherCodec, value.init)
+        storeTlb(eitherXCodec, value.body)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): Message<X> = cellSlice {
         val info = loadTlb(commonMsgInfoCodec)
         val init = loadTlb(maybeEitherCodec)

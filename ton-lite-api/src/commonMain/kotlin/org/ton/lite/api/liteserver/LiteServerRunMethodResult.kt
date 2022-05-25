@@ -116,8 +116,8 @@ data class LiteServerRunMethodResult(
 
         override fun encode(output: Output, value: LiteServerRunMethodResult) {
             output.writeIntLittleEndian(value.mode)
-            output.writeTl(value.id, TonNodeBlockIdExt)
-            output.writeTl(value.shardblk, TonNodeBlockIdExt)
+            output.writeTl(TonNodeBlockIdExt, value.id)
+            output.writeTl(TonNodeBlockIdExt, value.shardblk)
             value.shardProof?.let { shardProof ->
                 output.writeBytesTl(shardProof)
             }

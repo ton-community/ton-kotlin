@@ -88,11 +88,11 @@ data class LiteServerMasterchainInfoExt(
             output.writeIntTl(value.mode)
             output.writeIntTl(value.version)
             output.writeLongLittleEndian(value.capabilities)
-            output.writeTl(value.last, TonNodeBlockIdExt)
+            output.writeTl(TonNodeBlockIdExt, value.last)
             output.writeIntTl(value.lastUTime)
             output.writeIntTl(value.now)
             output.writeInt256Tl(value.stateRootHash)
-            output.writeTl(value.init, TonNodeZeroStateIdExt)
+            output.writeTl(TonNodeZeroStateIdExt, value.init)
         }
 
         override fun decode(input: Input): LiteServerMasterchainInfoExt {

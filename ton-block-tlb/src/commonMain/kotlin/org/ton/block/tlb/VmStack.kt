@@ -14,20 +14,16 @@ fun VmStack.Companion.tlbCodec(): TlbCodec<VmStack> = VmStackTlbConstructor()
 private class VmStackTlbConstructor : TlbConstructor<VmStack>(
     schema = "vm_stack#_ depth:(## 24) stack:(VmStackList depth) = VmStack;"
 ) {
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: VmStack,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: VmStack
     ) = cellBuilder {
         storeUInt(value.depth, 24)
-        storeTlb(value.stack, VmStackList.tlbCodec(value.depth))
+        storeTlb(VmStackList.tlbCodec(value.depth), value.stack)
     }
 
-    override fun decode(
-        cellSlice: CellSlice,
-        param: Int,
-        negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): VmStack = cellSlice {
         val depth = loadUInt(24).toInt()
         val stack = loadTlb(VmStackList.tlbCodec(depth))

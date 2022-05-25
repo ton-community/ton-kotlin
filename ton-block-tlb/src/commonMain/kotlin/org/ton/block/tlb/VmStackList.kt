@@ -6,11 +6,11 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmStackList.Companion.tlbCodec(depth: Int): TlbCodec<VmStackList> = VmStackListCombinator(depth)
+fun VmStackList.Companion.tlbCodec(n: Int): TlbCodec<VmStackList> = VmStackListCombinator(n)
 
-private class VmStackListCombinator(val depth: Int) : TlbCombinator<VmStackList>() {
+private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
     private val vmStkConsConstructor by lazy {
-        VmStackListConsConstructor(depth)
+        VmStackListConsConstructor(n)
     }
     private val vmStkNilConstructor by lazy {
         VmStackListNilConstructor()
@@ -25,49 +25,43 @@ private class VmStackListCombinator(val depth: Int) : TlbCombinator<VmStackList>
         is VmStackList.Nil -> vmStkNilConstructor
     }
 
-    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmStackList {
-        return if (depth == 0) {
-            vmStkNilConstructor.decode(cellSlice, param, negativeParam)
+    override fun loadTlb(cellSlice: CellSlice): VmStackList {
+        return if (n == 0) {
+            vmStkNilConstructor.loadTlb(cellSlice)
         } else {
-            vmStkConsConstructor.decode(cellSlice, param, negativeParam)
+            vmStkConsConstructor.loadTlb(cellSlice)
         }
     }
 
     private class VmStackListConsConstructor(
-        depth: Int
+        n: Int
     ) : TlbConstructor<VmStackList.Cons>(
         schema = "vm_stk_cons#_ {n:#} rest:^(VmStackList n) tos:VmStackValue = VmStackList (n + 1);"
     ) {
-        val n = depth - 1
-
         private val vmStackListCodec by lazy {
-            VmStackList.tlbCodec(n)
+            VmStackList.tlbCodec(n - 1)
         }
         private val vmStackValue by lazy {
             VmStackValue.tlbCodec()
         }
 
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackList.Cons,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackList.Cons
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.rest, vmStackListCodec, n)
+                storeTlb(vmStackListCodec, value.rest)
             }
-            storeTlb(value.tos, vmStackValue)
+            storeTlb(vmStackValue, value.tos)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackList.Cons = cellSlice {
             val rest = loadRef {
-                loadTlb(vmStackListCodec, n)
+                loadTlb(vmStackListCodec)
             }
-            val tos = loadTlb(vmStackValue, n)
+            val tos = loadTlb(vmStackValue)
             VmStackList.Cons(rest, tos)
         }
     }
@@ -75,18 +69,14 @@ private class VmStackListCombinator(val depth: Int) : TlbCombinator<VmStackList>
     private class VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
         schema = "vm_stk_nil#_ = VmStackList 0;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackList.Nil,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackList.Nil
         ) {
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackList.Nil {
             return VmStackList.Nil
         }

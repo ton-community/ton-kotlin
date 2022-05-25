@@ -21,20 +21,18 @@ private class ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurren
         VarUInteger.tlbCodec(32)
     }
     private val hashMapE32Codec by lazy {
-        HashMapE.tlbCodec(varUInteger32Codec)
+        HashMapE.tlbCodec(32, varUInteger32Codec)
     }
 
-    override fun encode(
+    override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: ExtraCurrencyCollection,
-        param: Int,
-        negativeParam: (Int) -> Unit
+        value: ExtraCurrencyCollection
     ) = cellBuilder {
-        storeTlb(value.dict, hashMapE32Codec)
+        storeTlb(hashMapE32Codec, value.dict)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): ExtraCurrencyCollection = cellSlice {
         val dict = loadTlb(hashMapE32Codec)
         ExtraCurrencyCollection(dict)

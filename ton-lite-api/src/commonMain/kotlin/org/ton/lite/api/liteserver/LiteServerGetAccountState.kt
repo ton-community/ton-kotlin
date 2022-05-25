@@ -23,8 +23,8 @@ data class LiteServerGetAccountState(
         }
 
         override fun encode(output: Output, value: LiteServerGetAccountState) {
-            output.writeTl(value.id, TonNodeBlockIdExt)
-            output.writeTl(value.account, LiteServerAccountId)
+            output.writeTl(TonNodeBlockIdExt, value.id)
+            output.writeTl(LiteServerAccountId, value.account)
         }
     }
 }

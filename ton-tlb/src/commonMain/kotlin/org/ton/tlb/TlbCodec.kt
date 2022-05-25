@@ -3,50 +3,42 @@ package org.ton.tlb
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 
-fun interface TlbEncoder<T> {
-    fun encode(cellBuilder: CellBuilder, value: T, param: Int) =
-        encode(cellBuilder, value, param) {}
-
-    fun encode(cellBuilder: CellBuilder, value: T, negativeParam: ((Int) -> Unit)) =
-        encode(cellBuilder, value, 0, negativeParam)
-
-    fun encode(
-        cellBuilder: CellBuilder,
-        value: T,
-        param: Int,
-        negativeParam: ((Int) -> Unit)
-    )
+fun interface TlbStorer<T> {
+    fun storeTlb(cellBuilder: CellBuilder, value: T)
 }
 
-fun <T> TlbEncoder(encoder: CellBuilder.(T, Int, ((Int) -> Unit)) -> Unit) =
-    TlbEncoder<T> { cellBuilder, value, param, negativeParam ->
-        encoder(cellBuilder, value, param, negativeParam)
+fun interface TlbNegatedStorer<T> : TlbStorer<T> {
+    fun storeNegatedTlb(cellBuilder: CellBuilder, value: T): Int
+
+    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+        storeNegatedTlb(cellBuilder, value)
     }
-
-interface TlbDecoder<T> {
-    fun decode(cellSlice: CellSlice, param: Int): T =
-        decode(cellSlice, param)
-
-    fun decode(cellSlice: CellSlice, negativeParam: ((Int) -> Unit)): T =
-        decode(cellSlice, 0, negativeParam)
-
-    fun decode(
-        cellSlice: CellSlice,
-        param: Int = 0,
-        negativeParam: ((Int) -> Unit) = {}
-    ): T
 }
 
-abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
-    abstract override fun toString(): String
+fun interface TlbLoader<T> {
+    fun loadTlb(cellSlice: CellSlice): T
 }
 
-fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T {
-    return codec.decode(this, param, negativeParam)
+fun interface TlbNegatedLoader<T> : TlbLoader<T> {
+    fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, T>
+
+    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
 }
 
-fun <T : Any> CellBuilder.storeTlb(
-    value: T, codec: TlbEncoder<T>, param: Int = 0, negativeParam: (Int) -> Unit = {}
-) = apply {
-    codec.encode(this, value, param, negativeParam)
+interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
+interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
+
+fun <T : Any> CellSlice.loadTlb(codec: TlbLoader<T>): T {
+    return codec.loadTlb(this)
 }
+
+fun <T : Any> CellSlice.loadTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
+    return codec.loadNegatedTlb(this)
+}
+
+fun <T : Any> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
+    codec.storeTlb(this, value)
+}
+
+fun <T : Any> CellBuilder.storeTlb(codec: TlbNegatedStorer<T>, value: T) =
+    codec.storeNegatedTlb(this, value)

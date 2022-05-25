@@ -11,15 +11,15 @@ fun Anycast.Companion.tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor()
 private class AnycastTlbConstructor : TlbConstructor<Anycast>(
     schema = "anycast_info\$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;"
 ) {
-    override fun encode(
-        cellBuilder: CellBuilder, value: Anycast, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: Anycast
     ) = cellBuilder {
         storeUIntLeq(value.depth, 30)
         storeBits(value.rewritePfx)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): Anycast = cellSlice {
         val depth = loadUIntLeq(30).toInt()
         val rewritePfx = loadBitString(depth)

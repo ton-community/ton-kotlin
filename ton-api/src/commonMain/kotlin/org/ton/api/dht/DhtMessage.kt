@@ -15,7 +15,7 @@ data class DhtMessage(
             schema = "dht.message node:dht.node = dht.Message"
     ) {
         override fun encode(output: Output, value: DhtMessage) {
-            output.writeTl(value.node, DhtNode)
+            output.writeTl(DhtNode, value.node)
         }
 
         override fun decode(input: Input): DhtMessage {

@@ -4,11 +4,11 @@ import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
 import org.ton.tlb.exception.ParseTlbException
 
-abstract class TlbConstructor<T : Any>(
+abstract class AbstractTlbConstructor<T : Any>(
     @Language("TL-B")
     val schema: String,
     id: BitString? = null
-) : TlbCodec<T>() {
+) {
     val id = id ?: calculateId(schema)
     override fun toString(): String = schema
 
@@ -35,3 +35,15 @@ abstract class TlbConstructor<T : Any>(
         }
     }
 }
+
+abstract class TlbConstructor<T : Any>(
+    @Language("TL-B")
+    schema: String,
+    id: BitString? = null
+) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T>
+
+abstract class TlbNegatedConstructor<T : Any>(
+    @Language("TL-B")
+    schema: String,
+    id: BitString? = null
+) : AbstractTlbConstructor<T>(schema, id), TlbNegatedCodec<T>

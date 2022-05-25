@@ -34,19 +34,17 @@ private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>() {
             Maybe.tlbCodec(Anycast.tlbCodec())
         }
 
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: MsgAddressInt.AddrStd,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: MsgAddressInt.AddrStd
         ) = cellBuilder {
-            storeTlb(value.anycast, maybeAnycastCodec)
+            storeTlb(maybeAnycastCodec, value.anycast)
             storeInt(value.workchainId, 8)
             storeBits(value.address.toBitString())
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): MsgAddressInt.AddrStd = cellSlice {
             val anycast = loadTlb(maybeAnycastCodec)
             val workchainId = loadInt(8).toInt()
@@ -62,20 +60,18 @@ private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>() {
             Maybe.tlbCodec(Anycast.tlbCodec())
         }
 
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: MsgAddressInt.AddrVar,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: MsgAddressInt.AddrVar
         ) = cellBuilder {
-            storeTlb(value.anycast, maybeAnycastCodec)
+            storeTlb(maybeAnycastCodec, value.anycast)
             storeUInt(value.addrLen, 9)
             storeInt(value.workchainId, 32)
             storeBits(value.address)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): MsgAddressInt.AddrVar = cellSlice {
             val anycast = loadTlb(maybeAnycastCodec)
             val addrLen = loadUInt(9).toInt()

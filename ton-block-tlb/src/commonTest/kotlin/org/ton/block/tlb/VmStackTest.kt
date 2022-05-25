@@ -14,7 +14,7 @@ class VmStackTest {
     fun `test VmStack (de)serialization with VmStackList-Nil`() {
         val stack = VmStack(VmStackList.Nil)
         val cell = CellBuilder.createCell {
-            storeTlb(stack, VmStack.tlbCodec())
+            storeTlb(VmStack.tlbCodec(), stack)
         }
         println(cell)
         val stack2 = cell.parse {
@@ -33,7 +33,7 @@ class VmStackTest {
             )
         )
         val cell = CellBuilder.createCell {
-            storeTlb(stack, VmStack.tlbCodec())
+            storeTlb(VmStack.tlbCodec(), stack)
         }
         println(cell)
         val stack2 = cell.parse {

@@ -43,37 +43,29 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private class VmStackValueNullConstructor : TlbConstructor<VmStackValue.Null>(
         schema = "vm_stk_null#00 = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Null,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Null
         ) {
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Null = VmStackValue.Null
     }
 
     private class VmStackValueTinyIntConstructor : TlbConstructor<VmStackValue.TinyInt>(
         schema = "vm_stk_tinyint#01 value:int64 = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.TinyInt,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.TinyInt
         ) = cellBuilder {
             storeInt(value.value, 64)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.TinyInt = cellSlice {
             val value = loadInt(64).toLong()
             VmStackValue.TinyInt(value)
@@ -83,19 +75,15 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private class VmStackValueIntConstructor : TlbConstructor<VmStackValue.Int>(
         schema = "vm_stk_int#0201_ value:int257 = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Int,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Int
         ) = cellBuilder {
             storeInt(value.value, 257)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Int = cellSlice {
             val value = loadInt(257)
             VmStackValue.Int(value)
@@ -105,37 +93,29 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private class VmStackValueNanConstructor : TlbConstructor<VmStackValue.Nan>(
         schema = "vm_stk_nan#02ff = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Nan,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Nan
         ) {
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Nan = VmStackValue.Nan
     }
 
     private class VmStackValueCellConstructor : TlbConstructor<VmStackValue.Cell>(
         schema = "vm_stk_cell#03 cell:^Cell = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Cell,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Cell
         ) = cellBuilder {
             storeRef(value.cell)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Cell = cellSlice {
             val cell = loadRef()
             VmStackValue.Cell(cell)
@@ -149,19 +129,15 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
             VmCellSlice.tlbCodec()
         }
 
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Slice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Slice
         ) = cellBuilder {
-            storeTlb(value.slice, vmCellSliceCodec)
+            storeTlb(vmCellSliceCodec, value.slice)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Slice = cellSlice {
             val slice = loadTlb(vmCellSliceCodec)
             VmStackValue.Slice(slice)
@@ -171,19 +147,15 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private class VmStackValueBuilderTlbConstructor : TlbConstructor<VmStackValue.Builder>(
         schema = "vm_stk_builder#05 cell:^Cell = VmStackValue;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: VmStackValue.Builder,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: VmStackValue.Builder
         ) = cellBuilder {
             storeRef(value.cell)
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Builder = cellSlice {
             val cell = loadRef()
             VmStackValue.Builder(cell)
@@ -197,14 +169,14 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
             VmCont.tlbCodec()
         }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmStackValue.Cont, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmStackValue.Cont
         ) = cellBuilder {
-            storeTlb(value.cont, vmContCodec)
+            storeTlb(vmContCodec, value.cont)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Cont = cellSlice {
             val cont = loadTlb(vmContCodec)
             VmStackValue.Cont(cont)
@@ -214,22 +186,18 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private class VmStackValueTupleConstructor : TlbConstructor<VmStackValue.Tuple>(
         schema = "vm_stk_tuple#07 len:(## 16) data:(VmTuple len) = VmStackValue;"
     ) {
-        private val vmTupleCodec by lazy {
-            VmTuple.tlbCodec()
-        }
-
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmStackValue.Tuple, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmStackValue.Tuple
         ) = cellBuilder {
             storeUInt(value.len, 16)
-            storeTlb(value.data, vmTupleCodec, value.len)
+            storeTlb(VmTuple.tlbCodec(value.len), value.data)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmStackValue.Tuple = cellSlice {
             val len = loadUInt(16).toInt()
-            val data = loadTlb(vmTupleCodec, len)
+            val data = loadTlb(VmTuple.tlbCodec(len))
             VmStackValue.Tuple(len, data)
         }
     }

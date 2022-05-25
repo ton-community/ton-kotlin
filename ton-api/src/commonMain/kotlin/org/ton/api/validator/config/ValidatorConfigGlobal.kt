@@ -24,8 +24,8 @@ data class ValidatorConfigGlobal(
         schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
     ) {
         override fun encode(output: Output, value: ValidatorConfigGlobal) {
-            output.writeTl(value.zeroState, TonNodeBlockIdExt)
-            output.writeTl(value.initBlock, TonNodeBlockIdExt)
+            output.writeTl(TonNodeBlockIdExt, value.zeroState)
+            output.writeTl(TonNodeBlockIdExt, value.initBlock)
             output.writeVectorTl(value.hardforks, TonNodeBlockIdExt)
         }
 

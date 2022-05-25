@@ -69,7 +69,7 @@ data class LiteServerGetTransactions(
 
         override fun encode(output: Output, value: LiteServerGetTransactions) {
             output.writeIntTl(value.count)
-            output.writeTl(value.account, LiteServerAccountId)
+            output.writeTl(LiteServerAccountId, value.account)
             output.writeLongTl(value.lt)
             output.writeInt256Tl(value.hash)
         }

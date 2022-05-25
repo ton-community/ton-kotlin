@@ -16,7 +16,7 @@ data class DhtDbBucket(
             schema = "dht.db.bucket nodes:dht.nodes = dht.db.Bucket"
     ) {
         override fun encode(output: Output, value: DhtDbBucket) {
-            output.writeTl(value.nodes, DhtNodes)
+            output.writeTl(DhtNodes, value.nodes)
         }
 
         override fun decode(input: Input): DhtDbBucket {

@@ -18,14 +18,14 @@ private class CoinsTlbConstructor : TlbConstructor<Coins>(
         VarUInteger.tlbCodec(16)
     }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: Coins, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: Coins
     ) = cellBuilder {
-        storeTlb(value.amount, varUIntegerCodec)
+        storeTlb(varUIntegerCodec, value.amount)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): Coins = cellSlice {
         val amount = loadTlb(varUIntegerCodec)
         Coins(amount)

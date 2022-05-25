@@ -7,12 +7,12 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
-fun VmTupleRef.Companion.tlbCodec(): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator()
+fun VmTupleRef.Companion.tlbCodec(n: Int): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator(n)
 
-private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>() {
+private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() {
     private val nilConstructor by lazy { VmTupleRefNilTlbConstructor() }
     private val singleConstructor by lazy { VmTupleRefSingleTlbConstructor() }
-    private val anyConstructor by lazy { VmTupleRefAnyTlbConstructor() }
+    private val anyConstructor by lazy { VmTupleRefAnyTlbConstructor(n) }
 
     override val constructors: List<TlbConstructor<out VmTupleRef>> by lazy {
         listOf(nilConstructor, singleConstructor, anyConstructor)
@@ -24,23 +24,23 @@ private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>() {
         is VmTupleRef.Any -> anyConstructor
     }
 
-    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmTupleRef {
-        return when (param) {
-            0 -> nilConstructor.decode(cellSlice, param, negativeParam)
-            1 -> singleConstructor.decode(cellSlice, param, negativeParam)
-            else -> anyConstructor.decode(cellSlice, param, negativeParam)
+    override fun loadTlb(cellSlice: CellSlice): VmTupleRef {
+        return when (n) {
+            0 -> nilConstructor.loadTlb(cellSlice)
+            1 -> singleConstructor.loadTlb(cellSlice)
+            else -> anyConstructor.loadTlb(cellSlice)
         }
     }
 
     private class VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRef.Nil>(
         schema = "vm_tupref_nil\$_ = VmTupleRef 0;"
     ) {
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmTupleRef.Nil, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmTupleRef.Nil
         ) {
         }
 
-        override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmTupleRef.Nil {
+        override fun loadTlb(cellSlice: CellSlice): VmTupleRef.Nil {
             return VmTupleRef.Nil
         }
     }
@@ -50,16 +50,16 @@ private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>() {
     ) {
         private val vmStackValueCodec by lazy { VmStackValue.tlbCodec() }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmTupleRef.Single, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmTupleRef.Single
         ) = cellBuilder {
             storeRef {
-                storeTlb(value.entry, vmStackValueCodec)
+                storeTlb(vmStackValueCodec, value.entry)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmTupleRef.Single = cellSlice {
             val entry = loadRef {
                 loadTlb(vmStackValueCodec)
@@ -68,26 +68,26 @@ private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>() {
         }
     }
 
-    private class VmTupleRefAnyTlbConstructor : TlbConstructor<VmTupleRef.Any>(
+    private class VmTupleRefAnyTlbConstructor(
+        n: Int
+    ) : TlbConstructor<VmTupleRef.Any>(
         schema = "vm_tupref_any\$_ {n:#} ref:^(VmTuple (n + 2)) = VmTupleRef (n + 2);"
     ) {
-        private val vmTupleCodec by lazy { VmTuple.tlbCodec() }
+        private val vmTupleCodec by lazy { VmTuple.tlbCodec(n - 2) }
 
-        override fun encode(
-            cellBuilder: CellBuilder, value: VmTupleRef.Any, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: VmTupleRef.Any
         ) = cellBuilder {
-            val n = param - 2
             storeRef {
-                storeTlb(value.ref, vmTupleCodec, n)
+                storeTlb(vmTupleCodec, value.ref)
             }
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): VmTupleRef.Any = cellSlice {
-            val n = param - 2
             val ref = loadRef {
-                loadTlb(vmTupleCodec, n)
+                loadTlb(vmTupleCodec)
             }
             VmTupleRef.Any(ref)
         }

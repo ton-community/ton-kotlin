@@ -5,110 +5,102 @@ import org.ton.cell.CellSlice
 import org.ton.hashmap.*
 import org.ton.tlb.*
 
-fun HashMapLabel.Companion.tlbCodec(): TlbCodec<HashMapLabel> = HashMapLabelTlbCombinator()
+fun HashMapLabel.Companion.tlbCodec(m: Int): TlbNegatedCodec<HashMapLabel> =
+    HashMapLabelTlbCombinator(m)
 
-private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>() {
+private class HashMapLabelTlbCombinator(
+    m: Int,
+) : TlbNegatedCombinator<HashMapLabel>() {
     private val shortConstructor by lazy {
         HashMapLabelShortTlbConstructor()
     }
     private val sameConstructor by lazy {
-        HashMapLabelSameTlbConstructor()
+        HashMapLabelSameTlbConstructor(m)
     }
     private val longConstructor by lazy {
-        HashMapLabelLongTlbConstructor()
+        HashMapLabelLongTlbConstructor(m)
     }
 
-    override val constructors: List<TlbConstructor<out HashMapLabel>> by lazy {
+    override val constructors: List<TlbNegatedConstructor<out HashMapLabel>> by lazy {
         listOf(shortConstructor, sameConstructor, longConstructor)
     }
 
-    override fun getConstructor(value: HashMapLabel): TlbConstructor<out HashMapLabel> = when (value) {
+    override fun getConstructor(value: HashMapLabel): TlbNegatedConstructor<out HashMapLabel> = when (value) {
         is HashMapLabelShort -> shortConstructor
         is HashMapLabelSame -> sameConstructor
         is HashMapLabelLong -> longConstructor
     }
 
-    private class HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
+    private class HashMapLabelShortTlbConstructor : TlbNegatedConstructor<HashMapLabelShort>(
         schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;"
     ) {
         private val unaryCodec by lazy {
             Unary.tlbCodec()
         }
 
-        override fun encode(
+        override fun storeNegatedTlb(
             cellBuilder: CellBuilder,
-            value: HashMapLabelShort,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ) = cellBuilder {
-            var n = 0
-            storeTlb(value.len, unaryCodec, param) { n = it }
-            storeBits(value.s)
-            negativeParam(n)
+            value: HashMapLabelShort
+        ): Int {
+            val n = cellBuilder.storeTlb(unaryCodec, value.len)
+            cellBuilder.storeBits(value.s)
+            return n
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ): HashMapLabelShort = cellSlice {
-            var n = 0
-            val len = loadTlb(unaryCodec, param) { n = it }
-            val s = loadBitString(n)
-            negativeParam(n)
-            HashMapLabelShort(len, s)
+        override fun loadNegatedTlb(
+            cellSlice: CellSlice
+        ): Pair<Int, HashMapLabelShort> {
+            val (n, len) = cellSlice.loadTlb(unaryCodec)
+            val s = cellSlice.loadBitString(n)
+            return n to HashMapLabelShort(len, s)
         }
     }
 
-    private class HashMapLabelLongTlbConstructor : TlbConstructor<HashMapLabelLong>(
+    private class HashMapLabelLongTlbConstructor(
+        val m: Int
+    ) : TlbNegatedConstructor<HashMapLabelLong>(
         schema = "hml_long\$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;"
     ) {
-        override fun encode(
+        override fun storeNegatedTlb(
             cellBuilder: CellBuilder,
-            value: HashMapLabelLong,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ) = cellBuilder {
-            storeUIntLeq(value.n, param)
-            storeBits(value.s)
-            negativeParam(value.n)
+            value: HashMapLabelLong
+        ): Int {
+            cellBuilder {
+                storeUIntLeq(value.n, m)
+                storeBits(value.s)
+            }
+            return value.n
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ): HashMapLabelLong = cellSlice {
-            val n = loadUIntLeq(param).toInt()
+        override fun loadNegatedTlb(
+            cellSlice: CellSlice
+        ): Pair<Int, HashMapLabelLong> = cellSlice {
+            val n = loadUIntLeq(m).toInt()
             val s = loadBitString(n)
-            negativeParam(n)
-            HashMapLabelLong(n, s)
+            n to HashMapLabelLong(n, s)
         }
     }
 
-    private class HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
+    private class HashMapLabelSameTlbConstructor(
+        val m: Int,
+    ) : TlbNegatedConstructor<HashMapLabelSame>(
         schema = "hml_same\$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;"
     ) {
-        override fun encode(
+        override fun storeNegatedTlb(
             cellBuilder: CellBuilder,
-            value: HashMapLabelSame,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ) = cellBuilder {
-            storeBit(value.v)
-            storeUIntLeq(value.n, param)
-            negativeParam(value.n)
+            value: HashMapLabelSame
+        ): Int {
+            cellBuilder.storeBit(value.v)
+            cellBuilder.storeUIntLeq(value.n, m)
+            return value.n
         }
 
-        override fun decode(
-            cellSlice: CellSlice,
-            param: Int,
-            negativeParam: (Int) -> Unit
-        ): HashMapLabelSame = cellSlice {
+        override fun loadNegatedTlb(
+            cellSlice: CellSlice
+        ): Pair<Int, HashMapLabelSame> = cellSlice {
             val v = loadBit()
-            val n = loadUIntLeq(param).toInt()
-            negativeParam(n)
-            HashMapLabelSame(v, n)
+            val n = loadUIntLeq(m).toInt()
+            n to HashMapLabelSame(v, n)
         }
     }
 }

@@ -15,7 +15,7 @@ class VmStackListTest {
         val depth = vmStackList.count()
 
         val cellBuilder = CellBuilder.beginCell()
-        cellBuilder.storeTlb(vmStackList, VmStackList.tlbCodec(depth))
+        cellBuilder.storeTlb(VmStackList.tlbCodec(depth), vmStackList)
         val cell = cellBuilder.endCell()
 
         val cellSlice = cell.beginParse()

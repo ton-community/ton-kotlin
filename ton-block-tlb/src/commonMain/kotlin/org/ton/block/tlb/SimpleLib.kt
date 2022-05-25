@@ -11,15 +11,15 @@ fun SimpleLib.Companion.tlbCodec(): TlbCodec<SimpleLib> = SimpleLibTlbConstructo
 private class SimpleLibTlbConstructor : TlbConstructor<SimpleLib>(
     schema = "simple_lib\$_ public:Bool root:^Cell = SimpleLib;"
 ) {
-    override fun encode(
-        cellBuilder: CellBuilder, value: SimpleLib, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: SimpleLib
     ) = cellBuilder {
         storeBit(value.public)
         storeRef(value.root)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): SimpleLib = cellSlice {
         val public = loadBit()
         val root = loadRef()

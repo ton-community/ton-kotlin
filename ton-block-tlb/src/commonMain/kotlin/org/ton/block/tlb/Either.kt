@@ -28,14 +28,14 @@ private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<
     class LeftTlbConstructor<X : Any, Y : Any>(val x: TlbCodec<X>) : TlbConstructor<Either.Left<X, Y>>(
         schema = "left\$0 {X:Type} {Y:Type} value:X = Either X Y;"
     ) {
-        override fun encode(
-            cellBuilder: CellBuilder, value: Either.Left<X, Y>, param: Int, negativeParam: (Int) -> Unit
+        override fun storeTlb(
+            cellBuilder: CellBuilder, value: Either.Left<X, Y>
         ) = cellBuilder {
-            storeTlb(value.value, x)
+            storeTlb(x, value.value)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): Either.Left<X, Y> = cellSlice {
             val value = loadTlb(x)
             Either.Left(value)
@@ -45,17 +45,15 @@ private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<
     class RightTlbConstructor<X : Any, Y : Any>(val y: TlbCodec<Y>) : TlbConstructor<Either.Right<X, Y>>(
         schema = "right\$1 {X:Type} {Y:Type} value:Y = Either X Y;"
     ) {
-        override fun encode(
+        override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: Either.Right<X, Y>,
-            param: Int,
-            negativeParam: (Int) -> Unit
+            value: Either.Right<X, Y>
         ) = cellBuilder {
-            storeTlb(value.value, y)
+            storeTlb(y, value.value)
         }
 
-        override fun decode(
-            cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+        override fun loadTlb(
+            cellSlice: CellSlice
         ): Either.Right<X, Y> = cellSlice {
             val value = loadTlb(y)
             Either.Right(value)

@@ -18,16 +18,16 @@ private class StorageUsedTlbConstructor : TlbConstructor<StorageUsed>(
         VarUInteger.tlbCodec(7)
     }
 
-    override fun encode(
-        cellBuilder: CellBuilder, value: StorageUsed, param: Int, negativeParam: (Int) -> Unit
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: StorageUsed
     ) = cellBuilder {
-        storeTlb(value.cells, varUInteger7Codec)
-        storeTlb(value.bits, varUInteger7Codec)
-        storeTlb(value.publicCells, varUInteger7Codec)
+        storeTlb(varUInteger7Codec, value.cells)
+        storeTlb(varUInteger7Codec, value.bits)
+        storeTlb(varUInteger7Codec, value.publicCells)
     }
 
-    override fun decode(
-        cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
+    override fun loadTlb(
+        cellSlice: CellSlice
     ): StorageUsed = cellSlice {
         val cells = loadTlb(varUInteger7Codec)
         val bits = loadTlb(varUInteger7Codec)

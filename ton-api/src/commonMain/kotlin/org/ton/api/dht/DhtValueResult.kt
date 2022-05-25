@@ -29,7 +29,7 @@ data class DhtValueNotFound(
             schema = "dht.valueNotFound nodes:dht.nodes = dht.ValueResult"
     ) {
         override fun encode(output: Output, value: DhtValueNotFound) {
-            output.writeTl(value.nodes, DhtNodes)
+            output.writeTl(DhtNodes, value.nodes)
         }
 
         override fun decode(input: Input): DhtValueNotFound {
@@ -49,7 +49,7 @@ data class DhtValueFound(
             schema = "dht.valueFound value:dht.Value = dht.ValueResult"
     ) {
         override fun encode(output: Output, value: DhtValueFound) {
-            output.writeTl(value.value, DhtValue)
+            output.writeTl(DhtValue, value.value)
         }
 
         override fun decode(input: Input): DhtValueFound {
