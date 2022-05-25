@@ -16,8 +16,12 @@ fun StorageInfo.Companion.tlbCodec(): TlbCodec<StorageInfo> = StorageInfoTlbCons
 private class StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
     schema = "storage_info\$_ used:StorageUsed last_paid:uint32 due_payment:(Maybe Coins) = StorageInfo;"
 ) {
-    private val storageUsedCodec = StorageUsed.tlbCodec()
-    private val maybeCoins = Maybe.tlbCodec(Coins.tlbCodec())
+    private val storageUsedCodec by lazy {
+        StorageUsed.tlbCodec()
+    }
+    private val maybeCoins by lazy {
+        Maybe.tlbCodec(Coins.tlbCodec())
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: StorageInfo, param: Int, negativeParam: (Int) -> Unit

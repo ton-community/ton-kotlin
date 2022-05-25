@@ -9,18 +9,30 @@ import org.ton.tlb.*
 
 fun VmTupleRef.Companion.tlbCodec(): TlbCodec<VmTupleRef> = VmTupleRefTlbCombinator()
 
-private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
-    VmTupleRefNilTlbConstructor,
-    VmTupleRefSingleTlbConstructor,
-    VmTupleRefAnyTlbConstructor
-) {
-    override fun getConstructor(value: VmTupleRef): TlbConstructor<out VmTupleRef> = when (value) {
-        is VmTupleRef.Nil -> VmTupleRefNilTlbConstructor
-        is VmTupleRef.Single -> VmTupleRefSingleTlbConstructor
-        is VmTupleRef.Any -> VmTupleRefAnyTlbConstructor
+private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>() {
+    private val nilConstructor by lazy { VmTupleRefNilTlbConstructor() }
+    private val singleConstructor by lazy { VmTupleRefSingleTlbConstructor() }
+    private val anyConstructor by lazy { VmTupleRefAnyTlbConstructor() }
+
+    override val constructors: List<TlbConstructor<out VmTupleRef>> by lazy {
+        listOf(nilConstructor, singleConstructor, anyConstructor)
     }
 
-    object VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRef.Nil>(
+    override fun getConstructor(value: VmTupleRef): TlbConstructor<out VmTupleRef> = when (value) {
+        is VmTupleRef.Nil -> nilConstructor
+        is VmTupleRef.Single -> singleConstructor
+        is VmTupleRef.Any -> anyConstructor
+    }
+
+    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmTupleRef {
+        return when (param) {
+            0 -> nilConstructor.decode(cellSlice, param, negativeParam)
+            1 -> singleConstructor.decode(cellSlice, param, negativeParam)
+            else -> anyConstructor.decode(cellSlice, param, negativeParam)
+        }
+    }
+
+    private class VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRef.Nil>(
         schema = "vm_tupref_nil\$_ = VmTupleRef 0;"
     ) {
         override fun encode(
@@ -33,10 +45,10 @@ private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
         }
     }
 
-    object VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRef.Single>(
+    private class VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRef.Single>(
         schema = "vm_tupref_single\$_ entry:^VmStackValue = VmTupleRef 1;"
     ) {
-        private val vmStackValueCodec = VmStackValue.tlbCodec()
+        private val vmStackValueCodec by lazy { VmStackValue.tlbCodec() }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmTupleRef.Single, param: Int, negativeParam: (Int) -> Unit
@@ -56,10 +68,10 @@ private class VmTupleRefTlbCombinator : TlbCombinator<VmTupleRef>(
         }
     }
 
-    object VmTupleRefAnyTlbConstructor : TlbConstructor<VmTupleRef.Any>(
+    private class VmTupleRefAnyTlbConstructor : TlbConstructor<VmTupleRef.Any>(
         schema = "vm_tupref_any\$_ {n:#} ref:^(VmTuple (n + 2)) = VmTupleRef (n + 2);"
     ) {
-        private val vmTupleCodec = VmTuple.tlbCodec()
+        private val vmTupleCodec by lazy { VmTuple.tlbCodec() }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmTupleRef.Any, param: Int, negativeParam: (Int) -> Unit

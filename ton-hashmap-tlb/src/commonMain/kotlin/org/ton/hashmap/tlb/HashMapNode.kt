@@ -38,12 +38,11 @@ private class HashMapNodeTlbCombinator<X : Any>(
         }
     }
 
-    class HashMapNodeLeafTlbConstructor<X : Any>(
+    private class HashMapNodeLeafTlbConstructor<X : Any>(
         val typeCodec: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeLeaf<X>>(
         schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
     ) {
-        @Suppress("UNCHECKED_CAST")
         override fun encode(
             cellBuilder: CellBuilder,
             value: HashMapNodeLeaf<X>,
@@ -53,7 +52,6 @@ private class HashMapNodeTlbCombinator<X : Any>(
             storeTlb(value.value, typeCodec)
         }
 
-        @Suppress("UNCHECKED_CAST")
         override fun decode(
             cellSlice: CellSlice,
             param: Int,
@@ -64,7 +62,7 @@ private class HashMapNodeTlbCombinator<X : Any>(
         }
     }
 
-    class HashMapNodeForkTlbConstructor<X : Any>(
+    private class HashMapNodeForkTlbConstructor<X : Any>(
         typeCodec: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeFork<X>>(
         schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;"

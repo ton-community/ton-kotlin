@@ -86,7 +86,7 @@ private class CellBuilderImpl(
     private val remainder: Int get() = bits.length - writePosition
     private var writePosition: Int = 0
 
-    override fun endCell(): Cell = Cell(bits.slice(0 .. writePosition - 1), refs)
+    override fun endCell(): Cell = Cell(bits.slice(0 until writePosition), refs)
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
@@ -112,16 +112,22 @@ private class CellBuilderImpl(
     }
 
     override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {
-        val bits = BooleanArray(length) { index ->
-            ((value shr index) and BigInt(1)).toInt() == 1
-        }.reversedArray()
-        storeBits(*bits)
+        check(value.bitLength <= length) { "Integer `$value` does not fit into $length bits" }
+        check(value.sign >= 0) { "Integer `$value` must be unsigned" }
+        storeNumber(value, length)
     }
 
     override fun storeInt(value: BigInt, length: Int): CellBuilder = apply {
         val intBits = BigInt(1) shl (length - 1)
         require(value >= -intBits && value < intBits) { "Can't store an Int, because its value allocates more space than provided." }
-        storeInt(value, length)
+        storeNumber(value, length)
+    }
+
+    private fun storeNumber(value: BigInt, length: Int): CellBuilder = apply {
+        val bits = BooleanArray(length) { index ->
+            ((value shr index) and BigInt(1)).toInt() == 1
+        }.reversedArray()
+        storeBits(*bits)
     }
 
     override fun storeSlice(slice: CellSlice): CellBuilder = apply {
@@ -135,6 +141,8 @@ private class CellBuilderImpl(
             storeRef(ref)
         }
     }
+
+    override fun toString(): String = endCell().toString()
 
     private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
         "Bits overflow. Can't add $length bits. $remainder bits left."

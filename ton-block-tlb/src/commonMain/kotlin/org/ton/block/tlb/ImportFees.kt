@@ -15,8 +15,12 @@ fun ImportFees.Companion.tlbCodec(): TlbCodec<ImportFees> = ImportFeesTlbConstru
 private class ImportFeesTlbConstructor : TlbConstructor<ImportFees>(
     schema = "import_fees\$_ fees_collected:Coins value_imported:CurrencyCollection = ImportFees;"
 ) {
-    private val coinsCodec = Coins.tlbCodec()
-    private val currencyCollectionCodec = CurrencyCollection.tlbCodec()
+    private val coinsCodec by lazy {
+        Coins.tlbCodec()
+    }
+    private val currencyCollectionCodec by lazy {
+        CurrencyCollection.tlbCodec()
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: ImportFees, param: Int, negativeParam: (Int) -> Unit

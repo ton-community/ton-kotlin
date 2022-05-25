@@ -19,14 +19,23 @@ sealed interface VmStackValue {
     @Serializable
     data class TinyInt(
         val value: Long
-    ) : VmStackValue
+    ) : VmStackValue {
+        constructor(byte: Byte) : this(byte.toLong())
+        constructor(short: Short) : this(short.toLong())
+        constructor(int: kotlin.Int) : this(int.toLong())
+    }
 
     @SerialName("vm_stk_int")
     @Serializable
     data class Int(
         @Serializable(BigIntSerializer::class)
         val value: BigInt
-    ) : VmStackValue
+    ) : VmStackValue {
+        constructor(byte: Byte) : this(BigInt(byte))
+        constructor(short: Short) : this(BigInt(short))
+        constructor(int: kotlin.Int) : this(BigInt(int))
+        constructor(long: Long) : this(BigInt(long))
+    }
 
     @SerialName("vm_stk_nan")
     object Nan : VmStackValue

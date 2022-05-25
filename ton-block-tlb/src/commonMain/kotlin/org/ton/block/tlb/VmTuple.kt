@@ -9,15 +9,28 @@ import org.ton.tlb.*
 
 fun VmTuple.Companion.tlbCodec(): TlbCodec<VmTuple> = VmTupleCombinator()
 
-private class VmTupleCombinator : TlbCombinator<VmTuple>(
-    NilTlbConstructor, TConsTlbConstructor
-) {
-    override fun getConstructor(value: VmTuple): TlbConstructor<out VmTuple> = when (value) {
-        is VmTuple.Nil -> NilTlbConstructor
-        is VmTuple.TCons -> TConsTlbConstructor
+private class VmTupleCombinator : TlbCombinator<VmTuple>() {
+    private val nilConstructor by lazy { NilTlbConstructor() }
+    private val tConsConstructor by lazy { TConsTlbConstructor() }
+
+    override val constructors: List<TlbConstructor<out VmTuple>> by lazy {
+        listOf(nilConstructor, tConsConstructor)
     }
 
-    object NilTlbConstructor : TlbConstructor<VmTuple.Nil>(
+    override fun getConstructor(value: VmTuple): TlbConstructor<out VmTuple> = when (value) {
+        is VmTuple.Nil -> nilConstructor
+        is VmTuple.TCons -> tConsConstructor
+    }
+
+    override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): VmTuple {
+        return if (param == 0) {
+            nilConstructor.decode(cellSlice, param, negativeParam)
+        } else {
+            tConsConstructor.decode(cellSlice, param, negativeParam)
+        }
+    }
+
+    private class NilTlbConstructor : TlbConstructor<VmTuple.Nil>(
         schema = "vm_tuple_nil\$_ = VmTuple 0;"
     ) {
         override fun encode(cellBuilder: CellBuilder, value: VmTuple.Nil, param: Int, negativeParam: (Int) -> Unit) {
@@ -28,11 +41,11 @@ private class VmTupleCombinator : TlbCombinator<VmTuple>(
         }
     }
 
-    private object TConsTlbConstructor : TlbConstructor<VmTuple.TCons>(
+    private class TConsTlbConstructor : TlbConstructor<VmTuple.TCons>(
         schema = "vm_tuple_tcons\$_ {n:#} head:(VmTupleRef n) tail:^VmStackValue = VmTuple (n + 1);"
     ) {
-        private val vmTupleRefCodec = VmTupleRef.tlbCodec()
-        private val vmStackValueCodec = VmStackValue.tlbCodec()
+        private val vmTupleRefCodec by lazy { VmTupleRef.tlbCodec() }
+        private val vmStackValueCodec by lazy { VmStackValue.tlbCodec() }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmTuple.TCons, param: Int, negativeParam: (Int) -> Unit

@@ -41,8 +41,12 @@ abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
     abstract override fun toString(): String
 }
 
-fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T =
-    codec.decode(this, param, negativeParam)
+fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T {
+    println("start deserialize: $codec")
+    val result = codec.decode(this, param, negativeParam)
+    println("complete serialize: $codec === $result")
+    return result
+}
 
 fun <T : Any> CellBuilder.storeTlb(
     value: T, codec: TlbEncoder<T>, param: Int = 0, negativeParam: (Int) -> Unit = {}

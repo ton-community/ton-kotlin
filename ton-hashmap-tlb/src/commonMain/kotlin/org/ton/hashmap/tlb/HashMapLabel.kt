@@ -7,18 +7,28 @@ import org.ton.tlb.*
 
 fun HashMapLabel.Companion.tlbCodec(): TlbCodec<HashMapLabel> = HashMapLabelTlbCombinator()
 
-private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
-    HashMapLabelShortTlbConstructor,
-    HashMapLabelLongTlbConstructor,
-    HashMapLabelSameTlbConstructor
-) {
-    override fun getConstructor(value: HashMapLabel): TlbConstructor<out HashMapLabel> = when (value) {
-        is HashMapLabelLong -> HashMapLabelLongTlbConstructor
-        is HashMapLabelSame -> HashMapLabelSameTlbConstructor
-        is HashMapLabelShort -> HashMapLabelShortTlbConstructor
+private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>() {
+    private val shortConstructor by lazy {
+        HashMapLabelShortTlbConstructor()
+    }
+    private val sameConstructor by lazy {
+        HashMapLabelSameTlbConstructor()
+    }
+    private val longConstructor by lazy {
+        HashMapLabelLongTlbConstructor()
     }
 
-    object HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
+    override val constructors: List<TlbConstructor<out HashMapLabel>> by lazy {
+        listOf(shortConstructor, sameConstructor, longConstructor)
+    }
+
+    override fun getConstructor(value: HashMapLabel): TlbConstructor<out HashMapLabel> = when (value) {
+        is HashMapLabelShort -> shortConstructor
+        is HashMapLabelSame -> sameConstructor
+        is HashMapLabelLong -> longConstructor
+    }
+
+    private class HashMapLabelShortTlbConstructor : TlbConstructor<HashMapLabelShort>(
         schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;"
     ) {
         private val unaryCodec by lazy {
@@ -50,7 +60,7 @@ private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
         }
     }
 
-    object HashMapLabelLongTlbConstructor : TlbConstructor<HashMapLabelLong>(
+    private class HashMapLabelLongTlbConstructor : TlbConstructor<HashMapLabelLong>(
         schema = "hml_long\$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;"
     ) {
         override fun encode(
@@ -76,7 +86,7 @@ private class HashMapLabelTlbCombinator : TlbCombinator<HashMapLabel>(
         }
     }
 
-    object HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
+    private class HashMapLabelSameTlbConstructor : TlbConstructor<HashMapLabelSame>(
         schema = "hml_same\$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;"
     ) {
         override fun encode(

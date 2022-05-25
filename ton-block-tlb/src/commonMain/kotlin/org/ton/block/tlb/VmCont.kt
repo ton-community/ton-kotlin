@@ -9,56 +9,94 @@ import org.ton.tlb.*
 
 fun VmCont.Companion.tlbCodec(): TlbCodec<VmCont> = VmContTlbCombinator()
 
-private class VmContTlbCombinator : TlbCombinator<VmCont>(
-    VmContStdTlbConstructor,
-    VmContEnvelopeTlbConstructor,
-    VmContQuitTlbConstructor,
-    VmContQuitExcTlbConstructor,
-    VmContRepeatTlbConstructor,
-    VmContUntilTlbConstructor,
-    VmContAgainTlbConstructor,
-    VmContWhileCondTlbConstructor,
-    VmContWhileBodyTlbConstructor,
-    VmContPushIntTlbConstructor
-) {
-    override fun getConstructor(value: VmCont): TlbConstructor<out VmCont> = when (value) {
-        is VmCont.Again -> VmContAgainTlbConstructor
-        is VmCont.Envelope -> VmContEnvelopeTlbConstructor
-        is VmCont.PushInt -> VmContPushIntTlbConstructor
-        is VmCont.Quit -> VmContQuitTlbConstructor
-        is VmCont.QuitExc -> VmContQuitExcTlbConstructor
-        is VmCont.Repeat -> VmContRepeatTlbConstructor
-        is VmCont.Std -> VmContStdTlbConstructor
-        is VmCont.Until -> VmContUntilTlbConstructor
-        is VmCont.WhileBody -> VmContWhileBodyTlbConstructor
-        is VmCont.WhileCond -> VmContWhileCondTlbConstructor
+private class VmContTlbCombinator : TlbCombinator<VmCont>() {
+
+    private val stdConstructor by lazy {
+        VmContStdTlbConstructor()
+    }
+    private val envelopeConstructor by lazy {
+        VmContEnvelopeTlbConstructor()
+    }
+    private val quitConstructor by lazy {
+        VmContQuitTlbConstructor()
+    }
+    private val quitExcConstructor by lazy {
+        VmContQuitExcTlbConstructor()
+    }
+    private val repeatConstructor by lazy {
+        VmContRepeatTlbConstructor()
+    }
+    private val untilConstructor by lazy {
+        VmContUntilTlbConstructor()
+    }
+    private val againConstructor by lazy {
+        VmContAgainTlbConstructor()
+    }
+    private val whileBodyConstructor by lazy {
+        VmContWhileBodyTlbConstructor()
+    }
+    private val whileCondConstructor by lazy {
+        VmContWhileCondTlbConstructor()
+    }
+    private val pushIntConstructor by lazy {
+        VmContPushIntTlbConstructor()
     }
 
+    override val constructors: List<TlbConstructor<out VmCont>> by lazy {
+        listOf(
+            stdConstructor, envelopeConstructor, quitConstructor, quitExcConstructor, repeatConstructor,
+            untilConstructor, againConstructor, whileBodyConstructor, whileCondConstructor, pushIntConstructor
+        )
+    }
 
-    private object VmContStdTlbConstructor : TlbConstructor<VmCont.Std>(
+    override fun getConstructor(value: VmCont): TlbConstructor<out VmCont> = when (value) {
+        is VmCont.Std -> stdConstructor
+        is VmCont.Envelope -> envelopeConstructor
+        is VmCont.Quit -> quitConstructor
+        is VmCont.QuitExc -> quitExcConstructor
+        is VmCont.Repeat -> repeatConstructor
+        is VmCont.Until -> untilConstructor
+        is VmCont.Again -> againConstructor
+        is VmCont.WhileBody -> whileBodyConstructor
+        is VmCont.WhileCond -> whileCondConstructor
+        is VmCont.PushInt -> pushIntConstructor
+    }
+
+    private class VmContStdTlbConstructor : TlbConstructor<VmCont.Std>(
         schema = "vmc_std\$00 cdata:VmControlData code:VmCellSlice = VmCont;"
     ) {
+        private val vmControlDataCodec by lazy {
+            VmControlData.tlbCodec()
+        }
+        private val vmCellSliceCodec by lazy {
+            VmCellSlice.tlbCodec()
+        }
+
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Std, param: Int, negativeParam: (Int) -> Unit
         ) = cellBuilder {
-            storeTlb(value.cdata, VmControlData.tlbCodec())
-            storeTlb(value.code, VmCellSlice.tlbCodec())
+            storeTlb(value.cdata, vmControlDataCodec)
+            storeTlb(value.code, vmCellSliceCodec)
         }
 
         override fun decode(
             cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit
         ): VmCont.Std = cellSlice {
-            val cdata = loadTlb(VmControlData.tlbCodec())
-            val code = loadTlb(VmCellSlice.tlbCodec())
+            val cdata = loadTlb(vmControlDataCodec)
+            val code = loadTlb(vmCellSliceCodec)
             VmCont.Std(cdata, code)
         }
     }
 
-    private object VmContEnvelopeTlbConstructor : TlbConstructor<VmCont.Envelope>(
+    private class VmContEnvelopeTlbConstructor : TlbConstructor<VmCont.Envelope>(
         schema = "vmc_envelope\$01 cdata:VmControlData next:^VmCont = VmCont;"
     ) {
-        private val vmControlDataCodec = VmControlData.tlbCodec()
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmControlDataCodec by lazy {
+            VmControlData.tlbCodec()
+        }
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Envelope, param: Int, negativeParam: (Int) -> Unit
@@ -80,7 +118,7 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContQuitTlbConstructor : TlbConstructor<VmCont.Quit>(
+    private class VmContQuitTlbConstructor : TlbConstructor<VmCont.Quit>(
         schema = "vmc_quit\$1000 exit_code:int32 = VmCont;"
     ) {
         override fun encode(
@@ -97,7 +135,7 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContQuitExcTlbConstructor : TlbConstructor<VmCont.QuitExc>(
+    private class VmContQuitExcTlbConstructor : TlbConstructor<VmCont.QuitExc>(
         schema = "vmc_quit_exc\$1001 = VmCont;"
     ) {
         override fun encode(
@@ -110,10 +148,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         ): VmCont.QuitExc = VmCont.QuitExc
     }
 
-    private object VmContRepeatTlbConstructor : TlbConstructor<VmCont.Repeat>(
+    private class VmContRepeatTlbConstructor : TlbConstructor<VmCont.Repeat>(
         schema = "vmc_repeat\$10100 count:uint63 body:^VmCont after:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Repeat, param: Int, negativeParam: (Int) -> Unit
@@ -141,10 +181,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContUntilTlbConstructor : TlbConstructor<VmCont.Until>(
+    private class VmContUntilTlbConstructor : TlbConstructor<VmCont.Until>(
         schema = "vmc_until\$110000 body:^VmCont after:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Until, param: Int, negativeParam: (Int) -> Unit
@@ -170,10 +212,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContAgainTlbConstructor : TlbConstructor<VmCont.Again>(
+    private class VmContAgainTlbConstructor : TlbConstructor<VmCont.Again>(
         schema = "vmc_again\$110001 body:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.Again, param: Int, negativeParam: (Int) -> Unit
@@ -193,10 +237,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContWhileCondTlbConstructor : TlbConstructor<VmCont.WhileCond>(
+    private class VmContWhileCondTlbConstructor : TlbConstructor<VmCont.WhileCond>(
         schema = "vmc_while_cond\$110010 cond:^VmCont body:^VmCont after:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.WhileCond, param: Int, negativeParam: (Int) -> Unit
@@ -228,10 +274,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContWhileBodyTlbConstructor : TlbConstructor<VmCont.WhileBody>(
+    private class VmContWhileBodyTlbConstructor : TlbConstructor<VmCont.WhileBody>(
         schema = "vmc_while_body\$110011 cond:^VmCont body:^VmCont after:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.WhileBody, param: Int, negativeParam: (Int) -> Unit
@@ -263,10 +311,12 @@ private class VmContTlbCombinator : TlbCombinator<VmCont>(
         }
     }
 
-    private object VmContPushIntTlbConstructor : TlbConstructor<VmCont.PushInt>(
+    private class VmContPushIntTlbConstructor : TlbConstructor<VmCont.PushInt>(
         schema = "vmc_pushint\$1111 value:int32 next:^VmCont = VmCont;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmCont.PushInt, param: Int, negativeParam: (Int) -> Unit

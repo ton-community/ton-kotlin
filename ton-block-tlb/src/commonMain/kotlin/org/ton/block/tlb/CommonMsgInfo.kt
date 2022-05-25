@@ -7,26 +7,42 @@ import org.ton.tlb.*
 
 fun CommonMsgInfo.Companion.tlbCodec(): TlbCodec<CommonMsgInfo> = CommonMsgInfoTlbCombinator()
 
-private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
-    IntMsgInfoTlbConstructor,
-    ExtInMsgInfoTlbConstructor,
-    ExtOutMsgInfoTlbConstructor
-) {
-    override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
-        is CommonMsgInfo.IntMsgInfo -> IntMsgInfoTlbConstructor
-        is CommonMsgInfo.ExtInMsgInfo -> ExtInMsgInfoTlbConstructor
-        is CommonMsgInfo.ExtOutMsgInfo -> ExtOutMsgInfoTlbConstructor
+private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
+    private val intMsgInfoConstructor by lazy {
+        IntMsgInfoTlbConstructor()
+    }
+    private val extInMsgConstructor by lazy {
+        IntMsgInfoTlbConstructor()
+    }
+    private val extOutMsgInfoConstructor by lazy {
+        ExtOutMsgInfoTlbConstructor()
     }
 
-    object IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.IntMsgInfo>(
+    override val constructors: List<TlbConstructor<out CommonMsgInfo>> by lazy {
+        listOf(intMsgInfoConstructor, extInMsgConstructor, extOutMsgInfoConstructor)
+    }
+
+    override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
+        is CommonMsgInfo.IntMsgInfo -> intMsgInfoConstructor
+        is CommonMsgInfo.ExtInMsgInfo -> extInMsgConstructor
+        is CommonMsgInfo.ExtOutMsgInfo -> extOutMsgInfoConstructor
+    }
+
+    private class IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.IntMsgInfo>(
         schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool " +
                 "src:MsgAddressInt dest:MsgAddressInt " +
                 "value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins " +
                 "created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
     ) {
-        private val msgAddressIntCodec = MsgAddressInt.tlbCodec()
-        private val currencyCollectionCodec = CurrencyCollection.tlbCodec()
-        private val coinsCodec = Coins.tlbCodec()
+        private val msgAddressIntCodec by lazy {
+            MsgAddressInt.tlbCodec()
+        }
+        private val currencyCollectionCodec by lazy {
+            CurrencyCollection.tlbCodec()
+        }
+        private val coinsCodec by lazy {
+            Coins.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,
@@ -74,12 +90,18 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
         }
     }
 
-    object ExtInMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.ExtInMsgInfo>(
+    private class ExtInMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.ExtInMsgInfo>(
         schema = "ext_in_msg_info\$10 src:MsgAddressExt dest:MsgAddressInt import_fee:Coins = CommonMsgInfo;"
     ) {
-        private val msgAddressExtCodec = MsgAddressExt.tlbCodec()
-        private val msgAddressIntCodec = MsgAddressInt.tlbCodec()
-        private val coinsCodec = Coins.tlbCodec()
+        private val msgAddressExtCodec by lazy {
+            MsgAddressExt.tlbCodec()
+        }
+        private val msgAddressIntCodec by lazy {
+            MsgAddressInt.tlbCodec()
+        }
+        private val coinsCodec by lazy {
+            Coins.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,
@@ -104,11 +126,15 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
         }
     }
 
-    object ExtOutMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.ExtOutMsgInfo>(
+    private class ExtOutMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfo.ExtOutMsgInfo>(
         schema = "ext_out_msg_info\$11 src:MsgAddressInt dest:MsgAddressExt created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
     ) {
-        private val msgAddressIntCodec = MsgAddressInt.tlbCodec()
-        private val msgAddressExtCodec = MsgAddressExt.tlbCodec()
+        private val msgAddressIntCodec by lazy {
+            MsgAddressInt.tlbCodec()
+        }
+        private val msgAddressExtCodec by lazy {
+            MsgAddressExt.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,

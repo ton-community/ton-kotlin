@@ -16,8 +16,12 @@ fun VmSaveList.Companion.tlbCodec(): TlbCodec<VmSaveList> = VmSaveListTlbConstru
 private class VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
     schema = "_ cregs:(HashmapE 4 VmStackValue) = VmSaveList;"
 ) {
-    private val vmStackValueCodec = VmStackValue.tlbCodec()
-    private val hashmapCombinator = HashMapE.tlbCodec(vmStackValueCodec)
+    private val vmStackValueCodec by lazy {
+        VmStackValue.tlbCodec()
+    }
+    private val hashmapCombinator by lazy {
+        HashMapE.tlbCodec(vmStackValueCodec)
+    }
 
     override fun encode(
         cellBuilder: CellBuilder,

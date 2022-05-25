@@ -10,30 +10,37 @@ import org.ton.tlb.*
 
 fun VmStackValue.Companion.tlbCodec(): TlbCodec<VmStackValue> = VmStackValueTlbCombinator()
 
-private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
-    VmStackValueBuilderTlbConstructor,
-    VmStackValueCellConstructor,
-    VmStackValueContTlbConstructor,
-    VmStackValueIntConstructor,
-    VmStackValueNanConstructor,
-    VmStackValueNullConstructor,
-    VmStackValueSliceTlbConstructor,
-    VmStackValueTinyIntConstructor,
-    VmStackValueTupleConstructor
-) {
-    override fun getConstructor(value: VmStackValue): TlbConstructor<out VmStackValue> = when (value) {
-        is VmStackValue.Builder -> VmStackValueBuilderTlbConstructor
-        is VmStackValue.Cell -> VmStackValueCellConstructor
-        is VmStackValue.Cont -> VmStackValueContTlbConstructor
-        is VmStackValue.Int -> VmStackValueIntConstructor
-        is VmStackValue.Nan -> VmStackValueNanConstructor
-        is VmStackValue.Null -> VmStackValueNullConstructor
-        is VmStackValue.Slice -> VmStackValueSliceTlbConstructor
-        is VmStackValue.TinyInt -> VmStackValueTinyIntConstructor
-        is VmStackValue.Tuple -> VmStackValueTupleConstructor
+private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
+    private val nullConstructor by lazy { VmStackValueNullConstructor() }
+    private val tinyIntConstructor by lazy { VmStackValueTinyIntConstructor() }
+    private val intConstructor by lazy { VmStackValueIntConstructor() }
+    private val nanConstructor by lazy { VmStackValueNanConstructor() }
+    private val cellConstructor by lazy { VmStackValueCellConstructor() }
+    private val sliceConstructor by lazy { VmStackValueSliceTlbConstructor() }
+    private val builderConstructor by lazy { VmStackValueBuilderTlbConstructor() }
+    private val contConstructor by lazy { VmStackValueContTlbConstructor() }
+    private val tupleConstructor by lazy { VmStackValueTupleConstructor() }
+
+    override val constructors: List<TlbConstructor<out VmStackValue>> by lazy {
+        listOf(
+            nullConstructor, tinyIntConstructor, intConstructor, nanConstructor, cellConstructor, sliceConstructor,
+            builderConstructor, contConstructor, tupleConstructor
+        )
     }
 
-    private object VmStackValueNullConstructor : TlbConstructor<VmStackValue.Null>(
+    override fun getConstructor(value: VmStackValue): TlbConstructor<out VmStackValue> = when (value) {
+        is VmStackValue.Null -> nullConstructor
+        is VmStackValue.TinyInt -> tinyIntConstructor
+        is VmStackValue.Int -> intConstructor
+        is VmStackValue.Nan -> nanConstructor
+        is VmStackValue.Cell -> cellConstructor
+        is VmStackValue.Slice -> sliceConstructor
+        is VmStackValue.Builder -> builderConstructor
+        is VmStackValue.Cont -> contConstructor
+        is VmStackValue.Tuple -> tupleConstructor
+    }
+
+    private class VmStackValueNullConstructor : TlbConstructor<VmStackValue.Null>(
         schema = "vm_stk_null#00 = VmStackValue;"
     ) {
         override fun encode(
@@ -51,7 +58,7 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         ): VmStackValue.Null = VmStackValue.Null
     }
 
-    private object VmStackValueTinyIntConstructor : TlbConstructor<VmStackValue.TinyInt>(
+    private class VmStackValueTinyIntConstructor : TlbConstructor<VmStackValue.TinyInt>(
         schema = "vm_stk_tinyint#01 value:int64 = VmStackValue;"
     ) {
         override fun encode(
@@ -73,7 +80,7 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueIntConstructor : TlbConstructor<VmStackValue.Int>(
+    private class VmStackValueIntConstructor : TlbConstructor<VmStackValue.Int>(
         schema = "vm_stk_int#0201_ value:int257 = VmStackValue;"
     ) {
         override fun encode(
@@ -95,7 +102,7 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueNanConstructor : TlbConstructor<VmStackValue.Nan>(
+    private class VmStackValueNanConstructor : TlbConstructor<VmStackValue.Nan>(
         schema = "vm_stk_nan#02ff = VmStackValue;"
     ) {
         override fun encode(
@@ -113,7 +120,7 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         ): VmStackValue.Nan = VmStackValue.Nan
     }
 
-    private object VmStackValueCellConstructor : TlbConstructor<VmStackValue.Cell>(
+    private class VmStackValueCellConstructor : TlbConstructor<VmStackValue.Cell>(
         schema = "vm_stk_cell#03 cell:^Cell = VmStackValue;"
     ) {
         override fun encode(
@@ -135,10 +142,12 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueSliceTlbConstructor : TlbConstructor<VmStackValue.Slice>(
+    private class VmStackValueSliceTlbConstructor : TlbConstructor<VmStackValue.Slice>(
         schema = "vm_stk_slice#04 _:VmCellSlice = VmStackValue;"
     ) {
-        private val vmCellSliceCodec = VmCellSlice.tlbCodec()
+        private val vmCellSliceCodec by lazy {
+            VmCellSlice.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,
@@ -159,7 +168,7 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueBuilderTlbConstructor : TlbConstructor<VmStackValue.Builder>(
+    private class VmStackValueBuilderTlbConstructor : TlbConstructor<VmStackValue.Builder>(
         schema = "vm_stk_builder#05 cell:^Cell = VmStackValue;"
     ) {
         override fun encode(
@@ -181,10 +190,12 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueContTlbConstructor : TlbConstructor<VmStackValue.Cont>(
+    private class VmStackValueContTlbConstructor : TlbConstructor<VmStackValue.Cont>(
         schema = "vm_stk_cont#06 cont:VmCont = VmStackValue;"
     ) {
-        private val vmContCodec = VmCont.tlbCodec()
+        private val vmContCodec by lazy {
+            VmCont.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmStackValue.Cont, param: Int, negativeParam: (Int) -> Unit
@@ -200,10 +211,12 @@ private class VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
         }
     }
 
-    private object VmStackValueTupleConstructor : TlbConstructor<VmStackValue.Tuple>(
+    private class VmStackValueTupleConstructor : TlbConstructor<VmStackValue.Tuple>(
         schema = "vm_stk_tuple#07 len:(## 16) data:(VmTuple len) = VmStackValue;"
     ) {
-        private val vmTupleCodec = VmTuple.tlbCodec()
+        private val vmTupleCodec by lazy {
+            VmTuple.tlbCodec()
+        }
 
         override fun encode(
             cellBuilder: CellBuilder, value: VmStackValue.Tuple, param: Int, negativeParam: (Int) -> Unit

@@ -37,4 +37,21 @@ sealed interface VmStackList : Iterable<VmStackValue> {
             return value
         }
     }
+
+    companion object {
+        @JvmStatic
+        fun of(vararg stackValues: VmStackValue) = of(stackValues.toList())
+
+        @JvmStatic
+        fun of(stackValues: Iterable<VmStackValue>): VmStackList {
+            var stackList: VmStackList = Nil
+            stackValues.forEach { value ->
+                stackList = Cons(stackList, value)
+            }
+            return stackList
+        }
+    }
 }
+
+fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)
+fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)

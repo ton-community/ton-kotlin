@@ -18,10 +18,18 @@ fun VmControlData.Companion.tlbCodec(): TlbCodec<VmControlData> = VmControlDataT
 private class VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     schema = "vm_ctl_data\$_ nargs:(Maybe uint13) stack:(Maybe VmStack) save:VmSaveList cp:(Maybe int16) = VmControlData;"
 ) {
-    private val maybeUint13Constructor = Maybe.tlbCodec(UIntTlbConstructor.int(13))
-    private val maybeVmStackConstructor = Maybe.tlbCodec(VmStack.tlbCodec())
-    private val vmSaveListCodec = VmSaveList.tlbCodec()
-    private val maybeInt16Constructor = Maybe.tlbCodec(IntTlbConstructor.int(16))
+    private val maybeUint13Constructor by lazy {
+        Maybe.tlbCodec(UIntTlbConstructor.int(13))
+    }
+    private val maybeVmStackConstructor by lazy {
+        Maybe.tlbCodec(VmStack.tlbCodec())
+    }
+    private val vmSaveListCodec by lazy {
+        VmSaveList.tlbCodec()
+    }
+    private val maybeInt16Constructor by lazy {
+        Maybe.tlbCodec(IntTlbConstructor.int(16))
+    }
 
     override fun encode(
         cellBuilder: CellBuilder,

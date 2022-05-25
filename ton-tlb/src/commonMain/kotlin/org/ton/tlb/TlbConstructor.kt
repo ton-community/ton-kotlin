@@ -13,7 +13,6 @@ abstract class TlbConstructor<T : Any>(
     override fun toString(): String = schema
 
     companion object {
-        // TODO: tests for `vm_stk_int#0201_ value:int257 = VmStackValue;`
         fun calculateId(@Language("TL-B") schema: String): BitString {
             if (schema.isEmpty()) return BitString(0)
             try {
@@ -26,7 +25,7 @@ abstract class TlbConstructor<T : Any>(
                 } else if (prefix.contains('#')) {
                     val (_, id) = prefix.split('#')
                     if (id != "_") {
-                        BitString(id)
+                        return BitString(id)
                     }
                 }
                 return BitString(0)

@@ -30,7 +30,7 @@ private class HashMapETlbCombinator<T : Any>(
         is EmptyHashMapE -> emptyConstructor
     }
 
-    class EmptyHashMapETlbConstructor<X : Any> : TlbConstructor<EmptyHashMapE<X>>(
+    private class EmptyHashMapETlbConstructor<X : Any> : TlbConstructor<EmptyHashMapE<X>>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
     ) {
         override fun encode(
@@ -47,7 +47,7 @@ private class HashMapETlbCombinator<T : Any>(
         ): EmptyHashMapE<X> = EmptyHashMapE()
     }
 
-    class RootHashMapETlbConstructor<X : Any>(
+    private class RootHashMapETlbConstructor<X : Any>(
         typeCodec: TlbCodec<X>
     ) : TlbConstructor<RootHashMapE<X>>(
         schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;"

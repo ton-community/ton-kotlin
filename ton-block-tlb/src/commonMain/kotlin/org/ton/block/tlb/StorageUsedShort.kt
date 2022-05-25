@@ -14,7 +14,9 @@ fun StorageUsedShort.Companion.tlbCodec(): TlbCodec<StorageUsedShort> = StorageU
 private class StorageUsedShortTlbConstructor : TlbConstructor<StorageUsedShort>(
     schema = "storage_used_short\$_ cells:(VarUInteger 7) bits:(VarUInteger 7) = StorageUsedShort;"
 ) {
-    private val varUInteger7Codec = VarUInteger.tlbCodec(7)
+    private val varUInteger7Codec by lazy {
+        VarUInteger.tlbCodec(7)
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: StorageUsedShort, param: Int, negativeParam: (Int) -> Unit

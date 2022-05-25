@@ -8,4 +8,6 @@ import kotlinx.serialization.Serializable
 data class VmStack(
     val depth: Int,
     val stack: VmStackList
-)
+) {
+    constructor(stack: VmStackList) : this(stack.count(), stack)
+}

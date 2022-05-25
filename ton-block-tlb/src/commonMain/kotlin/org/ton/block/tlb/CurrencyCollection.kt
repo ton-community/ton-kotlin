@@ -15,8 +15,12 @@ fun CurrencyCollection.Companion.tlbCodec(): TlbCodec<CurrencyCollection> = Curr
 private class CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(
     schema = "currencies\$_ coins:Coins other:ExtraCurrencyCollection = CurrencyCollection;"
 ) {
-    private val coinsCodec = Coins.tlbCodec()
-    private val extraCurrencyCollectionCodec = ExtraCurrencyCollection.tlbCodec()
+    private val coinsCodec by lazy {
+        Coins.tlbCodec()
+    }
+    private val extraCurrencyCollectionCodec by lazy {
+        ExtraCurrencyCollection.tlbCodec()
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: CurrencyCollection, param: Int, negativeParam: (Int) -> Unit

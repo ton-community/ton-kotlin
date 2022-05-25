@@ -10,18 +10,29 @@ import org.ton.tlb.*
 
 fun MsgAddressInt.Companion.tlbCodec(): TlbCodec<MsgAddressInt> = MsgAddressIntTlbCombinator()
 
-private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
-    AddrStdTlbConstructor, AddrVarTlbConstructor
-) {
-    override fun getConstructor(value: MsgAddressInt): TlbConstructor<out MsgAddressInt> = when (value) {
-        is MsgAddressInt.AddrStd -> AddrStdTlbConstructor
-        is MsgAddressInt.AddrVar -> AddrVarTlbConstructor
+private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>() {
+    private val addrStdConstructor by lazy {
+        AddrStdTlbConstructor()
+    }
+    private val addrVarConstructor by lazy {
+        AddrVarTlbConstructor()
     }
 
-    object AddrStdTlbConstructor : TlbConstructor<MsgAddressInt.AddrStd>(
+    override val constructors: List<TlbConstructor<out MsgAddressInt>> by lazy {
+        listOf(addrStdConstructor, addrVarConstructor)
+    }
+
+    override fun getConstructor(value: MsgAddressInt): TlbConstructor<out MsgAddressInt> = when (value) {
+        is MsgAddressInt.AddrStd -> addrStdConstructor
+        is MsgAddressInt.AddrVar -> addrVarConstructor
+    }
+
+    private class AddrStdTlbConstructor : TlbConstructor<MsgAddressInt.AddrStd>(
         schema = "addr_std\$10 anycast:(Maybe Anycast) workchain_id:int8 address:bits256 = MsgAddressInt;"
     ) {
-        private val maybeAnycastCodec = Maybe.tlbCodec(Anycast.tlbCodec())
+        private val maybeAnycastCodec by lazy {
+            Maybe.tlbCodec(Anycast.tlbCodec())
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,
@@ -44,10 +55,12 @@ private class MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
         }
     }
 
-    object AddrVarTlbConstructor : TlbConstructor<MsgAddressInt.AddrVar>(
+    private class AddrVarTlbConstructor : TlbConstructor<MsgAddressInt.AddrVar>(
         schema = "addr_var\$11 anycast:(Maybe Anycast) addr_len:(## 9) workchain_id:int32 address:(bits addr_len) = MsgAddressInt;"
     ) {
-        private val maybeAnycastCodec = Maybe.tlbCodec(Anycast.tlbCodec())
+        private val maybeAnycastCodec by lazy {
+            Maybe.tlbCodec(Anycast.tlbCodec())
+        }
 
         override fun encode(
             cellBuilder: CellBuilder,

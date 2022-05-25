@@ -17,8 +17,12 @@ fun ExtraCurrencyCollection.Companion.tlbCodec(): TlbCodec<ExtraCurrencyCollecti
 private class ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
     schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
 ) {
-    private val varUInteger32Codec = VarUInteger.tlbCodec(32)
-    private val hashMapE32Codec = HashMapE.tlbCodec(varUInteger32Codec)
+    private val varUInteger32Codec by lazy {
+        VarUInteger.tlbCodec(32)
+    }
+    private val hashMapE32Codec by lazy {
+        HashMapE.tlbCodec(varUInteger32Codec)
+    }
 
     override fun encode(
         cellBuilder: CellBuilder,

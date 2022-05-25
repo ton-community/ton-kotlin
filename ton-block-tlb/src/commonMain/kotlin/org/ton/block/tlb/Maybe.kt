@@ -12,12 +12,18 @@ fun <X : Any> Maybe.Companion.tlbCodec(typeCodec: TlbCodec<X>): TlbCodec<Maybe<X
 private class MaybeTlbCombinator<X : Any>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<Maybe<X>>() {
-    private val nothingConstructor = NothingConstructor<X>()
-    private val justConstructor = JustConstructor(typeCodec)
+    private val nothingConstructor by lazy {
+        NothingConstructor<X>()
+    }
+    private val justConstructor by lazy {
+        JustConstructor(typeCodec)
+    }
 
-    override val constructors: List<TlbConstructor<out Maybe<X>>> = listOf(
-        nothingConstructor, justConstructor
-    )
+    override val constructors: List<TlbConstructor<out Maybe<X>>> by lazy {
+        listOf(
+            nothingConstructor, justConstructor
+        )
+    }
 
     override fun getConstructor(value: Maybe<X>): TlbConstructor<out Maybe<X>> = when (value) {
         is Just -> justConstructor

@@ -1,9 +1,6 @@
 package org.ton.cell
 
-import org.ton.bigint.BigInt
-import org.ton.bigint.bitLength
-import org.ton.bigint.minus
-import org.ton.bigint.times
+import org.ton.bigint.*
 import org.ton.bitstring.BitString
 
 interface CellSlice {
@@ -70,7 +67,8 @@ private class CellSliceImpl(
         refs.maxOfOrNull { it.maxDepth } ?: 0
     }
 
-    override fun endParse() = check(bitsPosition == bits.length)
+    override fun endParse() =
+        check(bitsPosition == bits.length) { "bitsPosition: $bitsPosition != bits.length: ${bits.length}" }
 
     override fun loadRef(): Cell {
         checkRefsOverflow()
@@ -132,7 +130,7 @@ private class CellSliceImpl(
 
     override fun preloadInt(length: Int): BigInt {
         val uint = preloadUInt(length)
-        val int = BigInt(1 shl (length - 1))
+        val int = BigInt(1) shl (length - 1)
         return if (uint >= int) uint - (int * 2) else uint
     }
 
@@ -144,6 +142,7 @@ private class CellSliceImpl(
 
     override fun preloadUInt(length: Int): BigInt {
         val bits = preloadBits(length)
+        // TODO: optimize with bit operations
         val intBits = bits.joinToString(separator = "") { if (it) "1" else "0" }
         return BigInt(intBits, 2)
     }

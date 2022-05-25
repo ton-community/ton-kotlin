@@ -9,15 +9,20 @@ import org.ton.tlb.TlbConstructor
 
 fun MsgAddressExt.Companion.tlbCodec(): TlbCodec<MsgAddressExt> = MsgAddressExtTlbCombinator()
 
-private class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
-    AddrNoneTlbConstructor, AddrExternTlbConstructor
-) {
-    override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {
-        is MsgAddressExt.AddrExtern -> AddrExternTlbConstructor
-        is MsgAddressExt.AddrNone -> AddrNoneTlbConstructor
+private class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>() {
+    private val addrNoneConstructor by lazy { AddrNoneTlbConstructor() }
+    private val addrExternConstructor by lazy { AddrExternTlbConstructor() }
+
+    override val constructors: List<TlbConstructor<out MsgAddressExt>> by lazy {
+        listOf(addrNoneConstructor, addrExternConstructor)
     }
 
-    private object AddrNoneTlbConstructor : TlbConstructor<MsgAddressExt.AddrNone>(
+    override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {
+        is MsgAddressExt.AddrNone -> addrNoneConstructor
+        is MsgAddressExt.AddrExtern -> addrExternConstructor
+    }
+
+    private class AddrNoneTlbConstructor : TlbConstructor<MsgAddressExt.AddrNone>(
         schema = "addr_none\$00 = MsgAddressExt;"
     ) {
         override fun encode(
@@ -33,7 +38,7 @@ private class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
         }
     }
 
-    private object AddrExternTlbConstructor : TlbConstructor<MsgAddressExt.AddrExtern>(
+    private class AddrExternTlbConstructor : TlbConstructor<MsgAddressExt.AddrExtern>(
         schema = "addr_extern\$01 len:(## 9) external_address:(bits len) = MsgAddressExt;"
     ) {
         override fun encode(

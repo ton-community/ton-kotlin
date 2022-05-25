@@ -14,7 +14,9 @@ fun Coins.Companion.tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor()
 private class CoinsTlbConstructor : TlbConstructor<Coins>(
     schema = "nanocoins\$_ amount:(VarUInteger 16) = Coins;"
 ) {
-    private val varUIntegerCodec = VarUInteger.tlbCodec(16)
+    private val varUIntegerCodec by lazy {
+        VarUInteger.tlbCodec(16)
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: Coins, param: Int, negativeParam: (Int) -> Unit

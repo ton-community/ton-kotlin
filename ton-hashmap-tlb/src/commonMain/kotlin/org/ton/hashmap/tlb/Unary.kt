@@ -1,6 +1,5 @@
 package org.ton.hashmap.tlb
 
-import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.Unary
@@ -10,18 +9,28 @@ import org.ton.tlb.*
 
 fun Unary.Companion.tlbCodec(): TlbCodec<Unary> = UnaryTlbCombinator()
 
-private class UnaryTlbCombinator : TlbCombinator<Unary>(
-    UnaryZeroTlbConstructor,
-    UnarySuccessTlbConstructor
-) {
-    override fun getConstructor(value: Unary): TlbConstructor<out Unary> = when (value) {
-        is UnarySuccess -> UnarySuccessTlbConstructor
-        is UnaryZero -> UnaryZeroTlbConstructor
+private class UnaryTlbCombinator : TlbCombinator<Unary>() {
+    private val unarySuccessConstructor by lazy {
+        UnarySuccessTlbConstructor()
+    }
+    private val unaryZeroConstructor by lazy {
+        UnaryZeroTlbConstructor()
     }
 
-    object UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
-        schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);",
-        id = BitString.binary("1")
+    override val constructors: List<TlbConstructor<out Unary>> by lazy {
+        listOf(
+            unarySuccessConstructor,
+            unaryZeroConstructor
+        )
+    }
+
+    override fun getConstructor(value: Unary): TlbConstructor<out Unary> = when (value) {
+        is UnarySuccess -> unarySuccessConstructor
+        is UnaryZero -> unaryZeroConstructor
+    }
+
+    private class UnarySuccessTlbConstructor : TlbConstructor<UnarySuccess>(
+        schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
     ) {
         private val unaryCodec = Unary.tlbCodec()
 
@@ -48,9 +57,8 @@ private class UnaryTlbCombinator : TlbCombinator<Unary>(
         }
     }
 
-    object UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
-        schema = "unary_zero\$0 = Unary ~0;",
-        id = BitString.binary("0")
+    private class UnaryZeroTlbConstructor : TlbConstructor<UnaryZero>(
+        schema = "unary_zero\$0 = Unary ~0;"
     ) {
         override fun encode(
             cellBuilder: CellBuilder,

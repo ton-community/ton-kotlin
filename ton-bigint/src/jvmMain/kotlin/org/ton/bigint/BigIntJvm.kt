@@ -11,6 +11,7 @@ actual fun Number.toBigInt(): BigInt = when (this) {
 }
 
 actual val BigInt.bitLength get() = bitLength()
+actual val BigInt.sign get() = signum()
 
 actual operator fun BigInt.plus(number: Number): BigInt = add(number.toBigInt())
 

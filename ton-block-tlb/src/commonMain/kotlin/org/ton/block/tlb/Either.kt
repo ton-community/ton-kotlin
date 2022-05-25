@@ -9,8 +9,12 @@ fun <X : Any, Y : Any> Either.Companion.tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>)
     EitherTlbCombinator(x, y)
 
 private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<X, Y>>() {
-    private val leftCodec = LeftTlbConstructor<X, Y>(x)
-    private val rightCodec = RightTlbConstructor<X, Y>(y)
+    private val leftCodec by lazy {
+        LeftTlbConstructor<X, Y>(x)
+    }
+    private val rightCodec by lazy {
+        RightTlbConstructor<X, Y>(y)
+    }
 
     override val constructors: List<TlbConstructor<out Either<X, Y>>> = listOf(
         leftCodec, rightCodec

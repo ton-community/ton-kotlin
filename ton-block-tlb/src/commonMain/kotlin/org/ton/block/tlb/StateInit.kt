@@ -21,10 +21,18 @@ fun StateInit.Companion.tlbCodec(): TlbCodec<StateInit> = StateInitTlbConstructo
 private class StateInitTlbConstructor : TlbConstructor<StateInit>(
     schema = "_ split_depth:(Maybe (## 5)) special:(Maybe TickTock) code:(Maybe ^Cell) data:(Maybe ^Cell) library:(HashmapE 256 SimpleLib) = StateInit;"
 ) {
-    private val maybeUint5Codec = Maybe.tlbCodec(UIntTlbConstructor.int(5))
-    private val maybeTickTockCodec = Maybe.tlbCodec(TickTock.tlbCodec())
-    private val maybeCell = Maybe.tlbCodec(Cell.tlbCodec())
-    private val hashMapESimpleLibCodec = HashMapE.tlbCodec(SimpleLib.tlbCodec())
+    private val maybeUint5Codec by lazy {
+        Maybe.tlbCodec(UIntTlbConstructor.int(5))
+    }
+    private val maybeTickTockCodec by lazy {
+        Maybe.tlbCodec(TickTock.tlbCodec())
+    }
+    private val maybeCell by lazy {
+        Maybe.tlbCodec(Cell.tlbCodec())
+    }
+    private val hashMapESimpleLibCodec by lazy {
+        HashMapE.tlbCodec(SimpleLib.tlbCodec())
+    }
 
     override fun encode(
         cellBuilder: CellBuilder, value: StateInit, param: Int, negativeParam: (Int) -> Unit

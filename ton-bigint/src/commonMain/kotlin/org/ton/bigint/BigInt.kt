@@ -42,3 +42,4 @@ object BigIntSerializer : KSerializer<BigInt> {
 }
 
 expect val BigInt.bitLength: Int
+expect val BigInt.sign: Int

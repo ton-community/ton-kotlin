@@ -19,13 +19,13 @@ private class MessageTlbConstructor<X : Any>(
             "init:(Maybe (Either StateInit ^StateInit)) " +
             "body:(Either X ^X) = Message X;"
 ) {
-    private val commonMsgInfoCodec = CommonMsgInfo.tlbCodec()
-    private val stateInitCodec = StateInit.tlbCodec()
-    private val referencedStateInitCodec = Cell.tlbCodec(stateInitCodec)
-    private val eitherStateInitCodec = Either.tlbCodec(stateInitCodec, referencedStateInitCodec)
-    private val maybeEitherCodec = Maybe.tlbCodec(eitherStateInitCodec)
-    private val referencedXCodec = Cell.tlbCodec(x)
-    private val eitherXCodec = Either.tlbCodec(x, referencedXCodec)
+    private val commonMsgInfoCodec by lazy { CommonMsgInfo.tlbCodec() }
+    private val stateInitCodec by lazy { StateInit.tlbCodec() }
+    private val referencedStateInitCodec by lazy { Cell.tlbCodec(stateInitCodec) }
+    private val eitherStateInitCodec by lazy { Either.tlbCodec(stateInitCodec, referencedStateInitCodec) }
+    private val maybeEitherCodec by lazy { Maybe.tlbCodec(eitherStateInitCodec) }
+    private val referencedXCodec by lazy { Cell.tlbCodec(x) }
+    private val eitherXCodec by lazy { Either.tlbCodec(x, referencedXCodec) }
 
     override fun encode(
         cellBuilder: CellBuilder, value: Message<X>, param: Int, negativeParam: (Int) -> Unit

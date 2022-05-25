@@ -108,7 +108,9 @@ data class Cell(
 
     private fun toString(appendable: Appendable, indent: String = "") {
         appendable.append(indent)
+        appendable.append("x{")
         appendable.append(bits.toString())
+        appendable.append("}")
         if (references.isNotEmpty()) {
             appendable.append('\n')
             references.forEach { reference ->
