@@ -66,7 +66,7 @@ private class CellSliceImpl(
     override var bitsPosition: Int = 0,
     override var refsPosition: Int = 0
 ) : CellSlice {
-    constructor(cell: Cell) : this(cell.bits, cell.references)
+    constructor(cell: Cell) : this(cell.bits, cell.refs)
 
     override val depth: Int by lazy {
         refs.maxOfOrNull { it.maxDepth } ?: 0

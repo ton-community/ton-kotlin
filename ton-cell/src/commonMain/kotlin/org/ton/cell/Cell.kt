@@ -10,9 +10,9 @@ import kotlin.math.floor
 
 @Serializable
 data class Cell(
-        val bits: BitString,
-        val references: List<Cell> = emptyList(),
-        val type: CellType = CellType.ORDINARY
+    val bits: BitString,
+    val refs: List<Cell> = emptyList(),
+    val type: CellType = CellType.ORDINARY
 ) {
     constructor(
             bits: String,
@@ -28,17 +28,17 @@ data class Cell(
 
     val maxLevel: Int by lazy {
         // TODO: level calculation differ for exotic cells
-        references.maxOfOrNull { it.maxLevel } ?: 0
+        refs.maxOfOrNull { it.maxLevel } ?: 0
     }
 
     val maxDepth: Int by lazy {
-        val maxDepth = references.maxOf { it.maxDepth }
-        if (references.isNotEmpty()) maxDepth + 1 else maxDepth
+        val maxDepth = refs.maxOf { it.maxDepth }
+        if (refs.isNotEmpty()) maxDepth + 1 else maxDepth
     }
 
     fun treeWalk(): Sequence<Cell> = sequence {
-        yieldAll(references)
-        references.forEach { reference ->
+        yieldAll(refs)
+        refs.forEach { reference ->
             yieldAll(reference.treeWalk())
         }
     }
@@ -71,7 +71,7 @@ data class Cell(
         other as Cell
 
         if (bits != other.bits) return false
-        if (references != other.references) return false
+        if (refs != other.refs) return false
         if (type != other.type) return false
 
         return true
@@ -79,13 +79,13 @@ data class Cell(
 
     override fun hashCode(): Int {
         var result = bits.hashCode()
-        result = 31 * result + references.hashCode()
+        result = 31 * result + refs.hashCode()
         result = 31 * result + type.hashCode()
         return result
     }
 
     private fun referencesDescriptor(): Byte =
-            (references.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
+        (refs.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
 
     private fun bitsDescriptor(): Byte =
             (ceil(bits.length / 8.0) + floor(bits.length / 8.0)).toInt().toByte()
@@ -96,11 +96,11 @@ data class Cell(
     private fun representation(): ByteArray = buildPacket {
         writeFully(descriptors())
         writeFully(augmentedBytes())
-        references.forEach { reference ->
+        refs.forEach { reference ->
             val depth = reference.maxDepth
             writeInt(depth)
         }
-        references.forEach { reference ->
+        refs.forEach { reference ->
             val hash = reference.hash()
             writeFully(hash)
         }
@@ -111,9 +111,9 @@ data class Cell(
         appendable.append("x{")
         appendable.append(bits.toString())
         appendable.append("}")
-        if (references.isNotEmpty()) {
+        if (refs.isNotEmpty()) {
             appendable.append('\n')
-            references.forEach { reference ->
+            refs.forEach { reference ->
                 reference.toString(appendable, "$indent ")
             }
         }

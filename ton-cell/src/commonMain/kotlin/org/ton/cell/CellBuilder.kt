@@ -69,6 +69,9 @@ interface CellBuilder {
 
     companion object {
         @JvmStatic
+        fun of(cell: Cell): CellBuilder = CellBuilderImpl(BitString.MAX_LENGTH, cell.bits, cell.refs.toMutableList())
+
+        @JvmStatic
         fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
 
         @JvmStatic
@@ -77,12 +80,17 @@ interface CellBuilder {
     }
 }
 
-private class CellBuilderImpl(
-    maxLength: Int
-) : CellBuilder {
-    override var bits: BitString = BitString(maxLength)
-    override var refs: MutableList<Cell> = ArrayList()
+fun CellBuilder(cell: Cell): CellBuilder =
+    CellBuilder.of(cell)
 
+fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder =
+    CellBuilderImpl(maxLength).apply(builder)
+
+private class CellBuilderImpl(
+    maxLength: Int,
+    override var bits: BitString = BitString(maxLength),
+    override var refs: MutableList<Cell> = ArrayList()
+) : CellBuilder {
     private val remainder: Int get() = bits.length - writePosition
     private var writePosition: Int = 0
 

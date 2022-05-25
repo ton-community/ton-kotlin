@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bigint.BigInt
 import org.ton.bigint.BigIntSerializer
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 
 @JsonClassDiscriminator("@type")
 @Serializable
@@ -49,12 +51,20 @@ sealed interface VmStackValue {
     data class Slice(
         @SerialName("_")
         val slice: VmCellSlice
-    ) : VmStackValue
+    ) : VmStackValue {
+        constructor(cellSlice: CellSlice) : this(VmCellSlice(cellSlice))
+
+        fun toCellSlice(): CellSlice = slice.toCellSlice()
+    }
 
     @SerialName("vm_stk_builder")
     data class Builder(
         val cell: org.ton.cell.Cell
-    ) : VmStackValue
+    ) : VmStackValue {
+        constructor(cellBuilder: CellBuilder) : this(cellBuilder.endCell())
+
+        fun toCellBuilder(): CellBuilder = CellBuilder(cell)
+    }
 
     @SerialName("vm_stk_cont")
     data class Cont(
