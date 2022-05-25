@@ -5,6 +5,7 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.block.MsgAddressInt
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
@@ -23,6 +24,10 @@ data class LiteServerAccountId(
     init {
         check(id.size == 32)
     }
+
+    constructor(addrStd: MsgAddressInt.AddrStd) : this(addrStd.workchainId, addrStd.address)
+
+    fun toAddrStd(): MsgAddressInt.AddrStd = MsgAddressInt.AddrStd(workchain, id)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

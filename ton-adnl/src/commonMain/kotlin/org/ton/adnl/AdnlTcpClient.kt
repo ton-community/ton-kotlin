@@ -9,14 +9,17 @@ import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.crypto.hex
 import org.ton.crypto.sha256
+import org.ton.logger.Logger
+import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 abstract class AdnlTcpClient(
-        val host: String,
-        val port: Int,
-        val publicKey: AdnlPublicKey,
-        protected val dispatcher: CoroutineContext
+    val host: String,
+    val port: Int,
+    val publicKey: AdnlPublicKey,
+    protected val dispatcher: CoroutineContext,
+    val logger: Logger = PrintLnLogger("TON ADNL")
 ) {
     constructor(
         ipv4: Int,

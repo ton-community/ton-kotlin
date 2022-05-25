@@ -2,14 +2,14 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.tonAdnl)
-                implementation(projects.tonTlb)
-                implementation(projects.tonBitstring)
-                implementation(projects.tonCrypto)
-                implementation(projects.tonCell)
-                implementation(projects.tonTlb)
-                implementation(projects.tonLiteApi)
-                implementation(projects.tonLogger)
+                api(projects.tonAdnl)
+                api(projects.tonTlb)
+                api(projects.tonBitstring)
+                api(projects.tonCrypto)
+                api(projects.tonCell)
+                api(projects.tonTlb)
+                api(projects.tonLiteApi)
+                api(projects.tonLogger)
                 implementation(libs.serialization.json)
             }
         }

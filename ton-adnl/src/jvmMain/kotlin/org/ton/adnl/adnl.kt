@@ -13,13 +13,20 @@ class AdnlTcpClientImpl(
     port: Int,
     publicKey: AdnlPublicKey,
     dispatcher: CoroutineContext,
-    var logger: Logger = PrintLnLogger("TON ADNL")
-) : AdnlTcpClient(host, port, publicKey, dispatcher) {
-    constructor(ipv4: Int, port: Int, publicKey: AdnlPublicKey, dispatcher: CoroutineContext) : this(
+    logger: Logger = PrintLnLogger("TON ADNL")
+) : AdnlTcpClient(host, port, publicKey, dispatcher, logger) {
+    constructor(
+        ipv4: Int,
+        port: Int,
+        publicKey: AdnlPublicKey,
+        dispatcher: CoroutineContext,
+        logger: Logger = PrintLnLogger("TON ADNL")
+    ) : this(
         ipv4(ipv4),
         port,
         publicKey,
-        dispatcher
+        dispatcher,
+        logger
     )
 
     private lateinit var connection: Connection

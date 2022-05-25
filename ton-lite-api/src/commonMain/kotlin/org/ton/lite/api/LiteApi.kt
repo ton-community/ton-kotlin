@@ -2,6 +2,7 @@ package org.ton.lite.api
 
 import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.block.MsgAddressInt
 import org.ton.block.VmStack
 import org.ton.block.VmStackList
 import org.ton.block.VmStackValue
@@ -35,6 +36,9 @@ interface LiteApi {
 
     suspend fun sendMessage(query: LiteServerSendMessage): LiteServerSendMsgStatus =
         sendQuery(query, LiteServerSendMessage, LiteServerSendMsgStatus)
+
+    suspend fun getAccountState(id: TonNodeBlockIdExt, account: MsgAddressInt.AddrStd): LiteServerAccountState =
+        getAccountState(id, LiteServerAccountId(account))
 
     suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId): LiteServerAccountState =
         getAccountState(LiteServerGetAccountState(id, account))

@@ -19,6 +19,8 @@ class LiteClient(
         logger: Logger = PrintLnLogger("TON LiteClient")
     ) : this(AdnlTcpClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default, logger))
 
+    val logger get() = adnlTcpClient.logger
+
     constructor(ipv4: Int, port: Int, publicKey: ByteArray) : this(ipv4(ipv4), port, publicKey)
 
     suspend fun connect() = apply {
