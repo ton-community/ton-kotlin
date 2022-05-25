@@ -84,9 +84,7 @@ private class CellSliceImpl(
 
     override fun <T> loadRef(cellSlice: CellSlice.() -> T): T {
         val slice = loadRef().beginParse()
-        val result = cellSlice(slice)
-        slice.endParse()
-        return result
+        return cellSlice(slice)
     }
 
     override fun loadRefs(count: Int): List<Cell> = List(count) { loadRef() }
@@ -95,9 +93,7 @@ private class CellSliceImpl(
 
     override fun <T> preloadRef(cellSlice: CellSlice.() -> T): T {
         val slice = preloadRef().beginParse()
-        val result = cellSlice(slice)
-        slice.endParse()
-        return result
+        return cellSlice(slice)
     }
 
     override fun preloadRefs(count: Int): List<Cell> = List(refsPosition + count) { refs[it] }
