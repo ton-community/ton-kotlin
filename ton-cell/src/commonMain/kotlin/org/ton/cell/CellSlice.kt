@@ -7,6 +7,8 @@ interface CellSlice {
     val bits: BitString
     val refs: List<Cell>
     val depth: Int
+    var bitsPosition: Int
+    var refsPosition: Int
 
     /**
      * Checks if slice is empty. If not, throws an exception.
@@ -17,8 +19,11 @@ interface CellSlice {
      * Loads the first reference from the slice.
      */
     fun loadRef(): Cell
+    fun loadRefs(count: Int): List<Cell>
     fun <T> loadRef(cellSlice: CellSlice.() -> T): T
+
     fun preloadRef(): Cell
+    fun preloadRefs(count: Int): List<Cell>
     fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
 
     fun loadBit(): Boolean
@@ -58,8 +63,8 @@ interface CellSlice {
 private class CellSliceImpl(
     override val bits: BitString,
     override val refs: List<Cell>,
-    private var bitsPosition: Int = 0,
-    private var refsPosition: Int = 0
+    override var bitsPosition: Int = 0,
+    override var refsPosition: Int = 0
 ) : CellSlice {
     constructor(cell: Cell) : this(cell.bits, cell.references)
 
@@ -84,6 +89,8 @@ private class CellSliceImpl(
         return result
     }
 
+    override fun loadRefs(count: Int): List<Cell> = List(count) { loadRef() }
+
     override fun preloadRef(): Cell = refs[refsPosition]
 
     override fun <T> preloadRef(cellSlice: CellSlice.() -> T): T {
@@ -92,6 +99,8 @@ private class CellSliceImpl(
         slice.endParse()
         return result
     }
+
+    override fun preloadRefs(count: Int): List<Cell> = List(refsPosition + count) { refs[it] }
 
     override fun loadBit(): Boolean {
         val bit = preloadBit()
