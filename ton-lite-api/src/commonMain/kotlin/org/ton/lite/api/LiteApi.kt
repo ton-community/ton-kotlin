@@ -64,8 +64,13 @@ interface LiteApi {
         account: LiteServerAccountId,
         methodName: String,
         vararg params: VmStackValue
-    ): LiteServerRunMethodResult = runSmcMethod(LiteServerRunSmcMethod(mode, id, account, methodName, VmStack(
-        VmStackList.of(params.asIterable()))))
+    ): LiteServerRunMethodResult = runSmcMethod(
+        LiteServerRunSmcMethod(
+            mode, id, account, methodName, VmStack(
+                VmStackList(params.asIterable())
+            )
+        )
+    )
 
     suspend fun runSmcMethod(query: LiteServerRunSmcMethod): LiteServerRunMethodResult =
         sendQuery(query, LiteServerRunSmcMethod, LiteServerRunMethodResult)

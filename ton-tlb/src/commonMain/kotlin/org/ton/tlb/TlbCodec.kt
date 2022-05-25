@@ -42,8 +42,7 @@ abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
 }
 
 fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T {
-    val result = codec.decode(this, param, negativeParam)
-    return result
+    return codec.decode(this, param, negativeParam)
 }
 
 fun <T : Any> CellBuilder.storeTlb(

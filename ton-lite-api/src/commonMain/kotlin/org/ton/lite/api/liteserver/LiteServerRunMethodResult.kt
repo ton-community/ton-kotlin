@@ -41,9 +41,17 @@ data class LiteServerRunMethodResult(
     @Serializable(Base64ByteArraySerializer::class)
     val result: ByteArray?
 ) : Iterable<VmStackValue> {
-    fun resultBagOfCells() = result?.let { BagOfCells(it) }
-    fun resultStack() = resultBagOfCells()?.roots?.first()?.beginParse()?.loadTlb(vmStackCodec)
-    fun resultValues() = resultStack()?.stack?.reversed()
+
+    fun resultBagOfCells(): BagOfCells? =
+        result?.let { BagOfCells(it) }
+
+    fun resultStack(): VmStack? =
+        resultBagOfCells()?.roots?.first()?.parse {
+            loadTlb(vmStackCodec)
+        }
+
+    fun resultValues(): List<VmStackValue>? =
+        resultStack()?.stack?.reversed()
 
     operator fun get(index: Int) = resultValues()?.get(index)
     override operator fun iterator(): Iterator<VmStackValue> = resultValues().orEmpty().iterator()
@@ -100,7 +108,7 @@ data class LiteServerRunMethodResult(
         return result1
     }
 
-    companion object : TlConstructor<LiteServerRunMethodResult>(
+    companion object LiteServerRunMethodResultTlConstructor : TlConstructor<LiteServerRunMethodResult>(
         type = LiteServerRunMethodResult::class,
         schema = "liteServer.runMethodResult mode:# id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:mode.0?bytes proof:mode.0?bytes state_proof:mode.1?bytes init_c7:mode.3?bytes lib_extras:mode.4?bytes exit_code:int result:mode.2?bytes = liteServer.RunMethodResult"
     ) {
