@@ -23,11 +23,9 @@ abstract class TlbCombinator<T : Any> : TlbCodec<T>() {
     override fun decode(cellSlice: CellSlice, param: Int, negativeParam: (Int) -> Unit): T {
         val constructor = sortedConstructors.find { constructor ->
             val id = cellSlice.preloadBitString(constructor.id.length)
-            println("id: $id --- ${constructor.id} | $constructor - ${constructor.id.length}")
             id == constructor.id
         } ?: throw UnknownTlbConstructorException()
         cellSlice.loadBits(constructor.id.length)
-        println("decoding constructor: $constructor")
         return constructor.decode(cellSlice, param, negativeParam)
     }
 

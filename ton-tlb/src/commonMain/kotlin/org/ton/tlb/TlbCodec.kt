@@ -42,9 +42,7 @@ abstract class TlbCodec<T> : TlbEncoder<T>, TlbDecoder<T> {
 }
 
 fun <T : Any> CellSlice.loadTlb(codec: TlbDecoder<T>, param: Int = 0, negativeParam: ((Int) -> Unit) = {}): T {
-    println("start deserialize: $codec")
     val result = codec.decode(this, param, negativeParam)
-    println("complete serialize: $codec === $result")
     return result
 }
 

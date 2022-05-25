@@ -1,6 +1,5 @@
 package org.ton.lite.client
 
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -9,7 +8,7 @@ import org.ton.adnl.AdnlPublicKey
 import org.ton.adnl.AdnlTcpClient
 import org.ton.adnl.AdnlTcpClientImpl
 import org.ton.cell.BagOfCells
-import org.ton.cell.writeBagOfCells
+import org.ton.crypto.base64
 import org.ton.crypto.hex
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerAccountId
@@ -18,9 +17,9 @@ import java.time.Instant
 
 suspend fun main() = coroutineScope {
     val liteClient = LiteClient(
-            host = "67.207.74.182",
-            port = 4924,
-            publicKey = hex("a5e253c3f6ab9517ecb204ee7fd04cca9273a8e8bb49712a48f496884c365353")
+        host = "185.86.79.9",
+        port = 4701,
+        publicKey = base64("G6cNAr6wXBBByWDzddEWP5xMFsAcp6y13fXA8Q7EJlM=")
     ).connect()
     val time = liteClient.getTime()
     println("[server time: $time] (${Instant.ofEpochSecond(time.now.toLong())})")
@@ -36,11 +35,7 @@ suspend fun LiteClient.getAccountTransactions(workchain: Int, address: String): 
     val cell = BagOfCells(state.state).roots.first()
 
 
-    println(hex(state.state))
-    println(hex(buildPacket { writeBagOfCells(BagOfCells(cell)) }.readBytes()))
-
-//    val json = cell.slice().Account().toJsonString()
-    return "json"
+    return cell.toString()
 }
 
 suspend fun LiteClient.lastBlockTask() = coroutineScope {
