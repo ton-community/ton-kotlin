@@ -2,8 +2,10 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.tonTlb)
                 implementation(projects.tonTl)
+                implementation(projects.tonTlb)
+                implementation(projects.tonBlock)
+                implementation(projects.tonBlockTlb)
                 implementation(projects.tonBitstring)
                 implementation(projects.tonCrypto)
                 implementation(projects.tonCell)

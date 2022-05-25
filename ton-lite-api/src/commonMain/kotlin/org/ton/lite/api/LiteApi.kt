@@ -2,6 +2,9 @@ package org.ton.lite.api
 
 import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.block.VmStack
+import org.ton.block.VmStackList
+import org.ton.block.VmStackValue
 import org.ton.cell.BagOfCells
 import org.ton.lite.api.liteserver.*
 import org.ton.tl.TlConstructor
@@ -54,6 +57,15 @@ interface LiteApi {
         methodName: String,
         params: BagOfCells
     ): LiteServerRunMethodResult = runSmcMethod(LiteServerRunSmcMethod(mode, id, account, methodName, params))
+
+    suspend fun runSmcMethod(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        methodName: String,
+        vararg params: VmStackValue
+    ): LiteServerRunMethodResult = runSmcMethod(LiteServerRunSmcMethod(mode, id, account, methodName, VmStack(
+        VmStackList.of(params.asIterable()))))
 
     suspend fun runSmcMethod(query: LiteServerRunSmcMethod): LiteServerRunMethodResult =
         sendQuery(query, LiteServerRunSmcMethod, LiteServerRunMethodResult)

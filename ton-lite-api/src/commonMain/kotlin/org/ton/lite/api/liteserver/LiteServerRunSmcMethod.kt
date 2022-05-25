@@ -4,13 +4,17 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.block.VmStack
+import org.ton.block.tlb.tlbCodec
 import org.ton.cell.BagOfCells
+import org.ton.cell.CellBuilder
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.crc16
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import org.ton.tlb.storeTlb
 
 @Serializable
 data class LiteServerRunSmcMethod(
@@ -29,6 +33,14 @@ data class LiteServerRunSmcMethod(
         methodName: String,
         params: BagOfCells
     ) : this(mode, id, account, methodId(methodName), params.toByteArray())
+
+    constructor(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        methodName: String,
+        params: VmStack
+    ) : this(mode, id, account, methodName, BagOfCells(CellBuilder.createCell { storeTlb(params, vmStackCodec) }))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -58,6 +70,8 @@ data class LiteServerRunSmcMethod(
         type = LiteServerRunSmcMethod::class,
         schema = "liteServer.runSmcMethod mode:# id:tonNode.blockIdExt account:liteServer.accountId method_id:long params:bytes = liteServer.RunMethodResult"
     ) {
+        private val vmStackCodec by lazy { VmStack.tlbCodec() }
+
         fun methodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
 
         override fun encode(output: Output, value: LiteServerRunSmcMethod) {

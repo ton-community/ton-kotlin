@@ -5,12 +5,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.toBits
+import org.ton.block.VmStack
+import org.ton.block.VmStackValue
+import org.ton.block.tlb.tlbCodec
+import org.ton.cell.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import org.ton.tlb.loadTlb
 
 @Serializable
 data class LiteServerRunMethodResult(
@@ -35,7 +40,14 @@ data class LiteServerRunMethodResult(
     val exitCode: Int,
     @Serializable(Base64ByteArraySerializer::class)
     val result: ByteArray?
-) {
+) : Iterable<VmStackValue> {
+    fun resultBagOfCells() = result?.let { BagOfCells(it) }
+    fun resultStack() = resultBagOfCells()?.roots?.first()?.beginParse()?.loadTlb(vmStackCodec)
+    fun resultValues() = resultStack()?.stack?.reversed()
+
+    operator fun get(index: Int) = resultValues()?.get(index)
+    override operator fun iterator(): Iterator<VmStackValue> = resultValues().orEmpty().iterator()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -92,6 +104,8 @@ data class LiteServerRunMethodResult(
         type = LiteServerRunMethodResult::class,
         schema = "liteServer.runMethodResult mode:# id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:mode.0?bytes proof:mode.0?bytes state_proof:mode.1?bytes init_c7:mode.3?bytes lib_extras:mode.4?bytes exit_code:int result:mode.2?bytes = liteServer.RunMethodResult"
     ) {
+        private val vmStackCodec by lazy { VmStack.tlbCodec() }
+
         override fun encode(output: Output, value: LiteServerRunMethodResult) {
             output.writeIntLittleEndian(value.mode)
             output.writeTl(value.id, TonNodeBlockIdExt)
