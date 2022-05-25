@@ -10,6 +10,7 @@ kotlin {
                 api(libs.ktor.client.cio)
                 api(libs.ktor.network)
                 implementation(libs.serialization.json)
+                implementation(projects.tonLogger)
             }
         }
         commonTest {

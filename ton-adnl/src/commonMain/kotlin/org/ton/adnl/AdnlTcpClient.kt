@@ -18,6 +18,13 @@ abstract class AdnlTcpClient(
         val publicKey: AdnlPublicKey,
         protected val dispatcher: CoroutineContext
 ) {
+    constructor(
+        ipv4: Int,
+        port: Int,
+        publicKey: AdnlPublicKey,
+        dispatcher: CoroutineContext
+    ) : this(ipv4(ipv4), port, publicKey, dispatcher)
+
     protected lateinit var job: Job
     private val sendFlow = MutableSharedFlow<AdnlMessageQuery>()
     private val queryMap = ConcurrentMap<String, CompletableDeferred<AdnlMessageAnswer>>()

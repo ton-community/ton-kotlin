@@ -9,6 +9,7 @@ kotlin {
                 implementation(projects.tonCell)
                 implementation(projects.tonTlb)
                 implementation(projects.tonLiteApi)
+                implementation(projects.tonLogger)
                 implementation(libs.serialization.json)
             }
         }

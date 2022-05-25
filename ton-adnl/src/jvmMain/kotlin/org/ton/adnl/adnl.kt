@@ -4,38 +4,51 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import org.ton.logger.Logger
+import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
 
 class AdnlTcpClientImpl(
-        host: String,
-        port: Int,
-        publicKey: AdnlPublicKey,
-        dispatcher: CoroutineContext
+    host: String,
+    port: Int,
+    publicKey: AdnlPublicKey,
+    dispatcher: CoroutineContext,
+    var logger: Logger = PrintLnLogger("TON ADNL")
 ) : AdnlTcpClient(host, port, publicKey, dispatcher) {
+    constructor(ipv4: Int, port: Int, publicKey: AdnlPublicKey, dispatcher: CoroutineContext) : this(
+        ipv4(ipv4),
+        port,
+        publicKey,
+        dispatcher
+    )
+
     private lateinit var connection: Connection
 
     override suspend fun connect() = apply {
+        logger.debug { "Connecting... $host:$port" }
         connection = aSocket(SelectorManager(dispatcher))
-                .tcp()
-                .connect(host, port)
-                .connection()
+            .tcp()
+            .connect(host, port)
+            .connection()
+        logger.debug { "Connected! Performing handshake... $publicKey" }
         performHandshake()
+        logger.debug { "Success handshake!" }
         job = launchReceiveJob()
     }
 
     private suspend fun performHandshake(
-            clientPrivateKey: AdnlPrivateKey = AdnlPrivateKey.random(),
-            aesParams: AdnlAesParams = AdnlAesParams.random(),
+        clientPrivateKey: AdnlPrivateKey = AdnlPrivateKey.random(),
+        aesParams: AdnlAesParams = AdnlAesParams.random(),
     ) {
         val clientPublicKey = clientPrivateKey.public()
         val sharedKey = clientPrivateKey.sharedKey(publicKey)
         val handshake =
-                AdnlHandshake(
-                        publicKey.address(),
-                        clientPublicKey,
-                        aesParams,
-                        sharedKey
-                ).build().readBytes()
+            AdnlHandshake(
+                publicKey.address(),
+                clientPublicKey,
+                aesParams,
+                sharedKey
+            ).build().readBytes()
         connection.output.writeFully(handshake)
         connection.output.flush()
 
