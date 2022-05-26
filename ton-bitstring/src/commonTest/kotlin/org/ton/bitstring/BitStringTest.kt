@@ -34,69 +34,34 @@ class BitStringTest {
         assertBitString("000001", "06_")
         assertBitString("0000001", "03_")
         assertBitString("00000001", "01")
+
+        assertBitString("10001010", "8A")
+        assertBitString("100010", "8A_")
+        assertBitString("00101101100", "2D9_")
     }
 
     @Test
-    fun bitString_10001010_8a() {
-        val bitString = BitString(byteArrayOf(0b1000_1010.toByte()))
-        assertEquals("10001010", bitString.toBooleanArray().joinToBits())
-        assertEquals("8A", bitString.toString())
+    fun `BitString concatenation without shifting`() {
+        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + BitString("BABE"))
+        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + byteArrayOf(0xBA.toByte(), 0xBE.toByte()))
+        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + BitString("BEEF"))
+        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + byteArrayOf(0xBE.toByte(), 0xEF.toByte()))
+
+        val bytes1 = Random.nextBytes(8)
+        val bytes2 = Random.nextBytes(8)
+        val expectedBytes = bytes1 + bytes2
+        assertEquals(BitString(expectedBytes), BitString(bytes1) + bytes2)
     }
 
     @Test
-    fun bitString_8a_10001010() {
-        val bitString1 = BitString("8A")
-        assertEquals("10001010", bitString1.toBooleanArray().joinToBits())
-        assertEquals("8A", bitString1.toString())
-
-        val bitString2 = BitString.binary("10001010")
-        assertEquals("10001010", bitString2.toBooleanArray().joinToBits())
-        assertEquals("8A", bitString2.toString())
-    }
-
-    @Test
-    fun bitString_100010_8a_() {
-        val bitString = BitString(
-            true,
-            false,
-            false,
-            false,
-            true,
-            false,
-        )
-        assertEquals("100010", bitString.toBooleanArray().joinToBits())
-        assertEquals("8A_", bitString.toString())
-    }
-
-    @Test
-    fun bitString_8a__100010() {
-        val bitString1 = BitString("8A_")
-        assertEquals("100010", bitString1.toBooleanArray().joinToBits())
-        assertEquals("8A_", bitString1.toString())
-
-        val bitString2 = BitString.binary("100010")
-        assertEquals("100010", bitString2.toBooleanArray().joinToBits())
-        assertEquals("8A_", bitString2.toString())
-    }
-
-    @Test
-    fun bitString_00101101100_2d9() {
-        val bitString = BitString(
-            false, false, true, false, true, true, false, true, true, false, false
-        )
-        assertEquals("00101101100", bitString.toBooleanArray().joinToBits())
-        assertEquals("2D9_", bitString.toString())
-    }
-
-    @Test
-    fun bitString_2D9__00101101100() {
-        val bitString1 = BitString("2D9_")
-        assertEquals("00101101100", bitString1.toBooleanArray().joinToBits())
-        assertEquals("2D9_", bitString1.toString())
-
-        val bitString2 = BitString.binary("00101101100")
-        assertEquals("00101101100", bitString2.toBooleanArray().joinToBits())
-        assertEquals("2D9_", bitString2.toString())
+    fun `BitString concatenation with shifting`() {
+        assertEquals(BitString.binary("100000001"), BitString.binary("10000000") + BitString.binary("1"))
+        assertEquals(BitString.binary("1000000011"), BitString.binary("10000000") + BitString.binary("11"))
+        assertEquals(BitString.binary("10000000111"), BitString.binary("10000000") + BitString.binary("111"))
+        assertEquals(BitString.binary("100000001111"), BitString.binary("10000000") + BitString.binary("1111"))
+        assertEquals(BitString.binary("1000000011111"), BitString.binary("10000000") + BitString.binary("11111"))
+        assertEquals(BitString.binary("10000000111111"), BitString.binary("10000000") + BitString.binary("111111"))
+        assertEquals(BitString.binary("100000001111111"), BitString.binary("10000000") + BitString.binary("1111111"))
     }
 
     @Test
@@ -159,12 +124,3 @@ fun assertBitString(binary: String, hex: String) {
 
 private fun BooleanArray.joinToBits() =
     joinToString(separator = "") { if (it) "1" else "0" }
-
-private fun String.toBooleanArray() =
-    mapIndexed { index: Int, c: Char ->
-        when (c) {
-            '1' -> true
-            '0' -> false
-            else -> throw IllegalArgumentException("index: $index char: `$c`")
-        }
-    }
