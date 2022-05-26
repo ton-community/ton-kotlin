@@ -15,13 +15,13 @@ data class Cell(
     val type: CellType = CellType.ORDINARY
 ) {
     constructor(
-            bits: String,
-            vararg cellReferences: Cell,
-            type: CellType = CellType.ORDINARY
+        bits: String,
+        vararg cellReferences: Cell,
+        type: CellType = CellType.ORDINARY
     ) : this(
-            BitString(bits),
-            cellReferences.toList(),
-            type
+        BitString(bits),
+        cellReferences.toList(),
+        type
     )
 
     val isExotic: Boolean get() = type.isExotic
@@ -87,17 +87,16 @@ data class Cell(
         (refs.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
 
     private fun bitsDescriptor(): Byte =
-            (ceil(bits.length / 8.0) + floor(bits.length / 8.0)).toInt().toByte()
+        (ceil(bits.length / 8.0) + floor(bits.length / 8.0)).toInt().toByte()
 
     private fun augmentedBytes(): ByteArray =
-            BitString(*bits.toBooleanArray().augment()).toByteArray()
+        BitString(*bits.toBooleanArray().augment()).toByteArray()
 
     private fun representation(): ByteArray = buildPacket {
         writeFully(descriptors())
         writeFully(augmentedBytes())
         refs.forEach { reference ->
-            val depth = reference.maxDepth
-            writeInt(depth)
+            writeShort(reference.maxDepth.toShort())
         }
         refs.forEach { reference ->
             val hash = reference.hash()
