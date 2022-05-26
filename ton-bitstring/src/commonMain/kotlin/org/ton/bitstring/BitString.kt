@@ -155,7 +155,7 @@ internal class ByteArrayBitStringImpl constructor(
         val l = length % 4
         if (l == 0) {
             bytes.forEach { byte ->
-                val hex = (byte.toInt() and 0xFF).toString(16).uppercase()
+                val hex = (byte.toInt() and 0xFF).toString(16).padStart(2, '0').uppercase()
                 stringBuilder.append(hex)
             }
             if (length % 8 != 0) {

@@ -54,6 +54,13 @@ class BitStringTest {
         assertEquals("00101101100", bitString.toBooleanArray().joinToBits())
         assertEquals("2D9_", bitString.toString())
     }
+
+    @Test
+    fun `toString() on a zero number`() {
+        assertEquals("0", BitString(List(4, { false })).toString())
+        assertEquals("00000000", BitString(List(32, { false })).toString())
+        assertEquals("0000000000000000", BitString(List(64, { false })).toString())
+    }
 }
 
 private fun BooleanArray.joinToBits() = joinToString(separator = "") { if (it) "1" else "0" }
