@@ -20,15 +20,4 @@ class HashMapLabelTest {
         assertEquals(HashMapLabelSame(false, 2), HashMapLabelSame.of(BitString.binary("00")))
         assertEquals(HashMapLabelSame(false, 3), HashMapLabelSame.of(BitString.binary("000")))
     }
-
-    @Test
-    fun `test HashMapLabel construction`() {
-        println(HashMapLabel.of(BitString.binary("10")))
-        println(HashMapLabel.of(BitString.binary("11111")))
-        println(BitString.binary("000"))
-        println(HashMapLabel.of(BitString("ABABBBAFA_")))
-        println(HashMapLabel.of(BitString("ABAA_")))
-    }
-
-    private fun BitString.bits() = joinToString("") { if (it) "1" else "0" }
 }
