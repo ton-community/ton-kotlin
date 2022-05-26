@@ -24,12 +24,6 @@ fun hex(vararg longs: Long): String = buildString {
     }
 }
 
-fun hex(vararg uLongs: ULong): String = buildString {
-    uLongs.forEach {
-        append(it.toString(16))
-    }
-}
-
 /**
  * Decode bytes from HEX string. It should be no spaces and `0x` prefixes.
  */

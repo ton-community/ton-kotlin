@@ -1,5 +1,5 @@
 [versions]
-coroutines = "1.6.0"
+coroutines = "1.6.0-RC3"
 datetime = "0.3.2"
 atomicfu = "0.17.0"
 benchmark = "0.4.2"
@@ -10,6 +10,7 @@ curve25519 = "f008dbc2c0"
 
 [libraries]
 coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "benchmark" }

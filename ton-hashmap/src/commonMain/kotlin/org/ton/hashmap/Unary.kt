@@ -2,7 +2,6 @@
 
 package org.ton.hashmap
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
@@ -21,18 +20,4 @@ sealed class Unary {
             return unary
         }
     }
-}
-
-@Serializable
-@SerialName("unary_succ")
-data class UnarySuccess(
-        val x: Unary
-) : Unary() {
-    override fun toString() = "unary_succ(x=$x)"
-}
-
-@Serializable
-@SerialName("unary_zero")
-object UnaryZero : Unary() {
-    override fun toString() = "unary_zero"
 }

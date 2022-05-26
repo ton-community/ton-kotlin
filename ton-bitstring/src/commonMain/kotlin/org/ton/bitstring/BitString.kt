@@ -21,6 +21,8 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
     operator fun set(index: Int, bit: Int)
     operator fun set(index: Int, bit: Boolean)
     operator fun get(index: Int): Boolean
+    operator fun plus(bits: BooleanArray): BitString
+    operator fun plus(bits: Iterable<Boolean>): BitString
     fun slice(indices: IntRange): BitString
     fun toByteArray(): ByteArray
     fun toBooleanArray(): BooleanArray
@@ -117,6 +119,18 @@ internal class ByteArrayBitStringImpl constructor(
         val wordIndex = index.wordIndex
         val bitMask = index.bitMask
         return (bytes[wordIndex] and bitMask) != 0.toByte()
+    }
+
+    override fun plus(bits: BooleanArray): BitString = plus(bits.asIterable())
+
+    override fun plus(bits: Iterable<Boolean>): BitString {
+        val bitsList = bits.toList()
+        val bitString = ByteArrayBitStringImpl(length + bitsList.size)
+        bytes.copyInto(bitString.bytes)
+        bits.forEachIndexed { index, bit ->
+            bitString[length + index] = bit
+        }
+        return bitString
     }
 
     override fun slice(indices: IntRange): BitString {
