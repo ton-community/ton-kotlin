@@ -1,7 +1,10 @@
 package org.ton.bitstring
 
+import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class BitStringTest {
     @Test
@@ -76,6 +79,31 @@ class BitStringTest {
         val bitString2 = BitString.binary("1_")
         assertEquals("000", bitString2.toBooleanArray().joinToBits())
         assertEquals("1_", bitString2.toString())
+    }
+
+    @Test
+    fun `random BitString`() {
+        repeat(100) {
+            repeat(BitString.MAX_LENGTH) { length ->
+                val bits1 = BooleanArray(length) { Random.nextBoolean() }
+                try {
+                    val bitString1 = BitString(*bits1)
+
+                    val bits2 = bitString1.toBooleanArray()
+                    assertContentEquals(bits1, bits2)
+
+                    val bytes1 = bitString1.toByteArray()
+                    val bitString2 = BitString(length, bytes1)
+
+                    assertEquals(bitString1, bitString2)
+                    assertEquals(bitString1.toString(), bitString2.toString())
+                    assertEquals(bitString1.toBooleanArray().joinToBits(), bitString2.toBooleanArray().joinToBits())
+                    assertContentEquals(bitString1.toByteArray(), bitString2.toByteArray())
+                } catch (e: Exception) {
+                    fail("bits: ${bits1.joinToBits()}", e)
+                }
+            }
+        }
     }
 
     @Test

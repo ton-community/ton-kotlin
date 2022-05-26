@@ -6,6 +6,7 @@ import kotlin.experimental.inv
 import kotlin.experimental.or
 import kotlin.math.min
 
+fun BitString(length: Int, byteArray: ByteArray): BitString = BitString.of(length, byteArray)
 fun BitString(byteArray: ByteArray): BitString = BitString.of(byteArray)
 fun BitString(length: Int): BitString = BitString.of(length)
 fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
@@ -42,6 +43,10 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
     companion object {
         const val MAX_LENGTH = 1023
+
+        @JvmStatic
+        fun of(length: Int, byteArray: ByteArray): BitString =
+            ByteArrayBitStringImpl(length, byteArray)
 
         @JvmStatic
         fun of(byteArray: ByteArray): BitString =
