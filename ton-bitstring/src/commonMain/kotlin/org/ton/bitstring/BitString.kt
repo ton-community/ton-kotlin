@@ -160,60 +160,6 @@ internal class ByteArrayBitStringImpl constructor(
         }
     }
 
-    private fun append(bytes: ByteArray, bits: Int) = apply {
-        require(length + bits <= BitString.MAX_LENGTH) { throw BitStringOverflowException() }
-        if (bits != 0) {
-            if (length % 8 == 0) {
-                if (bits % 8 == 0) {
-                    appendWithoutShifting(bytes, bits)
-                } else {
-                    appendWithShifting(bytes, bits)
-                }
-            } else {
-                // TODO:
-//                appendWithDoubleShifting(bytes, bits)
-                plus(bytes.toBitString().toBooleanArray())
-            }
-        }
-    }
-
-    private fun appendWithoutShifting(bytes: ByteArray, bits: Int) {
-        require(length % 8 == 0)
-        require(bits % 8 == 0)
-
-        val newBytes = this.bytes.copyOf(bytesSize(length + bits))
-        bytes.copyInto(
-            destination = newBytes,
-            destinationOffset = length / Byte.SIZE_BITS,
-            endIndex = bits / Byte.SIZE_BITS
-        )
-        this.bytes = newBytes
-        length += bits
-    }
-
-    private fun appendWithShifting(bytes: ByteArray, bits: Int) {
-        require(length % 8 == 0)
-        val shift = bits % 8
-        require(shift != 0)
-
-        val newBytes = this.bytes.copyOf(bytesSize(length + bits))
-        bytes.copyInto(
-            destination = newBytes,
-            destinationOffset = length / Byte.SIZE_BITS,
-            endIndex = bits / Byte.SIZE_BITS + 1
-        )
-        var lastByte = bytes[bits / Byte.SIZE_BITS].toInt()
-        lastByte = lastByte shr (8 - shift)
-        lastByte = lastByte shl (8 - shift)
-        newBytes[(length + bits) / Byte.SIZE_BITS] = lastByte.toByte()
-        this.bytes = newBytes
-        length += bits
-    }
-
-    private fun appendWithDoubleShifting(bytes: ByteArray, bits: Int) {
-        TODO()
-    }
-
     override fun slice(indices: IntRange): BitString {
         val result = ByteArrayBitStringImpl(length = indices.last - indices.first + 1)
         for ((position, i) in indices.withIndex()) {
@@ -282,6 +228,60 @@ internal class ByteArrayBitStringImpl constructor(
         var result = length
         result = 31 * result + bytes.contentHashCode()
         return result
+    }
+
+    private fun append(bytes: ByteArray, bits: Int) = apply {
+        require(length + bits <= BitString.MAX_LENGTH) { throw BitStringOverflowException() }
+        if (bits != 0) {
+            if (length % 8 == 0) {
+                if (bits % 8 == 0) {
+                    appendWithoutShifting(bytes, bits)
+                } else {
+                    appendWithShifting(bytes, bits)
+                }
+            } else {
+                // TODO:
+//                appendWithDoubleShifting(bytes, bits)
+                plus(bytes.toBitString().toBooleanArray())
+            }
+        }
+    }
+
+    private fun appendWithoutShifting(bytes: ByteArray, bits: Int) {
+        require(length % 8 == 0)
+        require(bits % 8 == 0)
+
+        val newBytes = this.bytes.copyOf(bytesSize(length + bits))
+        bytes.copyInto(
+            destination = newBytes,
+            destinationOffset = length / Byte.SIZE_BITS,
+            endIndex = bits / Byte.SIZE_BITS
+        )
+        this.bytes = newBytes
+        length += bits
+    }
+
+    private fun appendWithShifting(bytes: ByteArray, bits: Int) {
+        require(length % 8 == 0)
+        val shift = bits % 8
+        require(shift != 0)
+
+        val newBytes = this.bytes.copyOf(bytesSize(length + bits))
+        bytes.copyInto(
+            destination = newBytes,
+            destinationOffset = length / Byte.SIZE_BITS,
+            endIndex = bits / Byte.SIZE_BITS + 1
+        )
+        var lastByte = bytes[bits / Byte.SIZE_BITS].toInt()
+        lastByte = lastByte shr (8 - shift)
+        lastByte = lastByte shl (8 - shift)
+        newBytes[(length + bits) / Byte.SIZE_BITS] = lastByte.toByte()
+        this.bytes = newBytes
+        length += bits
+    }
+
+    private fun appendWithDoubleShifting(bytes: ByteArray, bits: Int) {
+        TODO()
     }
 
     private fun checkLength(length: Int) = require(length <= BitString.MAX_LENGTH) {
