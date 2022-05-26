@@ -8,6 +8,35 @@ import kotlin.test.fail
 
 class BitStringTest {
     @Test
+    fun `BitString creation`() {
+        assertBitString("0", "4_")
+        assertBitString("00", "2_")
+        assertBitString("000", "1_")
+        assertBitString("0000", "0")
+        assertBitString("00000", "04_")
+        assertBitString("000000", "02_")
+        assertBitString("0000000", "01_")
+        assertBitString("00000000", "00")
+
+        assertBitString("1", "C_")
+        assertBitString("11", "E_")
+        assertBitString("111", "F_")
+        assertBitString("1111", "F")
+        assertBitString("11111", "FC_")
+        assertBitString("111111", "FE_")
+        assertBitString("1111111", "FF_")
+        assertBitString("11111111", "FF")
+
+        assertBitString("01", "6_")
+        assertBitString("001", "3_")
+        assertBitString("0001", "1")
+        assertBitString("00001", "0C_")
+        assertBitString("000001", "06_")
+        assertBitString("0000001", "03_")
+        assertBitString("00000001", "01")
+    }
+
+    @Test
     fun bitString_10001010_8a() {
         val bitString = BitString(byteArrayOf(0b1000_1010.toByte()))
         assertEquals("10001010", bitString.toBooleanArray().joinToBits())
@@ -28,12 +57,12 @@ class BitStringTest {
     @Test
     fun bitString_100010_8a_() {
         val bitString = BitString(
-                true,
-                false,
-                false,
-                false,
-                true,
-                false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
         )
         assertEquals("100010", bitString.toBooleanArray().joinToBits())
         assertEquals("8A_", bitString.toString())
@@ -53,7 +82,7 @@ class BitStringTest {
     @Test
     fun bitString_00101101100_2d9() {
         val bitString = BitString(
-                false, false, true, false, true, true, false, true, true, false, false
+            false, false, true, false, true, true, false, true, true, false, false
         )
         assertEquals("00101101100", bitString.toBooleanArray().joinToBits())
         assertEquals("2D9_", bitString.toString())
@@ -68,17 +97,6 @@ class BitStringTest {
         val bitString2 = BitString.binary("00101101100")
         assertEquals("00101101100", bitString2.toBooleanArray().joinToBits())
         assertEquals("2D9_", bitString2.toString())
-    }
-
-    @Test
-    fun `BitString 1_ 000`() {
-        val bitString1 = BitString.binary("000")
-        assertEquals("000", bitString1.toBooleanArray().joinToBits())
-        assertEquals("1_", bitString1.toString())
-
-        val bitString2 = BitString.binary("1_")
-        assertEquals("000", bitString2.toBooleanArray().joinToBits())
-        assertEquals("1_", bitString2.toString())
     }
 
     @Test
@@ -108,10 +126,45 @@ class BitStringTest {
 
     @Test
     fun `toString() on a zero number`() {
-        assertEquals("0", BitString(List(4, { false })).toString())
-        assertEquals("00000000", BitString(List(32, { false })).toString())
-        assertEquals("0000000000000000", BitString(List(64, { false })).toString())
+        assertEquals("0", BitString(List(4) { false }).toString())
+        assertEquals("00000000", BitString(List(32) { false }).toString())
+        assertEquals("0000000000000000", BitString(List(64) { false }).toString())
     }
 }
 
-private fun BooleanArray.joinToBits() = joinToString(separator = "") { if (it) "1" else "0" }
+fun assertBitString(binary: String, hex: String) {
+    try {
+        val binaryBits = BitString.binary(binary)
+        val hexBits = BitString(hex)
+
+        assertEquals(binaryBits, hexBits)
+        assertEquals(hex, binaryBits.toString())
+        assertEquals(hex, hexBits.toString())
+        assertEquals(binary, binaryBits.toBooleanArray().joinToBits())
+        assertEquals(binary, hexBits.toBooleanArray().joinToBits())
+        assertEquals(binaryBits.toString(), hexBits.toString())
+        assertContentEquals(binaryBits.toBooleanArray(), hexBits.toBooleanArray())
+        assertContentEquals(binaryBits.toByteArray(), hexBits.toByteArray())
+        assertEquals(BitString(binaryBits.length), BitString(hexBits.length))
+        assertEquals(
+            BitString(binaryBits.length, binaryBits.toByteArray()),
+            BitString(hexBits.length, hexBits.toByteArray())
+        )
+        assertEquals(BitString(binaryBits.toByteArray()), BitString(hexBits.toByteArray()))
+        assertEquals(BitString(*binaryBits.toBooleanArray()), BitString(*hexBits.toBooleanArray()))
+    } catch (e: Exception) {
+        fail("binary: $binary hex: $hex", e)
+    }
+}
+
+private fun BooleanArray.joinToBits() =
+    joinToString(separator = "") { if (it) "1" else "0" }
+
+private fun String.toBooleanArray() =
+    mapIndexed { index: Int, c: Char ->
+        when (c) {
+            '1' -> true
+            '0' -> false
+            else -> throw IllegalArgumentException("index: $index char: `$c`")
+        }
+    }

@@ -1,6 +1,7 @@
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
+import org.ton.crypto.hex
 import kotlin.experimental.and
 import kotlin.experimental.inv
 import kotlin.experimental.or
@@ -43,6 +44,7 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
     companion object {
         const val MAX_LENGTH = 1023
+        const val BYTES_SIZE = Byte.SIZE_BYTES * 128
 
         @JvmStatic
         fun of(length: Int, byteArray: ByteArray): BitString =
@@ -50,7 +52,7 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(byteArray: ByteArray): BitString =
-            ByteArrayBitStringImpl(length = byteArray.size * Byte.SIZE_BITS, bytes = byteArray)
+            ByteArrayBitStringImpl(length = min(MAX_LENGTH, byteArray.size * Byte.SIZE_BITS), bytes = byteArray)
 
         @JvmStatic
         fun of(length: Int): BitString = ByteArrayBitStringImpl(length)
@@ -102,11 +104,13 @@ interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
 internal class ByteArrayBitStringImpl constructor(
     override val length: Int = BitString.MAX_LENGTH,
-    private val bytes: ByteArray = ByteArray(length / Byte.SIZE_BITS + if (length % Byte.SIZE_BITS == 0) 0 else 1)
+    bytes: ByteArray = ByteArray(BitString.BYTES_SIZE)
 ) : BitString {
     init {
-        checkLength()
+        checkLength(length, bytes)
     }
+
+    val bytes = bytes.copyOf(BitString.BYTES_SIZE)
 
     override operator fun set(index: Int, bit: Int) = set(index, bit != 0)
 
@@ -167,38 +171,23 @@ internal class ByteArrayBitStringImpl constructor(
     }
 
     override fun toString(): String {
-        if (length == 0) return "_"
+        if (length == 0) return ""
+        val data = appendTag(bytes, length)
+        val result = StringBuilder(hex(data))
+        when (length % 8) {
+            0 -> {
+                result.deleteAt(result.lastIndex)
+                result.deleteAt(result.lastIndex)
+            }
 
-        val stringBuilder = StringBuilder()
+            in 1..3 -> {
+                result[result.lastIndex] = '_'
+            }
 
-        val l = length % 4
-        if (l == 0) {
-            bytes.forEach { byte ->
-                val hex = (byte.toInt() and 0xFF).toString(16).padStart(2, '0').uppercase()
-                stringBuilder.append(hex)
-            }
-            if (length % 8 != 0) {
-                stringBuilder.setLength(stringBuilder.length - 1)
-            }
-        } else {
-            bytes.forEach { byte ->
-                val hex = (byte.toInt() and 0xFF).toString(16).uppercase()
-                stringBuilder.append(hex)
-            }
-            val bitMask = length.bitMask
-            val value = bytes.last() or bitMask
-            val hex = (value.toInt() and 0xFF).toString(16)
-            if (bitMask > 0b0000_1111.toByte()) {
-                val char = hex.first().uppercaseChar()
-                stringBuilder[stringBuilder.lastIndex - 1] = char
-                stringBuilder[stringBuilder.lastIndex] = '_'
-            } else {
-                val char = hex.last().uppercaseChar()
-                stringBuilder[stringBuilder.lastIndex] = char
-                stringBuilder.append('_')
-            }
+            4 -> result.deleteAt(result.lastIndex)
+            else -> result.append('_')
         }
-        return stringBuilder.toString()
+        return result.toString()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -223,10 +212,36 @@ internal class ByteArrayBitStringImpl constructor(
         return result
     }
 
-    private fun checkLength() = require(length <= BitString.MAX_LENGTH) {
-        "BitString length expected: 0..${BitString.MAX_LENGTH}, actual: $length"
+    private fun checkLength(length: Int, bytes: ByteArray) {
+        require(length <= BitString.MAX_LENGTH) {
+            "BitString length expected: 0..${BitString.MAX_LENGTH}, actual: $length"
+        }
+        require(bytes.size <= BitString.BYTES_SIZE) {
+            "ByteArray length expected: 0..${BitString.BYTES_SIZE}, actual: ${bytes.size}"
+        }
     }
 }
 
 private inline val Int.wordIndex get() = (this / Byte.SIZE_BITS) or 0
 private inline val Int.bitMask get() = (1 shl (7 - (this % Byte.SIZE_BITS))).toByte()
+
+private fun appendTag(data: ByteArray, bits: Int): ByteArray {
+    val shift = bits % 8
+    if (shift == 0 || data.isEmpty()) {
+        val newData = data.copyOf(bits / 8 + 1)
+        newData[newData.lastIndex] = 0x80.toByte()
+        return newData
+    } else {
+        val newData = data.copyOf(bits / 8 + 1)
+        var lastByte = newData[newData.lastIndex].toInt()
+        if (shift != 7) {
+            lastByte = lastByte shr (7 - shift)
+        }
+        lastByte = lastByte or 1
+        if (shift != 7) {
+            lastByte = lastByte shl (7 - shift)
+        }
+        newData[newData.lastIndex] = lastByte.toByte()
+        return newData
+    }
+}
