@@ -32,8 +32,7 @@ data class Cell(
     }
 
     val maxDepth: Int by lazy {
-        val maxDepth = refs.maxOf { it.maxDepth }
-        if (refs.isNotEmpty()) maxDepth + 1 else maxDepth
+        refs.maxOfOrNull { it.maxDepth }?.plus(1) ?: 0
     }
 
     fun treeWalk(): Sequence<Cell> = sequence {
