@@ -13,9 +13,13 @@ class BitStringTest {
 
     @Test
     fun bitString_8a_10001010() {
-        val bitString = BitString("8A")
-        assertEquals("10001010", bitString.toBooleanArray().joinToBits())
-        assertEquals("8A", bitString.toString())
+        val bitString1 = BitString("8A")
+        assertEquals("10001010", bitString1.toBooleanArray().joinToBits())
+        assertEquals("8A", bitString1.toString())
+
+        val bitString2 = BitString.binary("10001010")
+        assertEquals("10001010", bitString2.toBooleanArray().joinToBits())
+        assertEquals("8A", bitString2.toString())
     }
 
     @Test
@@ -34,9 +38,13 @@ class BitStringTest {
 
     @Test
     fun bitString_8a__100010() {
-        val bitString = BitString("8A_")
-        assertEquals("100010", bitString.toBooleanArray().joinToBits())
-        assertEquals("8A_", bitString.toString())
+        val bitString1 = BitString("8A_")
+        assertEquals("100010", bitString1.toBooleanArray().joinToBits())
+        assertEquals("8A_", bitString1.toString())
+
+        val bitString2 = BitString.binary("100010")
+        assertEquals("100010", bitString2.toBooleanArray().joinToBits())
+        assertEquals("8A_", bitString2.toString())
     }
 
     @Test
@@ -50,9 +58,24 @@ class BitStringTest {
 
     @Test
     fun bitString_2D9__00101101100() {
-        val bitString = BitString("2D9_")
-        assertEquals("00101101100", bitString.toBooleanArray().joinToBits())
-        assertEquals("2D9_", bitString.toString())
+        val bitString1 = BitString("2D9_")
+        assertEquals("00101101100", bitString1.toBooleanArray().joinToBits())
+        assertEquals("2D9_", bitString1.toString())
+
+        val bitString2 = BitString.binary("00101101100")
+        assertEquals("00101101100", bitString2.toBooleanArray().joinToBits())
+        assertEquals("2D9_", bitString2.toString())
+    }
+
+    @Test
+    fun `BitString 1_ 000`() {
+        val bitString1 = BitString.binary("000")
+        assertEquals("000", bitString1.toBooleanArray().joinToBits())
+        assertEquals("1_", bitString1.toString())
+
+        val bitString2 = BitString.binary("1_")
+        assertEquals("000", bitString2.toBooleanArray().joinToBits())
+        assertEquals("1_", bitString2.toString())
     }
 
     @Test
