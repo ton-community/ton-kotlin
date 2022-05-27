@@ -65,6 +65,20 @@ class BitStringTest {
     }
 
     @Test
+    fun `BitString concatenation with double-shifting`() {
+        assertEquals(BitString("AB"), BitString("A") + BitString("B"))
+        assertEquals(BitString("BC"), BitString("B") + BitString("C"))
+        assertEquals(BitString("CD"), BitString("C") + BitString("D"))
+        assertEquals(BitString.binary("100000010000001"), BitString.binary("1000000") + BitString.binary("10000001"))
+        assertEquals(BitString.binary("100000110000001"), BitString.binary("100000") + BitString.binary("110000001"))
+        assertEquals(BitString.binary("100001110000001"), BitString.binary("10000") + BitString.binary("1110000001"))
+        assertEquals(BitString.binary("100011110000001"), BitString.binary("1000") + BitString.binary("11110000001"))
+        assertEquals(BitString.binary("100111110000001"), BitString.binary("100") + BitString.binary("111110000001"))
+        assertEquals(BitString.binary("101111110000001"), BitString.binary("10") + BitString.binary("1111110000001"))
+        assertEquals(BitString.binary("101111110000001"), BitString.binary("1") + BitString.binary("01111110000001"))
+    }
+
+    @Test
     fun `random BitString`() {
         repeat(100) {
             repeat(BitString.MAX_LENGTH) { length ->
@@ -76,7 +90,7 @@ class BitStringTest {
                     assertContentEquals(bits1, bits2)
 
                     val bytes1 = bitString1.toByteArray()
-                    val bitString2 = BitString(length, bytes1)
+                    val bitString2 = BitString(bytes1, length)
 
                     assertEquals(bitString1, bitString2)
                     assertEquals(bitString1.toString(), bitString2.toString())
@@ -110,10 +124,10 @@ fun assertBitString(binary: String, hex: String) {
         assertEquals(binaryBits.toString(), hexBits.toString())
         assertContentEquals(binaryBits.toBooleanArray(), hexBits.toBooleanArray())
         assertContentEquals(binaryBits.toByteArray(), hexBits.toByteArray())
-        assertEquals(BitString(binaryBits.length), BitString(hexBits.length))
+        assertEquals(BitString(binaryBits.size), BitString(hexBits.size))
         assertEquals(
-            BitString(binaryBits.length, binaryBits.toByteArray()),
-            BitString(hexBits.length, hexBits.toByteArray())
+            BitString(binaryBits.toByteArray(), binaryBits.size),
+            BitString(hexBits.toByteArray(), hexBits.size)
         )
         assertEquals(BitString(binaryBits.toByteArray()), BitString(hexBits.toByteArray()))
         assertEquals(BitString(*binaryBits.toBooleanArray()), BitString(*hexBits.toBooleanArray()))

@@ -177,7 +177,7 @@ fun Output.writeBagOfCells(
         buildPacket {
             val d1 = cell.refs.size + (if (cell.isExotic) 1 else 0) * 8 + cell.maxLevel * 32
             writeByte(d1.toByte())
-            val d2 = ceil(cell.bits.length / 8.0) + floor(cell.bits.length / 8.0)
+            val d2 = ceil(cell.bits.size / 8.0) + floor(cell.bits.size / 8.0)
             writeByte(d2.toInt().toByte())
             writeFully(cell.bits.toByteArray())
             cell.refs.forEach { reference ->

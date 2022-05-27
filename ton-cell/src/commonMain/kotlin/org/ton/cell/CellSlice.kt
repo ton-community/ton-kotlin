@@ -2,6 +2,8 @@ package org.ton.cell
 
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
+import org.ton.bitstring.exception.BitStringUnderflowException
+import org.ton.cell.exception.CellUnderflowException
 
 interface CellSlice {
     val bits: BitString
@@ -73,7 +75,7 @@ private class CellSliceImpl(
     }
 
     override fun endParse() =
-        check(bitsPosition == bits.length) { "bitsPosition: $bitsPosition != bits.length: ${bits.length}" }
+        check(bitsPosition == bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
 
     override fun loadRef(): Cell {
         checkRefsOverflow()
@@ -104,7 +106,11 @@ private class CellSliceImpl(
         return bit
     }
 
-    override fun preloadBit(): Boolean = bits[bitsPosition]
+    override fun preloadBit(): Boolean = try {
+        bits[bitsPosition]
+    } catch (e: BitStringUnderflowException) {
+        throw CellUnderflowException(e)
+    }
 
     override fun loadBits(length: Int): BooleanArray {
         val bits = preloadBits(length)
@@ -123,7 +129,11 @@ private class CellSliceImpl(
     override fun preloadBits(length: Int): BooleanArray {
         checkBitsOverflow(length)
         return BooleanArray(length) { index ->
-            bits[bitsPosition + index]
+            try {
+                bits[bitsPosition + index]
+            } catch (e: BitStringUnderflowException) {
+                throw CellUnderflowException(e)
+            }
         }
     }
 
@@ -153,7 +163,7 @@ private class CellSliceImpl(
     }
 
     private fun checkBitsOverflow(length: Int) {
-        val remaining = bits.length - bitsPosition
+        val remaining = bits.size - bitsPosition
         require(length <= remaining) {
             "Bits overflow. Can't load $length bits. $remaining bits left."
         }

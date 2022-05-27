@@ -8,7 +8,7 @@ abstract class AbstractTlbCombinator<T : Any, C : AbstractTlbConstructor<out T>>
     abstract val constructors: List<AbstractTlbConstructor<*>>
 
     private val sortedConstructors by lazy {
-        constructors.asSequence().sortedBy { it.id.length }
+        constructors.asSequence().sortedBy { it.id.size }
     }
 
     abstract fun getConstructor(value: T): AbstractTlbConstructor<*>
@@ -22,10 +22,10 @@ abstract class AbstractTlbCombinator<T : Any, C : AbstractTlbConstructor<out T>>
 
     fun loadTlbConstructor(cellSlice: CellSlice): C {
         val constructor = sortedConstructors.find { constructor ->
-            val id = cellSlice.preloadBitString(constructor.id.length)
+            val id = cellSlice.preloadBitString(constructor.id.size)
             id == constructor.id
         } ?: throw UnknownTlbConstructorException()
-        cellSlice.loadBits(constructor.id.length)
+        cellSlice.loadBits(constructor.id.size)
         @Suppress("UNCHECKED_CAST")
         return constructor as C
     }

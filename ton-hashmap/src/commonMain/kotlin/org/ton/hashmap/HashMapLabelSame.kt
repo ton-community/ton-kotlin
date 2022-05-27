@@ -16,7 +16,7 @@ data class HashMapLabelSame(
 
     companion object {
         @JvmStatic
-        fun of(key: BitString, length: Int = key.length): HashMapLabelSame? {
+        fun of(key: BitString, length: Int = key.size): HashMapLabelSame? {
             var zeroBitFound = false
             var oneBitFound = false
             key.forEach { bit ->

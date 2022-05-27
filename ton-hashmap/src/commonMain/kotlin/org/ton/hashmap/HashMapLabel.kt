@@ -13,14 +13,14 @@ sealed interface HashMapLabel {
 
     companion object {
         @JvmStatic
-        fun of(key: BitString, max: Int = key.length): HashMapLabel = HashMapLabel(key, max)
+        fun of(key: BitString, max: Int = key.size): HashMapLabel = HashMapLabel(key, max)
     }
 }
 
-fun HashMapLabel(key: BitString, max: Int = key.length): HashMapLabel {
+fun HashMapLabel(key: BitString, max: Int = key.size): HashMapLabel {
     val len = 16 - max.toShort().countLeadingZeroBits()
-    val longLength = 2 + len + key.length
-    val shortLength = 1 + 2 * key.length + 1
+    val longLength = 2 + len + key.size
+    val shortLength = 1 + 2 * key.size + 1
     val sameLength = 2 + 1 + len
     val sameLabel = HashMapLabelSame.of(key)
     if (sameLabel != null) {

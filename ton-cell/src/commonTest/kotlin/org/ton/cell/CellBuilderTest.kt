@@ -12,7 +12,7 @@ class CellBuilderTest {
     fun `build empty`() {
         val cell = CellBuilder.beginCell()
             .endCell()
-        assertEquals(0, cell.bits.length)
+        assertEquals(0, cell.bits.size)
         assertEquals(Cell(""), cell)
     }
 
@@ -40,7 +40,7 @@ class CellBuilderTest {
     fun `fail on too many bits added`() {
         val builder = CellBuilder.beginCell(10)
             .storeUInt(0, 10) // fine for now
-        assertEquals(10, builder.bits.length)
+        assertEquals(10, builder.bits.size)
         assertFails {
             builder.storeBit(false)
         }

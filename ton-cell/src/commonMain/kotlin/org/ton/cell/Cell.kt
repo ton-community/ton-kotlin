@@ -87,7 +87,7 @@ data class Cell(
         (refs.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
 
     private fun bitsDescriptor(): Byte =
-        (ceil(bits.length / 8.0) + floor(bits.length / 8.0)).toInt().toByte()
+        (ceil(bits.size / 8.0) + floor(bits.size / 8.0)).toInt().toByte()
 
     private fun augmentedBytes(): ByteArray =
         BitString(*bits.toBooleanArray().augment()).toByteArray()

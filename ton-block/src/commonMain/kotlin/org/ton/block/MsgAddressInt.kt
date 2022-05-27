@@ -160,7 +160,7 @@ sealed interface MsgAddressInt : MsgAddress {
         constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
         constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
             anycast.toMaybe(),
-            address.length,
+            address.size,
             workchainId,
             address
         )

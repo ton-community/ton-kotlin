@@ -10,7 +10,7 @@ data class HashMapLabelShort(
     val len: Unary,
     override val s: BitString
 ) : HashMapLabel {
-    constructor(s: BitString) : this(Unary(s.length), s)
+    constructor(s: BitString) : this(Unary(s.size), s)
 
     override fun toString() = "hml_short(len=$len, s=$s)"
 }

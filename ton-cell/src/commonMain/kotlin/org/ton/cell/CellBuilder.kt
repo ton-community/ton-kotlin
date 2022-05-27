@@ -2,9 +2,11 @@ package org.ton.cell
 
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
+import org.ton.bitstring.ByteBackedMutableBitString
+import org.ton.bitstring.MutableBitString
 
 interface CellBuilder {
-    var bits: BitString
+    var bits: MutableBitString
     var refs: MutableList<Cell>
 
     /**
@@ -69,7 +71,8 @@ interface CellBuilder {
 
     companion object {
         @JvmStatic
-        fun of(cell: Cell): CellBuilder = CellBuilderImpl(BitString.MAX_LENGTH, cell.bits, cell.refs.toMutableList())
+        fun of(cell: Cell): CellBuilder =
+            CellBuilderImpl(BitString.MAX_LENGTH, cell.bits.toMutableBitString(), cell.refs.toMutableList())
 
         @JvmStatic
         fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
@@ -88,10 +91,10 @@ fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -
 
 private class CellBuilderImpl(
     maxLength: Int,
-    override var bits: BitString = BitString(maxLength),
+    override var bits: MutableBitString = ByteBackedMutableBitString.of(maxLength),
     override var refs: MutableList<Cell> = ArrayList()
 ) : CellBuilder {
-    private val remainder: Int get() = bits.length - writePosition
+    private val remainder: Int get() = bits.size - writePosition
     private var writePosition: Int = 0
 
     override fun endCell(): Cell = Cell(bits.slice(0 until writePosition), refs)
@@ -141,7 +144,7 @@ private class CellBuilderImpl(
     override fun storeSlice(slice: CellSlice): CellBuilder = apply {
         val (bits, refs) = slice
 
-        checkBitsOverflow(bits.length)
+        checkBitsOverflow(bits.size)
         checkRefsOverflow(refs.size)
 
         storeBits(bits)

@@ -21,7 +21,7 @@ data class VmCellSlice(
     constructor(cellSlice: CellSlice) : this(
         cell = Cell(cellSlice.bits, cellSlice.refs),
         stBits = cellSlice.bitsPosition,
-        endBits = cellSlice.bits.length,
+        endBits = cellSlice.bits.size,
         stRef = cellSlice.refsPosition,
         endRef = cellSlice.refs.size
     )

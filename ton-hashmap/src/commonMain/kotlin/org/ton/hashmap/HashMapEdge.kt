@@ -25,16 +25,16 @@ data class HashMapEdge<T : Any>(
     fun toMap(): Map<BitString, T> = nodes().toMap()
 
     companion object {
-        fun <T : Any> of(map: Map<BitString, T>) {
-            var length = 0
-            map.asSequence().sortedByDescending { (key, _) ->
-                key
-            }.forEach { (key, value) ->
-                if (key.length > length) {
-
-                }
-                key.length
-            }
-        }
+//        fun <T : Any> of(map: Map<BitString, T>) {
+//            var length = 0
+//            map.asSequence().sortedByDescending { (key, _) ->
+//                key
+//            }.forEach { (key, value) ->
+//                if (key.size > length) {
+//
+//                }
+//                key.size
+//            }
+//        }
     }
 }

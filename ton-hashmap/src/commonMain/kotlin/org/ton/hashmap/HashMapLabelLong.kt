@@ -10,7 +10,7 @@ data class HashMapLabelLong(
     val n: Int,
     override val s: BitString
 ) : HashMapLabel {
-    constructor(s: BitString) : this(s.length, s)
+    constructor(s: BitString) : this(s.size, s)
 
     override fun toString() = "hml_long(n=$n, s=$s)"
 }

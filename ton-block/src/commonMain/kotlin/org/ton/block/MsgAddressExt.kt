@@ -22,10 +22,10 @@ sealed interface MsgAddressExt : MsgAddress {
         val externalAddress: BitString
     ) : MsgAddressExt {
         init {
-            require(len == externalAddress.length)
+            require(len == externalAddress.size)
         }
 
-        constructor(externalAddress: BitString) : this(externalAddress.length, externalAddress)
+        constructor(externalAddress: BitString) : this(externalAddress.size, externalAddress)
     }
 
     companion object {
