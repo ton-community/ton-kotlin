@@ -9,7 +9,7 @@ import org.ton.lite.api.LiteApi
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 
-class LiteClient(
+open class LiteClient(
     val adnlTcpClient: AdnlTcpClient
 ) : LiteApi {
     constructor(
