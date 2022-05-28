@@ -1,11 +1,11 @@
 package org.ton.crypto
 
-import java.nio.ByteBuffer
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.PBEKeySpec
+import org.bouncycastle.crypto.digests.SHA512Digest
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator
+import org.bouncycastle.crypto.params.KeyParameter
 
 actual fun pbkdf2Sha512(key: ByteArray, salt: ByteArray, iterations: Int): ByteArray {
-    val spec = PBEKeySpec(Charsets.US_ASCII.decode(ByteBuffer.wrap(key)).array(), salt, iterations, 512)
-
-    return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512").generateSecret(spec).encoded
+    val gen = PKCS5S2ParametersGenerator(SHA512Digest())
+    gen.init(key, salt, iterations)
+    return (gen.generateDerivedParameters(512) as KeyParameter).key
 }
