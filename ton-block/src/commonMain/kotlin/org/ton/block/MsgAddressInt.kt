@@ -6,7 +6,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
 import org.ton.crypto.*
@@ -129,7 +128,7 @@ sealed interface MsgAddressInt : MsgAddress {
                             this,
                             testOnly,
                             bounceable
-                        ).toBigInt() == BigInt(raw.sliceArray(34..35)))
+                        ) == raw[34].toUByte().toInt() * 256 + raw[35].toUByte().toInt())
                     ) { "CRC check failed" }
                 }
             }
