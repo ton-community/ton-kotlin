@@ -6,6 +6,8 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.api.pub.PublicKeyEd25519
+import org.ton.crypto.Ed25519
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
@@ -61,6 +63,17 @@ data class PrivateKeyUnencrypted(
 data class PrivateKeyEd25519(
         val key: ByteArray
 ) : PrivateKey {
+    init {
+        require(key.size == 32) { "key size expected: 32 actual: ${key.size}" }
+    }
+
+    fun publicKey(): PublicKeyEd25519 = PublicKeyEd25519(
+        Ed25519.publicKey(key)
+    )
+
+    fun sign(byteArray: ByteArray): ByteArray =
+        Ed25519.sign(key, byteArray)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -76,9 +89,11 @@ data class PrivateKeyEd25519(
         return key.contentHashCode()
     }
 
+    override fun toString(): String = "pk.ed25519"
+
     companion object : TlConstructor<PrivateKeyEd25519>(
-            type = PrivateKeyEd25519::class,
-            schema = "pk.ed25519 key:int256 = PrivateKey"
+        type = PrivateKeyEd25519::class,
+        schema = "pk.ed25519 key:int256 = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyEd25519) {
             output.writeFully(value.key)

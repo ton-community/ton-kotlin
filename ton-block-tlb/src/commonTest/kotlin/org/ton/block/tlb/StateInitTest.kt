@@ -18,6 +18,7 @@ class StateInitTest {
 
     @Test
     fun `serialization of an example wallet StateInit`() {
+
         val publicKey = "4745ede03eb4ef607843359c1f206d061a5632f68caa6f63021aa23b400950fd"
         val hash = "2c49a26a126a6e3a7b1a99c5041698504cbef27fca60a230f2f475954deb07cf"
 

@@ -33,8 +33,13 @@ sealed interface CommonMsgInfo {
         val src: MsgAddressExt,
         val dest: MsgAddressInt,
         @SerialName("import_fee")
-        val importFee: Coins
-    ) : CommonMsgInfo
+        val importFee: Coins = Coins(0)
+    ) : CommonMsgInfo {
+        constructor(
+            dest: MsgAddressInt,
+            importFee: Coins = Coins(0)
+        ) : this(MsgAddressExt.AddrNone, dest, importFee)
+    }
 
     @SerialName("ext_out_msg_info")
     data class ExtOutMsgInfo(

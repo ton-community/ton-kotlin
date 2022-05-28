@@ -11,7 +11,10 @@ import org.ton.bitstring.BitString
 sealed interface HashMapE<T : Any> {
     fun <K> toMap(keyTransform: (BitString) -> K): Map<K, T>
     fun toMap(): Map<BitString, T>
-}
 
+    companion object {
+        fun <T : Any> of(): HashMapE<T> = EmptyHashMapE()
+    }
+}
 
 

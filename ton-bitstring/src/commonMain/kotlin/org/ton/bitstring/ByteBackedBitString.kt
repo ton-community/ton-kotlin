@@ -147,8 +147,8 @@ open class ByteBackedBitString protected constructor(
 
         @JvmStatic
         protected fun expandByteArray(bytes: ByteArray, size: Int): ByteArray {
-            return if (bytes.size == bytesSize(size)) {
-                checkSize(size)
+            val requiredBytesSize = bytesSize(size)
+            return if (bytes.size == requiredBytesSize) {
                 bytes
             } else {
                 constructByteArray(bytes, size)
@@ -173,7 +173,10 @@ open class ByteBackedBitString protected constructor(
             return (bytes[byteIndex] and bitMask) != 0.toByte()
         }
 
-        private fun bytesSize(bits: Int) = bits / Byte.SIZE_BITS + if (bits % Byte.SIZE_BITS == 0) 0 else 1
+        private fun bytesSize(bits: Int): Int {
+            checkSize(bits)
+            return bits / Byte.SIZE_BITS + if (bits % Byte.SIZE_BITS == 0) 0 else 1
+        }
     }
 }
 

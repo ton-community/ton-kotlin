@@ -7,6 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.crypto.Ed25519
 import org.ton.crypto.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
@@ -71,6 +72,13 @@ data class PublicKeyEd25519(
         @Serializable(Base64ByteArraySerializer::class)
         val key: ByteArray
 ) : PublicKey {
+    init {
+        require(key.size == 32) { "key size expected: 32 actual: ${key.size}" }
+    }
+
+    fun verify(signature: ByteArray, byteArray: ByteArray): Boolean =
+        Ed25519.verify(signature, key, byteArray)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

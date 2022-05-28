@@ -24,6 +24,8 @@ interface CellBuilder {
     fun storeBits(vararg bits: Boolean): CellBuilder
     fun storeBits(bits: Iterable<Boolean>): CellBuilder
 
+    fun storeBytes(byteArray: ByteArray): CellBuilder
+
     /**
      * Stores a reference to cell into builder.
      */
@@ -112,6 +114,12 @@ private class CellBuilderImpl(
     }
 
     override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(*bits.toList().toBooleanArray())
+
+    override fun storeBytes(byteArray: ByteArray): CellBuilder = apply {
+        byteArray.forEach { byte ->
+            storeUInt(byte.toInt() and 0xFF, Byte.SIZE_BITS)
+        }
+    }
 
     override fun storeRef(ref: Cell): CellBuilder = apply {
         checkRefsOverflow(1)

@@ -8,12 +8,12 @@ kotlin {
         commonMain {
             dependencies {
                 api(libs.ktor.utils)
+                api(libs.curve25519)
                 compileOnly(libs.serialization.core)
             }
         }
         jvmMain {
             dependencies {
-                implementation(libs.curve25519)
                 implementation(libs.bouncycastle)
             }
         }
