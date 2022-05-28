@@ -66,6 +66,8 @@ enum class CellType(
     MERKLE_UPDATE(4);
 
     val isExotic: Boolean get() = this != ORDINARY
+    val isMerkle: Boolean get() = this == MERKLE_PROOF || this == MERKLE_UPDATE
+    val isPruned: Boolean get() = this == PRUNED_BRANCH
 
     companion object {
         operator fun get(index: Int) = values()[index]

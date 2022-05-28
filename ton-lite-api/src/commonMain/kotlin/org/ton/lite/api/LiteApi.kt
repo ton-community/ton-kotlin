@@ -6,7 +6,7 @@ import org.ton.block.MsgAddressInt
 import org.ton.block.VmStack
 import org.ton.block.VmStackList
 import org.ton.block.VmStackValue
-import org.ton.cell.BagOfCells
+import org.ton.boc.BagOfCells
 import org.ton.lite.api.liteserver.*
 import org.ton.tl.TlConstructor
 

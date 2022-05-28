@@ -7,6 +7,10 @@ kotlin {
                 implementation(projects.tonTlb)
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(projects.tonBoc)
+            }
+        }
     }
 }

@@ -1,68 +1,12 @@
-package org.ton.cell
+package org.ton.boc
 
-import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell
+import org.ton.cell.CellType
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.floor
-
-private const val BOC_GENERIC_MAGIC = 0xB5EE9C72.toInt()
-private const val BOC_INDEXED_MAGIC = 0x68FF65F3
-private const val BOC_INDEXED_CRC32C_MAGIC = 0xACC3A728.toInt()
-
-data class BagOfCells(
-        val roots: List<Cell>,
-        val isIndexed: Boolean = false,
-        val crc32hash: ByteArray? = null
-) : Iterable<Cell> by roots {
-    constructor(root: Cell) : this(roots = listOf(root))
-
-    constructor(
-        root: Cell,
-        isIndexed: Boolean,
-        crc32hash: ByteArray?
-    ) : this(listOf(root), isIndexed, crc32hash)
-
-    fun treeWalk(): Sequence<Cell> = sequence {
-        yieldAll(roots)
-        roots.forEach { root ->
-            yieldAll(root.treeWalk())
-        }
-    }.distinct()
-
-    fun toByteArray(): ByteArray = buildPacket {
-        writeBagOfCells(this@BagOfCells)
-    }.readBytes()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as BagOfCells
-
-        if (roots != other.roots) return false
-        if (isIndexed != other.isIndexed) return false
-        if (crc32hash != null) {
-            if (other.crc32hash == null) return false
-            if (!crc32hash.contentEquals(other.crc32hash)) return false
-        } else if (other.crc32hash != null) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = roots.hashCode()
-        result = 31 * result + isIndexed.hashCode()
-        result = 31 * result + (crc32hash?.contentHashCode() ?: 0)
-        return result
-    }
-
-    override fun toString(): String =
-            "BagOfCells(roots=$roots, isIndexed=$isIndexed, crc32hash=${crc32hash?.let { hex(it) }})"
-}
-
-fun BagOfCells(byteArray: ByteArray) = ByteReadPacket(byteArray).readBagOfCell()
 
 fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
@@ -72,7 +16,7 @@ fun Input.readBagOfCell(): BagOfCells {
     val flags: Int
     val sizeBytes: Int
     when (prefix) {
-        BOC_GENERIC_MAGIC -> {
+        BagOfCells.BOC_GENERIC_MAGIC -> {
             val flagsByte = readByte()
             hasIdx = (flagsByte and 128.toByte()) != 0.toByte()
             hashCrc32 = (flagsByte and 64.toByte()) != 0.toByte()
@@ -80,7 +24,8 @@ fun Input.readBagOfCell(): BagOfCells {
             flags = (flagsByte and 16) * 2 + (flagsByte and 8)
             sizeBytes = flagsByte % 8
         }
-        BOC_INDEXED_MAGIC -> {
+
+        BagOfCells.BOC_INDEXED_MAGIC -> {
             TODO()
 //            hasIdx = true
 //            hashCrc32 = false
@@ -88,7 +33,8 @@ fun Input.readBagOfCell(): BagOfCells {
 //            flags = 0
 //            sizeBytes = readByte().toInt()
         }
-        BOC_INDEXED_CRC32C_MAGIC -> {
+
+        BagOfCells.BOC_INDEXED_CRC32C_MAGIC -> {
             TODO()
 //            hasIdx = true
 //            hashCrc32 = true
@@ -96,6 +42,7 @@ fun Input.readBagOfCell(): BagOfCells {
 //            flags = 0
 //            sizeBytes = readByte().toInt()
         }
+
         else -> throw IllegalArgumentException("Unknown magic prefix: ${prefix.toString(16)}")
     }
 
@@ -143,7 +90,7 @@ fun Input.readBagOfCell(): BagOfCells {
         val refs = references[cellIndex].map { referenceIndex ->
             requireNotNull(doneCells[referenceIndex])
         }
-        val cell = Cell(BitString(cellData), refs, cellsType[cellIndex])
+        val cell = Cell.of(BitString(cellData), refs, cellsType[cellIndex])
         doneCells[cellIndex] = cell
     }
 
@@ -157,13 +104,12 @@ fun Input.readBagOfCell(): BagOfCells {
     return BagOfCells(roots)
 }
 
-
 fun Output.writeBagOfCells(
-        bagOfCells: BagOfCells,
-        hasIndex: Boolean = false,
-        hasCrc32c: Boolean = false,
-        hasCacheBits: Boolean = false,
-        flags: Int = 0
+    bagOfCells: BagOfCells,
+    hasIndex: Boolean = false,
+    hasCrc32c: Boolean = false,
+    hasCacheBits: Boolean = false,
+    flags: Int = 0
 ) {
     val cells = bagOfCells.treeWalk().distinct().toList()
     val cellsCount = cells.size
@@ -197,7 +143,7 @@ fun Output.writeBagOfCells(
         offsetBytes++
     }
 
-    writeInt(BOC_GENERIC_MAGIC)
+    writeInt(BagOfCells.BOC_GENERIC_MAGIC)
 
     var flagsByte = 0
     if (hasIndex) {

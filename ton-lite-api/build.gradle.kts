@@ -6,9 +6,9 @@ kotlin {
                 api(projects.tonTlb)
                 api(projects.tonBlock)
                 api(projects.tonBlockTlb)
-                api(projects.tonBitstring)
                 api(projects.tonCrypto)
                 api(projects.tonCell)
+                api(projects.tonBoc)
                 api(projects.tonApi)
                 implementation(libs.serialization.json)
             }

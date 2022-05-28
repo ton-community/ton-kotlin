@@ -17,6 +17,7 @@ enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     versionCatalogs {
         create("libs") {
             from(files("libs.versions.toml"))
@@ -38,5 +39,6 @@ include(":ton-lite-api")
 include(":ton-lite-client")
 include(":ton-logger")
 include(":ton-mnemonic")
+include(":ton-smartcontract")
 include(":ton-tl")
 include(":ton-tlb")

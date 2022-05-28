@@ -13,7 +13,7 @@ class CellBuilderTest {
         val cell = CellBuilder.beginCell()
             .endCell()
         assertEquals(0, cell.bits.size)
-        assertEquals(Cell(""), cell)
+        assertEquals(Cell(), cell)
     }
 
     @Test
@@ -73,7 +73,8 @@ class CellBuilderTest {
         assertEquals(Cell("3B9ACAEF"), CellBuilder.createCell { storeInt(1000000239, 32) })
         assertEquals(
             Cell("00000001BC16E45E4D41643_"),
-            CellBuilder.createCell { storeInt(1000000239L * 1000000239, 91) })
+            CellBuilder.createCell { storeInt(1000000239L * 1000000239, 91) }
+        )
         assertEquals(
             Cell("989A386C05EFF862FFFFE23_"),
             CellBuilder.createCell { storeInt(BigInt("-1000000000000000000000000239"), 91) })

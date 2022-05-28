@@ -2,9 +2,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.tonBitstring)
-                api(projects.tonBigint)
-                api(projects.tonCrypto)
+                api(projects.tonCell)
+                implementation(libs.ktor.utils)
                 implementation(libs.serialization.json)
             }
         }

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.VmStack
 import org.ton.block.tlb.tlbCodec
-import org.ton.cell.BagOfCells
+import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.crc16
