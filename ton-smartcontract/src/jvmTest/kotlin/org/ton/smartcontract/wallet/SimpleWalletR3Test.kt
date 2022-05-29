@@ -27,15 +27,7 @@ suspend fun main() {
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
 
-    val messageCodec = Message.tlbCodec(object : TlbCodec<BitString> {
-        override fun storeTlb(cellBuilder: CellBuilder, value: BitString) {
-            cellBuilder.storeBits(value)
-        }
-
-        override fun loadTlb(cellSlice: CellSlice): BitString {
-            return cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
-        }
-    })
+    val messageCodec = Message.tlbCodec(AnyCodec)
     val bocExample = BagOfCells(queryFile.readBytes())
     val messageExample = bocExample.first().beginParse().loadTlb(messageCodec)
     println("Example: $messageExample")
@@ -56,4 +48,14 @@ suspend fun main() {
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     ).connect()
     liteClient.sendMessage(boc.toByteArray())
+}
+
+object AnyCodec : TlbCodec<BitString> {
+    override fun storeTlb(cellBuilder: CellBuilder, value: BitString) {
+        cellBuilder.storeBits(value)
+    }
+
+    override fun loadTlb(cellSlice: CellSlice): BitString {
+        return cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
+    }
 }
