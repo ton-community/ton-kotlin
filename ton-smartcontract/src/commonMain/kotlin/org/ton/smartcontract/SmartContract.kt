@@ -12,10 +12,10 @@ interface SmartContract {
     val name: String
     val code: Cell
 
-    fun createData(): Cell
+    fun createDataInit(): Cell
 
     fun createStateInit(): StateInit = StateInit(
-        code, createData()
+        code, createDataInit()
     )
 
     fun address(stateInit: StateInit = createStateInit()): MsgAddressInt.AddrStd =

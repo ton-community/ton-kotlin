@@ -16,19 +16,19 @@ abstract class WalletContract(
         privateKey.publicKey()
     }
 
-    override fun createData(): Cell = CellBuilder.createCell {
+    override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
-        storeBytes(privateKey.key)
+        storeBytes(publicKey.key)
     }
 
-    fun createSigningMessage(seqno: Int = 0): Cell = CellBuilder.createCell {
+    fun createSigningMessage(seqno: Int): Cell = CellBuilder.createCell {
         storeUInt(seqno, 32)
     }
 
     fun createInitMessage(): Message<BitString> {
         val stateInit = createStateInit()
         val dest = address(stateInit)
-        val signingMessage = createSigningMessage()
+        val signingMessage = createSigningMessage(0)
         val signature = privateKey.sign(signingMessage.hash())
         val body = CellBuilder.createCell {
             storeBytes(signature)
