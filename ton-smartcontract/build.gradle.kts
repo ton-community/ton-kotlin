@@ -7,5 +7,10 @@ kotlin {
                 api(projects.tonCrypto)
             }
         }
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

@@ -1,19 +1,16 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.bitstring.BitString
 import org.ton.block.Message
 import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
-import org.ton.tlb.TlbCodec
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
 import java.io.File
 
 suspend fun main() {
@@ -27,7 +24,7 @@ suspend fun main() {
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
 
-    val messageCodec = Message.tlbCodec(AnyCodec)
+    val messageCodec = Message.tlbCodec(AnyTlbConstructor)
     val bocExample = BagOfCells(queryFile.readBytes())
     val messageExample = bocExample.first().beginParse().loadTlb(messageCodec)
     println("Example: $messageExample")
@@ -35,7 +32,7 @@ suspend fun main() {
 
     val message = simpleWalletR3.createInitMessage()
     val cell = CellBuilder.createCell {
-        storeTlb(messageCodec, message)
+        messageCodec.storeTlb(this, message)
     }
     val boc = BagOfCells(cell)
     println("Current: $message")
@@ -48,14 +45,4 @@ suspend fun main() {
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     ).connect()
     liteClient.sendMessage(boc.toByteArray())
-}
-
-object AnyCodec : TlbCodec<BitString> {
-    override fun storeTlb(cellBuilder: CellBuilder, value: BitString) {
-        cellBuilder.storeBits(value)
-    }
-
-    override fun loadTlb(cellSlice: CellSlice): BitString {
-        return cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
-    }
 }
