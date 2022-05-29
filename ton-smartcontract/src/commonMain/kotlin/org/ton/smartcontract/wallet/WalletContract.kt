@@ -1,8 +1,9 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.bitstring.BitString
 import org.ton.block.CommonMsgInfo
-import org.ton.block.MsgAddressInt
+import org.ton.block.Message
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.smartcontract.SmartContract
@@ -24,14 +25,20 @@ abstract class WalletContract(
         storeUInt(seqno, 32)
     }
 
-    fun createInitExternalMessage(
-        dest: MsgAddressInt.AddrStd
-    ) {
+    fun createInitMessage(): Message<BitString> {
         val stateInit = createStateInit()
+        val dest = address(stateInit)
         val signingMessage = createSigningMessage()
         val signature = privateKey.sign(signingMessage.hash())
-
-        val extInMsgInfo = CommonMsgInfo.ExtInMsgInfo(dest)
-
+        val body = CellBuilder.createCell {
+            storeBytes(signature)
+            storeBits(signingMessage.bits)
+        }.bits
+        val info = CommonMsgInfo.ExtInMsgInfo(dest)
+        return Message(
+            info,
+            stateInit to null,
+            body to null
+        )
     }
 }

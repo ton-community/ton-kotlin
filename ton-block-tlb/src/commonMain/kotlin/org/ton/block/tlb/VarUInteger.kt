@@ -16,14 +16,14 @@ private class VarUIntegerTlbConstructor(
     override fun storeTlb(
         cellBuilder: CellBuilder, value: VarUInteger
     ) = cellBuilder {
-        storeUIntLeq(value.len, n)
+        storeUIntLes(value.len, n)
         storeUInt(value.value, value.len * 8)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): VarUInteger = cellSlice {
-        val len = loadUIntLeq(n).toInt()
+        val len = loadUIntLes(n).toInt()
         val value = loadUInt(len)
         VarUInteger(len, value)
     }

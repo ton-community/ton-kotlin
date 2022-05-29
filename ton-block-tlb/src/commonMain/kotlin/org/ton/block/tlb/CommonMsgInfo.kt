@@ -12,7 +12,7 @@ private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
         IntMsgInfoTlbConstructor()
     }
     private val extInMsgConstructor by lazy {
-        IntMsgInfoTlbConstructor()
+        ExtInMsgInfoTlbConstructor()
     }
     private val extOutMsgInfoConstructor by lazy {
         ExtOutMsgInfoTlbConstructor()

@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_USAGE")
+
 package org.ton.block
 
 import kotlinx.serialization.SerialName

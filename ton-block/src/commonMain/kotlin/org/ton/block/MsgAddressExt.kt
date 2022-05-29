@@ -12,7 +12,9 @@ import org.ton.bitstring.BitString
 sealed interface MsgAddressExt : MsgAddress {
     @SerialName("addr_none")
     @Serializable
-    object AddrNone : MsgAddressExt
+    object AddrNone : MsgAddressExt {
+        override fun toString(): String = "addr_none"
+    }
 
     @SerialName("addr_extern")
     @Serializable
@@ -35,7 +37,7 @@ sealed interface MsgAddressExt : MsgAddress {
 }
 
 fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt =
-    if (externalAddress == null || externalAddress.isEmpty()) {
+    if (externalAddress.isNullOrEmpty()) {
         MsgAddressExt.AddrNone
     } else {
         MsgAddressExt.AddrExtern(externalAddress)

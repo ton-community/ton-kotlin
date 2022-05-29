@@ -58,6 +58,12 @@ allprojects {
                     implementation(kotlin("test"))
                 }
             }
+            val jvmTest by getting {
+                dependencies {
+                    implementation(kotlin("test"))
+                    implementation("junit:junit:4.13.1")
+                }
+            }
         }
     }
 

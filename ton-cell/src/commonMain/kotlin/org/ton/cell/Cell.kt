@@ -77,26 +77,15 @@ interface Cell {
             firstChild: Boolean = true
         ) {
             appendable.append(indent)
-            if (firstChild) {
-                if (lastChild) {
-                    appendable.append(" └─")
-                } else {
-                    appendable.append(" ├─")
-                }
-            } else {
-                if (lastChild) {
-                    appendable.append("   ")
-                } else {
-                    appendable.append(" │ ")
-                }
-            }
+            appendable.append("x{")
             appendable.append(cell.bits.toString())
+            appendable.append("}")
             cell.refs.forEachIndexed { index, reference ->
+                appendable.append('\n')
                 val firstRef = index == 0
                 val lastRef = index == cell.refs.lastIndex
-                toString(reference, appendable, "$indent ", firstRef, lastRef)
+                toString(reference, appendable, "$indent    ", firstRef, lastRef)
             }
-            appendable.append('\n')
         }
     }
 }

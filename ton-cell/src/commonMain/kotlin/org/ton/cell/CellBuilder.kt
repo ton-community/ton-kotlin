@@ -9,6 +9,8 @@ interface CellBuilder {
     var bits: MutableBitString
     var refs: MutableList<Cell>
 
+    val bitsPosition: Int
+
     /**
      * @return the depth of builder. If no cell references are stored in builder, then returns `0`;
      * otherwise the returned value is one plus the maximum of depths of cells referred to from builder.
@@ -96,20 +98,20 @@ private class CellBuilderImpl(
     override var bits: MutableBitString = ByteBackedMutableBitString.of(maxLength),
     override var refs: MutableList<Cell> = ArrayList()
 ) : CellBuilder {
-    private val remainder: Int get() = bits.size - writePosition
-    private var writePosition: Int = 0
+    private val remainder: Int get() = bits.size - bitsPosition
+    override var bitsPosition: Int = 0
 
-    override fun endCell(): Cell = Cell(bits.slice(0 until writePosition), refs)
+    override fun endCell(): Cell = Cell(bits.slice(0 until bitsPosition), refs)
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
-        bits[writePosition++] = bit
+        bits[bitsPosition++] = bit
     }
 
     override fun storeBits(vararg bits: Boolean): CellBuilder = apply {
         checkBitsOverflow(bits.size)
         bits.forEach { bit ->
-            this.bits[writePosition++] = bit
+            this.bits[bitsPosition++] = bit
         }
     }
 

@@ -156,6 +156,7 @@ private class CellSliceImpl(
     }
 
     override fun preloadUInt(length: Int): BigInt {
+        if (length == 0) return BigInt(0)
         val bits = preloadBits(length)
         // TODO: optimize with bit operations
         val intBits = bits.joinToString(separator = "") { if (it) "1" else "0" }

@@ -4,12 +4,14 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface CommonMsgInfo {
     @SerialName("int_msg_info")
+    @Serializable
     data class IntMsgInfo(
         @SerialName("ihr_disabled")
         val ihrDisabled: Boolean,
@@ -29,6 +31,7 @@ sealed interface CommonMsgInfo {
     ) : CommonMsgInfo
 
     @SerialName("ext_in_msg_info")
+    @Serializable
     data class ExtInMsgInfo(
         val src: MsgAddressExt,
         val dest: MsgAddressInt,
@@ -39,9 +42,12 @@ sealed interface CommonMsgInfo {
             dest: MsgAddressInt,
             importFee: Coins = Coins(0)
         ) : this(MsgAddressExt.AddrNone, dest, importFee)
+
+        override fun toString(): String = Json.encodeToString(serializer(), this)
     }
 
     @SerialName("ext_out_msg_info")
+    @Serializable
     data class ExtOutMsgInfo(
         val src: MsgAddressInt,
         val dest: MsgAddressExt,

@@ -5,6 +5,7 @@ package org.ton.block
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
@@ -53,15 +54,7 @@ sealed interface MsgAddressInt : MsgAddress {
             return result
         }
 
-        override fun toString() = buildString {
-            append("MsgAddressInt.AddrStd(anycast=")
-            append(anycast)
-            append(", workchainId=")
-            append(workchainId)
-            append(", address=")
-            append(hex(address))
-            append(")")
-        }
+        override fun toString() = Json.encodeToString(serializer(), this)
 
         fun toString(
             userFriendly: Boolean = true,

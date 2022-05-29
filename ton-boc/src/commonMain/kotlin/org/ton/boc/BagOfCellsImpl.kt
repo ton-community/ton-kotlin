@@ -52,13 +52,11 @@ internal data class BagOfCellsImpl(
     }
 
     override fun toString(): String = buildString {
-        append("BagOfCells(roots=")
-        append(roots)
-        append(", isIndexed=")
+        append("BagOfCells(isIndexed=")
         append(isIndexed)
         append(", crc32hash=")
         append(crc32hash?.let { hex(it) })
-        append(")")
+        append(")\n")
         roots.forEachIndexed { index, cell ->
             val firstChild = index == 0
             val lastChild = index == roots.lastIndex
