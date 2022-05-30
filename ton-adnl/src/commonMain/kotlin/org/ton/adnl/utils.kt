@@ -14,7 +14,7 @@ fun ipv4(host: String): Int {
     val bytes = host.split('.').reversed()
     require(bytes.size == 4) { "Invalid IPv4 address" }
     var result = 0
-    bytes.forEach { byte ->
+    bytes.asReversed().forEach { byte ->
         result = (result shl 8) or (byte.toInt() and 0xFF)
     }
     return result
