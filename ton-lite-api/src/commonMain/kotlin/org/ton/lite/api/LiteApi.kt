@@ -31,6 +31,9 @@ interface LiteApi {
     suspend fun getMasterchainInfo(): LiteServerMasterchainInfo =
         sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
 
+    suspend fun sendMessage(bagOfCells: BagOfCells): LiteServerSendMsgStatus =
+        sendMessage(LiteServerSendMessage(bagOfCells))
+
     suspend fun sendMessage(body: ByteArray): LiteServerSendMsgStatus =
         sendMessage(LiteServerSendMessage(body))
 

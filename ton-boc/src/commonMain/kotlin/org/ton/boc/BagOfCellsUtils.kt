@@ -65,32 +65,35 @@ fun Input.readBagOfCell(): BagOfCells {
         }
     } else null
 
-    val cellsData = Array(cellsCount) { byteArrayOf() }
+    val cellsData = Array(cellsCount) { ByteArray(128) }
     val references = Array(cellsCount) { intArrayOf() }
     val cellsType = Array(cellsCount) { CellType.ORDINARY }
     repeat(cellsCount) { cellIndex ->
-        val d1 = readByte()
-        val d2 = readByte().toInt() and 0XFF
-        val isExotic = (d1 and 8) != 0.toByte()
+        val d1 = readByte().toInt() and 0xFF
+        val d2 = readByte().toInt() and 0xFF
+        val isExotic = (d1 and 8) != 0
         val referenceCount = d1 % 8
         val fullFilledBytes = d2 % 2 == 0
         val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
-        val data = readBytes(dataSize)
-        cellsData[cellIndex] = data
+        cellsData[cellIndex] = readBytes(dataSize)
+        if (fullFilledBytes) {
+            cellsData[cellIndex] = BitString.appendAugmentTag(cellsData[cellIndex], dataSize * 8)
+        }
         references[cellIndex] = IntArray(referenceCount) {
             readInt(sizeBytes)
         }
-        cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[data[0].toInt()]
+        cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
     }
 
     // Resolving references & constructing cells from leaves to roots
     val doneCells = Array<Cell?>(cellsCount) { null }
     for (cellIndex in cellsCount - 1 downTo 0) {
         val cellData = cellsData[cellIndex]
+        val cellSize = BitString.findAugmentTag(cellData)
         val refs = references[cellIndex].map { referenceIndex ->
             requireNotNull(doneCells[referenceIndex])
         }
-        val cell = Cell.of(BitString(cellData), refs, cellsType[cellIndex])
+        val cell = Cell.of(BitString(cellData, cellSize), refs, cellsType[cellIndex])
         doneCells[cellIndex] = cell
     }
 
@@ -123,9 +126,13 @@ fun Output.writeBagOfCells(
         buildPacket {
             val d1 = cell.refs.size + (if (cell.isExotic) 1 else 0) * 8 + cell.maxLevel * 32
             writeByte(d1.toByte())
-            val d2 = ceil(cell.bits.size / 8.0) + floor(cell.bits.size / 8.0)
-            writeByte(d2.toInt().toByte())
-            writeFully(cell.bits.toByteArray())
+            val d2 = ceil(cell.bits.size / 8.0).toInt() + floor(cell.bits.size / 8.0).toInt()
+            writeByte(d2.toByte())
+            val cellData = if (cell.bits.size % 8 != 0) {
+                BitString.appendAugmentTag(cell.bits.toByteArray(), cell.bits.size)
+            } else cell.bits.toByteArray()
+//            println("WriteData: ${hex(cellData)}")
+            writeFully(cellData)
             cell.refs.forEach { reference ->
                 writeInt(cells.indexOf(reference), sizeBytes)
             }
@@ -174,7 +181,8 @@ fun Output.writeBagOfCells(
         }
     }
     serializedCells.forEach { serializedCell ->
-        writePacket(serializedCell)
+        val bytes = serializedCell.readBytes()
+        writeFully(bytes)
     }
     if (hasCrc32c) {
         TODO()

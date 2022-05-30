@@ -5,16 +5,15 @@ import org.ton.block.Message
 import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
+import org.ton.crypto.base64
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.loadTlb
 import java.io.File
 
 suspend fun main() {
-    val queryFile = File("C:\\Users\\andreypfau\\ton\\wallet\\new-wallet-query.boc")
     val pkFile = File("C:\\Users\\andreypfau\\ton\\wallet\\new-wallet.pk")
     val privateKey = PrivateKeyEd25519(pkFile.readBytes())
     val simpleWalletR3 = SimpleWalletR3(privateKey)
@@ -25,24 +24,19 @@ suspend fun main() {
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
 
     val messageCodec = Message.tlbCodec(AnyTlbConstructor)
-    val bocExample = BagOfCells(queryFile.readBytes())
-    val messageExample = bocExample.first().beginParse().loadTlb(messageCodec)
-    println("Example: $messageExample")
-    println("Example BOC: $bocExample")
 
     val message = simpleWalletR3.createInitMessage()
     val cell = CellBuilder.createCell {
         messageCodec.storeTlb(this, message)
     }
     val boc = BagOfCells(cell)
-    println("Current: $message")
-    println("Current BOC: $boc")
 
     val liteClient = LiteClient(
-        host = "5.9.10.47",
-        port = 19949,
-        publicKey = hex("9f85439d2094b92a639c2c9493d7b740e39dea8d08b525986d39d6dd69e7f309"),
+        ipv4 = 1426768764,
+        port = 13724,
+        publicKey = base64("R1KsqYlNks2Zows+I9s4ywhilbSevs9dH1x2KF9MeSU="),
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     ).connect()
-    liteClient.sendMessage(boc.toByteArray())
+    val result = liteClient.sendMessage(boc)
+    liteClient.logger.info { result.toString() }
 }

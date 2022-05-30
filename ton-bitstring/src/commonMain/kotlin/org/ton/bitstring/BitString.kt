@@ -90,5 +90,49 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
             return BitString(bits)
         }
+
+        @JvmStatic
+        fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
+            val shift = bits % Byte.SIZE_BITS
+            if (shift == 0 || data.isEmpty()) {
+                val newData = data.copyOf(bits / Byte.SIZE_BITS + 1)
+                newData[newData.lastIndex] = 0x80.toByte()
+                return newData
+            } else {
+                val newData = data.copyOf(bits / Byte.SIZE_BITS + 1)
+                var lastByte = newData[newData.lastIndex].toInt() and 0xFF
+                if (shift != 7) {
+                    lastByte = lastByte shr (7 - shift)
+                }
+                lastByte = lastByte or 1
+                if (shift != 7) {
+                    lastByte = lastByte shl (7 - shift)
+                }
+                newData[newData.lastIndex] = lastByte.toByte()
+                return newData
+            }
+        }
+
+        @JvmStatic
+        fun findAugmentTag(byteArray: ByteArray): Int {
+            var length = byteArray.size * 8
+            var index = byteArray.lastIndex
+            while (true) {
+                val byte = byteArray[index--].toInt()
+                if (byte == 0) {
+                    length -= 8
+                } else {
+                    var skip = 1
+                    var mask = 1
+                    while (byte and mask == 0) {
+                        skip++
+                        mask = mask shl 1
+                    }
+                    length -= skip
+                    break
+                }
+            }
+            return length
+        }
     }
 }

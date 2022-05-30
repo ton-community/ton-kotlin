@@ -2,6 +2,7 @@ package org.ton.lite.api.liteserver
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import org.ton.boc.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
@@ -13,6 +14,8 @@ data class LiteServerSendMessage(
     @Serializable(Base64ByteArraySerializer::class)
     val body: ByteArray
 ) {
+    constructor(bagOfCells: BagOfCells) : this(bagOfCells.toByteArray())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
