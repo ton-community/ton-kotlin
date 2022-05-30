@@ -16,7 +16,9 @@ open class ByteBackedBitString protected constructor(
 
     override fun plus(bits: BooleanArray): BitString = toMutableBitString().plus(bits)
     override fun plus(bits: Iterable<Boolean>): BitString = toMutableBitString().plus(bits)
+    override fun plus(bits: Collection<Boolean>): BitString = toMutableBitString().plus(bits)
     override fun plus(bytes: ByteArray): BitString = toMutableBitString().plus(bytes)
+    override fun plus(bytes: ByteArray, bits: Int): BitString = toMutableBitString().plus(bytes, bits)
 
     override fun slice(indices: IntRange): BitString {
         val result = ByteBackedMutableBitString.of(size = indices.last - indices.first + 1)

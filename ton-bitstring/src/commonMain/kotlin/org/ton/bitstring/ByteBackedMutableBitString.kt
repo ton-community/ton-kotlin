@@ -22,21 +22,36 @@ open class ByteBackedMutableBitString(
     override fun subList(fromIndex: Int, toIndex: Int): MutableBitString =
         slice(fromIndex..toIndex).toMutableBitString()
 
-    override fun plus(bits: BooleanArray): BitString = plus(bits.asIterable())
-    override fun plus(bytes: ByteArray): ByteBackedMutableBitString = append(bytes, bytes.size * Byte.SIZE_BITS)
-    override fun plus(bits: Iterable<Boolean>): ByteBackedMutableBitString = apply {
+    override fun plus(bits: BooleanArray) = plus(bits.asIterable())
+    override fun plus(bytes: ByteArray) = plus(bytes, bytes.size * Byte.SIZE_BITS)
+    override fun plus(bits: Iterable<Boolean>): ByteBackedMutableBitString = plus(bits.toList())
+    override fun plus(bits: Collection<Boolean>) = apply {
         if (bits is ByteBackedBitString) {
-            append(bits.bytes, bits.size)
+            plus(bits.bytes, bits.size)
         } else {
-            val bitsCollection = if (bits is Collection<Boolean>) bits else bits.toList()
-            val bitsCount = bitsCollection.size
+            val bitsCount = bits.size
 
             val newBytes = expandByteArray(bytes, size + bitsCount)
-            bitsCollection.forEachIndexed { index, bit ->
+            bits.forEachIndexed { index, bit ->
                 set(newBytes, size + index, bit)
             }
             bytes = newBytes
             size += bitsCount
+        }
+    }
+
+    override fun plus(bytes: ByteArray, bits: Int) = apply {
+        checkSize(size + bits)
+        if (bits != 0) {
+            if (size % 8 == 0) {
+                if (bits % 8 == 0) {
+                    appendWithoutShifting(bytes, bits)
+                } else {
+                    appendWithShifting(bytes, bits)
+                }
+            } else {
+                appendWithDoubleShifting(bytes, bits)
+            }
         }
     }
 
@@ -46,7 +61,7 @@ open class ByteBackedMutableBitString(
 
     override fun add(element: Boolean): Boolean {
         val newBytes = expandByteArray(bytes, size + 1)
-        set(newBytes, size + 1, element)
+        set(newBytes, size, element)
         bytes = newBytes
         size += 1
         return true
@@ -82,21 +97,6 @@ open class ByteBackedMutableBitString(
 
     override fun retainAll(elements: Collection<Boolean>): Boolean {
         TODO("Not yet implemented")
-    }
-
-    private fun append(bytes: ByteArray, bits: Int) = apply {
-        checkSize(size + bits)
-        if (bits != 0) {
-            if (size % 8 == 0) {
-                if (bits % 8 == 0) {
-                    appendWithoutShifting(bytes, bits)
-                } else {
-                    appendWithShifting(bytes, bits)
-                }
-            } else {
-                appendWithDoubleShifting(bytes, bits)
-            }
-        }
     }
 
     private fun appendWithoutShifting(byteArray: ByteArray, bits: Int) {

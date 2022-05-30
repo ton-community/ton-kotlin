@@ -21,7 +21,9 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
     operator fun plus(bits: BooleanArray): BitString
     operator fun plus(bits: Iterable<Boolean>): BitString
+    operator fun plus(bits: Collection<Boolean>): BitString
     operator fun plus(bytes: ByteArray): BitString
+    fun plus(bytes: ByteArray, bits: Int): BitString
 
     fun slice(indices: IntRange): BitString
     fun toByteArray(): ByteArray
