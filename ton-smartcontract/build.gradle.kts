@@ -5,6 +5,7 @@ kotlin {
                 api(projects.tonLiteClient)
                 api(projects.tonBoc)
                 api(projects.tonCrypto)
+                api(libs.datetime)
             }
         }
         commonTest {

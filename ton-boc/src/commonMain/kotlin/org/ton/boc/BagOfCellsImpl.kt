@@ -22,7 +22,7 @@ internal data class BagOfCellsImpl(
         roots.forEach { root ->
             yieldAll(root.treeWalk())
         }
-    }.distinct()
+    }
 
     override fun toByteArray(): ByteArray = buildPacket {
         writeBagOfCells(this@BagOfCellsImpl)

@@ -5,7 +5,6 @@ import org.ton.block.VmStackValue
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapE
-import org.ton.hashmap.tlb.tlbCodec
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb

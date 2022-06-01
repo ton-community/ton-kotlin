@@ -35,6 +35,7 @@ data class VarUInteger(
     override fun toShort(): Short = value.toShort()
 
     companion object {
+        @JvmStatic
         fun tlbCodec(n: Int): TlbCodec<VarUInteger> = VarUIntegerTlbConstructor(n)
     }
 

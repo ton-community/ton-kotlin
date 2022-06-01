@@ -21,13 +21,13 @@ sealed interface CommonMsgInfo {
         val dest: MsgAddressInt,
         val value: CurrencyCollection,
         @SerialName("ihr_fee")
-        val ihrFee: Coins,
+        val ihrFee: Coins = Coins(),
         @SerialName("fwd_fee")
-        val fwdFee: Coins,
+        val fwdFee: Coins = Coins(),
         @SerialName("created_lt")
-        val createdLt: Long,
+        val createdLt: Long = 0,
         @SerialName("created_at")
-        val createdAt: Int
+        val createdAt: Int = 0
     ) : CommonMsgInfo
 
     @SerialName("ext_in_msg_info")
@@ -36,11 +36,11 @@ sealed interface CommonMsgInfo {
         val src: MsgAddressExt,
         val dest: MsgAddressInt,
         @SerialName("import_fee")
-        val importFee: Coins = Coins(0)
+        val importFee: Coins = Coins()
     ) : CommonMsgInfo {
         constructor(
             dest: MsgAddressInt,
-            importFee: Coins = Coins(0)
+            importFee: Coins = Coins()
         ) : this(MsgAddressExt.AddrNone, dest, importFee)
 
         override fun toString(): String = Json.encodeToString(serializer(), this)

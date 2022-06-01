@@ -21,7 +21,7 @@ abstract class AbstractTlbCombinator<T : Any, C : AbstractTlbConstructor<out T>>
     }
 
     fun loadTlbConstructor(cellSlice: CellSlice): C {
-        val constructor = sortedConstructors.find { constructor ->
+        val constructor = sortedConstructors.firstOrNull { constructor ->
             val id = cellSlice.preloadBitString(constructor.id.size)
             id == constructor.id
         } ?: throw UnknownTlbConstructorException()

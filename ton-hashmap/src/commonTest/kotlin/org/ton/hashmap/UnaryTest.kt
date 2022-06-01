@@ -1,10 +1,8 @@
-package org.ton.hashmap.tlb
+package org.ton.hashmap
 
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
-import org.ton.hashmap.Unary
-import org.ton.hashmap.UnarySuccess
-import org.ton.hashmap.UnaryZero
+import org.ton.hashmap.tlb.testSerialization
 import org.ton.tlb.loadTlb
 import kotlin.test.Test
 import kotlin.test.assertEquals

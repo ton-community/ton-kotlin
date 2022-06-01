@@ -142,8 +142,10 @@ private class CellBuilderImpl(
     }
 
     override fun storeRef(ref: Cell): CellBuilder = apply {
-        checkRefsOverflow(1)
-        refs.add(ref)
+        if (!ref.isEmpty()) {
+            checkRefsOverflow(1)
+            refs.add(ref)
+        }
     }
 
     override fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
@@ -152,14 +154,14 @@ private class CellBuilderImpl(
 
     override fun storeRefs(vararg refs: Cell): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs)
+        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
     }
 
     override fun storeRefs(refs: Iterable<Cell>): CellBuilder = storeRefs(refs.toList())
 
     override fun storeRefs(refs: Collection<Cell>): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs)
+        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
     }
 
     override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {

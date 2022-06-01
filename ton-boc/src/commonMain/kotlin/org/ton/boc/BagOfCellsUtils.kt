@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellType
+import org.ton.crypto.hex
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -68,6 +69,7 @@ fun Input.readBagOfCell(): BagOfCells {
     val cellsData = Array(cellsCount) { ByteArray(128) }
     val references = Array(cellsCount) { intArrayOf() }
     val cellsType = Array(cellsCount) { CellType.ORDINARY }
+    println("cellsCount: $cellsCount")
     repeat(cellsCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
         val d2 = readByte().toInt() and 0xFF
@@ -82,6 +84,7 @@ fun Input.readBagOfCell(): BagOfCells {
         references[cellIndex] = IntArray(referenceCount) {
             readInt(sizeBytes)
         }
+        println("cell: $cellIndex - ${hex(cellsData[cellIndex])}")
         cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
     }
 
@@ -90,7 +93,9 @@ fun Input.readBagOfCell(): BagOfCells {
     for (cellIndex in cellsCount - 1 downTo 0) {
         val cellData = cellsData[cellIndex]
         val cellSize = BitString.findAugmentTag(cellData)
+        println("L cell: $cellIndex")
         val refs = references[cellIndex].map { referenceIndex ->
+            println("L   ref: $referenceIndex")
             requireNotNull(doneCells[referenceIndex])
         }
         val cell = Cell.of(BitString(cellData, cellSize), refs, cellsType[cellIndex])
@@ -114,7 +119,7 @@ fun Output.writeBagOfCells(
     hasCacheBits: Boolean = false,
     flags: Int = 0
 ) {
-    val cells = bagOfCells.treeWalk().distinct().toList()
+    val cells = bagOfCells.treeWalk().toList()
     val cellsCount = cells.size
     val rootsCount = bagOfCells.roots.size
     var sizeBytes = 0
@@ -134,7 +139,7 @@ fun Output.writeBagOfCells(
 //            println("WriteData: ${hex(cellData)}")
             writeFully(cellData)
             cell.refs.forEach { reference ->
-                writeInt(cells.indexOf(reference), sizeBytes)
+                writeInt(cells.lastIndexOf(reference), sizeBytes)
             }
         }
     }
@@ -173,7 +178,7 @@ fun Output.writeBagOfCells(
 
     writeInt(fullSize, offsetBytes)
     bagOfCells.roots.forEach { root ->
-        writeInt(cells.indexOf(root), sizeBytes)
+        writeInt(cells.lastIndexOf(root), sizeBytes)
     }
     if (hasIndex) {
         serializedCells.forEachIndexed { index, _ ->

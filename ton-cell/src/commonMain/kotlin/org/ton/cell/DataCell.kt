@@ -3,7 +3,6 @@ package org.ton.cell
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.bitstring.augment
 import org.ton.crypto.sha256
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -72,10 +71,12 @@ internal class DataCell private constructor(
         (refs.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
 
     private fun bitsDescriptor(): Byte =
-        (ceil(bits.size / 8.0) + floor(bits.size / 8.0)).toInt().toByte()
+        (ceil(bits.size / 8.0).toInt() + floor(bits.size / 8.0).toInt()).toByte()
 
     private fun augmentedBytes(): ByteArray =
-        BitString(*bits.toBooleanArray().augment()).toByteArray()
+        if (bits.size % 8 != 0) {
+            BitString.appendAugmentTag(bits.toByteArray(), bits.size)
+        } else bits.toByteArray()
 
     private fun representation(): ByteArray = buildPacket {
         writeFully(descriptors())

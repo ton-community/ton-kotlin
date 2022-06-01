@@ -3,6 +3,12 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("hm_edge")
@@ -25,16 +31,38 @@ data class HashMapEdge<T : Any>(
     fun toMap(): Map<BitString, T> = nodes().toMap()
 
     companion object {
-//        fun <T : Any> of(map: Map<BitString, T>) {
-//            var length = 0
-//            map.asSequence().sortedByDescending { (key, _) ->
-//                key
-//            }.forEach { (key, value) ->
-//                if (key.size > length) {
-//
-//                }
-//                key.size
-//            }
-//        }
+        @JvmStatic
+        fun <X : Any> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
+            HashMapEdgeTlbConstructor(n, x)
+    }
+}
+
+
+private class HashMapEdgeTlbConstructor<X : Any>(
+    val n: Int,
+    val x: TlbCodec<X>
+) : TlbConstructor<HashMapEdge<X>>(
+    schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
+) {
+    private val hashMapLabelCodec by lazy {
+        HashMapLabel.tlbCodec(n)
+    }
+
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: HashMapEdge<X>
+    ) {
+        val l = cellBuilder.storeTlb(hashMapLabelCodec, value.label)
+        val m = n - l
+        cellBuilder.storeTlb(HashMapNode.tlbCodec(m, x), value.node)
+    }
+
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): HashMapEdge<X> {
+        val (l, label) = cellSlice.loadTlb(hashMapLabelCodec)
+        val m = n - l
+        val node = cellSlice.loadTlb(HashMapNode.tlbCodec(m, x))
+        return HashMapEdge(label, node)
     }
 }

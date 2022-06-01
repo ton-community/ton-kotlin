@@ -3,7 +3,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.tonBlock)
-                implementation(projects.tonHashmapTlb)
+                implementation(projects.tonHashmap)
                 implementation(projects.tonTlb)
             }
         }

@@ -2,9 +2,10 @@ package org.ton.smartcontract
 
 import org.ton.block.MsgAddressInt
 import org.ton.block.StateInit
-import org.ton.block.tlb.tlbCodec
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
+import org.ton.lite.api.LiteApi
+import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tlb.storeTlb
 
 interface SmartContract {
@@ -20,6 +21,8 @@ interface SmartContract {
 
     fun address(stateInit: StateInit = createStateInit()): MsgAddressInt.AddrStd =
         address(workchainId, stateInit)
+
+    suspend fun deploy(liteApi: LiteApi): LiteServerSendMsgStatus
 
     override fun toString(): String
 

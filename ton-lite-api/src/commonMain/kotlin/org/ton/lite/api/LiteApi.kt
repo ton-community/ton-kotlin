@@ -2,11 +2,9 @@ package org.ton.lite.api
 
 import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.MsgAddressInt
-import org.ton.block.VmStack
-import org.ton.block.VmStackList
-import org.ton.block.VmStackValue
+import org.ton.block.*
 import org.ton.boc.BagOfCells
+import org.ton.cell.Cell
 import org.ton.lite.api.liteserver.*
 import org.ton.tl.TlConstructor
 
@@ -30,6 +28,9 @@ interface LiteApi {
 
     suspend fun getMasterchainInfo(): LiteServerMasterchainInfo =
         sendQuery(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
+
+    suspend fun sendMessage(message: Message<Cell>): LiteServerSendMsgStatus =
+        sendMessage(LiteServerSendMessage(message))
 
     suspend fun sendMessage(bagOfCells: BagOfCells): LiteServerSendMsgStatus =
         sendMessage(LiteServerSendMessage(bagOfCells))

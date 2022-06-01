@@ -23,6 +23,8 @@ interface Cell {
     val maxLevel: Int
     val maxDepth: Int
 
+    fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
+
     fun treeWalk(): Sequence<Cell>
     fun beginParse(): CellSlice
 

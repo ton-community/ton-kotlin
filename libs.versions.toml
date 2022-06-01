@@ -1,6 +1,6 @@
 [versions]
 coroutines = "1.6.0-RC3"
-datetime = "0.3.2"
+datetime = "0.3.3"
 atomicfu = "0.17.0"
 benchmark = "0.4.2"
 serialization = "1.3.2"
