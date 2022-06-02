@@ -1,5 +1,6 @@
 package org.ton.smartcontract.wallet
 
+import kotlinx.coroutines.delay
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Coins
 import org.ton.block.MsgAddressInt
@@ -30,11 +31,19 @@ suspend fun main() {
 
     liteClient.connect()
 
-    simpleWalletR3.transfer(
-        dest = MsgAddressInt.AddrStd.parse("kQBxAWAmYrgtx1Wrpww5OWdAYKdMaaSUudRP6N9QSKO_Zw5w"),
-        seqno = 1,
-        coins = Coins.of(1),
-        payload = Cell(),
-        bounce = true
+    println(
+        simpleWalletR3.deploy()
+    )
+
+    delay(5000)
+
+    println(
+        simpleWalletR3.transfer(
+            dest = MsgAddressInt.AddrStd.parse("kQBxAWAmYrgtx1Wrpww5OWdAYKdMaaSUudRP6N9QSKO_Zw5w"),
+            seqno = 1,
+            coins = Coins.of(1),
+            payload = Cell(),
+            bounce = true
+        )
     )
 }
