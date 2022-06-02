@@ -29,10 +29,11 @@ suspend fun main() {
     ).connect()
 
     simpleWalletR3.transfer(
-        liteClient,
-        MsgAddressInt.AddrStd.parse("kQBxAWAmYrgtx1Wrpww5OWdAYKdMaaSUudRP6N9QSKO_Zw5w"),
-        1,
-        Coins.of(1),
-        Cell()
+        liteApi = liteClient,
+        dest = MsgAddressInt.AddrStd.parse("kQBxAWAmYrgtx1Wrpww5OWdAYKdMaaSUudRP6N9QSKO_Zw5w"),
+        seqno = 1,
+        coins = Coins.of(1),
+        payload = Cell(),
+        bounce = true
     )
 }

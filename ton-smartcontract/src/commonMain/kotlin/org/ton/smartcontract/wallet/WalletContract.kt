@@ -28,20 +28,20 @@ abstract class WalletContract(
         liteApi: LiteApi,
         dest: MsgAddressInt,
         seqno: Int,
-        amount: Coins,
+        coins: Coins,
         comment: String?,
-        bounce: Boolean = true
-    ): LiteServerSendMsgStatus = transfer(liteApi, dest, seqno, amount, createCommentPayload(comment), bounce)
+        bounce: Boolean
+    ): LiteServerSendMsgStatus = transfer(liteApi, dest, seqno, coins, createCommentPayload(comment), bounce)
 
     suspend fun transfer(
         liteApi: LiteApi,
         dest: MsgAddressInt,
         seqno: Int,
-        amount: Coins,
+        coins: Coins,
         payload: Cell,
-        bounce: Boolean = true
+        bounce: Boolean
     ): LiteServerSendMsgStatus {
-        val transferMessage = createTransferMessage(dest, seqno, amount, payload, bounce)
+        val transferMessage = createTransferMessage(dest, seqno, coins, payload, bounce)
         return liteApi.sendMessage(transferMessage)
     }
 
@@ -77,8 +77,8 @@ abstract class WalletContract(
         dest: MsgAddressInt,
         seqno: Int,
         amount: Coins,
-        payload: Cell = Cell.of(),
-        bounce: Boolean = true,
+        payload: Cell,
+        bounce: Boolean,
         sendMode: Int = 3
     ): Message<Cell> {
         val stateInit = createStateInit()
