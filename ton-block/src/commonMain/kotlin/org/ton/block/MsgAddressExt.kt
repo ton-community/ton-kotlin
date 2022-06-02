@@ -2,15 +2,12 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.exception.UnknownTlbConstructorException
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt.of(externalAddress)
@@ -18,85 +15,36 @@ inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = Ms
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface MsgAddressExt : MsgAddress {
-    @SerialName("addr_none")
-    @Serializable
-    object AddrNone : MsgAddressExt {
-        override fun toString(): String = "addr_none"
-    }
-
-    @SerialName("addr_extern")
-    @Serializable
-    data class AddrExtern(
-        val len: Int,
-        @SerialName("external_address")
-        val externalAddress: BitString
-    ) : MsgAddressExt {
-        init {
-            require(len == externalAddress.size)
-        }
-
-        constructor(externalAddress: BitString) : this(externalAddress.size, externalAddress)
-    }
-
     companion object {
         @JvmStatic
         fun of(externalAddress: BitString? = null): MsgAddressExt {
             return if (externalAddress.isNullOrEmpty()) {
-                AddrNone
+                MsgAddressExtNone
             } else {
-                AddrExtern(externalAddress)
+                MsgAddressExtOrdinary(externalAddress)
             }
         }
 
         @JvmStatic
-        fun tlbCodec(): TlbCodec<MsgAddressExt> = MsgAddressExtTlbCombinator()
+        fun of(externalAddress: ByteArray): MsgAddressExt = MsgAddressExtOrdinary(externalAddress)
 
-        internal class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>() {
-            private val addrNoneConstructor by lazy { AddrNoneTlbConstructor() }
-            private val addrExternConstructor by lazy { AddrExternTlbConstructor() }
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<MsgAddressExt> = MsgAddressExtTlbCombinator()
+    }
+}
 
-            override val constructors: List<TlbConstructor<out MsgAddressExt>> by lazy {
-                listOf(addrNoneConstructor, addrExternConstructor)
-            }
+private class MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>() {
+    private val addrNoneConstructor by lazy { MsgAddressExtNone.tlbCodec() }
+    private val addrExternConstructor by lazy { MsgAddressExtOrdinary.tlbCodec() }
 
-            override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {
-                is AddrNone -> addrNoneConstructor
-                is AddrExtern -> addrExternConstructor
-            }
+    override val constructors: List<TlbConstructor<out MsgAddressExt>> by lazy {
+        listOf(addrNoneConstructor, addrExternConstructor)
+    }
 
-            private class AddrNoneTlbConstructor : TlbConstructor<AddrNone>(
-                schema = "addr_none\$00 = MsgAddressExt;"
-            ) {
-                override fun storeTlb(
-                    cellBuilder: CellBuilder,
-                    value: AddrNone
-                ) {
-                }
-
-                override fun loadTlb(cellSlice: CellSlice): AddrNone {
-                    return AddrNone
-                }
-            }
-
-            private class AddrExternTlbConstructor : TlbConstructor<AddrExtern>(
-                schema = "addr_extern\$01 len:(## 9) external_address:(bits len) = MsgAddressExt;"
-            ) {
-                override fun storeTlb(
-                    cellBuilder: CellBuilder,
-                    value: AddrExtern
-                ) = cellBuilder {
-                    storeUInt(value.len, 9)
-                    storeBits(value.externalAddress)
-                }
-
-                override fun loadTlb(
-                    cellSlice: CellSlice
-                ): AddrExtern = cellSlice {
-                    val len = loadUInt(9).toInt()
-                    val externalAddress = loadBitString(len)
-                    AddrExtern(len, externalAddress)
-                }
-            }
-        }
+    @Suppress("REDUNDANT_ELSE_IN_WHEN") // kotlin compiler bug
+    override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {
+        is MsgAddressExtNone -> addrNoneConstructor
+        is MsgAddressExtOrdinary -> addrExternConstructor
+        else -> throw UnknownTlbConstructorException()
     }
 }

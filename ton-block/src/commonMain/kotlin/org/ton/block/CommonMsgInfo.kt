@@ -41,7 +41,7 @@ sealed interface CommonMsgInfo {
         constructor(
             dest: MsgAddressInt,
             importFee: Coins = Coins()
-        ) : this(MsgAddressExt.AddrNone, dest, importFee)
+        ) : this(MsgAddressExtNone, dest, importFee)
 
         override fun toString(): String = Json.encodeToString(serializer(), this)
     }

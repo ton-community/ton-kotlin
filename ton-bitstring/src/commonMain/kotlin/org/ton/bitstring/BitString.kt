@@ -1,16 +1,18 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
 
-fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
+inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
     BitString.of(byteArray, size)
 
-fun BitString(size: Int): BitString = BitString.of(size)
-fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
-fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
-fun BitString(hex: String): BitString = BitString.of(hex)
+inline fun BitString(size: Int): BitString = BitString.of(size)
+inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
+inline fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
+inline fun BitString(hex: String): BitString = BitString.of(hex)
 
-fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
+inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
 
 @Serializable(with = FiftHexBitStringSerializer::class)
 interface BitString : List<Boolean>, Comparable<BitString> {

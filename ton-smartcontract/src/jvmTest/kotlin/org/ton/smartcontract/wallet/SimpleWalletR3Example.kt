@@ -6,26 +6,24 @@ import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
-import java.io.File
 
-private val liteClient = LiteClient(
+private val privateKey = PrivateKeyEd25519(ByteArray(32))
+
+private fun liteClient() = LiteClient(
     ipv4 = 1426768764,
     port = 13724,
     publicKey = base64("R1KsqYlNks2Zows+I9s4ywhilbSevs9dH1x2KF9MeSU="),
-    logger = PrintLnLogger("TON WalletV2", Logger.Level.DEBUG)
+    logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
 )
 
 suspend fun main() {
-    val pkFile = File("C:\\Users\\andreypfau\\ton\\wallet\\new-wallet.pk")
-    val privateKey = PrivateKeyEd25519(pkFile.readBytes())
-    val wallet = WalletV2R2(liteClient, privateKey)
-    println("Public Key: ${hex(wallet.publicKey.key)}")
+    val liteClient = liteClient()
+    liteClient.connect()
+    val wallet = SimpleWalletR3(liteClient, privateKey)
     val address = wallet.address()
-    println("new wallet address = ${address.workchainId}:${address.address}")
+    println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
-
-    liteClient.connect()
-
+    println("Corresponding public key is ${hex(wallet.publicKey.key).uppercase()}")
     println(wallet.deploy())
 }
