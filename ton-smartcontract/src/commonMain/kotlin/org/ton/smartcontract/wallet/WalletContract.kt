@@ -12,6 +12,7 @@ import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 
 abstract class WalletContract(
+    override val liteApi: LiteApi,
     val privateKey: PrivateKeyEd25519,
     override val workchainId: Int = 0
 ) : SmartContract {
@@ -19,22 +20,20 @@ abstract class WalletContract(
         privateKey.publicKey()
     }
 
-    override suspend fun deploy(liteApi: LiteApi): LiteServerSendMsgStatus {
+    override suspend fun deploy(): LiteServerSendMsgStatus {
         val initMessage = createInitMessage()
         return liteApi.sendMessage(initMessage)
     }
 
     suspend fun transfer(
-        liteApi: LiteApi,
         dest: MsgAddressInt,
         seqno: Int,
         coins: Coins,
         comment: String?,
         bounce: Boolean
-    ): LiteServerSendMsgStatus = transfer(liteApi, dest, seqno, coins, createCommentPayload(comment), bounce)
+    ): LiteServerSendMsgStatus = transfer(dest, seqno, coins, createCommentPayload(comment), bounce)
 
     suspend fun transfer(
-        liteApi: LiteApi,
         dest: MsgAddressInt,
         seqno: Int,
         coins: Coins,

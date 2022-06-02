@@ -9,6 +9,7 @@ import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tlb.storeTlb
 
 interface SmartContract {
+    val liteApi: LiteApi
     val workchainId: Int
     val name: String
     val code: Cell
@@ -22,7 +23,7 @@ interface SmartContract {
     fun address(stateInit: StateInit = createStateInit()): MsgAddressInt.AddrStd =
         address(workchainId, stateInit)
 
-    suspend fun deploy(liteApi: LiteApi): LiteServerSendMsgStatus
+    suspend fun deploy(): LiteServerSendMsgStatus
 
     override fun toString(): String
 
