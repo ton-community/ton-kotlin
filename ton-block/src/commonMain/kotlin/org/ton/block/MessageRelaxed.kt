@@ -22,6 +22,20 @@ data class MessageRelaxed<X : Any>(
         body: Pair<X?, X?>
     ) : this(info, init?.toEither().toMaybe(), body.toEither())
 
+    constructor(
+        info: CommonMsgInfoRelaxed,
+        init: StateInit? = null,
+        body: X? = null,
+        storeInitInRef: Boolean = true,
+        storeBodyInRef: Boolean = true
+    ) : this(
+        info = info,
+        init = init?.let {
+            if (storeInitInRef) null to init else init to null
+        },
+        body = if (storeBodyInRef) null to body else body to null
+    )
+
     companion object {
         @JvmStatic
         fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbCodec<MessageRelaxed<X>> = MessageRelaxedTlbConstructor(x)

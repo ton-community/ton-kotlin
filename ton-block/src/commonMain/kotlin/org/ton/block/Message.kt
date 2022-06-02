@@ -13,4 +13,18 @@ data class Message<X : Any>(
         init: Pair<StateInit?, StateInit?>? = null,
         body: Pair<X?, X?>
     ) : this(info, init?.toEither().toMaybe(), body.toEither())
+
+    constructor(
+        info: CommonMsgInfo,
+        init: StateInit? = null,
+        body: X? = null,
+        storeInitInRef: Boolean = true,
+        storeBodyInRef: Boolean = true
+    ) : this(
+        info = info,
+        init = init?.let {
+            if (storeInitInRef) null to init else init to null
+        },
+        body = if (storeBodyInRef) null to body else body to null
+    )
 }
