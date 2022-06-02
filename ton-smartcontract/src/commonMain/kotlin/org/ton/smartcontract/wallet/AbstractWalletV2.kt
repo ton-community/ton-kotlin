@@ -2,6 +2,7 @@ package org.ton.smartcontract.wallet
 
 import kotlinx.datetime.Clock
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.lite.api.LiteApi
@@ -16,7 +17,7 @@ abstract class AbstractWalletV2(
     override fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit): Cell = CellBuilder.createCell {
         storeUInt(seqno, 32)
         if (seqno == 0) {
-            storeInt(-1, 32)
+            storeBits(BitString("FFFFFFFF"))
         } else {
             val now = Clock.System.now().toEpochMilliseconds() / 1000
             storeUInt(now + timeout, 32)
