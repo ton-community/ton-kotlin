@@ -3,6 +3,7 @@ package org.ton.smartcontract.wallet
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Coins
 import org.ton.block.MsgAddressInt
+import org.ton.cell.Cell
 import org.ton.crypto.base64
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
@@ -32,6 +33,6 @@ suspend fun main() {
         MsgAddressInt.AddrStd.parse("kQBxAWAmYrgtx1Wrpww5OWdAYKdMaaSUudRP6N9QSKO_Zw5w"),
         1,
         Coins.of(1),
-        "Hello World!"
+        Cell()
     )
 }

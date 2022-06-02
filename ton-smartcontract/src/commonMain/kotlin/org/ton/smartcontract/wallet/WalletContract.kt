@@ -31,8 +31,17 @@ abstract class WalletContract(
         amount: Coins,
         comment: String?,
         bounce: Boolean = true
+    ): LiteServerSendMsgStatus = transfer(liteApi, dest, seqno, amount, createCommentPayload(comment), bounce)
+
+    suspend fun transfer(
+        liteApi: LiteApi,
+        dest: MsgAddressInt,
+        seqno: Int,
+        amount: Coins,
+        payload: Cell,
+        bounce: Boolean = true
     ): LiteServerSendMsgStatus {
-        val transferMessage = createTransferMessage(dest, seqno, amount, createCommentPayload(comment), bounce)
+        val transferMessage = createTransferMessage(dest, seqno, amount, payload, bounce)
         return liteApi.sendMessage(transferMessage)
     }
 
@@ -90,7 +99,7 @@ abstract class WalletContract(
                         )
                     ),
                     init = null,
-                    body = payload to null
+                    body = payload
                 )
                 storeTlb(MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed)
             }
@@ -102,9 +111,9 @@ abstract class WalletContract(
             storeRefs(signingMessage.refs)
         }
         return Message(
-            info,
-            null,
-            null to body
+            info = info,
+            init = null,
+            body = body
         )
     }
 

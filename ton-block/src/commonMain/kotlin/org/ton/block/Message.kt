@@ -10,14 +10,14 @@ data class Message<X : Any>(
 ) {
     constructor(
         info: CommonMsgInfo,
-        init: Pair<StateInit?, StateInit?>? = null,
+        init: Pair<StateInit?, StateInit?>?,
         body: Pair<X?, X?>
     ) : this(info, init?.toEither().toMaybe(), body.toEither())
 
     constructor(
         info: CommonMsgInfo,
-        init: StateInit? = null,
-        body: X? = null,
+        init: StateInit?,
+        body: X?,
         storeInitInRef: Boolean = true,
         storeBodyInRef: Boolean = true
     ) : this(
