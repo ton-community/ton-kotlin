@@ -15,10 +15,10 @@ sealed interface CommonMsgInfoRelaxed {
     @SerialName("int_msg_info")
     data class IntMsgInfo(
         @SerialName("ihr_disabled")
-        val ihrDisabled: Boolean,
+        val ihrDisabled: Boolean = true,
         val bounce: Boolean,
-        val bounced: Boolean,
-        val src: MsgAddress,
+        val bounced: Boolean = false,
+        val src: MsgAddress = MsgAddressExt(),
         val dest: MsgAddressInt,
         val value: CurrencyCollection,
         @SerialName("ihr_fee")
@@ -29,7 +29,22 @@ sealed interface CommonMsgInfoRelaxed {
         val createdLt: Long = 0,
         @SerialName("created_at")
         val createdAt: Int = 0
-    ) : CommonMsgInfoRelaxed
+    ) : CommonMsgInfoRelaxed {
+        constructor(dest: MsgAddressInt, bounce: Boolean, coins: Coins) : this(
+            dest = dest,
+            bounce = bounce,
+            value = CurrencyCollection(coins)
+        )
+
+        constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(
+            ihrDisabled = true,
+            bounce = bounce,
+            bounced = false,
+            src = MsgAddressExt(),
+            dest = dest,
+            value = value
+        )
+    }
 
     @SerialName("ext_out_msg_info")
     data class ExtOutMsgInfo(
