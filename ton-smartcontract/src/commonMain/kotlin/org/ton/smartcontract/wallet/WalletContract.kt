@@ -1,6 +1,7 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -14,7 +15,7 @@ abstract class WalletContract(
     val privateKey: PrivateKeyEd25519,
     override val workchainId: Int = 0
 ) : SmartContract {
-    val publicKey by lazy {
+    val publicKey: PublicKeyEd25519 by lazy {
         privateKey.publicKey()
     }
 

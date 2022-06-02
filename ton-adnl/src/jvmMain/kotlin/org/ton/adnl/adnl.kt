@@ -4,6 +4,7 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.cancelAndJoin
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
@@ -41,6 +42,11 @@ class AdnlTcpClientImpl(
         performHandshake()
         logger.debug { "Success handshake!" }
         job = launchReceiveJob()
+    }
+
+    override suspend fun disconnect() {
+        job.cancelAndJoin()
+        connection.socket.awaitClosed()
     }
 
     private suspend fun performHandshake(

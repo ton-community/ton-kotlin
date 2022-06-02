@@ -37,6 +37,8 @@ abstract class AdnlTcpClient(
 
     abstract suspend fun connect(): AdnlTcpClient
 
+    abstract suspend fun disconnect()
+
     suspend fun sendQuery(query: ByteArray): ByteArray {
         val queryId = Random.nextBytes(32)
         val adnlMessageQuery = AdnlMessageQuery(queryId, query)
