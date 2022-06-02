@@ -4,7 +4,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellType
-import org.ton.crypto.hex
+import org.ton.crypto.crc32c
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -69,7 +69,6 @@ fun Input.readBagOfCell(): BagOfCells {
     val cellsData = Array(cellsCount) { ByteArray(128) }
     val references = Array(cellsCount) { intArrayOf() }
     val cellsType = Array(cellsCount) { CellType.ORDINARY }
-    println("cellsCount: $cellsCount")
     repeat(cellsCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
         val d2 = readByte().toInt() and 0xFF
@@ -84,7 +83,6 @@ fun Input.readBagOfCell(): BagOfCells {
         references[cellIndex] = IntArray(referenceCount) {
             readInt(sizeBytes)
         }
-        println("cell: $cellIndex - ${hex(cellsData[cellIndex])}")
         cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
     }
 
@@ -93,17 +91,17 @@ fun Input.readBagOfCell(): BagOfCells {
     for (cellIndex in cellsCount - 1 downTo 0) {
         val cellData = cellsData[cellIndex]
         val cellSize = BitString.findAugmentTag(cellData)
-        println("L cell: $cellIndex")
         val refs = references[cellIndex].map { referenceIndex ->
-            println("L   ref: $referenceIndex")
             requireNotNull(doneCells[referenceIndex])
         }
         val cell = Cell.of(BitString(cellData, cellSize), refs, cellsType[cellIndex])
         doneCells[cellIndex] = cell
     }
 
-    // TODO: Crc32
-//    val crc32c = readShort()
+    // TODO: Crc32c check (calculate size of resulting bytearray)
+    if (hashCrc32) {
+        readIntLittleEndian()
+    }
 
     val roots = rootIndexes.map { rootIndex ->
         requireNotNull(doneCells[rootIndex])
@@ -115,10 +113,27 @@ fun Input.readBagOfCell(): BagOfCells {
 fun Output.writeBagOfCells(
     bagOfCells: BagOfCells,
     hasIndex: Boolean = false,
-    hasCrc32c: Boolean = false,
+    hasCrc32c: Boolean = true,
     hasCacheBits: Boolean = false,
     flags: Int = 0
 ) {
+    val serializedBagOfCells = serializeBagOfCells(bagOfCells, hasIndex, hasCrc32c, hasCacheBits, flags)
+    if (hasCrc32c) {
+        val crc32c = crc32c(serializedBagOfCells).toInt()
+        writeFully(serializedBagOfCells)
+        writeIntLittleEndian(crc32c)
+    } else {
+        writeFully(serializedBagOfCells)
+    }
+}
+
+private fun serializeBagOfCells(
+    bagOfCells: BagOfCells,
+    hasIndex: Boolean,
+    hasCrc32c: Boolean,
+    hasCacheBits: Boolean,
+    flags: Int
+): ByteArray = buildPacket {
     val cells = bagOfCells.treeWalk().toList()
     val cellsCount = cells.size
     val rootsCount = bagOfCells.roots.size
@@ -189,10 +204,7 @@ fun Output.writeBagOfCells(
         val bytes = serializedCell.readBytes()
         writeFully(bytes)
     }
-    if (hasCrc32c) {
-        TODO()
-    }
-}
+}.readBytes()
 
 private fun Input.readInt(bytes: Int): Int {
     var result = 0

@@ -15,4 +15,9 @@ interface Logger {
         WARN,
         FATAL;
     }
+
+    companion object {
+        @JvmStatic
+        fun println(name: String, level: Level = Level.INFO): Logger = PrintLnLogger(name, level)
+    }
 }

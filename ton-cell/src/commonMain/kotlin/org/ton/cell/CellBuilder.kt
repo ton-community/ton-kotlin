@@ -142,10 +142,8 @@ private class CellBuilderImpl(
     }
 
     override fun storeRef(ref: Cell): CellBuilder = apply {
-        if (!ref.isEmpty()) {
-            checkRefsOverflow(1)
-            refs.add(ref)
-        }
+        checkRefsOverflow(1)
+        refs.add(ref)
     }
 
     override fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {

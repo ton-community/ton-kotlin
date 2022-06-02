@@ -1,5 +1,6 @@
 package org.ton.smartcontract
 
+import org.ton.block.Message
 import org.ton.block.MsgAddressInt
 import org.ton.block.StateInit
 import org.ton.cell.Cell
@@ -22,6 +23,8 @@ interface SmartContract {
 
     fun address(stateInit: StateInit = createStateInit()): MsgAddressInt.AddrStd =
         address(workchainId, stateInit)
+
+    fun createExternalInitMessage(): Message<Cell>
 
     suspend fun deploy(): LiteServerSendMsgStatus
 

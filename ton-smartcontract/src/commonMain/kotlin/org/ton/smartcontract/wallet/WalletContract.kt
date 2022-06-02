@@ -7,6 +7,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
+import org.ton.logger.Logger
 import org.ton.smartcontract.SmartContract
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
@@ -16,12 +17,17 @@ abstract class WalletContract(
     val privateKey: PrivateKeyEd25519,
     override val workchainId: Int = 0
 ) : SmartContract {
+    val logger: Logger by lazy {
+        Logger.println(name, Logger.Level.DEBUG)
+    }
+
     val publicKey: PublicKeyEd25519 by lazy {
         privateKey.publicKey()
     }
 
     override suspend fun deploy(): LiteServerSendMsgStatus {
-        val initMessage = createInitMessage()
+        val initMessage = createExternalInitMessage()
+        logger.info { "Deploy: $initMessage" }
         return liteApi.sendMessage(initMessage)
     }
 
@@ -41,6 +47,7 @@ abstract class WalletContract(
         bounce: Boolean
     ): LiteServerSendMsgStatus {
         val transferMessage = createTransferMessage(dest, seqno, coins, payload, bounce)
+        logger.info { "Transfer: $transferMessage" }
         return liteApi.sendMessage(transferMessage)
     }
 
@@ -54,7 +61,7 @@ abstract class WalletContract(
         apply(builder)
     }
 
-    fun createInitMessage(): Message<Cell> {
+    override fun createExternalInitMessage(): Message<Cell> {
         val stateInit = createStateInit()
         val dest = address(stateInit)
         val signingMessage = createSigningMessage(0)
