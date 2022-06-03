@@ -5,6 +5,7 @@ import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
+import org.ton.cell.exception.CellOverflowException
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.logger.Logger
@@ -105,9 +106,18 @@ abstract class WalletContract(
                         )
                     ),
                     init = null,
-                    body = payload
+                    body = payload,
+                    storeBodyInRef = false
                 )
-                storeTlb(MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed)
+                try {
+                    storeTlb(MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed)
+                } catch (e: CellOverflowException) {
+                    storeTlb(
+                        MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed.copy(
+                            body = Either.of(null, payload)
+                        )
+                    )
+                }
             }
         }
         val signature = privateKey.sign(signingMessage.hash())
@@ -119,7 +129,9 @@ abstract class WalletContract(
         return Message(
             info = info,
             init = null,
-            body = body
+            body = body,
+            storeInitInRef = false,
+            storeBodyInRef = false
         )
     }
 
@@ -127,9 +139,11 @@ abstract class WalletContract(
         return if (comment == null) {
             Cell.of()
         } else {
+            val commentBytes = comment.encodeToByteArray()
+            require(commentBytes.size <= 123) { TODO("Commentaries with more than 123 bytes not supported yet. Provided: ${commentBytes.size}") }
             CellBuilder.createCell {
                 storeUInt(0, 32)
-                storeBytes(comment.encodeToByteArray())
+                storeBytes(commentBytes)
             }
         }
     }

@@ -67,7 +67,7 @@ interface Cell {
 
         @JvmStatic
         fun checkRefsCount(count: Int) = require(count in 0..MAX_REFS) {
-            throw CellOverflowException()
+            throw CellOverflowException("Refs overflow expected: $count actual: $MAX_REFS")
         }
 
         @JvmStatic

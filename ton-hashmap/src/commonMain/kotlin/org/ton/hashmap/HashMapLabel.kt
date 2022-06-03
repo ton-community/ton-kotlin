@@ -75,7 +75,7 @@ private class HashMapLabelTlbCombinator(
             cellBuilder: CellBuilder,
             value: HashMapLabelShort
         ): Int {
-            val n = cellBuilder.storeTlb(unaryCodec, value.len)
+            val n = cellBuilder.storeNegatedTlb(unaryCodec, value.len)
             cellBuilder.storeBits(value.s)
             return n
         }

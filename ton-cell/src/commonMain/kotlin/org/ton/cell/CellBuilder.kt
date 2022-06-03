@@ -4,6 +4,7 @@ import org.ton.bigint.*
 import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
+import org.ton.cell.exception.CellOverflowException
 
 interface CellBuilder {
     var bits: MutableBitString
@@ -196,10 +197,10 @@ private class CellBuilderImpl(
     override fun toString(): String = endCell().toString()
 
     private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
-        "Bits overflow. Can't add $length bits. $remainder bits left."
+        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left.")
     }
 
     private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {
-        "Refs overflow. Can't add $count refs. ${4 - refs.size} refs left."
+        throw CellOverflowException("Refs overflow. Can't add $count refs. ${4 - refs.size} refs left.")
     }
 }

@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 @Serializable
 @SerialName("hm_edge")
@@ -52,7 +49,7 @@ private class HashMapEdgeTlbConstructor<X : Any>(
         cellBuilder: CellBuilder,
         value: HashMapEdge<X>
     ) {
-        val l = cellBuilder.storeTlb(hashMapLabelCodec, value.label)
+        val l = cellBuilder.storeNegatedTlb(hashMapLabelCodec, value.label)
         val m = n - l
         cellBuilder.storeTlb(HashMapNode.tlbCodec(m, x), value.node)
     }

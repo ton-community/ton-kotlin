@@ -113,7 +113,7 @@ fun Input.readBagOfCell(): BagOfCells {
 fun Output.writeBagOfCells(
     bagOfCells: BagOfCells,
     hasIndex: Boolean = false,
-    hasCrc32c: Boolean = true,
+    hasCrc32c: Boolean = false,
     hasCacheBits: Boolean = false,
     flags: Int = 0
 ) {

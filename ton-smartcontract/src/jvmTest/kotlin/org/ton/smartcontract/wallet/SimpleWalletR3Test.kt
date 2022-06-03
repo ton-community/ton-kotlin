@@ -1,7 +1,9 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.block.Coins
 import org.ton.block.Message
+import org.ton.block.MsgAddressInt
 import org.ton.block.StateInit
 import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
@@ -100,7 +102,7 @@ class SimpleWalletR3Test {
     }
 
     @Test
-    fun `test deploy boc`() {
+    fun `test deploy BOC`() {
         val wallet = wallet()
         val message = wallet.createExternalInitMessage()
         val actual =
@@ -109,6 +111,42 @@ class SimpleWalletR3Test {
             }).toByteArray()
         val expected =
             hex("b5ee9c724101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da296d304c45")
+        assertContentEquals(expected, actual)
+    }
+
+    private fun SimpleWalletR3.exampleTransferMessage(comment: String) = createTransferMessage(
+        dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm"),
+        bounce = true,
+        amount = Coins.of(1),
+        seqno = 1,
+        payload = createCommentPayload(comment)
+    )
+
+    @Test
+    fun `test transfer message with 'Hello TON' comment`() {
+        val wallet = wallet()
+        val message = wallet.exampleTransferMessage("Hello TON")
+        val actual = CellBuilder.createCell {
+            storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
+        }
+        println(actual)
+        val expected = Cell(
+            "880083A2C647078B8A66F9765A64401CE06B507A077E2E426E1C0EB9D0DFC45BC7AC062741DE2DC749D0CA21D3D2577EDB734C223E2C94A414C25DE9AEF583E82F565A6281C86A6C919DCA4B96B1FB68A0FB2836B7D3363D7364BF1CBD9A54F4ACE050000000081C_",
+            Cell("6200798F62E648D4D112F54116E56686A5D9033F7E135F66A8E63A77CAD088FD441F21DCD65000000000000000000000000000000000000048656C6C6F20544F4E"),
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `test transfer BOC with 'Hello TON' comment`() {
+        val wallet = wallet()
+        val message = wallet.exampleTransferMessage("Hello TON")
+        val actual =
+            BagOfCells(CellBuilder.createCell {
+                storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
+            }).toByteArray()
+        val expected =
+            hex("b5ee9c724101020100ae0001cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac062741de2dc749d0ca21d3d2577edb734c223e2c94a414c25de9aef583e82f565a6281c86a6c919dca4b96b1fb68a0fb2836b7d3363d7364bf1cbd9a54f4ace050000000081c0100826200798f62e648d4d112f54116e56686a5d9033f7e135f66a8e63a77cad088fd441f21dcd65000000000000000000000000000000000000048656c6c6f20544f4e765c2f2f")
         assertContentEquals(expected, actual)
     }
 }

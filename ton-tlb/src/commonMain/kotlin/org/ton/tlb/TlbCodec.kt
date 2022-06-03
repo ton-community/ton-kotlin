@@ -41,6 +41,5 @@ fun <T : Any> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
     codec.storeTlb(this, value)
 }
 
-@JvmName("storeNegatedTlb")
-fun <T : Any> CellBuilder.storeTlb(codec: TlbNegatedStorer<T>, value: T) =
+fun <T : Any> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
     codec.storeNegatedTlb(this, value)

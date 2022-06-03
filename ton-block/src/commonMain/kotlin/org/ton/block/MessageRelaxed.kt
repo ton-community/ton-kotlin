@@ -18,22 +18,20 @@ data class MessageRelaxed<X : Any>(
 ) {
     constructor(
         info: CommonMsgInfoRelaxed,
-        init: Pair<StateInit?, StateInit?>? = null,
-        body: Pair<X?, X?>
-    ) : this(info, init?.toEither().toMaybe(), body.toEither())
-
-    constructor(
-        info: CommonMsgInfoRelaxed,
         init: StateInit? = null,
         body: X? = null,
         storeInitInRef: Boolean = true,
         storeBodyInRef: Boolean = true
     ) : this(
         info = info,
-        init = init?.let {
-            if (storeInitInRef) null to init else init to null
-        },
-        body = if (storeBodyInRef) null to body else body to null
+        init = Maybe.of(
+            if (init != null) {
+                if (storeInitInRef) Either.of(null, init)
+                else Either.of(init, null)
+            } else null
+        ),
+        body = if (storeBodyInRef) Either.of(null, body)
+        else Either.of(body, null)
     )
 
     companion object {

@@ -21,18 +21,18 @@ private fun liteClient() = LiteClient(
 suspend fun main() {
     val liteClient = liteClient()
     liteClient.connect()
-    val wallet = SimpleWalletR3(liteClient, privateKey)
+    val wallet = WalletV2R1(liteClient, privateKey)
     val address = wallet.address()
     println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
     println("Corresponding public key is ${hex(wallet.publicKey.key).uppercase()}")
-    val seqno = 4
     wallet.transfer(
         MsgAddressInt.parse("kf8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM_BP"),
         false,
         Coins.of(0.01),
-        seqno,
-        "[$seqno] Hello TON"
+        1,
+        "Hello TON \uD83D\uDE80"
     )
 }
+

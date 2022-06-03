@@ -1,9 +1,13 @@
 package org.ton.cell.exception
 
-class CellOverflowException(
-    override val cause: Throwable? = null
-) : RuntimeException("Cell overflow")
+class CellOverflowException : RuntimeException {
+    constructor(message: String) : super(message)
+    constructor(cause: Throwable) : super("Cell overflow", cause)
+    constructor(message: String, cause: Throwable) : super(message, cause)
+}
 
-class CellUnderflowException(
-    override val cause: Throwable? = null
-) : RuntimeException("Cell underflow")
+class CellUnderflowException : RuntimeException {
+    constructor(message: String) : super(message)
+    constructor(cause: Throwable) : super("Cell underflow", cause)
+    constructor(message: String, cause: Throwable) : super(message, cause)
+}

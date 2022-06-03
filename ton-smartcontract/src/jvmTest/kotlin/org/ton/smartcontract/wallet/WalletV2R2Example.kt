@@ -1,7 +1,8 @@
 package org.ton.smartcontract.wallet
 
-import kotlinx.coroutines.delay
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.block.Coins
+import org.ton.block.MsgAddressInt
 import org.ton.crypto.base64
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
@@ -26,6 +27,11 @@ suspend fun main() {
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
     println("Corresponding public key is ${hex(wallet.publicKey.key).uppercase()}")
-    println(wallet.deploy())
-    delay(6001)
+    wallet.transfer(
+        MsgAddressInt.parse("kf8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM_BP"),
+        false,
+        Coins.of(0.01),
+        1,
+        "Hello TON"
+    )
 }

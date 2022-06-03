@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.block
 
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -21,6 +23,9 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.experimental.and
 import kotlin.experimental.or
+
+inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.parse(address)
+inline fun MsgAddressIntStd(address: String): MsgAddressIntStd = MsgAddressIntStd.parse(address)
 
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("@type")

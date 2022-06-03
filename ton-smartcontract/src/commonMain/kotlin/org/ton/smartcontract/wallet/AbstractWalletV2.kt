@@ -22,5 +22,6 @@ abstract class AbstractWalletV2(
             val now = Clock.System.now().toEpochMilliseconds() / 1000
             storeUInt(now + timeout, 32)
         }
+        apply(builder)
     }
 }
