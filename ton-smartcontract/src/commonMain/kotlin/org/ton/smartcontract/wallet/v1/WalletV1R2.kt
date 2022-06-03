@@ -1,11 +1,9 @@
 package org.ton.smartcontract.wallet.v1
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.VmStackValue
 import org.ton.cell.Cell
 import org.ton.lite.api.LiteApi
-import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.smartcontract.wallet.SeqnoWallet
 
 /**
  * Wallet v1 revision 2
@@ -18,17 +16,9 @@ class WalletV1R2(
     liteApi: LiteApi,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0
-) : AbstractWalletV1(liteApi, privateKey, workchainId) {
+) : AbstractWalletV1(liteApi, privateKey, workchainId), SeqnoWallet {
     override val name: String = "v1r2"
     override val code: Cell = CODE
-
-    suspend fun seqno(): Int = seqno(liteApi.getMasterchainInfo().last)
-
-    suspend fun seqno(blockIdExt: TonNodeBlockIdExt): Int {
-        val liteServerAccountId = LiteServerAccountId(address())
-        val result = liteApi.runSmcMethod(4, blockIdExt, liteServerAccountId, "seqno")
-        return (result.first() as VmStackValue.TinyInt).value.toInt()
-    }
 
     companion object {
         val CODE: Cell =

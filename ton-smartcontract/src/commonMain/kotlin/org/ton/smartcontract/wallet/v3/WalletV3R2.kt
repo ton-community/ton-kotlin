@@ -1,12 +1,9 @@
 package org.ton.smartcontract.wallet.v3
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.api.pub.PublicKeyEd25519
-import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.VmStackValue
 import org.ton.cell.Cell
 import org.ton.lite.api.LiteApi
-import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.smartcontract.wallet.GetPublicKeyWallet
 
 /**
  * Wallet v3 revision 1
@@ -21,18 +18,9 @@ class WalletV3R2(
     workchainId: Int = 0,
     subwalletId: Int = DEFAULT_WALLET_ID + workchainId,
     timeout: Long = 60
-) : AbstractWalletV3(liteApi, privateKey, workchainId, subwalletId, timeout) {
+) : AbstractWalletV3(liteApi, privateKey, workchainId, subwalletId, timeout), GetPublicKeyWallet {
     override val name: String = "v3r2"
     override val code: Cell = CODE
-
-    suspend fun getPublicKey(): PublicKeyEd25519 = getPublicKey(liteApi.getMasterchainInfo().last)
-
-    suspend fun getPublicKey(blockIdExt: TonNodeBlockIdExt): PublicKeyEd25519 {
-        val liteServerAccountId = LiteServerAccountId(address())
-        val result = liteApi.runSmcMethod(4, blockIdExt, liteServerAccountId, "get_public_key")
-        val rawPublicKey = (result.first() as VmStackValue.Int).value.toByteArray()
-        return PublicKeyEd25519(rawPublicKey)
-    }
 
     companion object {
         val CODE: Cell =
