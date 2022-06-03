@@ -1,7 +1,6 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -20,10 +19,6 @@ abstract class WalletContract(
 ) : SmartContract {
     val logger: Logger by lazy {
         Logger.println(name, Logger.Level.DEBUG)
-    }
-
-    val publicKey: PublicKeyEd25519 by lazy {
-        privateKey.publicKey()
     }
 
     override suspend fun deploy(): LiteServerSendMsgStatus {
@@ -54,7 +49,7 @@ abstract class WalletContract(
 
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
-        storeBytes(publicKey.key)
+        storeBytes(privateKey.publicKey().key)
     }
 
     open fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell {

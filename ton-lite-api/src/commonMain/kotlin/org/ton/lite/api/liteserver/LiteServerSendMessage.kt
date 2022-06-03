@@ -8,7 +8,7 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.hex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
@@ -42,7 +42,7 @@ data class LiteServerSendMessage(
 
     override fun toString(): String = buildString {
         append("LiteServerSendMessage(body=")
-        append(base64(body))
+        append(hex(body))
         append(")")
     }
 

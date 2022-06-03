@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.Ed25519
 import org.ton.crypto.base64
+import org.ton.crypto.hex
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
@@ -94,11 +95,7 @@ data class PublicKeyEd25519(
         return key.contentHashCode()
     }
 
-    override fun toString(): String = buildString {
-        append("PublicKeyEd25519(key=")
-        append(base64(key))
-        append(")")
-    }
+    override fun toString(): String = hex(key)
 
     companion object : TlConstructor<PublicKeyEd25519>(
             type = PublicKeyEd25519::class,

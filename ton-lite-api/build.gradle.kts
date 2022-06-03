@@ -10,6 +10,7 @@ kotlin {
                 api(projects.tonCell)
                 api(projects.tonBoc)
                 api(projects.tonApi)
+                api(projects.tonLogger)
                 implementation(libs.serialization.json)
             }
         }

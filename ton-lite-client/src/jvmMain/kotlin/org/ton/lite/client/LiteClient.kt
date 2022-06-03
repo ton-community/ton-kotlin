@@ -19,7 +19,7 @@ open class LiteClient(
         logger: Logger = PrintLnLogger("TON LiteClient")
     ) : this(AdnlTcpClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default, logger))
 
-    val logger get() = adnlTcpClient.logger
+    override val logger get() = adnlTcpClient.logger
 
     constructor(ipv4: Int, port: Int, publicKey: ByteArray, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
         ipv4(ipv4),

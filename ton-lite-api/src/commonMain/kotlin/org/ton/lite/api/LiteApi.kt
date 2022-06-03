@@ -6,12 +6,16 @@ import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.lite.api.liteserver.*
+import org.ton.logger.Logger
 import org.ton.tl.TlConstructor
 
 interface LiteApi {
+    val logger: Logger
+
     suspend fun sendRawQuery(byteArray: ByteArray): ByteArray
 
     suspend fun <Q : Any, A : Any> sendQuery(query: Q, queryCodec: TlConstructor<Q>, answerCodec: TlConstructor<A>): A {
+        logger.debug { "Send query: $query" }
         val queryBytes = queryCodec.encodeBoxed(query)
         val liteServerQuery = LiteServerQuery(queryBytes)
         val liteServerQueryBytes = LiteServerQuery.encodeBoxed(liteServerQuery)
@@ -20,7 +24,9 @@ interface LiteApi {
         if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
             throw LiteServerError.decode(errorByteInput)
         }
-        return answerCodec.decodeBoxed(answerBytes)
+        val answer = answerCodec.decodeBoxed(answerBytes)
+        logger.debug { "Query answer: $answer" }
+        return answer
     }
 
     suspend fun getTime(): LiteServerCurrentTime =

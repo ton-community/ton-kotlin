@@ -1,4 +1,4 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.v1
 
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Coins
@@ -20,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-class SimpleWalletR3Test {
+class WalletV1R3Test {
     private val privateKey = PrivateKeyEd25519(ByteArray(32))
 
     private fun liteClient() = LiteClient(
@@ -30,7 +30,7 @@ class SimpleWalletR3Test {
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     )
 
-    private fun wallet() = SimpleWalletR3(liteClient(), privateKey)
+    private fun wallet() = WalletV1R3(liteClient(), privateKey)
 
     @Test
     fun `test private key`() {
@@ -114,7 +114,7 @@ class SimpleWalletR3Test {
         assertContentEquals(expected, actual)
     }
 
-    private fun SimpleWalletR3.exampleTransferMessage(comment: String) = createTransferMessage(
+    private fun WalletV1R3.exampleTransferMessage(comment: String) = createTransferMessage(
         dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm"),
         bounce = true,
         amount = Coins.of(1),

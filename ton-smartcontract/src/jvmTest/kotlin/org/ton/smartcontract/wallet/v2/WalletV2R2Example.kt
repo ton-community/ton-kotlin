@@ -1,8 +1,6 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.v2
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.block.Coins
-import org.ton.block.MsgAddressInt
 import org.ton.crypto.base64
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
@@ -20,19 +18,16 @@ private fun liteClient() = LiteClient(
 
 suspend fun main() {
     val liteClient = liteClient()
-    liteClient.connect()
-    val wallet = WalletV2R1(liteClient, privateKey)
+    val wallet = WalletV2R2(liteClient, privateKey)
     val address = wallet.address()
     println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
-    println("Corresponding public key is ${hex(wallet.publicKey.key).uppercase()}")
-    wallet.transfer(
-        MsgAddressInt.parse("kf8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM_BP"),
-        false,
-        Coins.of(0.01),
-        1,
-        "Hello TON \uD83D\uDE80"
-    )
-}
+    println("Corresponding public key is ${hex(wallet.privateKey.publicKey().key).uppercase()}")
 
+    liteClient.connect()
+    val block = liteClient.getMasterchainInfo().last
+
+    println("seqno: ${wallet.seqno(block)}")
+    println("get_public_key: ${wallet.getPublicKey(block)}")
+}

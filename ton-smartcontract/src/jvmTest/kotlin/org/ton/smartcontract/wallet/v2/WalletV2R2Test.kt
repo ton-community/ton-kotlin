@@ -1,4 +1,4 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.v2
 
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Message

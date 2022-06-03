@@ -7,6 +7,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.storeTlb
 
 interface SmartContract {
@@ -31,7 +32,7 @@ interface SmartContract {
     override fun toString(): String
 
     companion object {
-        private val stateInitCodec by lazy {
+        private val stateInitCodec: TlbCodec<StateInit> by lazy {
             StateInit.tlbCodec()
         }
 
