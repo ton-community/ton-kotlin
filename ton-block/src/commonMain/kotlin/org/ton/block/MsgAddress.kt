@@ -8,6 +8,7 @@ import org.ton.tlb.exception.UnknownTlbConstructorException
 @Serializable
 sealed interface MsgAddress {
     companion object {
+        @JvmStatic
         fun tlbCodec(): TlbCombinator<MsgAddress> = MsgAddressTlbCombinator()
     }
 }
