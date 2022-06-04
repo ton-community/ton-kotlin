@@ -218,7 +218,7 @@ private fun Input.readInt(bytes: Int): Int {
     return when (bytes) {
         1 -> readByte().toInt()
         2 -> readShort().toInt()
-        3 -> readShort().toInt() + readByte().toInt()
+        3 -> (readByte().toInt() shl Short.SIZE_BITS) + readShort().toInt()
         else -> readInt()
     }
 }
@@ -228,8 +228,8 @@ private fun Output.writeInt(value: Int, bytes: Int) {
         1 -> writeByte(value.toByte())
         2 -> writeShort(value.toShort())
         3 -> {
-            writeShort(value.toShort())
             writeByte((value shr Short.SIZE_BITS).toByte())
+            writeShort(value.toShort())
         }
         else -> writeInt(value)
     }
