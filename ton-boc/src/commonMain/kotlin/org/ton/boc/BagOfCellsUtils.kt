@@ -134,8 +134,7 @@ private fun serializeBagOfCells(
     hasCacheBits: Boolean,
     flags: Int
 ): ByteArray = buildPacket {
-    val cells = bagOfCells.treeWalk().toList()
-    println("cells list: \n${cells.joinToString(separator = "\n") { it.bits.toString() }}\n")
+    val cells = bagOfCells.treeWalk().toSet()
     val cellsCount = cells.size
     val rootsCount = bagOfCells.roots.size
     var sizeBytes = 0
@@ -152,7 +151,6 @@ private fun serializeBagOfCells(
             val cellData = if (cell.bits.size % 8 != 0) {
                 BitString.appendAugmentTag(cell.bits.toByteArray(), cell.bits.size)
             } else cell.bits.toByteArray()
-//            println("WriteData: ${hex(cellData)}")
             writeFully(cellData)
             cell.refs.forEach { reference ->
                 writeInt(cells.lastIndexOf(reference), sizeBytes)
@@ -186,21 +184,14 @@ private fun serializeBagOfCells(
     flagsByte = flagsByte or flags // flags:(## 2) { flags = 0 }
     flagsByte = flagsByte or sizeBytes // size:(## 3) { size <= 4 }
     writeByte(flagsByte.toByte())
-    println("flags=$flagsByte - ${flagsByte.toString(16).padStart(2, '0')}")
 
     writeByte(offsetBytes.toByte()) // off_bytes:(## 8) { off_bytes <= 8 }
-    println("off_bytes=$offsetBytes - ${offsetBytes.toString(16).padStart(2, '0')}")
     writeInt(cellsCount, sizeBytes) // cells:(##(size * 8))
-    println("cells=$cellsCount - ${cellsCount.toString(16).padStart(2, '0')}")
     writeInt(rootsCount, sizeBytes) // roots:(##(size * 8)) { roots >= 1 }
-    println("roots=$rootsCount - ${rootsCount.toString(16).padStart(2, '0')}")
     writeInt(0, sizeBytes) // absent:(##(size * 8)) { roots + absent <= cells }
-    println("absent=0 - ${0.toString(16).padStart(2, '0')}")
-    println("tot_cells_size=$fullSize")
     writeInt(fullSize, offsetBytes) // tot_cells_size:(##(off_bytes * 8))
     bagOfCells.roots.forEach { root ->
         val rootIndex = cells.indexOf(root)
-        println("rootindex=$rootIndex - ${rootIndex.toString(16)}")
         writeInt(rootIndex, sizeBytes)
     }
     if (hasIndex) {
