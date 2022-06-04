@@ -21,7 +21,6 @@ abstract class AbstractWalletV3(
         storeUInt(0, 32) // seqno
         storeUInt(subwalletId, 32)
         storeBytes(privateKey.publicKey().key)
-        storeUInt(0, 1) // plugins dict empty
     }
 
     override fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit): Cell = CellBuilder.createCell {

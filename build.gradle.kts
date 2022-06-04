@@ -55,6 +55,7 @@ allprojects {
             }
             val commonTest by getting {
                 dependencies {
+                    implementation("io.mockk:mockk:1.12.4")
                     implementation(kotlin("test"))
                 }
             }

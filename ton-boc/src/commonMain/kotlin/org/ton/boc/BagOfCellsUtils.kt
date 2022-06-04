@@ -135,6 +135,7 @@ private fun serializeBagOfCells(
     flags: Int
 ): ByteArray = buildPacket {
     val cells = bagOfCells.treeWalk().toList()
+    println("cells list: \n${cells.joinToString(separator = "\n") { it.bits.toString() }}\n")
     val cellsCount = cells.size
     val rootsCount = bagOfCells.roots.size
     var sizeBytes = 0
@@ -174,26 +175,33 @@ private fun serializeBagOfCells(
 
     var flagsByte = 0
     if (hasIndex) {
-        flagsByte = flagsByte or (1 shl 7)
+        flagsByte = flagsByte or (1 shl 7) // has_idx:(## 1)
     }
     if (hasCrc32c) {
-        flagsByte = flagsByte or (1 shl 6)
+        flagsByte = flagsByte or (1 shl 6) // has_crc32c:(## 1)
     }
     if (hasCacheBits) {
-        flagsByte = flagsByte or (1 shl 5)
+        flagsByte = flagsByte or (1 shl 5) // has_cache_bits:(## 1)
     }
-    flagsByte = flagsByte or flags
-    flagsByte = flagsByte or sizeBytes
-
+    flagsByte = flagsByte or flags // flags:(## 2) { flags = 0 }
+    flagsByte = flagsByte or sizeBytes // size:(## 3) { size <= 4 }
     writeByte(flagsByte.toByte())
-    writeByte(offsetBytes.toByte())
-    writeInt(cellsCount, sizeBytes)
-    writeInt(rootsCount, sizeBytes)
-    writeInt(0, sizeBytes)
+    println("flags=$flagsByte - ${flagsByte.toString(16).padStart(2, '0')}")
 
-    writeInt(fullSize, offsetBytes)
+    writeByte(offsetBytes.toByte()) // off_bytes:(## 8) { off_bytes <= 8 }
+    println("off_bytes=$offsetBytes - ${offsetBytes.toString(16).padStart(2, '0')}")
+    writeInt(cellsCount, sizeBytes) // cells:(##(size * 8))
+    println("cells=$cellsCount - ${cellsCount.toString(16).padStart(2, '0')}")
+    writeInt(rootsCount, sizeBytes) // roots:(##(size * 8)) { roots >= 1 }
+    println("roots=$rootsCount - ${rootsCount.toString(16).padStart(2, '0')}")
+    writeInt(0, sizeBytes) // absent:(##(size * 8)) { roots + absent <= cells }
+    println("absent=0 - ${0.toString(16).padStart(2, '0')}")
+    println("tot_cells_size=$fullSize")
+    writeInt(fullSize, offsetBytes) // tot_cells_size:(##(off_bytes * 8))
     bagOfCells.roots.forEach { root ->
-        writeInt(cells.lastIndexOf(root), sizeBytes)
+        val rootIndex = cells.indexOf(root)
+        println("rootindex=$rootIndex - ${rootIndex.toString(16)}")
+        writeInt(rootIndex, sizeBytes)
     }
     if (hasIndex) {
         serializedCells.forEachIndexed { index, _ ->
@@ -207,21 +215,22 @@ private fun serializeBagOfCells(
 }.readBytes()
 
 private fun Input.readInt(bytes: Int): Int {
-    var result = 0
-    var b = bytes
-    while (b > 0) {
-        result = (result shl 8) + readByte()
-        b--
+    return when (bytes) {
+        1 -> readByte().toInt()
+        2 -> readShort().toInt()
+        3 -> readShort().toInt() + readByte().toInt()
+        else -> readInt()
     }
-    return result
 }
 
 private fun Output.writeInt(value: Int, bytes: Int) {
-    var v = value
-    var b = bytes
-    while (b > 0) {
-        writeByte((v and 0xff).toByte())
-        v = v shr 8
-        b--
+    when (bytes) {
+        1 -> writeByte(value.toByte())
+        2 -> writeShort(value.toShort())
+        3 -> {
+            writeShort(value.toShort())
+            writeByte((value shr Short.SIZE_BITS).toByte())
+        }
+        else -> writeInt(value)
     }
 }
