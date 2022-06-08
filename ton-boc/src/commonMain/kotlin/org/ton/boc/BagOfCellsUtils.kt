@@ -71,26 +71,32 @@ fun Input.readBagOfCell(): BagOfCells {
     repeat(cellsCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
         val level = d1 shr 5
-        val hasHashes = (d1 and 16) == 16
-        val isExotic = (d1 and 8) == 8
-        val refsCount = d1 and 7
-        val isAbsent = refsCount == 7 && hasHashes
-
-        println("isExotic=$isExotic refsCount: $refsCount")
+        val hasHashes = (d1 and 0b0001_0000) != 0
+        val isExotic = (d1 and 0b0000_1000) != 0
+        val refsCount = d1 and 0b0000_0111
+        val isAbsent = refsCount == 0b0000_0111 && hasHashes
 
         // For absent cells (i.e., external references), only d1 is present, always equal to 23 + 32l.
         if (isAbsent) {
             TODO()
-//            val dataSize = 256 *
         } else {
             require(refsCount in 0..4) {
                 "refsCount expected: 0..4 actual: $refsCount"
             }
 
             val d2 = readByte().toInt() and 0xFF
-
             val fullFilledBytes = d2 and 1 == 0
             val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
+
+            if (hasHashes) {
+                val hashes = Array(level + 1) {
+                    readBytes(32)
+                }
+                val depth = IntArray(level + 1) {
+                    readShort().toInt()
+                }
+            }
+
             cellsData[cellIndex] = readBytes(dataSize)
             if (fullFilledBytes) {
                 cellsData[cellIndex] = BitString.appendAugmentTag(cellsData[cellIndex], dataSize * 8)

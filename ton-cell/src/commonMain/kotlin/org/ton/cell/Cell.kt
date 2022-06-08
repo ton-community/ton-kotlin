@@ -79,6 +79,10 @@ interface Cell {
             firstChild: Boolean = true
         ) {
             appendable.append(indent)
+            if (cell.isExotic) {
+                appendable.append(cell.type.toString())
+                appendable.append(' ')
+            }
             appendable.append("x{")
             appendable.append(cell.bits.toString())
             appendable.append("}")
