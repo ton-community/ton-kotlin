@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.hex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 
@@ -56,9 +56,9 @@ data class TonNodeBlockIdExt(
         append(", seqno=")
         append(seqno)
         append(", rootHash=")
-        append(base64(rootHash))
+        append(hex(rootHash))
         append(", fileHash=")
-        append(base64(fileHash))
+        append(hex(fileHash))
         append(")")
     }
 

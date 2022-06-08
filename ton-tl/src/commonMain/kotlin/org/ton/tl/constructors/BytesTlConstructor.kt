@@ -9,9 +9,11 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
     schema = "bytes data:string = Bytes"
 ) {
     override fun decode(input: Input): ByteArray {
-        var (size, read) = input.readByteLengthEx()
-        size += calculatePadding(size + read)
-        return input.readBytes(size)
+        val (size, read) = input.readByteLengthEx()
+        val padding = calculatePadding(size + read)
+        val bytes = input.readBytes(size)
+        input.discard(padding)
+        return bytes
     }
 
     override fun encode(output: Output, value: ByteArray) {

@@ -5,7 +5,6 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellType
 import org.ton.crypto.crc32c
-import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -18,12 +17,12 @@ fun Input.readBagOfCell(): BagOfCells {
     val sizeBytes: Int
     when (prefix) {
         BagOfCells.BOC_GENERIC_MAGIC -> {
-            val flagsByte = readByte()
-            hasIdx = (flagsByte and 128.toByte()) != 0.toByte()
-            hashCrc32 = (flagsByte and 64.toByte()) != 0.toByte()
-            hasCacheBits = (flagsByte and 32.toByte()) != 0.toByte()
-            flags = (flagsByte and 16) * 2 + (flagsByte and 8)
-            sizeBytes = flagsByte % 8
+            val firstByte = readByte().toInt() and 0xFF
+            hasIdx = (firstByte and 128) != 0
+            hashCrc32 = (firstByte and 64) != 0
+            hasCacheBits = (firstByte and 32) != 0
+            flags = (firstByte and 16) * 2 + (firstByte and 8)
+            sizeBytes = firstByte and 0b0000_0111
         }
 
         BagOfCells.BOC_INDEXED_MAGIC -> {
@@ -71,19 +70,36 @@ fun Input.readBagOfCell(): BagOfCells {
     val cellsType = Array(cellsCount) { CellType.ORDINARY }
     repeat(cellsCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
-        val d2 = readByte().toInt() and 0xFF
-        val isExotic = (d1 and 8) != 0
-        val referenceCount = d1 % 8
-        val fullFilledBytes = d2 % 2 == 0
-        val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
-        cellsData[cellIndex] = readBytes(dataSize)
-        if (fullFilledBytes) {
-            cellsData[cellIndex] = BitString.appendAugmentTag(cellsData[cellIndex], dataSize * 8)
+        val level = d1 shr 5
+        val hasHashes = (d1 and 16) == 16
+        val isExotic = (d1 and 8) == 8
+        val refsCount = d1 and 7
+        val isAbsent = refsCount == 7 && hasHashes
+
+        println("isExotic=$isExotic refsCount: $refsCount")
+
+        // For absent cells (i.e., external references), only d1 is present, always equal to 23 + 32l.
+        if (isAbsent) {
+            TODO()
+//            val dataSize = 256 *
+        } else {
+            require(refsCount in 0..4) {
+                "refsCount expected: 0..4 actual: $refsCount"
+            }
+
+            val d2 = readByte().toInt() and 0xFF
+
+            val fullFilledBytes = d2 and 1 == 0
+            val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
+            cellsData[cellIndex] = readBytes(dataSize)
+            if (fullFilledBytes) {
+                cellsData[cellIndex] = BitString.appendAugmentTag(cellsData[cellIndex], dataSize * 8)
+            }
+            references[cellIndex] = IntArray(refsCount) {
+                readInt(sizeBytes)
+            }
+            cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
         }
-        references[cellIndex] = IntArray(referenceCount) {
-            readInt(sizeBytes)
-        }
-        cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
     }
 
     // Resolving references & constructing cells from leaves to roots
