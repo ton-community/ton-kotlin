@@ -83,7 +83,7 @@ private class HashMapLabelTlbCombinator(
         override fun loadNegatedTlb(
             cellSlice: CellSlice
         ): Pair<Int, HashMapLabelShort> {
-            val (n, len) = cellSlice.loadTlb(unaryCodec)
+            val (n, len) = cellSlice.loadNegatedTlb(unaryCodec)
             val s = cellSlice.loadBitString(n)
             return n to HashMapLabelShort(len, s)
         }

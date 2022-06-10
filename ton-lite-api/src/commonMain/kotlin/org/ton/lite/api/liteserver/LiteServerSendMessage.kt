@@ -3,7 +3,6 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.block.Message
-import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder

@@ -13,7 +13,7 @@ import org.ton.tlb.*
 @Serializable
 sealed interface CommonMsgInfoRelaxed {
     @SerialName("int_msg_info")
-    data class IntMsgInfo(
+    data class IntMsgInfoRelaxed(
         @SerialName("ihr_disabled")
         val ihrDisabled: Boolean = true,
         val bounce: Boolean,
@@ -47,7 +47,7 @@ sealed interface CommonMsgInfoRelaxed {
     }
 
     @SerialName("ext_out_msg_info")
-    data class ExtOutMsgInfo(
+    data class ExtOutMsgInfoRelaxed(
         val src: MsgAddress,
         val dest: MsgAddressExt,
         @SerialName("created_lt")
@@ -74,11 +74,11 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
     }
 
     override fun getConstructor(value: CommonMsgInfoRelaxed): TlbConstructor<out CommonMsgInfoRelaxed> = when (value) {
-        is CommonMsgInfoRelaxed.IntMsgInfo -> intMsgInfoConstructor
-        is CommonMsgInfoRelaxed.ExtOutMsgInfo -> extOutMsgInfoConstructor
+        is CommonMsgInfoRelaxed.IntMsgInfoRelaxed -> intMsgInfoConstructor
+        is CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed -> extOutMsgInfoConstructor
     }
 
-    private class IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.IntMsgInfo>(
+    private class IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.IntMsgInfoRelaxed>(
         schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool" +
                 " src:MsgAddress dest:MsgAddressInt" +
                 " value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins" +
@@ -98,7 +98,7 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
         }
 
         override fun storeTlb(
-            cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.IntMsgInfo
+            cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.IntMsgInfoRelaxed
         ) = cellBuilder {
             storeBit(value.ihrDisabled)
             storeBit(value.bounce)
@@ -114,7 +114,7 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): CommonMsgInfoRelaxed.IntMsgInfo = cellSlice {
+        ): CommonMsgInfoRelaxed.IntMsgInfoRelaxed = cellSlice {
             val ihrDisabled = loadBit()
             val bounce = loadBit()
             val bounced = loadBit()
@@ -125,13 +125,13 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
             val fwdFee = loadTlb(coinsCodec)
             val createdLt = loadUInt(64).toLong()
             val createdAt = loadUInt(32).toInt()
-            CommonMsgInfoRelaxed.IntMsgInfo(
+            CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
                 ihrDisabled, bounce, bounced, src, dest, value, ihrFee, fwdFee, createdLt, createdAt
             )
         }
     }
 
-    private class ExtOutMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.ExtOutMsgInfo>(
+    private class ExtOutMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed>(
         schema = "ext_out_msg_info\$11 src:MsgAddress dest:MsgAddressExt" +
                 " created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;"
     ) {
@@ -143,7 +143,7 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
         }
 
         override fun storeTlb(
-            cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.ExtOutMsgInfo
+            cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed
         ) = cellBuilder {
             storeTlb(msgAddressCodec, value.src)
             storeTlb(msgAddressExtCodec, value.dest)
@@ -153,12 +153,12 @@ private class CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRel
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): CommonMsgInfoRelaxed.ExtOutMsgInfo = cellSlice {
+        ): CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed = cellSlice {
             val src = loadTlb(msgAddressCodec)
             val dest = loadTlb(msgAddressExtCodec)
             val createdLt = loadUInt(64).toLong()
             val createdAt = loadUInt(32).toInt()
-            CommonMsgInfoRelaxed.ExtOutMsgInfo(src, dest, createdLt, createdAt)
+            CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed(src, dest, createdLt, createdAt)
         }
     }
 }

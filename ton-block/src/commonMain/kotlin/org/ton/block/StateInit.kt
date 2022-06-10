@@ -7,7 +7,6 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.EmptyHashMapE
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
@@ -17,8 +16,7 @@ import org.ton.tlb.storeTlb
 @SerialName("state_init")
 @Serializable
 data class StateInit(
-    @SerialName("split_depth")
-    val splitDepth: Maybe<Int>,
+    val split_depth: Maybe<Int>,
     val special: Maybe<TickTock>,
     val code: Maybe<Cell>,
     val data: Maybe<Cell>,
@@ -36,7 +34,7 @@ data class StateInit(
 
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbCodec<StateInit> = StateInitTlbConstructor()
+        fun tlbCodec(): TlbConstructor<StateInit> = StateInitTlbConstructor()
     }
 }
 
@@ -59,7 +57,7 @@ private class StateInitTlbConstructor : TlbConstructor<StateInit>(
     override fun storeTlb(
         cellBuilder: CellBuilder, value: StateInit
     ) = cellBuilder {
-        storeTlb(maybeUint5Codec, value.splitDepth)
+        storeTlb(maybeUint5Codec, value.split_depth)
         storeTlb(maybeTickTockCodec, value.special)
         storeTlb(maybeCell, value.code)
         storeTlb(maybeCell, value.data)

@@ -20,11 +20,11 @@ data class TickTock(
 
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor()
+        fun tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor
     }
 }
 
-private class TickTockTlbConstructor : TlbConstructor<TickTock>(
+private object TickTockTlbConstructor : TlbConstructor<TickTock>(
     schema = "tick_tock\$_ tick:Bool tock:Bool = TickTock;"
 ) {
     override fun storeTlb(

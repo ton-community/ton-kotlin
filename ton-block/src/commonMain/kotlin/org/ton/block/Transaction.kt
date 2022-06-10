@@ -5,94 +5,122 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.bitstring.BitString
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 
 @SerialName("transaction")
 @Serializable
 data class Transaction(
-        val account_addr: ByteArray,
-        val lt: Long,
-        val prev_trans_hash: ByteArray,
-        val prev_trans_lt: Long,
-        val now: Long,
-        val outmsg_cnt: Int,
-        val orig_status: AccountStatus,
-        val end_status: AccountStatus,
-        val in_msg: Message<ByteArray>?,
-        val out_msgs: HashMapE<Message<ByteArray>>,
-        val total_fees: CurrencyCollection,
-        val state_update: HashUpdate<org.ton.block.Account>,
-        val description: TransactionDescr
+    val account_addr: BitString,
+    val lt: Long,
+    val prev_trans_hash: BitString,
+    val prev_trans_lt: Long,
+    val now: Long,
+    val outmsg_cnt: Int,
+    val orig_status: AccountStatus,
+    val end_status: AccountStatus,
+    val in_msg: Maybe<Message<Cell>>,
+    val out_msgs: HashMapE<Message<Cell>>,
+    val total_fees: CurrencyCollection,
+    val state_update: HashUpdate<Account>,
+    val description: TransactionDescr
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Transaction
-
-        if (!account_addr.contentEquals(other.account_addr)) return false
-        if (lt != other.lt) return false
-        if (!prev_trans_hash.contentEquals(other.prev_trans_hash)) return false
-        if (prev_trans_lt != other.prev_trans_lt) return false
-        if (now != other.now) return false
-        if (outmsg_cnt != other.outmsg_cnt) return false
-        if (orig_status != other.orig_status) return false
-        if (end_status != other.end_status) return false
-        if (in_msg != other.in_msg) return false
-        if (out_msgs != other.out_msgs) return false
-        if (total_fees != other.total_fees) return false
-        if (state_update != other.state_update) return false
-        if (description != other.description) return false
-
-        return true
+    init {
+        require(account_addr.size == 256) { "required: account_addr.size == 256, actual: ${account_addr.size}" }
+        require(prev_trans_hash.size == 256) { "required: prev_trans_hash.size == 256, actual: ${prev_trans_hash.size}" }
     }
 
-    override fun hashCode(): Int {
-        var result = account_addr.contentHashCode()
-        result = 31 * result + lt.hashCode()
-        result = 31 * result + prev_trans_hash.contentHashCode()
-        result = 31 * result + prev_trans_lt.hashCode()
-        result = 31 * result + now.hashCode()
-        result = 31 * result + outmsg_cnt
-        result = 31 * result + orig_status.hashCode()
-        result = 31 * result + end_status.hashCode()
-        result = 31 * result + in_msg.hashCode()
-        result = 31 * result + out_msgs.hashCode()
-        result = 31 * result + total_fees.hashCode()
-        result = 31 * result + state_update.hashCode()
-        result = 31 * result + description.hashCode()
-        return result
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbConstructor<Transaction> = TransactionTlbConstructor
+    }
+}
+
+private object TransactionTlbConstructor : TlbConstructor<Transaction>(
+    schema = "transaction\$0111 account_addr:bits256 lt:uint64 " +
+            "prev_trans_hash:bits256 prev_trans_lt:uint64 now:uint32 " +
+            "outmsg_cnt:uint15 " +
+            "orig_status:AccountStatus end_status:AccountStatus " +
+            "^[ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) ] " +
+            "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
+            "description:^TransactionDescr = Transaction;"
+) {
+    val accountStatus by lazy { AccountStatus.tlbCodec() }
+    val messageAny by lazy { Cell.tlbCodec(Message.tlbCodec(Cell.tlbCodec())) }
+    val maybeMessageAny by lazy { Maybe.tlbCodec(messageAny) }
+    val hashMapEMessageAny by lazy { HashMapE.tlbCodec(15, messageAny) }
+    val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
+    val hashUpdateAccount by lazy { HashUpdate.tlbCodec(Account.tlbCodec()) }
+    val transactionDescr by lazy { TransactionDescr.tlbCodec() }
+
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: Transaction
+    ) = cellBuilder {
+        storeBits(value.account_addr)
+        storeUInt(value.lt, 64)
+        storeBits(value.prev_trans_hash)
+        storeUInt(value.prev_trans_lt, 64)
+        storeUInt(value.now, 32)
+        storeUInt(value.outmsg_cnt, 15)
+        storeTlb(accountStatus, value.orig_status)
+        storeTlb(accountStatus, value.end_status)
+        storeRef {
+            storeTlb(maybeMessageAny, value.in_msg)
+            storeTlb(hashMapEMessageAny, value.out_msgs)
+        }
+        storeTlb(currencyCollection, value.total_fees)
+        storeRef {
+            storeTlb(hashUpdateAccount, value.state_update)
+        }
+        storeRef {
+            storeTlb(transactionDescr, value.description)
+        }
     }
 
-    override fun toString(): String = buildString {
-        append("Transaction(account_addr=")
-        append(hex(account_addr))
-        append(", lt=")
-        append(lt)
-        append(", prev_trans_hash=")
-        append(hex(prev_trans_hash))
-        append(", prev_trans_lt=")
-        append(prev_trans_lt)
-        append(", now=")
-        append(now)
-        append(", outmsg_cnt=")
-        append(outmsg_cnt)
-        append(", orig_status=")
-        append(orig_status)
-        append(", end_status=")
-        append(end_status)
-        append(", in_msg=")
-        append(in_msg)
-        append(", out_msgs=")
-        append(out_msgs)
-        append(", total_fees=")
-        append(total_fees)
-        append(", state_update=")
-        append(state_update)
-        append(", description=")
-        append(description)
-        append(")")
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): Transaction = cellSlice {
+        val accountAddr = loadBitString(256)
+        val lt = loadUInt(64).toLong()
+        val prevTransHash = loadBitString(256)
+        val prevTransLt = loadUInt(64).toLong()
+        val now = loadUInt(32).toLong()
+        val outmsgCnt = loadUInt(15).toInt()
+        val origStatus = loadTlb(accountStatus)
+        val endStatus = loadTlb(accountStatus)
+        val (inMsg, outMsgs) = loadRef {
+            loadTlb(maybeMessageAny) to loadTlb(hashMapEMessageAny)
+        }
+        val totalFees = loadTlb(currencyCollection)
+        val stateUpdate = loadRef {
+            loadTlb(hashUpdateAccount)
+        }
+        val description = loadRef {
+            loadTlb(transactionDescr)
+        }
+        Transaction(
+            accountAddr,
+            lt,
+            prevTransHash,
+            prevTransLt,
+            now,
+            outmsgCnt,
+            origStatus,
+            endStatus,
+            inMsg,
+            outMsgs,
+            totalFees,
+            stateUpdate,
+            description
+        )
     }
 }

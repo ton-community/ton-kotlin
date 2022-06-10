@@ -32,8 +32,7 @@ fun <T : Any> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
 }
 
-@JvmName("loadNegatedTlb")
-fun <T : Any> CellSlice.loadTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
+fun <T : Any> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
     return codec.loadNegatedTlb(this)
 }
 

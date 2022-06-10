@@ -1,9 +1,5 @@
 package org.ton.block
 
-import org.ton.hashmap.HashmapAugE
+import org.ton.hashmap.AugDictionary
 
-interface InMsgDescr : HashmapAugE<InMsg, ImportFees>
-
-data class InMsgDescrData(
-    private val _value: HashmapAugE<InMsg, ImportFees>
-) : InMsgDescr, HashmapAugE<InMsg, ImportFees> by _value
+typealias InMsgDescr = AugDictionary<InMsg, ImportFees>

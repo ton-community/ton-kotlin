@@ -13,7 +13,7 @@ data class MerkleUpdate<X : Any>(
     val new: X
 ) {
     init {
-        require(old_hash.size == 256) { "expected: old_hash.size = 256, actual: ${old_hash.size}" }
-        require(old_hash.size == 256) { "expected: new_hash.size = 256, actual: ${new_hash.size}" }
+        require(old_hash.size == 256) { "required: old_hash.size = 256, actual: ${old_hash.size}" }
+        require(new_hash.size == 256) { "required: new_hash.size = 256, actual: ${new_hash.size}" }
     }
 }

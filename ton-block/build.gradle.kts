@@ -3,6 +3,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.tonCell)
+                api(projects.tonBoc)
                 api(projects.tonHashmap)
                 api(projects.tonCrypto)
                 api(projects.tonBigint)

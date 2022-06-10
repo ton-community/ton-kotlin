@@ -5,38 +5,43 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbConstructor
 
-@SerialName("update_hashes")
 @Serializable
-data class HashUpdate<T>(
-        val old_hash: ByteArray,
-        val new_hash: ByteArray
+@SerialName("update_hashes")
+data class HashUpdate<X : Any>(
+    val old_hash: BitString,
+    val new_hash: BitString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        @JvmStatic
+        fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbConstructor<HashUpdate<X>> =
+            HashUpdateTlbConstructor as TlbConstructor<HashUpdate<X>>
+    }
+}
 
-        other as HashUpdate<*>
-
-        if (!old_hash.contentEquals(other.old_hash)) return false
-        if (!new_hash.contentEquals(other.new_hash)) return false
-
-        return true
+private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate<*>>(
+    schema = "update_hashes#72 {X:Type} old_hash:bits256 new_hash:bits256 = HASH_UPDATE X;"
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: HashUpdate<*>
+    ) = cellBuilder {
+        storeBits(value.old_hash)
+        storeBits(value.new_hash)
     }
 
-    override fun hashCode(): Int {
-        var result = old_hash.contentHashCode()
-        result = 31 * result + new_hash.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = buildString {
-        append("HashUpdate(old_hash=")
-        append(hex(old_hash))
-        append(", new_hash=")
-        append(hex(new_hash))
-        append(")")
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): HashUpdate<*> = cellSlice {
+        val oldHash = loadBitString(256)
+        val newHash = loadBitString(256)
+        HashUpdate<Unit>(oldHash, newHash)
     }
 }

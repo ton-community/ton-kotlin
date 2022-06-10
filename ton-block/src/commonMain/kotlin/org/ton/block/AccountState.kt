@@ -2,52 +2,40 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
-@JsonClassDiscriminator("@type")
 @Serializable
+@JsonClassDiscriminator("@type")
 sealed interface AccountState {
-    @SerialName("account_uninit")
-    @Serializable
-    object AccountUninit : AccountState
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<AccountState> = AccountStateTlbCombinator
+    }
+}
 
-    @SerialName("account_active")
-    @Serializable
-    data class AccountActive(
-        @SerialName("_")
-        val init: StateInit
-    ) : AccountState
+private object AccountStateTlbCombinator : TlbCombinator<AccountState>() {
+    val uninit by lazy {
+        AccountUninit.tlbCodec()
+    }
+    val active by lazy {
+        AccountActive.tlbCodec()
+    }
+    val frozen by lazy {
+        AccountFrozen.tlbCodec()
+    }
 
-    @SerialName("account_frozen")
-    @Serializable
-    data class AccountFrozen(
-        @SerialName("state_hash")
-        @Serializable(HexByteArraySerializer::class)
-        val stateHash: ByteArray
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+    override val constructors: List<TlbConstructor<out AccountState>> by lazy {
+        listOf(uninit, active, frozen)
+    }
 
-            other as AccountFrozen
-
-            if (!stateHash.contentEquals(other.stateHash)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return stateHash.contentHashCode()
-        }
-
-        override fun toString(): String = buildString {
-            append("AccountFrozen(stateHash=")
-            append(hex(stateHash))
-            append(")")
-        }
+    override fun getConstructor(
+        value: AccountState
+    ): TlbConstructor<out AccountState> = when (value) {
+        is AccountUninit -> uninit
+        is AccountActive -> active
+        is AccountFrozen -> frozen
     }
 }

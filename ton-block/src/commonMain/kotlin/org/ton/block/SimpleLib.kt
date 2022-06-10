@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 @Serializable
@@ -14,7 +13,7 @@ data class SimpleLib(
 ) {
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbCodec<SimpleLib> = SimpleLibTlbConstructor()
+        fun tlbCodec(): TlbConstructor<SimpleLib> = SimpleLibTlbConstructor()
     }
 }
 

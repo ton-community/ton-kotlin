@@ -5,28 +5,52 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
-
-inline fun MsgImportExt(
-    msg: Message<Cell>,
-    transaction: Transaction
-) = MsgImportExt.of(msg, transaction)
-
-interface MsgImportExt : InMsg {
-    val msg: Message<Cell>
-    val transaction: Transaction
-
-    companion object {
-        @JvmStatic
-        fun of(
-            msg: Message<Cell>,
-            transaction: Transaction
-        ): MsgImportExt = MsgImportExtData(msg, transaction)
-    }
-}
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_import_ext")
-private data class MsgImportExtData(
-    override val msg: Message<Cell>,
-    override val transaction: Transaction
-) : MsgImportExt, InMsgData
+data class MsgImportExt(
+     val msg: Message<Cell>,
+     val transaction: Transaction
+) : InMsg {
+     companion object {
+          @JvmStatic
+          fun tlbCodec(): TlbConstructor<MsgImportExt> = MsgImportExtTlbConstructor
+     }
+}
+
+private object MsgImportExtTlbConstructor : TlbConstructor<MsgImportExt>(
+     schema = "msg_import_ext\$000 msg:^(Message Any) transaction:^Transaction = InMsg;"
+) {
+     val messageAny by lazy { Message.tlbCodec(Cell.tlbCodec()) }
+     val transaction by lazy { Transaction.tlbCodec() }
+
+     override fun storeTlb(
+          cellBuilder: CellBuilder,
+          value: MsgImportExt
+     ) = cellBuilder {
+          storeRef {
+               storeTlb(messageAny, value.msg)
+          }
+          storeRef {
+               storeTlb(transaction, value.transaction)
+          }
+     }
+
+     override fun loadTlb(
+          cellSlice: CellSlice
+     ): MsgImportExt = cellSlice {
+          val msg = loadRef {
+               loadTlb(messageAny)
+          }
+          val transaction = loadRef {
+               loadTlb(transaction)
+          }
+          MsgImportExt(msg, transaction)
+     }
+}

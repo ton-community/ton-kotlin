@@ -36,7 +36,9 @@ data class MessageRelaxed<X : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbCodec<MessageRelaxed<X>> = MessageRelaxedTlbConstructor(x)
+        fun <X : Any> tlbCodec(
+            x: TlbCodec<X>
+        ): TlbConstructor<MessageRelaxed<X>> = MessageRelaxedTlbConstructor(x)
     }
 }
 

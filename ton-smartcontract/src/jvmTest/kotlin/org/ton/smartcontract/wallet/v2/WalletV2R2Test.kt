@@ -3,7 +3,6 @@ package org.ton.smartcontract.wallet.v2
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Message
 import org.ton.block.StateInit
-import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder

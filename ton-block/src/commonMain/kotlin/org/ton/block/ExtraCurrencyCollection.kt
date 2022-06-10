@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -17,11 +16,11 @@ data class ExtraCurrencyCollection(
 ) {
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbCodec<ExtraCurrencyCollection> = ExtraCurrencyCollectionTlbConstructor()
+        fun tlbCodec(): TlbConstructor<ExtraCurrencyCollection> = ExtraCurrencyCollectionTlbConstructor
     }
 }
 
-private class ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
+private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
     schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
 ) {
     private val varUInteger32Codec by lazy {

@@ -2,58 +2,38 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface CommonMsgInfo {
-    @SerialName("int_msg_info")
-    @Serializable
-    data class IntMsgInfo(
-        @SerialName("ihr_disabled")
-        val ihrDisabled: Boolean,
-        val bounce: Boolean,
-        val bounced: Boolean,
-        val src: MsgAddressInt,
-        val dest: MsgAddressInt,
-        val value: CurrencyCollection,
-        @SerialName("ihr_fee")
-        val ihrFee: Coins = Coins(),
-        @SerialName("fwd_fee")
-        val fwdFee: Coins = Coins(),
-        @SerialName("created_lt")
-        val createdLt: Long = 0,
-        @SerialName("created_at")
-        val createdAt: Int = 0
-    ) : CommonMsgInfo
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator()
+    }
+}
 
-    @SerialName("ext_in_msg_info")
-    @Serializable
-    data class ExtInMsgInfo(
-        val src: MsgAddressExt,
-        val dest: MsgAddressInt,
-        @SerialName("import_fee")
-        val importFee: Coins = Coins()
-    ) : CommonMsgInfo {
-        constructor(
-            dest: MsgAddressInt,
-            importFee: Coins = Coins()
-        ) : this(MsgAddressExtNone, dest, importFee)
-
-        override fun toString(): String = Json.encodeToString(serializer(), this)
+private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
+    private val intMsgInfoConstructor by lazy {
+        IntMsgInfo.tlbCodec()
+    }
+    private val extInMsgConstructor by lazy {
+        ExtInMsgInfo.tlbCodec()
+    }
+    private val extOutMsgInfoConstructor by lazy {
+        ExtOutMsgInfo.tlbCodec()
     }
 
-    @SerialName("ext_out_msg_info")
-    @Serializable
-    data class ExtOutMsgInfo(
-        val src: MsgAddressInt,
-        val dest: MsgAddressExt,
-        @SerialName("created_lt")
-        val createdLt: Long,
-        @SerialName("created_at")
-        val createdAt: Int
-    ) : CommonMsgInfo
+    override val constructors: List<TlbConstructor<out CommonMsgInfo>> by lazy {
+        listOf(intMsgInfoConstructor, extInMsgConstructor, extOutMsgInfoConstructor)
+    }
+
+    override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
+        is IntMsgInfo -> intMsgInfoConstructor
+        is ExtInMsgInfo -> extInMsgConstructor
+        is ExtOutMsgInfo -> extOutMsgInfoConstructor
+    }
 }

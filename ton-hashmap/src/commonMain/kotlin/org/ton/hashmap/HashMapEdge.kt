@@ -57,7 +57,7 @@ private class HashMapEdgeTlbConstructor<X : Any>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): HashMapEdge<X> {
-        val (l, label) = cellSlice.loadTlb(hashMapLabelCodec)
+        val (l, label) = cellSlice.loadNegatedTlb(hashMapLabelCodec)
         val m = n - l
         val node = cellSlice.loadTlb(HashMapNode.tlbCodec(m, x))
         return HashMapEdge(label, node)

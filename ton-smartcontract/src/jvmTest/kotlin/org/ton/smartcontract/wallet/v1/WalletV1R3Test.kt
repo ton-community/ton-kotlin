@@ -5,7 +5,6 @@ import org.ton.block.Coins
 import org.ton.block.Message
 import org.ton.block.MsgAddressInt
 import org.ton.block.StateInit
-import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder

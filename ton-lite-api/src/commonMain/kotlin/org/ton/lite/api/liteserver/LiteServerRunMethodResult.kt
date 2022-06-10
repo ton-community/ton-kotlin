@@ -7,7 +7,6 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.toBits
 import org.ton.block.VmStack
 import org.ton.block.VmStackValue
-import org.ton.block.tlb.tlbCodec
 import org.ton.boc.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor

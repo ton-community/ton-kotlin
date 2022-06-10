@@ -5,7 +5,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbNegatedConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.loadNegatedTlb
 import org.ton.tlb.storeNegatedTlb
 
 sealed interface SnakeData {
@@ -89,7 +89,7 @@ data class SnakeDataCons(
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, SnakeDataCons> {
             val b = cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
             val (n, next) = cellSlice.loadRef {
-                cellSlice.loadTlb(snakeData)
+                cellSlice.loadNegatedTlb(snakeData)
             }
             return n + 1 to SnakeDataCons(b, next)
         }

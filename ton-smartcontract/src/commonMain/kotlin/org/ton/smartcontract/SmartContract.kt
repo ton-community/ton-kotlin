@@ -1,7 +1,7 @@
 package org.ton.smartcontract
 
+import org.ton.block.AddrStd
 import org.ton.block.Message
-import org.ton.block.MsgAddressIntStd
 import org.ton.block.StateInit
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -22,7 +22,7 @@ interface SmartContract {
         code, createDataInit()
     )
 
-    fun address(stateInit: StateInit = createStateInit()): MsgAddressIntStd =
+    fun address(stateInit: StateInit = createStateInit()): AddrStd =
         address(workchainId, stateInit)
 
     fun createExternalInitMessage(): Message<Cell>
@@ -37,12 +37,12 @@ interface SmartContract {
         }
 
         @JvmStatic
-        fun address(workchainId: Int, stateInit: StateInit): MsgAddressIntStd {
+        fun address(workchainId: Int, stateInit: StateInit): AddrStd {
             val cell = CellBuilder.createCell {
                 storeTlb(stateInitCodec, stateInit)
             }
             val hash = cell.hash()
-            return MsgAddressIntStd(workchainId, hash)
+            return AddrStd(workchainId, hash)
         }
     }
 }

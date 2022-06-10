@@ -55,7 +55,7 @@ private class UnaryTlbCombinator : TlbNegatedCombinator<Unary>() {
         }
 
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, UnarySuccess> {
-            val (n, x) = cellSlice.loadTlb(unaryCodec)
+            val (n, x) = cellSlice.loadNegatedTlb(unaryCodec)
             return n + 1 to UnarySuccess(x)
         }
     }

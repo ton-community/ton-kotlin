@@ -12,27 +12,30 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 data class Anycast(
     val depth: Int,
-    @SerialName("rewrite_pfx")
-    val rewritePfx: BitString
+    val rewrite_pfx: BitString
 ) {
+    constructor(
+        rewrite_pfx: BitString
+    ) : this(rewrite_pfx.size, rewrite_pfx)
+
     init {
-        require(depth >= 1) { "depth >= 1" }
+        require(depth in 1..30) { "required: depth in 1..30, actual: $depth" }
     }
 
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor()
+        fun tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor
     }
 }
 
-private class AnycastTlbConstructor : TlbConstructor<Anycast>(
+private object AnycastTlbConstructor : TlbConstructor<Anycast>(
     schema = "anycast_info\$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: Anycast
     ) = cellBuilder {
         storeUIntLeq(value.depth, 30)
-        storeBits(value.rewritePfx)
+        storeBits(value.rewrite_pfx)
     }
 
     override fun loadTlb(

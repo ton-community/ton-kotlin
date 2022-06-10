@@ -67,7 +67,7 @@ abstract class WalletContract(
             storeBits(signingMessage.bits)
             storeRefs(signingMessage.refs)
         }
-        val info = CommonMsgInfo.ExtInMsgInfo(dest)
+        val info = ExtInMsgInfo(dest)
         return Message(
             info,
             stateInit to null,
@@ -85,16 +85,16 @@ abstract class WalletContract(
     ): Message<Cell> {
         val stateInit = createStateInit()
         val address = address(stateInit)
-        val info = CommonMsgInfo.ExtInMsgInfo(address)
+        val info = ExtInMsgInfo(address)
         val signingMessage = createSigningMessage(seqno) {
             storeUInt(sendMode, 8)
             storeRef {
                 val messageRelaxed = MessageRelaxed(
-                    info = CommonMsgInfoRelaxed.IntMsgInfo(
+                    info = CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
                         ihrDisabled = true,
                         bounce = bounce,
                         bounced = false,
-                        src = MsgAddressExtNone,
+                        src = AddrNone,
                         dest = dest,
                         value = CurrencyCollection(
                             coins = amount

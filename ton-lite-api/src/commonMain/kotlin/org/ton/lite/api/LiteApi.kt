@@ -53,7 +53,7 @@ interface LiteApi {
     suspend fun sendMessage(query: LiteServerSendMessage): LiteServerSendMsgStatus =
         sendQuery(query, LiteServerSendMessage, LiteServerSendMsgStatus)
 
-    suspend fun getAccountState(id: TonNodeBlockIdExt, account: MsgAddressIntStd): LiteServerAccountState =
+    suspend fun getAccountState(id: TonNodeBlockIdExt, account: AddrStd): LiteServerAccountState =
         getAccountState(id, LiteServerAccountId(account))
 
     suspend fun getAccountState(id: TonNodeBlockIdExt, account: LiteServerAccountId): LiteServerAccountState =
