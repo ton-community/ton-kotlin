@@ -40,9 +40,10 @@ abstract class WalletContract(
         bounce: Boolean,
         coins: Coins,
         seqno: Int,
-        payload: Cell
+        payload: Cell,
+        destinationStateInit: StateInit? = null,
     ): LiteServerSendMsgStatus {
-        val transferMessage = createTransferMessage(dest, bounce, coins, seqno, payload)
+        val transferMessage = createTransferMessage(dest, bounce, coins, seqno, payload, destinationStateInit = destinationStateInit)
         logger.info { "Transfer: $transferMessage" }
         return liteApi.sendMessage(transferMessage)
     }
@@ -81,7 +82,8 @@ abstract class WalletContract(
         amount: Coins,
         seqno: Int,
         payload: Cell,
-        sendMode: Int = 3
+        sendMode: Int = 3,
+        destinationStateInit: StateInit? = null,
     ): Message<Cell> {
         val stateInit = createStateInit()
         val address = address(stateInit)
@@ -100,7 +102,7 @@ abstract class WalletContract(
                             coins = amount
                         )
                     ),
-                    init = null,
+                    init = destinationStateInit,
                     body = payload,
                     storeBodyInRef = false
                 )
