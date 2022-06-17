@@ -2,29 +2,34 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface TrBouncePhase {
-    @SerialName("tr_phase_bounce_negfunds")
-    @Serializable
-    object TrPhaseBounceNegFunds : TrBouncePhase
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<TrBouncePhase> = TrBouncePhaseTlbCombinator
+    }
+}
 
-    @SerialName("tr_phase_bounce_nofunds")
-    @Serializable
-    data class TrPhaseBounceNoFunds(
-            val msg_size: StorageUsedShort,
-            val req_fwd_fees: Coins
-    ) : TrBouncePhase
+private object TrBouncePhaseTlbCombinator : TlbCombinator<TrBouncePhase>() {
+    val negFunds by lazy { TrPhaseBounceNegFunds.tlbCodec() }
+    val noFunds by lazy { TrPhaseBounceNoFunds.tlbCodec() }
+    val ok by lazy { TrPhaseBounceOk.tlbCodec() }
 
-    @SerialName("tr_phase_bounce_ok")
-    @Serializable
-    data class TrPhaseBounceOk(
-            val msg_size: StorageUsedShort,
-            val msg_fees: Coins,
-            val fwd_fees: Coins
-    )
+    override val constructors: List<TlbConstructor<out TrBouncePhase>> by lazy {
+        listOf(negFunds, noFunds, ok)
+    }
+
+    override fun getConstructor(
+        value: TrBouncePhase
+    ): TlbConstructor<out TrBouncePhase> = when (value) {
+        is TrPhaseBounceNegFunds -> negFunds
+        is TrPhaseBounceNoFunds -> noFunds
+        is TrPhaseBounceOk -> ok
+    }
 }

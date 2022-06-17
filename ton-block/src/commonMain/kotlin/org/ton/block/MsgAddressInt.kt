@@ -1,96 +1,75 @@
+@file:Suppress("NOTHING_TO_INLINE", "PropertyName")
+
 package org.ton.block
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
+
+inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.parse(address)
 
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface MsgAddressInt {
-    @SerialName("addr_std")
-    @Serializable
-    data class AddrStd(
-            val anycast: Anycast?,
-            val workchain_id: Int,
-            @Serializable(HexByteArraySerializer::class)
-            val address: ByteArray
-    ) : MsgAddressInt {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+sealed interface MsgAddressInt : MsgAddress {
+    val workchain_id: Int
 
-            other as AddrStd
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<MsgAddressInt> = MsgAddressIntTlbCombinator
 
-            if (anycast != other.anycast) return false
-            if (workchain_id != other.workchain_id) return false
-            if (!address.contentEquals(other.address)) return false
-
-            return true
+        @JvmStatic
+        fun toString(
+            address: MsgAddressInt,
+            userFriendly: Boolean = true,
+            urlSafe: Boolean = true,
+            testOnly: Boolean = false,
+            bounceable: Boolean = true
+        ): String {
+            checkAddressStd(address)
+            return AddrStd.toString(address, userFriendly, urlSafe, testOnly, bounceable)
         }
 
-        override fun hashCode(): Int {
-            var result = anycast?.hashCode() ?: 0
-            result = 31 * result + workchain_id
-            result = 31 * result + address.contentHashCode()
-            return result
-        }
+        @JvmStatic
+        fun parse(address: String): MsgAddressInt = AddrStd.parse(address)
 
-        override fun toString() = buildString {
-            append("MsgAddressInt.AddrStd(anycast=")
-            append(anycast)
-            append(", workchainId=")
-            append(workchain_id)
-            append(", address=")
-            append(hex(address))
-            append(")")
-        }
-    }
+        @JvmStatic
+        fun parseRaw(address: String): MsgAddressInt = AddrStd.parseRaw(address)
 
-    @SerialName("addr_var")
-    @Serializable
-    data class AddrVar(
-            val anycast: Anycast?,
-            val addr_len: Int,
-            val workchain_id: Int,
-            @Serializable(HexByteArraySerializer::class)
-            val address: ByteArray
-    ) : MsgAddressInt {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
+        @JvmStatic
+        fun parseUserFriendly(address: String): MsgAddressInt = AddrStd.parseUserFriendly(address)
 
-            other as AddrVar
-
-            if (anycast != other.anycast) return false
-            if (addr_len != other.addr_len) return false
-            if (workchain_id != other.workchain_id) return false
-            if (!address.contentEquals(other.address)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = anycast?.hashCode() ?: 0
-            result = 31 * result + addr_len
-            result = 31 * result + workchain_id
-            result = 31 * result + address.contentHashCode()
-            return result
-        }
-
-        override fun toString() = buildString {
-            append("MsgAddressInt.AddrVar(anycast=")
-            append(anycast)
-            append(", addrLen=")
-            append(addr_len)
-            append(", workchainId=")
-            append(workchain_id)
-            append(", address=")
-            append(hex(address))
-            append(")")
+        @OptIn(ExperimentalContracts::class)
+        private fun checkAddressStd(value: MsgAddressInt) {
+            contract {
+                returns() implies (value is AddrStd)
+            }
+            require(value is AddrStd) {
+                "expected class: ${AddrStd::class} actual: ${value::class}"
+            }
         }
     }
 }
+
+private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>() {
+    private val addrStdConstructor by lazy {
+        AddrStd.tlbCodec()
+    }
+    private val addrVarConstructor by lazy {
+        AddrVar.tlbCodec()
+    }
+
+    override val constructors: List<TlbConstructor<out MsgAddressInt>> by lazy {
+        listOf(addrStdConstructor, addrVarConstructor)
+    }
+
+    override fun getConstructor(value: MsgAddressInt): TlbConstructor<out MsgAddressInt> = when (value) {
+        is AddrStd -> addrStdConstructor
+        is AddrVar -> addrVarConstructor
+    }
+}
+

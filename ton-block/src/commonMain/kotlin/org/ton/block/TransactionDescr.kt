@@ -2,29 +2,33 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface TransactionDescr {
-    @SerialName("trans_ord")
-    @Serializable
-    data class TransOrd(
-            val credit_first: Boolean,
-            val storage_ph: TrStoragePhase?,
-            val credit_ph: TrCreditPhase?,
-            val compute_ph: TrComputePhase,
-            val action: TrActionPhase,
-            val aborted: Boolean,
-            val bounce: TrBouncePhase?,
-            val destroyed: Boolean
-    ) : TransactionDescr
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<TransactionDescr> = TransactionDescrTlbCombinator
+    }
+}
 
-    @SerialName("trans_storage")
-    @Serializable
-    data class TransStorage(
-            val storage_ph: TrStoragePhase
-    ) : TransactionDescr
+private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>() {
+    val ord by lazy { TransOrd.tlbCodec() }
+    val storage by lazy { TransStorage.tlbCodec() }
+
+    override val constructors: List<TlbConstructor<out TransactionDescr>> by lazy {
+        listOf(ord, storage)
+    }
+
+    override fun getConstructor(
+        value: TransactionDescr
+    ): TlbConstructor<out TransactionDescr> = when (value) {
+        is TransOrd -> ord
+        is TransStorage -> storage
+        is TransTickTock -> TODO()
+    }
 }

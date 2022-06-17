@@ -1,14 +1,16 @@
 package org.ton.cell
 
+import org.ton.bigint.*
 import org.ton.bitstring.BitString
-import org.ton.primitives.BigInt
-import org.ton.primitives.minus
-import org.ton.primitives.times
+import org.ton.bitstring.exception.BitStringUnderflowException
+import org.ton.cell.exception.CellUnderflowException
 
 interface CellSlice {
     val bits: BitString
     val refs: List<Cell>
     val depth: Int
+    var bitsPosition: Int
+    var refsPosition: Int
 
     /**
      * Checks if slice is empty. If not, throws an exception.
@@ -19,7 +21,12 @@ interface CellSlice {
      * Loads the first reference from the slice.
      */
     fun loadRef(): Cell
+    fun loadRefs(count: Int): List<Cell>
+    fun <T> loadRef(cellSlice: CellSlice.() -> T): T
+
     fun preloadRef(): Cell
+    fun preloadRefs(count: Int): List<Cell>
+    fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
 
     fun loadBit(): Boolean
     fun preloadBit(): Boolean
@@ -36,10 +43,18 @@ interface CellSlice {
     fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
 
+    fun loadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
+    fun preloadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
+
+    fun loadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
+    fun preloadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
+
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
     operator fun component1(): BitString = bits
     operator fun component2(): List<Cell> = refs
+
+    operator fun <T : Any> invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
 
     companion object {
         @JvmStatic
@@ -48,18 +63,19 @@ interface CellSlice {
 }
 
 private class CellSliceImpl(
-        override val bits: BitString,
-        override val refs: List<Cell>,
-        private var bitsPosition: Int = 0,
-        private var refsPosition: Int = 0
+    override val bits: BitString,
+    override val refs: List<Cell>,
+    override var bitsPosition: Int = 0,
+    override var refsPosition: Int = 0
 ) : CellSlice {
-    constructor(cell: Cell) : this(cell.bits, cell.references)
+    constructor(cell: Cell) : this(cell.bits, cell.refs)
 
     override val depth: Int by lazy {
         refs.maxOfOrNull { it.maxDepth } ?: 0
     }
 
-    override fun endParse() = check(bitsPosition == bits.length)
+    override fun endParse() =
+        check(bitsPosition == bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
 
     override fun loadRef(): Cell {
         checkRefsOverflow()
@@ -68,7 +84,21 @@ private class CellSliceImpl(
         return cell
     }
 
+    override fun <T> loadRef(cellSlice: CellSlice.() -> T): T {
+        val slice = loadRef().beginParse()
+        return cellSlice(slice)
+    }
+
+    override fun loadRefs(count: Int): List<Cell> = List(count) { loadRef() }
+
     override fun preloadRef(): Cell = refs[refsPosition]
+
+    override fun <T> preloadRef(cellSlice: CellSlice.() -> T): T {
+        val slice = preloadRef().beginParse()
+        return cellSlice(slice)
+    }
+
+    override fun preloadRefs(count: Int): List<Cell> = List(refsPosition + count) { refs[it] }
 
     override fun loadBit(): Boolean {
         val bit = preloadBit()
@@ -76,7 +106,11 @@ private class CellSliceImpl(
         return bit
     }
 
-    override fun preloadBit(): Boolean = bits[bitsPosition]
+    override fun preloadBit(): Boolean = try {
+        bits[bitsPosition]
+    } catch (e: BitStringUnderflowException) {
+        throw CellUnderflowException(e)
+    }
 
     override fun loadBits(length: Int): BooleanArray {
         val bits = preloadBits(length)
@@ -95,7 +129,11 @@ private class CellSliceImpl(
     override fun preloadBits(length: Int): BooleanArray {
         checkBitsOverflow(length)
         return BooleanArray(length) { index ->
-            bits[bitsPosition + index]
+            try {
+                bits[bitsPosition + index]
+            } catch (e: BitStringUnderflowException) {
+                throw CellUnderflowException(e)
+            }
         }
     }
 
@@ -107,7 +145,7 @@ private class CellSliceImpl(
 
     override fun preloadInt(length: Int): BigInt {
         val uint = preloadUInt(length)
-        val int = BigInt(1 shl (length - 1))
+        val int = BigInt(1) shl (length - 1)
         return if (uint >= int) uint - (int * 2) else uint
     }
 
@@ -118,13 +156,15 @@ private class CellSliceImpl(
     }
 
     override fun preloadUInt(length: Int): BigInt {
+        if (length == 0) return BigInt(0)
         val bits = preloadBits(length)
-        val intBits = bits.reversed().joinToString(separator = "") { if (it) "1" else "0" }
+        // TODO: optimize with bit operations
+        val intBits = bits.joinToString(separator = "") { if (it) "1" else "0" }
         return BigInt(intBits, 2)
     }
 
     private fun checkBitsOverflow(length: Int) {
-        val remaining = bits.length - bitsPosition
+        val remaining = bits.size - bitsPosition
         require(length <= remaining) {
             "Bits overflow. Can't load $length bits. $remaining bits left."
         }

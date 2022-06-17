@@ -1,7 +1,7 @@
-package org.ton.cell;
+package org.ton.cell
 
 enum class CellType(
-        val value: Int
+    val value: Int
 ) {
     /**
      * Contains up to 1023 bits of data and up to four cell references.
@@ -66,6 +66,8 @@ enum class CellType(
     MERKLE_UPDATE(4);
 
     val isExotic: Boolean get() = this != ORDINARY
+    val isMerkle: Boolean get() = this == MERKLE_PROOF || this == MERKLE_UPDATE
+    val isPruned: Boolean get() = this == PRUNED_BRANCH
 
     companion object {
         operator fun get(index: Int) = values()[index]

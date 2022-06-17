@@ -38,7 +38,7 @@ data class AdnlAesParams(
         return result
     }
 
-    fun build() = buildPacket(160) {
+    fun build() = buildPacket {
         writeFully(rxKey)
         writeFully(txKey)
         writeFully(rxNonce)

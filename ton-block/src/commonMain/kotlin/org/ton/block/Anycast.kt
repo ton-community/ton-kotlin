@@ -2,39 +2,48 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbConstructor
 
 @SerialName("anycast_info")
 @Serializable
 data class Anycast(
-        val depth: Int,
-        @Serializable(HexByteArraySerializer::class)
-        val rewrite_pfx: ByteArray
+    val depth: Int,
+    val rewrite_pfx: BitString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    constructor(
+        rewrite_pfx: BitString
+    ) : this(rewrite_pfx.size, rewrite_pfx)
 
-        other as Anycast
-
-        if (depth != other.depth) return false
-        if (!rewrite_pfx.contentEquals(other.rewrite_pfx)) return false
-
-        return true
+    init {
+        require(depth in 1..30) { "required: depth in 1..30, actual: $depth" }
     }
 
-    override fun hashCode(): Int {
-        var result = depth
-        result = 31 * result + rewrite_pfx.contentHashCode()
-        return result
-    }
-
-    override fun toString() = buildString {
-        append("Anycast(depth=")
-        append(depth)
-        append(", rewrite_pfx=")
-        append(hex(rewrite_pfx))
-        append(")")
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor
     }
 }
+
+private object AnycastTlbConstructor : TlbConstructor<Anycast>(
+    schema = "anycast_info\$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;"
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: Anycast
+    ) = cellBuilder {
+        storeUIntLeq(value.depth, 30)
+        storeBits(value.rewrite_pfx)
+    }
+
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): Anycast = cellSlice {
+        val depth = loadUIntLeq(30).toInt()
+        val rewritePfx = loadBitString(depth)
+        Anycast(depth, rewritePfx)
+    }
+}
+

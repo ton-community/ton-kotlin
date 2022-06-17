@@ -5,27 +5,24 @@ private val DIGITS = "0123456789abcdef".toCharArray()
 /**
  * Encode [bytes] as a HEX string with no spaces, newlines and `0x` prefixes.
  */
-fun hex(bytes: ByteArray): String {
-    val result = CharArray(bytes.size * 2)
-    var resultIndex = 0
-
-    for (element in bytes) {
-        val b = element.toInt() and 0xff
-        result[resultIndex++] = DIGITS[b shr 4]
-        result[resultIndex++] = DIGITS[b and 0x0f]
+fun hex(bytes: ByteArray): String = buildString(bytes.size * 2) {
+    bytes.forEach { byte ->
+        val b = byte.toInt() and 0xFF
+        append(DIGITS[b shr 4])
+        append(DIGITS[b and 0x0F])
     }
+}
 
-    return result.concatToString()
+fun hex(bytes: Iterable<Byte>): String = buildString {
+    bytes.forEach { byte ->
+        val b = byte.toInt() and 0xFF
+        append(DIGITS[b shr 4])
+        append(DIGITS[b and 0x0F])
+    }
 }
 
 fun hex(vararg longs: Long): String = buildString {
     longs.forEach {
-        append(it.toString(16))
-    }
-}
-
-fun hex(vararg uLongs: ULong): String = buildString {
-    uLongs.forEach {
         append(it.toString(16))
     }
 }
@@ -43,3 +40,6 @@ fun hex(s: String): ByteArray {
     }
     return result
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun String.encodeHex(): ByteArray = hex(this)

@@ -5,98 +5,109 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.IntTlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 
 @SerialName("tr_phase_action")
 @Serializable
 data class TrActionPhase(
-        val success: Boolean,
-        val valid: Boolean,
-        val no_funds: Boolean,
-        val status_change: org.ton.block.AccStatusChange,
-        val total_fwd_fees: Coins?,
-        val total_action_fees: Coins?,
-        val result_code: Int,
-        val result_arg: Int?,
-        val tot_actions: Int,
-        val spec_actions: Int,
-        val skipped_actions: Int,
-        val msgs_created: Int,
-        val action_list_hash: ByteArray,
-        val tot_msg_size: StorageUsedShort
+    val success: Boolean,
+    val valid: Boolean,
+    val no_funds: Boolean,
+    val status_change: AccStatusChange,
+    val total_fwd_fees: Maybe<Coins>,
+    val total_action_fees: Maybe<Coins>,
+    val result_code: Int,
+    val result_arg: Maybe<Int>,
+    val tot_actions: Int,
+    val spec_actions: Int,
+    val skipped_actions: Int,
+    val msgs_created: Int,
+    val action_list_hash: BitString,
+    val tot_msg_size: StorageUsedShort
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as TrActionPhase
-
-        if (success != other.success) return false
-        if (valid != other.valid) return false
-        if (no_funds != other.no_funds) return false
-        if (status_change != other.status_change) return false
-        if (total_fwd_fees != other.total_fwd_fees) return false
-        if (total_action_fees != other.total_action_fees) return false
-        if (result_code != other.result_code) return false
-        if (result_arg != other.result_arg) return false
-        if (tot_actions != other.tot_actions) return false
-        if (spec_actions != other.spec_actions) return false
-        if (skipped_actions != other.skipped_actions) return false
-        if (msgs_created != other.msgs_created) return false
-        if (!action_list_hash.contentEquals(other.action_list_hash)) return false
-        if (tot_msg_size != other.tot_msg_size) return false
-
-        return true
+    init {
+        require(action_list_hash.size == 256) { "required: action_list_hash.size == 256, actual: ${action_list_hash.size}" }
     }
 
-    override fun hashCode(): Int {
-        var result = success.hashCode()
-        result = 31 * result + valid.hashCode()
-        result = 31 * result + no_funds.hashCode()
-        result = 31 * result + status_change.hashCode()
-        result = 31 * result + (total_fwd_fees?.hashCode() ?: 0)
-        result = 31 * result + (total_action_fees?.hashCode() ?: 0)
-        result = 31 * result + result_code
-        result = 31 * result + (result_arg ?: 0)
-        result = 31 * result + tot_actions
-        result = 31 * result + spec_actions
-        result = 31 * result + skipped_actions
-        result = 31 * result + msgs_created
-        result = 31 * result + action_list_hash.contentHashCode()
-        result = 31 * result + tot_msg_size.hashCode()
-        return result
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbConstructor<TrActionPhase> = TrActionPhaseTlbConstructor
+    }
+}
+
+private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
+    schema = "tr_phase_action\$_ success:Bool valid:Bool no_funds:Bool " +
+            "status_change:AccStatusChange " +
+            "total_fwd_fees:(Maybe Coins) total_action_fees:(Maybe Coins) " +
+            "result_code:int32 result_arg:(Maybe int32) tot_actions:uint16 " +
+            "spec_actions:uint16 skipped_actions:uint16 msgs_created:uint16 " +
+            "action_list_hash:bits256 tot_msg_size:StorageUsedShort " +
+            "= TrActionPhase;"
+) {
+    val accStatusChange by lazy { AccStatusChange.tlbCodec() }
+    val maybeCoins by lazy { Maybe.tlbCodec(Coins.tlbCodec()) }
+    val maybeInt32 by lazy { Maybe.tlbCodec(IntTlbConstructor.int(32)) }
+    val storageUsedShort by lazy { StorageUsedShort.tlbCodec() }
+
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: TrActionPhase
+    ) = cellBuilder {
+        storeBit(value.success)
+        storeBit(value.valid)
+        storeBit(value.no_funds)
+        storeTlb(accStatusChange, value.status_change)
+        storeTlb(maybeCoins, value.total_fwd_fees)
+        storeTlb(maybeCoins, value.total_action_fees)
+        storeInt(value.result_code, 32)
+        storeTlb(maybeInt32, value.result_arg)
+        storeUInt(value.tot_actions, 16)
+        storeUInt(value.spec_actions, 16)
+        storeUInt(value.skipped_actions, 16)
+        storeUInt(value.msgs_created, 16)
+        storeBits(value.action_list_hash)
+        storeTlb(storageUsedShort, value.tot_msg_size)
     }
 
-    override fun toString(): String = buildString {
-        append("TrActionPhase(success=")
-        append(success)
-        append(", valid=")
-        append(valid)
-        append(", no_funds=")
-        append(no_funds)
-        append(", status_change=")
-        append(status_change)
-        append(", total_fwd_fees=")
-        append(total_fwd_fees)
-        append(", total_action_fees=")
-        append(total_action_fees)
-        append(", result_code=")
-        append(result_code)
-        append(", result_arg=")
-        append(result_arg)
-        append(", tot_actions=")
-        append(tot_actions)
-        append(", spec_actions=")
-        append(spec_actions)
-        append(", skipped_actions=")
-        append(skipped_actions)
-        append(", msgs_created=")
-        append(msgs_created)
-        append(", action_list_hash=")
-        append(hex(action_list_hash))
-        append(", tot_msg_size=")
-        append(tot_msg_size)
-        append(")")
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): TrActionPhase = cellSlice {
+        val success = loadBit()
+        val valid = loadBit()
+        val noFunds = loadBit()
+        val statusChange = loadTlb(accStatusChange)
+        val totalFwdFees = loadTlb(maybeCoins)
+        val totalActionFees = loadTlb(maybeCoins)
+        val resultCode = loadInt(32).toInt()
+        val resultArg = loadTlb(maybeInt32)
+        val totActions = loadUInt(16).toInt()
+        val specActions = loadUInt(16).toInt()
+        val skippedActions = loadUInt(16).toInt()
+        val msgCreated = loadUInt(16).toInt()
+        val actionListHash = loadBitString(256)
+        val totMsgSize = loadTlb(storageUsedShort)
+        TrActionPhase(
+            success,
+            valid,
+            noFunds,
+            statusChange,
+            totalFwdFees,
+            totalActionFees,
+            resultCode,
+            resultArg,
+            totActions,
+            specActions,
+            skippedActions,
+            msgCreated,
+            actionListHash,
+            totMsgSize
+        )
     }
 }

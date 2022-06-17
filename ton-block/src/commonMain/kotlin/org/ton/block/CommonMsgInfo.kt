@@ -2,39 +2,38 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface CommonMsgInfo {
-    @SerialName("int_msg_info")
-    data class IntMsgInfo(
-            val ihr_disabled: Boolean,
-            val bounce: Boolean,
-            val bounced: Boolean,
-            val src: MsgAddressInt,
-            val dest: MsgAddressInt,
-            val value: CurrencyCollection,
-            val ihr_fee: Coins,
-            val fwd_fee: Coins,
-            val created_lt: Long,
-            val created_at: Long
-    ) : CommonMsgInfo
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator()
+    }
+}
 
-    @SerialName("ext_in_msg_info")
-    data class ExtInMsgInfo(
-            val src: MsgAddressExt,
-            val dest: MsgAddressInt,
-            val import_fee: Coins
-    ) : CommonMsgInfo
+private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
+    private val intMsgInfoConstructor by lazy {
+        IntMsgInfo.tlbCodec()
+    }
+    private val extInMsgConstructor by lazy {
+        ExtInMsgInfo.tlbCodec()
+    }
+    private val extOutMsgInfoConstructor by lazy {
+        ExtOutMsgInfo.tlbCodec()
+    }
 
-    @SerialName("ext_out_msg_info")
-    data class ExtOutMsgInfo(
-            val src: MsgAddressInt,
-            val dest: MsgAddressExt,
-            val created_lt: Long,
-            val created_at: Long
-    )
+    override val constructors: List<TlbConstructor<out CommonMsgInfo>> by lazy {
+        listOf(intMsgInfoConstructor, extInMsgConstructor, extOutMsgInfoConstructor)
+    }
+
+    override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
+        is IntMsgInfo -> intMsgInfoConstructor
+        is ExtInMsgInfo -> extInMsgConstructor
+        is ExtOutMsgInfo -> extOutMsgInfoConstructor
+    }
 }

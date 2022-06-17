@@ -17,7 +17,7 @@ if (localPropsFile.exists()) {
 
 allprojects {
     group = "org.ton"
-    version = "0.0.2-SNAPSHOT"
+    version = "0.0.2"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -55,7 +55,14 @@ allprojects {
             }
             val commonTest by getting {
                 dependencies {
+                    implementation("io.mockk:mockk:1.12.4")
                     implementation(kotlin("test"))
+                }
+            }
+            val jvmTest by getting {
+                dependencies {
+                    implementation(kotlin("test"))
+                    implementation("junit:junit:4.13.1")
                 }
             }
         }
@@ -106,11 +113,14 @@ allprojects {
         }
     }
 
-    signing {
-        sign(publishing.publications)
-        val keyId = project.properties["signing.keyId"].toString()
-        val secretKey = project.properties["signing.secretKey"].toString()
-        val password = project.properties["signing.password"].toString()
-        useInMemoryPgpKeys(keyId, secretKey, password)
+    val signingKeyId = project.properties["signing.keyId"]?.toString()
+    val signingSecretKey = project.properties["signing.secretKey"]?.toString()
+    val signingPassword = project.properties["signing.password"]?.toString()
+
+    if (signingKeyId != null && signingSecretKey != null && signingPassword != null) {
+        signing {
+            sign(publishing.publications)
+            useInMemoryPgpKeys(signingKeyId, signingSecretKey, signingPassword)
+        }
     }
 }
