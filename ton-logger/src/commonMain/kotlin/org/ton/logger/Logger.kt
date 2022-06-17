@@ -1,7 +1,7 @@
 package org.ton.logger
 
 interface Logger {
-    val level: Level
+    var level: Level
 
     fun log(level: Level, message: () -> String)
     fun debug(message: () -> String) = log(Level.DEBUG, message)

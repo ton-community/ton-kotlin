@@ -1,10 +1,9 @@
 package org.ton.fift
 
-import org.ton.types.ExceptionCode
-
+// TODO: exception code
 open class FiftException(
-        exceptionCode: ExceptionCode,
+        exceptionCode: Int,
         message: String? = null,
-) : Exception("Fift Exception: $exceptionCode, code: ${exceptionCode.code}${if (!message.isNullOrBlank()) ", $message" else ""}")
+) : Exception("Fift Exception: $exceptionCode${if (!message.isNullOrBlank()) ", $message" else ""}")
 
-class FiftStackOverflow(message: String? = null) : FiftException(ExceptionCode.StackOverflow, message)
+class FiftStackOverflow(message: String? = null) : FiftException(0, message)

@@ -1,15 +1,18 @@
 package org.ton.fift
 
-import org.ton.types.ExceptionCode
-import org.ton.types.int257.Int257
-import org.ton.types.int257.int257
+import org.ton.bigint.BigInt
+import org.ton.logger.Logger
 
 class FiftInterpretator(
-        val stack: Stack = Stack(),
-        val dictionary: Dictionary = Dictionary().apply { defineBasicWords() },
-        var output: (String) -> Unit = { print(it) },
+    val dictionary: Dictionary = Dictionary().apply { defineBasicWords() },
+    var output: (String) -> Unit = { print(it) },
+    var logger: Logger = Logger.println("Fift")
 ) {
+    // Uses only for debug logging indent
+    internal var debugExecutionDepth: Int = 0
+    internal fun debugExecutionDepthIndent(): String = "  ".repeat(debugExecutionDepth)
 
+    val stack: Stack = Stack(this)
     var state: Int = 0
     var charPos = 0
     var currentLine: String = ""
@@ -21,7 +24,7 @@ class FiftInterpretator(
         while (canRead()) {
             skipSpace()
             val pos = charPos
-            var word = scanWord(' ')
+            var word = scanInput(' ')
             var wordDef = dictionary[word]
 
             if (wordDef == null) {
@@ -57,6 +60,7 @@ class FiftInterpretator(
             } else {
                 charPos += word.length
                 val int257s = word.parseInt256()
+                logger.debug { "Interpret: ${int257s.joinToString(" ")} state=$state" }
                 when (int257s.size) {
                     1 -> {
                         stack.push(int257s.first())
@@ -67,7 +71,7 @@ class FiftInterpretator(
                         stack.push(int257s[1])
                         stack.pushArgCount(2)
                     }
-                    else -> throw FiftException(ExceptionCode.DictionaryError, "Unknown word: $word")
+                    else -> throw FiftException(-1, "Unknown word: $word")
                 }
                 compileExecute()
             }
@@ -80,6 +84,7 @@ class FiftInterpretator(
     }
 
     fun interpret(wordDef: WordDef) {
+        logger.debug { "Interpret: '$wordDef' state=$state isActive=${wordDef.isActive}" }
         if (wordDef.isActive) {
             wordDef.execute(this)
             compileExecute()
@@ -92,15 +97,15 @@ class FiftInterpretator(
 
     fun compileExecute() {
         if (state > 0) {
-            interpretCompileInternal()
+            dictionary["(compile) "]?.execute(this)
         } else {
-            interpretExecuteInternal()
+            dictionary["(execute) "]?.execute(this)
         }
     }
 
     fun canRead() = charPos in 0..currentLine.lastIndex
 
-    fun scanWord(separator: Char = ' ', readSeparator: Boolean = false): String {
+    fun scanInput(separator: Char = ' ', readSeparator: Boolean = false): String {
         val wordBuilder = StringBuilder()
         while (canRead()) {
             val char = currentLine[charPos]
@@ -114,7 +119,9 @@ class FiftInterpretator(
                 break
             }
         }
-        return wordBuilder.toString()
+        val result = wordBuilder.toString()
+        logger.debug { "Scanned input: \"$result\"" }
+        return result
     }
 
     fun skipSpace() {
@@ -128,11 +135,11 @@ class FiftInterpretator(
         }
     }
 
-    fun String.parseInt256(): Array<Int257> = try {
+    fun String.parseInt256(): Array<BigInt> = try {
         val fracStrings = split('/')
         when {
-            fracStrings.size == 1 -> arrayOf(int257(fracStrings.first()))
-            fracStrings.size > 1 -> arrayOf(int257(fracStrings.first()), int257(fracStrings[1]))
+            fracStrings.size == 1 -> arrayOf(BigInt(fracStrings.first()))
+            fracStrings.size > 1 -> arrayOf(BigInt(fracStrings.first()), BigInt(fracStrings[1]))
             else -> emptyArray()
         }
     } catch (e: NumberFormatException) {

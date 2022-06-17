@@ -1,5 +1,6 @@
 import org.ton.fift.FiftException
 import org.ton.fift.FiftInterpretator
+import org.ton.logger.Logger
 
 fun main() {
     fift()
@@ -9,6 +10,10 @@ fun fift() {
     val fift = FiftInterpretator()
     fift.quiet {
         runFile("Fift.fif")
+    }
+    fift.logger.level = Logger.Level.DEBUG
+    fift.output = {
+        fift.logger.debug { "Output: '${it.replace("\n", "\\n")}'" }
     }
     while (true) {
         try {

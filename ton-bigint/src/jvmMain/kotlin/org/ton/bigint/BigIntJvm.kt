@@ -12,6 +12,7 @@ actual fun Number.toBigInt(): BigInt = when (this) {
 
 actual val BigInt.bitLength get() = bitLength()
 actual val BigInt.sign get() = signum()
+actual val BigInt.isZero get() = this == BigInteger.ZERO
 
 actual operator fun BigInt.plus(number: Number): BigInt = add(number.toBigInt())
 
@@ -28,3 +29,12 @@ actual infix fun BigInt.shr(shr: Int): BigInt = shiftRight(shr)
 actual infix fun BigInt.shl(shl: Int): BigInt = shiftLeft(shl)
 
 actual infix fun BigInt.and(and: BigInt): BigInt = and(and)
+
+actual infix fun BigInt.mod(mod: BigInt): BigInt = mod(mod)
+
+actual infix fun BigInt.or(mod: BigInt): BigInt = or(mod)
+
+actual infix fun BigInt.xor(mod: BigInt): BigInt = xor(mod)
+
+// TODO: check all cases
+actual infix fun BigInt.divRem(value: BigInt): Array<BigInt> = divideAndRemainder(value)

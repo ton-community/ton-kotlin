@@ -2,15 +2,14 @@
 
 package org.ton.fift
 
-import org.ton.types.Box
-import org.ton.types.int257.Int257
-import org.ton.types.int257.int257
-import ton.types.cell.Cell
-import ton.types.cell.CellBuilder
-import ton.types.cell.CellSlice
+import org.ton.bigint.BigInt
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 
 class Stack(
-        private val storage: ArrayDeque<Any> = ArrayDeque(),
+    val fift: FiftInterpretator,
+    private val storage: ArrayDeque<Any> = ArrayDeque()
 ) : Iterable<Any> {
     val depth: Int get() = storage.size
     val isEmpty: Boolean get() = depth == 0
@@ -19,42 +18,63 @@ class Stack(
 
     fun push(stackEntry: Any) {
         when (stackEntry) {
-            is Int -> push(int257(stackEntry))
-            is Long -> push(int257(stackEntry))
-            is Boolean -> push(int257(stackEntry))
-            else -> storage.addLast(stackEntry)
+            is Int -> push(BigInt(stackEntry))
+            is Long -> push(BigInt(stackEntry))
+            is Boolean -> push(BigInt(if (stackEntry) -1 else 0))
+            else -> {
+                fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack push: ${stackEntry.fiftFormat()}" }
+                storage.addLast(stackEntry)
+            }
         }
     }
 
     fun pop(): Any = try {
-        storage.removeLast()
+        val value = storage.removeLast()
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack pop: ${value.fiftFormat()}" }
+        value
     } catch (e: NoSuchElementException) {
         throw FiftStackOverflow()
     }
 
     fun pop(index: Int): Any = try {
-        storage.removeAt(storage.lastIndex - index)
+        val value = storage.removeAt(storage.lastIndex - index)
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack pop at $index: ${value.fiftFormat()}" }
+        value
     } catch (e: NoSuchElementException) {
         throw FiftStackOverflow()
     }
 
     operator fun get(index: Int = 0): Any = try {
-        storage[storage.lastIndex - index]
+        val value = getStackEntry(index)
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack set at $index: ${value.fiftFormat()}" }
+        value
     } catch (e: NoSuchElementException) {
         throw FiftStackOverflow()
     }
 
+    private fun getStackEntry(index: Int) = storage[storage.lastIndex - index]
+
     operator fun set(index: Int, stackEntry: Any) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack set at $index: ${stackEntry.fiftFormat()}" }
+        setStackEntry(index, stackEntry)
+    }
+
+    private fun setStackEntry(index: Int, stackEntry: Any) {
         storage[storage.lastIndex - index] = stackEntry
     }
 
-    fun clear() = storage.clear()
-
-    inline fun swap(firstIndex: Int, secondIndex: Int) {
-        val swap = get(firstIndex)
-        set(firstIndex, get(secondIndex))
-        set(secondIndex, swap)
+    fun clear() {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack clear" }
+        storage.clear()
     }
+
+    fun swap(firstIndex: Int, secondIndex: Int) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack swap $firstIndex<->$secondIndex" }
+        val swap = getStackEntry(firstIndex)
+        setStackEntry(firstIndex, getStackEntry(secondIndex))
+        setStackEntry(secondIndex, swap)
+    }
+
 }
 
 fun Stack.pushArgCount(args: Int) {
@@ -62,7 +82,7 @@ fun Stack.pushArgCount(args: Int) {
     push(NopWordDef)
 }
 
-fun Stack.popInt257() = pop() as Int257
+fun Stack.popInt() = pop() as BigInt
 fun Stack.popString() = pop() as String
 fun Stack.popWordList() = pop() as WordList
 fun Stack.popWordDef() = pop() as WordDef

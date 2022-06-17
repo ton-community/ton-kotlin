@@ -9,7 +9,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-utils:2.0.0-beta-1")
-                implementation(projects.tonTypes)
+                implementation(projects.tonLogger)
+                implementation(projects.tonBigint)
+                implementation(projects.tonBoc)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
             }
         }

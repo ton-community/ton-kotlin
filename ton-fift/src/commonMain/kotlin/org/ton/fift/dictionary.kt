@@ -17,9 +17,13 @@ data class WordList(
         get() = false
 
     override fun execute(fift: FiftInterpretator) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
+        fift.debugExecutionDepth++
         list.forEach {
             it.execute(fift)
         }
+        fift.debugExecutionDepth--
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}FINISH execute WordDef: ${toString()}" }
     }
 }
 
@@ -29,9 +33,11 @@ interface WordDef {
     fun execute(fift: FiftInterpretator)
 }
 
-object NopWordDef : NamedWordDef("nop", false) {
+object NopWordDef : NamedWordDef("nop ", false) {
     override fun execute(fift: FiftInterpretator) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
         // nop
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}FINISH execute WordDef: ${toString()}" }
     }
 }
 
@@ -40,16 +46,29 @@ open class NamedWordDef(
         override val isActive: Boolean,
         val function: FiftInterpretator.() -> Unit = {},
 ) : WordDef {
-    override fun execute(fift: FiftInterpretator) = function(fift)
-    override fun toString(): String = name
+    override fun execute(fift: FiftInterpretator) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
+        fift.debugExecutionDepth++
+        function(fift)
+        fift.debugExecutionDepth--
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}FINISH execute WordDef: ${toString()}" }
+    }
+
+    override fun toString(): String = "WordDef($name)"
 }
 
 data class StackPushWordDef(
         val element: Any,
 ) : NamedWordDef(element.toString(), false) {
     override fun execute(fift: FiftInterpretator) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
+        fift.debugExecutionDepth++
         fift.stack.push(element)
+        fift.debugExecutionDepth--
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}FINISH execute WordDef: ${toString()}" }
     }
+
+    override fun toString(): String = "StackPushWordDef(${element.fiftFormat()})"
 }
 
 data class SequentialWordDef(
@@ -58,12 +77,16 @@ data class SequentialWordDef(
     override val isActive: Boolean = false
 
     override fun execute(fift: FiftInterpretator) {
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
+        fift.debugExecutionDepth++
         iterable.forEach {
             it.execute(fift)
         }
+        fift.debugExecutionDepth--
+        fift.logger.debug { "${fift.debugExecutionDepthIndent()}FINISH execute WordDef: ${toString()}" }
     }
 
-    override fun toString(): String = "{${iterable.joinToString(",")}}"
+    override fun toString(): String = "WordDef(${iterable.joinToString(",")})"
 }
 
 fun WordDef(entry: Any) = StackPushWordDef(entry)
