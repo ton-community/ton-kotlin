@@ -205,19 +205,15 @@ msg_export_deq_imm$100 out_msg:^MsgEnvelope
 
 _ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;
 
-_ (AugDictionary 256 OutMsg CurrencyCollection) = OutMsgDescr;
-
-_ (AugDictionary 352 EnqueuedMsg uint64) = OutMsgQueue;
-
 processed_upto$_ last_msg_lt:uint64 last_msg_hash:bits256 = ProcessedUpto;
 // key is [ shard:uint64 mc_seqno:uint32 ]
-_ (HashmapE 96 ProcessedUpto) = ProcessedInfo;
 
 ihr_pending$_ import_lt:uint64 = IhrPendingSince;
-_ (HashmapE 320 IhrPendingSince) = IhrPendingInfo;
 
-_ out_queue:OutMsgQueue proc_info:ProcessedInfo
-  ihr_pending:IhrPendingInfo = OutMsgQueueInfo;
+_ out_queue:(AugDictionary 352 EnqueuedMsg uint64)
+  proc_info:(HashmapE 96 ProcessedUpto)
+  ihr_pending:(HashmapE 320 IhrPendingSince)
+  = OutMsgQueueInfo;
 //
 storage_used$_ cells:(VarUInteger 7) bits:(VarUInteger 7)
   public_cells:(VarUInteger 7) = StorageUsed;
@@ -400,7 +396,8 @@ shard_state#9023afe2 global_id:int32
   min_ref_mc_seqno:uint32
   out_msg_queue_info:^OutMsgQueueInfo
   before_split:(## 1)
-  accounts:^ShardAccounts
+//   accounts:^ShardAccounts
+  accounts:^(AugDictionary 256 ShardAccount DepthBalanceInfo)
   ^[ overload_history:uint64 underload_history:uint64
   total_balance:CurrencyCollection
   total_validator_fees:CurrencyCollection
@@ -445,7 +442,7 @@ block#11ef55aa global_id:int32
   extra:^BlockExtra = Block;
 
 block_extra in_msg_descr:^InMsgDescr
-  out_msg_descr:^OutMsgDescr
+  out_msg_descr:^(AugDictionary 256 OutMsg CurrencyCollection)
   account_blocks:^ShardAccountBlocks
   rand_seed:bits256
   created_by:bits256
