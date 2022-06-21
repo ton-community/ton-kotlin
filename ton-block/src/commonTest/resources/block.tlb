@@ -444,9 +444,9 @@ block#11ef55aa global_id:int32
   state_update:^(MERKLE_UPDATE ShardState)
   extra:^BlockExtra = Block;
 
-block_extra in_msg_descr:^InMsgDescr
-  out_msg_descr:^OutMsgDescr
-  account_blocks:^ShardAccountBlocks
+block_extra in_msg_descr:^(HashmapAugE 256 InMsg ImportFees)
+  out_msg_descr:^(HashmapAugE 256 OutMsg CurrencyCollection)
+  account_blocks:^(HashmapAugE 256 AccountBlock CurrencyCollection)
   rand_seed:bits256
   created_by:bits256
   custom:(Maybe ^McBlockExtra) = BlockExtra;
@@ -526,7 +526,10 @@ _ key:Bool blk_ref:ExtBlkRef = KeyExtBlkRef;
 _ (HashmapAugE 32 KeyExtBlkRef KeyMaxLt) = OldMcBlocksInfo;
 
 
-counters#_ last_updated:uint32 total:uint64 cnt2048:uint64 cnt65536:uint64 = Counters;
+counters#_ last_updated:uint32
+ total:uint64
+  cnt2048:uint64
+   cnt65536:uint64 = Counters;
 creator_info#4 mc_blocks:Counters shard_blocks:Counters = CreatorStats;
 block_create_stats#17 counters:(HashmapE 256 CreatorStats) = BlockCreateStats;
 block_create_stats_ext#34 counters:(HashmapAugE 256 CreatorStats uint32) = BlockCreateStats;
@@ -553,7 +556,8 @@ certificate_env#a419b7d certificate:Certificate = CertificateEnv;  // 384 bits
 signed_certificate$_ certificate:Certificate certificate_signature:CryptoSignature
   = SignedCertificate;  // 356+516 = 872 bits
 // certificate_signature is the signature of CertificateEnv (with embedded certificate) with persistent key
-chained_signature#f signed_cert:^SignedCertificate temp_key_signature:CryptoSignatureSimple
+chained_signature#f signed_cert:^SignedCertificate
+ temp_key_signature:CryptoSignatureSimple
   = CryptoSignature;   // 4+(356+516)+516 = 520 bits+ref (1392 bits total)
 // temp_key_signature is the signature of whatever was originally intended to be signed with temp_key from certificate
 

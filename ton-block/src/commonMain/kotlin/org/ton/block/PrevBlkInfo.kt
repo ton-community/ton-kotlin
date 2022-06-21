@@ -8,33 +8,33 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-@SerialName("master_info")
 @Serializable
-data class BlkMasterInfo(
-    val master: ExtBlkRef
-) {
+@SerialName("prev_blk_info")
+data class PrevBlkInfo(
+    val prev: ExtBlkRef
+) : BlkPrevInfo {
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlkMasterInfo> = BlkMasterInfoTlbConstructor
+        fun tlbCodec(): TlbConstructor<PrevBlkInfo> = PrevBlkInfoTlbConstructor
     }
 }
 
-private object BlkMasterInfoTlbConstructor : TlbConstructor<BlkMasterInfo>(
-    schema = "master_info\$_ master:ExtBlkRef = BlkMasterInfo;"
+private object PrevBlkInfoTlbConstructor : TlbConstructor<PrevBlkInfo>(
+    schema = "prev_blk_info\$_ prev:ExtBlkRef = BlkPrevInfo 0;"
 ) {
     val extBlkRef by lazy { ExtBlkRef.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: BlkMasterInfo
+        value: PrevBlkInfo
     ) = cellBuilder {
-        storeTlb(extBlkRef, value.master)
+        storeTlb(extBlkRef, value.prev)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): BlkMasterInfo = cellSlice {
-        val master = loadTlb(extBlkRef)
-        BlkMasterInfo(master)
+    ): PrevBlkInfo = cellSlice {
+        val prev = loadTlb(extBlkRef)
+        PrevBlkInfo(prev)
     }
 }

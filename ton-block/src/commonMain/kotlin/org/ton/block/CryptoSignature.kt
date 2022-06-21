@@ -2,25 +2,34 @@
 
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.BitString
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface CryptoSignature
+sealed interface CryptoSignature {
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbCombinator<CryptoSignature> = CryptoSignatureTlbCombinator
+    }
+}
 
-@Serializable
-@SerialName("ed25519_signature")
-data class CryptoSignatureSimple(
-    val r: BitString,
-    val s: BitString
-) : CryptoSignature
+private object CryptoSignatureTlbCombinator : TlbCombinator<CryptoSignature>() {
+    val regular by lazy { CryptoSignatureSimple.tlbCodec() }
+    val chained by lazy { ChainedSignature.tlbCodec() }
 
-@Serializable
-@SerialName("chained_signature")
-data class ChainedSignature(
-    val signed_crt: SignedCertificate,
-    val temp_key_signature: CryptoSignatureSimple
-) : CryptoSignature
+    override val constructors: List<TlbConstructor<out CryptoSignature>> by lazy {
+        listOf(regular, chained)
+    }
+
+    override fun getConstructor(
+        value: CryptoSignature
+    ): TlbConstructor<out CryptoSignature> = when (value) {
+        is CryptoSignatureSimple -> regular
+        is ChainedSignature -> chained
+    }
+}
+
+
