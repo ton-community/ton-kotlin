@@ -7,7 +7,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.AugDictionary
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.UIntTlbConstructor
+import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
 @SerialName("block_extra")
@@ -24,6 +24,11 @@ data class BlockExtra(
         require(rand_seed.size == 256) { "expected: rand_seed.size == 256, actual: ${rand_seed.size}" }
         require(created_by.size == 256) { "expected: created_by.size == 256, actual: ${created_by.size}" }
     }
+
+    companion object {
+        @JvmStatic
+        fun tlbCodec(): TlbConstructor<BlockExtra> = BlockExtraTlbConstructor
+    }
 }
 
 private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
@@ -35,7 +40,7 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
             "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
 ) {
     val inMsgDescr by lazy { AugDictionary.tlbCodec(256, InMsg.tlbCodec(), ImportFees.tlbCodec()) }
-    val outMsgDescr by lazy { AugDictionary.tlbCodec(356, OutMsg.tlbCodec(), CurrencyCollection.long(64)) }
+    val outMsgDescr by lazy { AugDictionary.tlbCodec(256, OutMsg.tlbCodec(), CurrencyCollection.tlbCodec()) }
     val shardAccountBlock by lazy {
         AugDictionary.tlbCodec(
             256,
@@ -51,11 +56,21 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
     ) = cellBuilder {
         storeRef { storeTlb(inMsgDescr, value.in_msg_descr) }
         storeRef { storeTlb(outMsgDescr, value.out_msg_descr) }
+        storeRef { storeTlb(shardAccountBlock, value.account_blocks) }
+        storeBits(value.rand_seed)
+        storeBits(value.created_by)
+        storeTlb(maybeMcBlockExtra, value.custom)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): BlockExtra = cellSlice {
-        TODO("Not yet implemented")
+        val inMsgDescr = loadRef { loadTlb(inMsgDescr) }
+        val outMsgDescr = loadRef { loadTlb(outMsgDescr) }
+        val accountBlocks = loadRef { loadTlb(shardAccountBlock) }
+        val randSeed = loadBitString(256)
+        val createdBy = loadBitString(256)
+        val custom = loadTlb(maybeMcBlockExtra)
+        BlockExtra(inMsgDescr, outMsgDescr, accountBlocks, randSeed, createdBy, custom)
     }
 }
