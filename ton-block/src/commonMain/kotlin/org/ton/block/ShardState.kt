@@ -20,7 +20,7 @@ private object ShardStateTlbCombinator : TlbCombinator<ShardState>() {
     val splitState by lazy { SplitState.tlbCodec() }
     val shardStateUnsplit by lazy { ShardStateUnsplit.tlbCodec() }
 
-    override val constructors: List<TlbConstructor<out ShardState> by lazy {
+    override val constructors: List<TlbConstructor<out ShardState>> by lazy {
         listOf(splitState, shardStateUnsplit)
     }
 
