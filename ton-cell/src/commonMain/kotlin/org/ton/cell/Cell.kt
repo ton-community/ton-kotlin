@@ -20,12 +20,13 @@ interface Cell {
     val isExotic: Boolean
     val isMerkle: Boolean
     val isPruned: Boolean
-    val maxLevel: Int
     val maxDepth: Int
+    val levelMask: LevelMask
 
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
     fun treeWalk(): Sequence<Cell>
+    fun loadCell(): Cell = this
     fun beginParse(): CellSlice
 
     fun <T : Any> parse(block: CellSlice.() -> T): T {

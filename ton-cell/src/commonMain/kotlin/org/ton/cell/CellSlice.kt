@@ -176,4 +176,13 @@ private class CellSliceImpl(
             "Refs overflow. Can't load ref. $remaining refs left."
         }
     }
+
+    override fun toString(): String = buildString {
+        append("x")
+        append(bits.toString())
+        if (refs.isNotEmpty()) {
+            append(",")
+            append(refs.size)
+        }
+    }
 }

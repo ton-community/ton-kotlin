@@ -30,5 +30,9 @@ private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>()
         is TransOrd -> ord
         is TransStorage -> storage
         is TransTickTock -> TODO()
+        is TransMergeInstall -> TODO()
+        is TransMergePrepare -> TODO()
+        is TransSplitInstall -> TODO()
+        is TransSplitPrepare -> TODO()
     }
 }

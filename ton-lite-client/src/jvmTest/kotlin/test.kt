@@ -2,6 +2,7 @@
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import org.ton.block.AddrStd
+import org.ton.block.Block
 import org.ton.boc.BagOfCells
 import org.ton.crypto.base64
 import org.ton.lite.api.liteserver.LiteServerAccountId
@@ -9,6 +10,7 @@ import org.ton.lite.api.liteserver.LiteServerAccountState
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
+import org.ton.tlb.loadTlb
 import java.time.Instant
 
 suspend fun main() = coroutineScope {
@@ -24,7 +26,8 @@ suspend fun main() = coroutineScope {
     val id = liteClient.getMasterchainInfo().last
     val block = liteClient.getBlock(id)
     val bagOfCells = BagOfCells(block.data)
-    println(bagOfCells)
+    val tlbBlock = bagOfCells.first().beginParse().loadTlb(Block.tlbCodec())
+    println(tlbBlock)
 //    val file = File("C:\\Users\\andreypfau\\Desktop\\block.boc")
 //    file.writeBytes(block.data)
 //    println(block.dataBagOfCells())

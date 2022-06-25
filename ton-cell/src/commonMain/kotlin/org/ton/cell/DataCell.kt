@@ -1,13 +1,11 @@
 package org.ton.cell
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.crypto.sha256
 import kotlin.math.ceil
 import kotlin.math.floor
 
-@Serializable
 internal class DataCell private constructor(
     override val bits: BitString,
     override val refs: List<Cell>,
@@ -21,14 +19,11 @@ internal class DataCell private constructor(
     override val isMerkle: Boolean = type.isMerkle
     override val isPruned: Boolean = type.isPruned
 
-    override val maxLevel: Int by lazy {
-        // TODO: level calculation differ for exotic cells
-        refs.maxOfOrNull { it.maxLevel } ?: 0
-    }
-
     override val maxDepth: Int by lazy {
         refs.maxOfOrNull { it.maxDepth }?.plus(1) ?: 0
     }
+
+    override val levelMask = LevelMask(0)
 
     override fun treeWalk(): Sequence<Cell> = sequence {
         yieldAll(refs)
@@ -60,15 +55,17 @@ internal class DataCell private constructor(
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = bits.hashCode()
-        result = 31 * result + refs.hashCode()
-        result = 31 * result + type.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = hash().contentHashCode()
+
+    /* TODO:
+      int get_serialized_size(bool with_hashes = false) const {
+    return ((get_bits() + 23) >> 3) +
+           (with_hashes ? get_level_mask().get_hashes_count() * (hash_bytes + depth_bytes) : 0);
+     */
+    fun serializedSize(withHashes: Boolean = false): Int = 0
 
     private fun referencesDescriptor(): Byte =
-        (refs.size + (if (isExotic) 1 else 0) * 8 + maxLevel * 32).toByte()
+        (refs.size + 8 * (if (isExotic) 1 else 0) + 32 * levelMask.level).toByte()
 
     private fun bitsDescriptor(): Byte =
         (ceil(bits.size / 8.0).toInt() + floor(bits.size / 8.0).toInt()).toByte()
