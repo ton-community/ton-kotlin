@@ -30,5 +30,6 @@ private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>()
         is TransOrd -> ord
         is TransStorage -> storage
         is TransTickTock -> TODO()
+        else -> TODO()
     }
 }
