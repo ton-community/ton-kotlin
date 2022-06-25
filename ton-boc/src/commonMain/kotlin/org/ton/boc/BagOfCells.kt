@@ -7,12 +7,8 @@ fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
 fun BagOfCells(roots: Iterable<Cell>): BagOfCells = BagOfCells.of(roots)
 fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
 
-interface BagOfCells : List<Cell> {
+interface BagOfCells : Iterable<Cell> {
     val roots: List<Cell>
-    val isIndexed: Boolean
-    val crc32hash: ByteArray?
-
-    fun treeWalk(): Sequence<Cell>
     fun toByteArray(): ByteArray
 
     override fun toString(): String
@@ -25,13 +21,13 @@ interface BagOfCells : List<Cell> {
         @JvmStatic
         fun of(roots: Iterable<Cell>): BagOfCells {
             val rootsList = roots.toList()
-            return BagOfCellsImpl(rootsList)
+            return CachedBagOfCells(rootsList)
         }
 
         @JvmStatic
         fun of(vararg roots: Cell): BagOfCells {
             val rootsList = roots.toList()
-            return BagOfCellsImpl(rootsList)
+            return CachedBagOfCells(rootsList)
         }
 
         @JvmStatic

@@ -48,7 +48,7 @@ fun Input.readBagOfCell(): BagOfCells {
 
     // Counters
     val offsetBytes = readByte().toInt()
-    val cellsCount = readInt(sizeBytes)
+    val cellCount = readInt(sizeBytes)
     val rootsCount = readInt(sizeBytes)
     val absentCount = readInt(sizeBytes)
     val totalCellsSize = readInt(offsetBytes)
@@ -60,15 +60,16 @@ fun Input.readBagOfCell(): BagOfCells {
 
     // Index
     val indexes = if (hasIdx) {
-        IntArray(cellsCount) {
+        IntArray(cellCount) {
             readInt(offsetBytes)
         }
     } else null
 
-    val cellsData = Array(cellsCount) { ByteArray(128) }
-    val references = Array(cellsCount) { intArrayOf() }
-    val cellsType = Array(cellsCount) { CellType.ORDINARY }
-    repeat(cellsCount) { cellIndex ->
+    val cellsBits = Array(cellCount) { BitString() }
+    val cellsRefs = Array(cellCount) { intArrayOf() }
+    val cellsType = Array(cellCount) { CellType.ORDINARY }
+
+    repeat(cellCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
         val level = d1 shr 5
         val hasHashes = (d1 and 0b0001_0000) != 0
@@ -97,39 +98,52 @@ fun Input.readBagOfCell(): BagOfCells {
                 }
             }
 
-            cellsData[cellIndex] = readBytes(dataSize)
+            var cellData = readBytes(dataSize)
             if (fullFilledBytes) {
-                cellsData[cellIndex] = BitString.appendAugmentTag(cellsData[cellIndex], dataSize * 8)
+                cellData = BitString.appendAugmentTag(cellData, dataSize * 8)
             }
-            references[cellIndex] = IntArray(refsCount) {
-                readInt(sizeBytes)
+            val cellSize = BitString.findAugmentTag(cellData)
+            cellsBits[cellIndex] = BitString(cellData, cellSize)
+            cellsRefs[cellIndex] = IntArray(refsCount) { k ->
+                val refIndex = readInt(sizeBytes)
+                check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
+                check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
+                refIndex
             }
-            cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellsData[cellIndex][0].toInt()]
+            cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellData[0].toInt()]
         }
     }
 
     // Resolving references & constructing cells from leaves to roots
-    val doneCells = Array<Cell?>(cellsCount) { null }
-    for (cellIndex in cellsCount - 1 downTo 0) {
-        val cellData = cellsData[cellIndex]
-        val cellSize = BitString.findAugmentTag(cellData)
-        val refs = references[cellIndex].map { referenceIndex ->
-            requireNotNull(doneCells[referenceIndex])
-        }
-        val cell = Cell.of(BitString(cellData, cellSize), refs, cellsType[cellIndex])
-        doneCells[cellIndex] = cell
+    val cells = Array<Cell?>(cellCount) { null }
+    repeat(cellCount) { cellIndex ->
+        createCell(cellIndex, cells, cellsBits, cellsRefs)
     }
-
     // TODO: Crc32c check (calculate size of resulting bytearray)
     if (hashCrc32) {
         readIntLittleEndian()
     }
 
     val roots = rootIndexes.map { rootIndex ->
-        requireNotNull(doneCells[rootIndex])
+        requireNotNull(cells[rootIndex])
     }
 
     return BagOfCells(roots)
+}
+
+private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, refs: Array<IntArray>): Cell {
+    var cell = cells[index]
+    if (cell != null) {
+        return cell
+    }
+    val cellBits = bits[index]
+    val cellRefIndexes = refs[index]
+    val cellRefs = cellRefIndexes.map { refIndex ->
+        createCell(refIndex, cells, bits, refs)
+    }
+    cell = Cell(cellBits, cellRefs)
+    cells[index] = cell
+    return cell
 }
 
 fun Output.writeBagOfCells(
@@ -156,7 +170,7 @@ private fun serializeBagOfCells(
     hasCacheBits: Boolean,
     flags: Int
 ): ByteArray = buildPacket {
-    val cells = bagOfCells.treeWalk().toSet()
+    val cells = bagOfCells.toList()
     val cellsCount = cells.size
     val rootsCount = bagOfCells.roots.size
     var sizeBytes = 0
@@ -164,9 +178,9 @@ private fun serializeBagOfCells(
         sizeBytes++
     }
 
-    val serializedCells = cells.map { cell ->
+    val serializedCells = cells.mapIndexed { index: Int, cell: Cell ->
         buildPacket {
-            val d1 = cell.refs.size + (if (cell.isExotic) 1 else 0) * 8 + cell.maxLevel * 32
+            val d1 = cell.refs.size + (if (cell.isExotic) 1 else 0) * 8 + cell.levelMask.level * 32
             writeByte(d1.toByte())
             val d2 = ceil(cell.bits.size / 8.0).toInt() + floor(cell.bits.size / 8.0).toInt()
             writeByte(d2.toByte())
@@ -175,7 +189,8 @@ private fun serializeBagOfCells(
             } else cell.bits.toByteArray()
             writeFully(cellData)
             cell.refs.forEach { reference ->
-                writeInt(cells.lastIndexOf(reference), sizeBytes)
+                val refIndex = cells.indexOf(reference)
+                writeInt(refIndex, sizeBytes)
             }
         }
     }
