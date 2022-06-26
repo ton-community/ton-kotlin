@@ -34,6 +34,5 @@ private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>()
         is TransMergePrepare -> TODO()
         is TransSplitInstall -> TODO()
         is TransSplitPrepare -> TODO()
-        else -> TODO()
     }
 }

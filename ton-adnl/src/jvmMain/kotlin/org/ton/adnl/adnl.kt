@@ -4,7 +4,9 @@ import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.withContext
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
@@ -41,11 +43,14 @@ class AdnlTcpClientImpl(
         logger.debug { "Connected! Performing handshake... $publicKey" }
         performHandshake()
         logger.debug { "Success handshake!" }
-        job = launchReceiveJob()
+        launchIoJob()
     }
 
     override suspend fun disconnect() {
-        job.cancelAndJoin()
+        supervisorJob.cancelAndJoin()
+        withContext(Dispatchers.IO) {
+            connection.socket.close()
+        }
         connection.socket.awaitClosed()
     }
 
@@ -68,6 +73,6 @@ class AdnlTcpClientImpl(
         input = AesByteReadChannel(connection.input, AdnlAes(aesParams.rxKey, aesParams.rxNonce))
         output = AesByteWriteChannel(connection.output, AdnlAes(aesParams.txKey, aesParams.txNonce))
 
-        check(receiveRaw().isEmpty) { "Invalid handshake response" }
+        check(receiveRaw().isEmpty()) { "Invalid handshake response" }
     }
 }

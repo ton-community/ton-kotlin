@@ -5,14 +5,24 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import org.ton.api.adnl.AdnlPing
+import org.ton.api.adnl.AdnlPong
+import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
+import org.ton.bitstring.BitString
 import org.ton.crypto.hex
 import org.ton.crypto.sha256
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
+import org.ton.tl.TlCombinator
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 abstract class AdnlTcpClient(
     val host: String,
@@ -28,26 +38,99 @@ abstract class AdnlTcpClient(
         dispatcher: CoroutineContext
     ) : this(ipv4(ipv4), port, publicKey, dispatcher)
 
-    protected lateinit var job: Job
-    private val sendFlow = MutableSharedFlow<AdnlMessageQuery>()
-    private val queryMap = ConcurrentMap<String, CompletableDeferred<AdnlMessageAnswer>>()
+    protected val supervisorJob = SupervisorJob()
+    private val outputFlow = MutableSharedFlow<ByteArray>()
+    private val inputFlow = MutableSharedFlow<ByteArray>()
+    private val queryMap = ConcurrentMap<BitString, CompletableDeferred<AdnlMessageAnswer>>()
+    private val pingMap = ConcurrentMap<AdnlPing, CompletableDeferred<AdnlPong>>()
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        logger.fatal {
+            throwable.stackTraceToString()
+        }
+        runBlocking {
+            disconnect()
+        }
+    }
 
-    lateinit var input: ByteReadChannel
-    lateinit var output: ByteWriteChannel
+    protected lateinit var input: ByteReadChannel
+    protected lateinit var output: ByteWriteChannel
 
     abstract suspend fun connect(): AdnlTcpClient
 
     abstract suspend fun disconnect()
 
-    suspend fun sendQuery(query: ByteArray): ByteArray {
-        val queryId = Random.nextBytes(32)
-        val adnlMessageQuery = AdnlMessageQuery(queryId, query)
+    suspend fun sendQuery(query: ByteArray): ByteArray = suspendCoroutine { continuation ->
+        val queryId = nextQueryId()
+        val adnlMessageQuery = AdnlMessageQuery(queryId.toByteArray(), query)
         val deferred = CompletableDeferred<AdnlMessageAnswer>()
-        queryMap[hex(queryId)] = deferred
+        queryMap[queryId] = deferred
 
-        sendFlow.emit(adnlMessageQuery)
+        val packet = AdnlMessageQuery.encodeBoxed(adnlMessageQuery)
+        CoroutineScope(continuation.context).launch {
+            outputFlow.emit(packet)
+            val answer = deferred.await().answer
+            continuation.resume(answer)
+        }
+    }
 
-        return deferred.await().answer
+    @OptIn(ExperimentalTime::class)
+    suspend fun ping(value: Long = Random.nextLong()) = measureTime {
+        val ping = AdnlPing(value)
+        val deferred = CompletableDeferred<AdnlPong>()
+        pingMap[ping] = deferred
+
+        val packet = AdnlPing.encodeBoxed(ping)
+        outputFlow.emit(packet)
+
+        deferred.await()
+    }
+
+    protected fun launchKeepAliveJob(delay: Duration) =
+        CoroutineScope(dispatcher + supervisorJob + CoroutineName("ADNL Keep Alive")).launch {
+            while (isActive) {
+                ping()
+                delay(delay)
+            }
+        }
+
+    protected fun launchIoJob() {
+        CoroutineScope(dispatcher + supervisorJob + exceptionHandler + CoroutineName("ADNL I/O INPUT")).launch {
+            outputFlow.collect { outputPacket ->
+                sendRaw(outputPacket)
+            }
+        }
+        CoroutineScope(dispatcher + supervisorJob + exceptionHandler + CoroutineName("ADNL I/O OUTPUT")).launch {
+            while (isActive) {
+                val inputPacket = receiveRaw()
+                inputFlow.emit(inputPacket)
+            }
+        }
+        CoroutineScope(dispatcher + supervisorJob + exceptionHandler + CoroutineName("ADNL Packet Handler")).launch {
+            inputFlow.collect { rawInput ->
+                when (val adnlPacket = AdnlTlCombinator.decodeBoxed(rawInput)) {
+                    is AdnlMessageAnswer -> {
+                        val queryId = BitString(adnlPacket.queryId)
+                        val deferred = requireNotNull(queryMap[queryId]) {
+                            "Unexpected AdnlMessageAnswer with queryId: $queryId"
+                        }
+                        deferred.complete(adnlPacket)
+                    }
+                    is AdnlPong -> {
+                        val value = AdnlPing(adnlPacket.value)
+                        val deferred = requireNotNull(pingMap[value]) {
+                            "Unexpected AdnlPong with value: $value"
+                        }
+                        deferred.complete(adnlPacket)
+                    }
+                    is AdnlPing -> {
+                        val value = adnlPacket.value
+                        val adnlPong = AdnlPong(value)
+                        val rawOutput = AdnlPong.encodeBoxed(adnlPong)
+                        outputFlow.emit(rawOutput)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun sendRaw(packet: ByteArray, nonce: ByteArray = Random.nextBytes(32), flush: Boolean = true) {
@@ -65,24 +148,7 @@ abstract class AdnlTcpClient(
         }
     }
 
-    protected fun launchReceiveJob() = CoroutineScope(dispatcher).launch {
-        while (isActive) {
-            sendFlow.collect { adnlMessageQuery ->
-                val encodedPacket = AdnlMessageQuery.encodeBoxed(adnlMessageQuery)
-                sendRaw(encodedPacket)
-                val packet = receiveRaw()
-                when (packet.readIntLittleEndian()) {
-                    AdnlMessageAnswer.id -> {
-                        val adnlMessageAnswer = AdnlMessageAnswer.decode(packet)
-                        val deferred = queryMap.remove(hex(adnlMessageAnswer.queryId))
-                        deferred?.complete(adnlMessageAnswer)
-                    }
-                }
-            }
-        }
-    }
-
-    protected suspend fun receiveRaw(): ByteReadPacket {
+    protected suspend fun receiveRaw(): ByteArray {
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
@@ -95,6 +161,19 @@ abstract class AdnlTcpClient(
         val actualHash = sha256(nonce, payload)
         check(hash.contentEquals(actualHash)) { "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)}" }
 
-        return ByteReadPacket(payload)
+        return payload
     }
+
+    private fun nextQueryId(): BitString {
+        var nextId: BitString
+        while (true) {
+            nextId = BitString(Random.nextBytes(256 / Byte.SIZE_BITS))
+            if (!queryMap.containsKey(nextId)) break
+        }
+        return nextId
+    }
+
+    private object AdnlTlCombinator : TlCombinator<Any>(
+        AdnlMessage.constructors + AdnlPing + AdnlPong
+    )
 }

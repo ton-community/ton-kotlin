@@ -8,18 +8,30 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
+import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 
 @JsonClassDiscriminator("@type")
-interface AdnlMessage
+sealed interface AdnlMessage {
+    companion object : TlCombinator<AdnlMessage>(
+        AdnlMessageQuery,
+        AdnlMessageAnswer,
+        AdnlMessageCreateChannel,
+        AdnlMessageConfirmChannel,
+        AdnlMessageCustom,
+        AdnlMessageNop,
+        AdnlMessageReinit,
+        AdnlMessagePart
+    )
+}
 
 @SerialName("adnl.message.createChannel")
 @Serializable
 data class AdnlMessageCreateChannel(
-        @Serializable(Base64ByteArraySerializer::class)
-        val key: ByteArray,
-        val date: Int
+    @Serializable(Base64ByteArraySerializer::class)
+    val key: ByteArray,
+    val date: Int
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -48,8 +60,8 @@ data class AdnlMessageCreateChannel(
     }
 
     companion object : TlConstructor<AdnlMessageCreateChannel>(
-            type = AdnlMessageCreateChannel::class,
-            schema = "adnl.message.createChannel key:int256 date:int = adnl.Message"
+        type = AdnlMessageCreateChannel::class,
+        schema = "adnl.message.createChannel key:int256 date:int = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageCreateChannel) {
             output.writeInt256Tl(value.key)
@@ -67,12 +79,12 @@ data class AdnlMessageCreateChannel(
 @SerialName("adnl.message.confirmChannel")
 @Serializable
 data class AdnlMessageConfirmChannel(
-        @Serializable(Base64ByteArraySerializer::class)
-        val key: ByteArray,
-        @SerialName("peer_key")
-        @Serializable(Base64ByteArraySerializer::class)
-        val peerKey: ByteArray,
-        val date: Int
+    @Serializable(Base64ByteArraySerializer::class)
+    val key: ByteArray,
+    @SerialName("peer_key")
+    @Serializable(Base64ByteArraySerializer::class)
+    val peerKey: ByteArray,
+    val date: Int
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -105,8 +117,8 @@ data class AdnlMessageConfirmChannel(
     }
 
     companion object : TlConstructor<AdnlMessageConfirmChannel>(
-            type = AdnlMessageConfirmChannel::class,
-            schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message"
+        type = AdnlMessageConfirmChannel::class,
+        schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageConfirmChannel) {
             output.writeInt256Tl(value.key)
@@ -126,8 +138,8 @@ data class AdnlMessageConfirmChannel(
 @SerialName("adnl.message.custom")
 @Serializable
 data class AdnlMessageCustom(
-        @Serializable(Base64ByteArraySerializer::class)
-        val data: ByteArray
+    @Serializable(Base64ByteArraySerializer::class)
+    val data: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -151,8 +163,8 @@ data class AdnlMessageCustom(
     }
 
     companion object : TlConstructor<AdnlMessageCustom>(
-            type = AdnlMessageCustom::class,
-            schema = "adnl.message.custom data:bytes = adnl.Message"
+        type = AdnlMessageCustom::class,
+        schema = "adnl.message.custom data:bytes = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageCustom) {
             output.writeBytesTl(value.data)
@@ -169,8 +181,8 @@ data class AdnlMessageCustom(
 @Serializable
 class AdnlMessageNop : AdnlMessage {
     companion object : TlConstructor<AdnlMessageNop>(
-            type = AdnlMessageNop::class,
-            schema = "adnl.message.nop = adnl.Message"
+        type = AdnlMessageNop::class,
+        schema = "adnl.message.nop = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageNop) {
         }
@@ -182,11 +194,11 @@ class AdnlMessageNop : AdnlMessage {
 @SerialName("adnl.message.reinit")
 @Serializable
 data class AdnlMessageReinit(
-        val date: Int
+    val date: Int
 ) : AdnlMessage {
     companion object : TlConstructor<AdnlMessageReinit>(
-            type = AdnlMessageReinit::class,
-            schema = "adnl.message.reinit date:int = adnl.Message"
+        type = AdnlMessageReinit::class,
+        schema = "adnl.message.reinit date:int = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageReinit) {
             output.writeIntTl(value.date)
@@ -202,11 +214,11 @@ data class AdnlMessageReinit(
 @SerialName("adnl.message.query")
 @Serializable
 data class AdnlMessageQuery(
-        @SerialName("query_id")
-        @Serializable(Base64ByteArraySerializer::class)
-        val queryId: ByteArray,
-        @Serializable(Base64ByteArraySerializer::class)
-        val query: ByteArray
+    @SerialName("query_id")
+    @Serializable(Base64ByteArraySerializer::class)
+    val queryId: ByteArray,
+    @Serializable(Base64ByteArraySerializer::class)
+    val query: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -235,8 +247,8 @@ data class AdnlMessageQuery(
     }
 
     companion object : TlConstructor<AdnlMessageQuery>(
-            type = AdnlMessageQuery::class,
-            schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message"
+        type = AdnlMessageQuery::class,
+        schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageQuery) {
             output.writeInt256Tl(value.queryId)
@@ -254,11 +266,11 @@ data class AdnlMessageQuery(
 @SerialName("adnl.message.answer")
 @Serializable
 data class AdnlMessageAnswer(
-        @SerialName("query_id")
-        @Serializable(Base64ByteArraySerializer::class)
-        val queryId: ByteArray,
-        @Serializable(Base64ByteArraySerializer::class)
-        val answer: ByteArray
+    @SerialName("query_id")
+    @Serializable(Base64ByteArraySerializer::class)
+    val queryId: ByteArray,
+    @Serializable(Base64ByteArraySerializer::class)
+    val answer: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -287,8 +299,8 @@ data class AdnlMessageAnswer(
     }
 
     companion object : TlConstructor<AdnlMessageAnswer>(
-            type = AdnlMessageAnswer::class,
-            schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message"
+        type = AdnlMessageAnswer::class,
+        schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageAnswer) {
             output.writeInt256Tl(value.queryId)
@@ -306,13 +318,13 @@ data class AdnlMessageAnswer(
 @SerialName("adnl.message.part")
 @Serializable
 data class AdnlMessagePart(
-        @Serializable(Base64ByteArraySerializer::class)
-        val hash: ByteArray,
-        @SerialName("total_size")
-        val totalSize: Int,
-        val offset: Int,
-        @Serializable(Base64ByteArraySerializer::class)
-        val data: ByteArray
+    @Serializable(Base64ByteArraySerializer::class)
+    val hash: ByteArray,
+    @SerialName("total_size")
+    val totalSize: Int,
+    val offset: Int,
+    @Serializable(Base64ByteArraySerializer::class)
+    val data: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -346,5 +358,27 @@ data class AdnlMessagePart(
         append(", data=")
         append(base64(data))
         append(")")
+    }
+
+    companion object : TlConstructor<AdnlMessagePart>(
+        AdnlMessagePart::class,
+        "adnl.message.part hash:int256 total_size:int offset:int data:bytes = adnl.Message;"
+    ) {
+        override fun decode(
+            input: Input
+        ): AdnlMessagePart {
+            val hash = input.readInt256Tl()
+            val totalSize = input.readIntTl()
+            val offset = input.readIntTl()
+            val data = input.readBytesTl()
+            return AdnlMessagePart(hash, totalSize, offset, data)
+        }
+
+        override fun encode(output: Output, value: AdnlMessagePart) {
+            output.writeInt256Tl(value.hash)
+            output.writeIntTl(value.totalSize)
+            output.writeIntTl(value.offset)
+            output.writeBytesTl(value.data)
+        }
     }
 }
