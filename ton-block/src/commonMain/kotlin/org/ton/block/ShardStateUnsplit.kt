@@ -2,10 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.AugDictionaryEmpty
+import org.ton.hashmap.EmptyHashMapE
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
@@ -61,7 +61,7 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
     val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
     val libraries by lazy { HashMapE.tlbCodec(256, LibDescr.tlbCodec()) }
     val maybeBlkMasterInfo by lazy { Maybe.tlbCodec(BlkMasterInfo) }
-    val maybeMcStateExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McStateExtra.tlbCodec())) }
+    val maybeMcStateExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McStateExtra)) }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -70,7 +70,7 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
         storeUInt(value.global_id, 32)
         storeTlb(ShardIdent, value.shard_id)
         storeUInt(value.seq_no, 32)
-        storeUInt(value.vert_seq_no, 8)
+        storeUInt(value.vert_seq_no, 32)
         storeUInt(value.min_ref_mc_seqno, 32)
         storeRef {
             storeTlb(outMsgQueueInfo, value.out_msg_queue_info)
@@ -96,7 +96,7 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
         val globalId = loadUInt(32).toLong()
         val shardId = loadTlb(ShardIdent)
         val seqNo = loadUInt(32).toLong()
-        val verSeqNo = loadUInt(8).toInt()
+        val verSeqNo = loadUInt(32).toInt()
         val genUtime = loadUInt(32).toLong()
         val genLt = loadUInt(64).toLong()
         val minRefMcSeqno = loadUInt(32).toLong()

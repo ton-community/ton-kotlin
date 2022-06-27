@@ -2,9 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbCodec

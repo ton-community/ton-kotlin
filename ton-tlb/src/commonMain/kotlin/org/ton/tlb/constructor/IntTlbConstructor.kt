@@ -3,6 +3,7 @@ package org.ton.tlb.constructor
 import org.ton.bigint.BigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 
 class IntTlbConstructor(

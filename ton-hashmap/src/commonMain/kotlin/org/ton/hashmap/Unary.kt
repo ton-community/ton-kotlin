@@ -4,8 +4,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.tlb.*
 
 inline fun Unary(depth: Int): Unary = Unary.of(depth)

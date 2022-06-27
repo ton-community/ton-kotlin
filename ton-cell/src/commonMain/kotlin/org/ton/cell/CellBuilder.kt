@@ -34,7 +34,6 @@ interface CellBuilder {
      * Stores a reference to cell into builder.
      */
     fun storeRef(ref: Cell): CellBuilder
-    fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder
 
     fun storeRefs(vararg refs: Cell): CellBuilder
     fun storeRefs(refs: Iterable<Cell>): CellBuilder
@@ -75,10 +74,6 @@ interface CellBuilder {
      */
     fun storeSlice(slice: CellSlice): CellBuilder
 
-    operator fun invoke(builder: CellBuilder.() -> Unit) {
-        builder(this)
-    }
-
     companion object {
         @JvmStatic
         fun of(cell: Cell): CellBuilder =
@@ -93,6 +88,17 @@ interface CellBuilder {
     }
 
     fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
+}
+
+inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
+    builder(this)
+}
+
+inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
+    val cellBuilder = CellBuilder.beginCell()
+    cellBuilder.apply(refBuilder)
+    val cell = cellBuilder.endCell()
+    storeRef(cell)
 }
 
 fun CellBuilder(cell: Cell): CellBuilder =
@@ -145,10 +151,6 @@ private class CellBuilderImpl(
     override fun storeRef(ref: Cell): CellBuilder = apply {
         checkRefsOverflow(1)
         refs.add(ref)
-    }
-
-    override fun storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
-        storeRef(CellBuilder.beginCell().apply(refBuilder).endCell())
     }
 
     override fun storeRefs(vararg refs: Cell): CellBuilder = apply {

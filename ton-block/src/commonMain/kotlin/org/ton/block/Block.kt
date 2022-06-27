@@ -2,9 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
@@ -14,8 +12,7 @@ data class Block(
     val global_id: Int,
     val info: BlockInfo,
     val value_flow: ValueFlow,
-//    val state_update: MerkleUpdate<ShardState>,
-    val state_update: Cell,
+    val state_update: MerkleUpdate<ShardState>,
     val extra: BlockExtra
 ) {
     companion object TlbCombinator : org.ton.tlb.TlbCombinator<Block>() {
@@ -41,8 +38,7 @@ data class Block(
             storeInt(value.global_id, 32)
             storeRef { storeTlb(BlockInfo, value.info) }
             storeRef { storeTlb(ValueFlow, value.value_flow) }
-//            storeRef { storeTlb(merkleUpdate, value.state_update) }
-            storeRef(value.state_update)
+            storeRef { storeTlb(merkleUpdate, value.state_update) }
             storeRef { storeTlb(BlockExtra, value.extra) }
         }
 
@@ -52,9 +48,7 @@ data class Block(
             val globalId = loadInt(32).toInt()
             val info = loadRef { loadTlb(BlockInfo) }
             val valueFlow = loadRef { loadTlb(ValueFlow) }
-            // FIXME
-//            val stateUpdate = loadRef { loadTlb(merkleUpdate) }
-            val stateUpdate = loadRef()
+            val stateUpdate = loadRef { loadTlb(merkleUpdate) }
             val extra = loadRef { loadTlb(BlockExtra) }
             Block(globalId, info, valueFlow, stateUpdate, extra)
         }

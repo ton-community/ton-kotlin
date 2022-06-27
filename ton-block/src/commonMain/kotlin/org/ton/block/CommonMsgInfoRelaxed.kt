@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.*
 
 @JsonClassDiscriminator("@type")

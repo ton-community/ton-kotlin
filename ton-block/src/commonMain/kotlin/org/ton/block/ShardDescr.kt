@@ -4,8 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb

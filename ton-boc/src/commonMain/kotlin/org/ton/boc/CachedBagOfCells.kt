@@ -63,25 +63,24 @@ class CachedBagOfCells(
             return currentIndex
         }
 
-        val loadedCell = cell.loadCell()
         var sumChildWeight = 1
-        val referenceIndexes = ArrayList<Int>(loadedCell.refs.size)
-        loadedCell.refs.forEach { reference ->
+        val referenceIndexes = ArrayList<Int>(cell.refs.size)
+        cell.refs.forEach { reference ->
             val referenceIndex = importCell(reference, depth + 1)
             sumChildWeight += cellList[referenceIndex].weight
             intermediateRefs++
             referenceIndexes.add(referenceIndex)
         }
         check(cellList.size == cellCount)
-        cellHashmap[loadedCell] = cellCount
+        cellHashmap[cell] = cellCount
         val cellInfo = CellInfo(
-            loadedCell,
+            cell,
             referenceIndexes,
-            hashesCount = loadedCell.levelMask.hashesCount,
+            hashesCount = cell.levelMask.hashesCount,
             weight = min(0xFF, sumChildWeight)
         )
         cellList.add(cellInfo)
-        dataBytes += loadedCell.serializedSize()
+        dataBytes += cell.serializedSize()
         return cellCount++
     }
 

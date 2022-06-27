@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.CellType.*
 import org.ton.crypto.sha256
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -16,7 +17,13 @@ class DataCell private constructor(
     override val cellType: CellType
 ) : Cell {
     init {
-        Cell.checkRefsCount(refs.size)
+        when(cellType) {
+            ORDINARY -> Cell.checkRefsCount(refs.size)
+            PRUNED_BRANCH -> Cell.checkRefsCount(0)
+            LIBRARY_REFERENCE -> Cell.checkRefsCount(refs.size, 1..Cell.MAX_REFS)
+            MERKLE_PROOF -> Cell.checkRefsCount(1)
+            MERKLE_UPDATE -> Cell.checkRefsCount(2)
+        }
     }
 
     override val isExotic: Boolean = cellType.isExotic
@@ -35,6 +42,15 @@ class DataCell private constructor(
             yieldAll(reference.treeWalk())
         }
     }
+
+    override fun loadCell(): Cell =
+        when(cellType) {
+            ORDINARY -> this
+            PRUNED_BRANCH -> error("Can't load pruned branch cell")
+            LIBRARY_REFERENCE -> TODO()
+            MERKLE_PROOF -> refs[0]
+            MERKLE_UPDATE -> refs[1]
+        }
 
     override fun beginParse(): CellSlice = CellSlice.beginParse(this)
 
@@ -96,7 +112,7 @@ class DataCell private constructor(
         fun of(
             bits: BitString,
             refs: Iterable<Cell>,
-            type: CellType = CellType.ORDINARY
+            type: CellType = ORDINARY
         ): DataCell {
             val refsCollection = if (refs is List<Cell>) refs else refs.toList()
             Cell.checkRefsCount(refsCollection.size)
@@ -108,7 +124,7 @@ class DataCell private constructor(
             vararg refs: Cell
         ): DataCell {
             Cell.checkRefsCount(refs.size)
-            return DataCell(bits, refs.toList(), CellType.ORDINARY)
+            return DataCell(bits, refs.toList(), ORDINARY)
         }
     }
 }

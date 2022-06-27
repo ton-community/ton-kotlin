@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.hashmap.HashMapEdge
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor

@@ -30,7 +30,7 @@ interface Cell {
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
     fun treeWalk(): Sequence<Cell>
-    fun loadCell(): Cell = this
+    fun loadCell(): Cell
     fun beginParse(): CellSlice
 
     fun <T> parse(block: CellSlice.() -> T): T {
@@ -71,8 +71,8 @@ interface Cell {
         ): Cell = DataCell.of(bits, *refs)
 
         @JvmStatic
-        fun checkRefsCount(count: Int) = require(count in 0..MAX_REFS) {
-            throw CellOverflowException("Refs overflow expected: $count actual: $MAX_REFS")
+        fun checkRefsCount(count: Int, range: IntRange =  0..MAX_REFS) = require(count in range) {
+            throw CellOverflowException("Refs overflow. expected: $range, actual: $count")
         }
 
         @JvmStatic

@@ -3,20 +3,20 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
 
 @SerialName("merkle_update")
 @Serializable
 data class MerkleUpdate<X>(
     val old_hash: BitString,
     val new_hash: BitString,
-    val old: X,
-    val new: X
+    val old: Cell,
+    val new: Cell
 ) {
     init {
         require(old_hash.size == 256) { "required: old_hash.size = 256, actual: ${old_hash.size}" }
@@ -27,7 +27,7 @@ data class MerkleUpdate<X>(
         @JvmStatic
         fun <X> tlbCodec(
             x: TlbCodec<X>
-        ): TlbConstructor<MerkleUpdate<X>> = MerkleUpdateTlbConstructor(x)
+        ): TlbCodec<MerkleUpdate<X>> = MerkleUpdateTlbConstructor(x)
     }
 }
 
@@ -42,12 +42,8 @@ private class MerkleUpdateTlbConstructor<X>(
     ) = cellBuilder {
         storeBits(value.old_hash)
         storeBits(value.new_hash)
-        storeRef {
-            storeTlb(x, value.old)
-        }
-        storeRef {
-            storeTlb(x, value.new)
-        }
+        storeRef(value.old)
+        storeRef(value.new)
     }
 
     override fun loadTlb(
@@ -55,8 +51,9 @@ private class MerkleUpdateTlbConstructor<X>(
     ): MerkleUpdate<X> = cellSlice {
         val oldHash = loadBitString(256)
         val newHash = loadBitString(256)
-        val old = loadRef { loadTlb(x) }
-        val new = loadRef { loadTlb(x) }
+        val old  = loadRef()
+        val new = loadRef()
+        // TODO: hash check
         MerkleUpdate(oldHash, newHash, old, new)
     }
 }

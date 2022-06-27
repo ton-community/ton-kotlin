@@ -1,8 +1,7 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
@@ -22,6 +21,9 @@ data class OutMsgQueueInfo(
     }
 }
 
+// _ (HashmapAugE 352 EnqueuedMsg uint64) = OutMsgQueue;
+// _ (HashmapE 96 ProcessedUpto) = ProcessedInfo;
+// _ (HashmapE 320 IhrPendingSince) = IhrPendingInfo;
 private object OutMsgQueueInfoTlbConstructor : TlbConstructor<OutMsgQueueInfo>(
     schema = "_ out_queue:OutMsgQueue proc_info:ProcessedInfo ihr_pending:IhrPendingInfo = OutMsgQueueInfo;"
 ) {

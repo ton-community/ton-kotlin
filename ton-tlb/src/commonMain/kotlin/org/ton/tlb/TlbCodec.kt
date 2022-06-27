@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.tlb
 
 import org.ton.cell.CellBuilder
@@ -28,18 +30,17 @@ fun interface TlbNegatedLoader<T> : TlbLoader<T> {
 interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
 interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
 
-
-fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
+inline fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
 }
 
-fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
+inline fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
     return codec.loadNegatedTlb(this)
 }
 
-fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
+inline fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
     codec.storeTlb(this, value)
 }
 
-fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
+inline fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
     codec.storeNegatedTlb(this, value)

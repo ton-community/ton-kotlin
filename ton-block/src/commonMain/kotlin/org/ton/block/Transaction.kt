@@ -7,8 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbCodec

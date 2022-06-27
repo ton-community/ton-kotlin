@@ -22,7 +22,6 @@ interface CellSlice {
      */
     fun loadRef(): Cell
     fun loadRefs(count: Int): List<Cell>
-    fun <T> loadRef(cellSlice: CellSlice.() -> T): T
 
     fun preloadRef(): Cell
     fun preloadRefs(count: Int): List<Cell>
@@ -54,13 +53,17 @@ interface CellSlice {
     operator fun component1(): BitString = bits
     operator fun component2(): List<Cell> = refs
 
-    operator fun <T> invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
 
     companion object {
         @JvmStatic
         fun beginParse(cell: Cell): CellSlice = CellSliceImpl(cell)
     }
 }
+
+inline operator fun <T> CellSlice.invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
+
+inline fun <T> CellSlice.loadRef(cellSlice: CellSlice.() -> T): T =
+    cellSlice(loadRef().beginParse())
 
 private class CellSliceImpl(
     override val bits: BitString,
@@ -82,11 +85,6 @@ private class CellSliceImpl(
         val cell = preloadRef()
         refsPosition++
         return cell
-    }
-
-    override fun <T> loadRef(cellSlice: CellSlice.() -> T): T {
-        val slice = loadRef().beginParse()
-        return cellSlice(slice)
     }
 
     override fun loadRefs(count: Int): List<Cell> = List(count) { loadRef() }

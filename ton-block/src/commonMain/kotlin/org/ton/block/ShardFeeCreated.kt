@@ -1,8 +1,7 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb

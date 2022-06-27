@@ -9,6 +9,7 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.crypto.base64
 import org.ton.crypto.base64url
 import org.ton.crypto.crc16

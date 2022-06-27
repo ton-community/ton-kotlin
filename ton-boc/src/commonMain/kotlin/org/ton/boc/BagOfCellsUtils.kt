@@ -65,9 +65,9 @@ fun Input.readBagOfCell(): BagOfCells {
         }
     } else null
 
-    val cellsBits = Array(cellCount) { BitString() }
-    val cellsRefs = Array(cellCount) { intArrayOf() }
-    val cellsType = Array(cellCount) { CellType.ORDINARY }
+    val cellBits = Array(cellCount) { BitString() }
+    val cellRefs = Array(cellCount) { intArrayOf() }
+    val cellTypes = Array(cellCount) { CellType.ORDINARY }
 
     repeat(cellCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
@@ -103,21 +103,21 @@ fun Input.readBagOfCell(): BagOfCells {
                 cellData = BitString.appendAugmentTag(cellData, dataSize * 8)
             }
             val cellSize = BitString.findAugmentTag(cellData)
-            cellsBits[cellIndex] = BitString(cellData, cellSize)
-            cellsRefs[cellIndex] = IntArray(refsCount) { k ->
+            cellBits[cellIndex] = BitString(cellData, cellSize)
+            cellRefs[cellIndex] = IntArray(refsCount) { k ->
                 val refIndex = readInt(sizeBytes)
                 check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
                 check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
                 refIndex
             }
-            cellsType[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellData[0].toInt()]
+            cellTypes[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellData[0].toInt()]
         }
     }
 
     // Resolving references & constructing cells from leaves to roots
     val cells = Array<Cell?>(cellCount) { null }
     repeat(cellCount) { cellIndex ->
-        createCell(cellIndex, cells, cellsBits, cellsRefs)
+        createCell(cellIndex, cells, cellBits, cellRefs, cellTypes)
     }
     // TODO: Crc32c check (calculate size of resulting bytearray)
     if (hashCrc32) {
@@ -131,7 +131,7 @@ fun Input.readBagOfCell(): BagOfCells {
     return BagOfCells(roots)
 }
 
-private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, refs: Array<IntArray>): Cell {
+private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, refs: Array<IntArray>, types: Array<CellType>): Cell {
     var cell = cells[index]
     if (cell != null) {
         return cell
@@ -139,9 +139,9 @@ private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, 
     val cellBits = bits[index]
     val cellRefIndexes = refs[index]
     val cellRefs = cellRefIndexes.map { refIndex ->
-        createCell(refIndex, cells, bits, refs)
+        createCell(refIndex, cells, bits, refs, types)
     }
-    cell = Cell(cellBits, cellRefs)
+    cell = Cell(cellBits, cellRefs, types[index])
     cells[index] = cell
     return cell
 }

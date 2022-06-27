@@ -2,11 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
@@ -25,23 +24,20 @@ data class McStateExtra(
     val block_create_stats: BlockCreateStats?,
     val global_balance: CurrencyCollection
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<McStateExtra> = McStateExtraTlbConstructor
-    }
+    companion object : TlbCodec<McStateExtra> by McStateExtraTlbConstructor.asTlbCombinator()
 }
 
 private object McStateExtraTlbConstructor : TlbConstructor<McStateExtra>(
-    schema = "masterchain_state_extra#cc26\n" +
-            "  shard_hashes:ShardHashes\n" +
-            "  config:ConfigParams\n" +
-            "  ^[ flags:(## 16) { flags <= 1 }\n" +
-            "     validator_info:ValidatorInfo\n" +
-            "     prev_blocks:OldMcBlocksInfo\n" +
-            "     after_key_block:Bool\n" +
-            "     last_key_block:(Maybe ExtBlkRef)\n" +
-            "     block_create_stats:(flags . 0)?BlockCreateStats ]\n" +
-            "  global_balance:CurrencyCollection\n" +
+    schema = "masterchain_state_extra#cc26" +
+            "  shard_hashes:ShardHashes" +
+            "  config:ConfigParams" +
+            "  ^[ flags:(## 16) { flags <= 1 }" +
+            "     validator_info:ValidatorInfo" +
+            "     prev_blocks:OldMcBlocksInfo" +
+            "     after_key_block:Bool" +
+            "     last_key_block:(Maybe ExtBlkRef)" +
+            "     block_create_stats:(flags . 0)?BlockCreateStats ]" +
+            "  global_balance:CurrencyCollection" +
             "= McStateExtra;"
 ) {
     val shardHashes by lazy { HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr.tlbCodec()))) }
