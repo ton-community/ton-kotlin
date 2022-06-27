@@ -23,21 +23,20 @@ data class MsgExportTr(
 private object MsgExportTrTlbConstructor : TlbConstructor<MsgExportTr>(
     schema = "msg_export_tr\$011 out_msg:^MsgEnvelope imported:^InMsg = OutMsg;"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
     val inMsg by lazy { InMsg.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgExportTr
     ) = cellBuilder {
-        storeRef { storeTlb(msgEnvelope, value.out_msg) }
+        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
         storeRef { storeTlb(inMsg, value.imported) }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportTr = cellSlice {
-        val outMsg = loadRef { loadTlb(msgEnvelope) }
+        val outMsg = loadRef { loadTlb(MsgEnvelope) }
         val imported = loadRef { loadTlb(inMsg) }
         MsgExportTr(outMsg, imported)
     }

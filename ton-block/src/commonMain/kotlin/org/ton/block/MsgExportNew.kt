@@ -23,22 +23,19 @@ data class MsgExportNew(
 private object MsgExportNewTlbConstructor : TlbConstructor<MsgExportNew>(
     schema = "msg_export_new\$001 out_msg:^MsgEnvelope transaction:^Transaction = OutMsg;"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
-    val transaction by lazy { Transaction.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgExportNew
     ) = cellBuilder {
-        storeRef { storeTlb(msgEnvelope, value.out_msg) }
-        storeRef { storeTlb(transaction, value.transaction) }
+        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
+        storeRef { storeTlb(Transaction, value.transaction) }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportNew = cellSlice {
-        val outMsg = loadRef { loadTlb(msgEnvelope) }
-        val transaction = loadRef { loadTlb(transaction) }
+        val outMsg = loadRef { loadTlb(MsgEnvelope) }
+        val transaction = loadRef { loadTlb(Transaction) }
         MsgExportNew(outMsg, transaction)
     }
 }

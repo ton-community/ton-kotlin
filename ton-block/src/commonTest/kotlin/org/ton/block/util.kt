@@ -6,7 +6,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.test.assertEquals
 
-fun <T : Any> testSerialization(codec: TlbCodec<T>, stackValue: T) {
+fun <T> testSerialization(codec: TlbCodec<T>, stackValue: T) {
     val cellBuilder = CellBuilder.beginCell()
     cellBuilder.storeTlb(codec, stackValue)
     val cell = cellBuilder.endCell()

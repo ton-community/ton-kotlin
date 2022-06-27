@@ -1,5 +1,8 @@
+@file:Suppress("OPT_IN_USAGE")
+
 package org.ton.cell
 
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.cell.exception.CellOverflowException
 
@@ -12,10 +15,11 @@ fun Cell(bits: BitString = BitString(), refs: Iterable<Cell> = emptyList(), type
 fun Cell(bits: BitString, vararg refs: Cell): Cell =
     Cell.of(bits, *refs)
 
+@JsonClassDiscriminator("@type")
 interface Cell {
     val bits: BitString
     val refs: List<Cell>
-    val type: CellType
+    val cellType: CellType
 
     val isExotic: Boolean
     val isMerkle: Boolean
@@ -29,7 +33,7 @@ interface Cell {
     fun loadCell(): Cell = this
     fun beginParse(): CellSlice
 
-    fun <T : Any> parse(block: CellSlice.() -> T): T {
+    fun <T> parse(block: CellSlice.() -> T): T {
         val slice = beginParse()
         val result = block(slice)
         slice.endParse()
@@ -81,7 +85,7 @@ interface Cell {
         ) {
             appendable.append(indent)
             if (cell.isExotic) {
-                appendable.append(cell.type.toString())
+                appendable.append(cell.cellType.toString())
                 appendable.append(' ')
             }
             appendable.append("x{")

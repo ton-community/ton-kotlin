@@ -7,6 +7,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.AugDictionaryEdge
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
@@ -23,10 +24,7 @@ data class AccountBlock(
         require(account_addr.size == 256) { "expected: account_addr.size == 256, actual: ${account_addr.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<AccountBlock> = AccountBlockTlbConstructor
-    }
+    companion object : TlbCodec<AccountBlock> by AccountBlockTlbConstructor.asTlbCombinator()
 }
 
 private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
@@ -38,7 +36,7 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
     val augDictionaryEdge by lazy {
         AugDictionaryEdge.tlbCodec(
             64,
-            Cell.tlbCodec(Transaction.tlbCodec()),
+            Cell.tlbCodec(Transaction),
             CurrencyCollection.tlbCodec()
         )
     }

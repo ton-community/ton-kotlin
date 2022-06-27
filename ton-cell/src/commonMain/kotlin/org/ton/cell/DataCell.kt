@@ -1,29 +1,33 @@
 package org.ton.cell
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.crypto.sha256
 import kotlin.math.ceil
 import kotlin.math.floor
 
-internal class DataCell private constructor(
+@SerialName("data_cell")
+@Serializable
+class DataCell private constructor(
     override val bits: BitString,
     override val refs: List<Cell>,
-    override val type: CellType
+    override val cellType: CellType
 ) : Cell {
     init {
         Cell.checkRefsCount(refs.size)
     }
 
-    override val isExotic: Boolean = type.isExotic
-    override val isMerkle: Boolean = type.isMerkle
-    override val isPruned: Boolean = type.isPruned
+    override val isExotic: Boolean = cellType.isExotic
+    override val isMerkle: Boolean = cellType.isMerkle
+    override val isPruned: Boolean = cellType.isPruned
 
     override val maxDepth: Int by lazy {
         refs.maxOfOrNull { it.maxDepth }?.plus(1) ?: 0
     }
 
-    override val levelMask = LevelMask(0)
+    override val levelMask get() = LevelMask(0)
 
     override fun treeWalk(): Sequence<Cell> = sequence {
         yieldAll(refs)
@@ -50,7 +54,7 @@ internal class DataCell private constructor(
 
         if (bits != other.bits) return false
         if (refs != other.refs) return false
-        if (type != other.type) return false
+        if (cellType != other.cellType) return false
 
         return true
     }

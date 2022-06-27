@@ -11,19 +11,19 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("bt_fork")
-data class BinTreeFork<X : Any>(
+data class BinTreeFork<X>(
     val left: BinTree<X>,
     val right: BinTree<X>
 ) : BinTree<X> {
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<BinTreeFork<X>> = BinTreeForkTlbConstructor(x)
     }
 }
 
-private class BinTreeForkTlbConstructor<X : Any>(
+private class BinTreeForkTlbConstructor<X>(
     val x: TlbCodec<X>
 ) : TlbConstructor<BinTreeFork<X>>(
     schema = "bt_fork\$1 {X:Type} left:^(BinTree X) right:^(BinTree X) = BinTree X;"

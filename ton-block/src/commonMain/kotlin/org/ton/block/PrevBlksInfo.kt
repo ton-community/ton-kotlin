@@ -23,21 +23,19 @@ data class PrevBlksInfo(
 private object PrevBlksInfoTlbConstructor : TlbConstructor<PrevBlksInfo>(
     schema = "prev_blks_info\$_ prev1:^ExtBlkRef prev2:^ExtBlkRef = BlkPrevInfo 1;"
 ) {
-    val extBlkRef by lazy { ExtBlkRef.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: PrevBlksInfo
     ) = cellBuilder {
-        storeRef { storeTlb(extBlkRef, value.prev1) }
-        storeRef { storeTlb(extBlkRef, value.prev2) }
+        storeRef { storeTlb(ExtBlkRef, value.prev1) }
+        storeRef { storeTlb(ExtBlkRef, value.prev2) }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): PrevBlksInfo = cellSlice {
-        val prev1 = loadRef { loadTlb(extBlkRef) }
-        val prev2 = loadRef { loadTlb(extBlkRef) }
+        val prev1 = loadRef { loadTlb(ExtBlkRef) }
+        val prev2 = loadRef { loadTlb(ExtBlkRef) }
         PrevBlksInfo(prev1, prev2)
     }
 }

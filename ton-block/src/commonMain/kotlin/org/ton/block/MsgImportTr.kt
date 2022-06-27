@@ -24,23 +24,22 @@ data class MsgImportTr(
 private object MsgImportTrTlbConstructor : TlbConstructor<MsgImportTr>(
     schema = "msg_import_tr\$101  in_msg:^MsgEnvelope out_msg:^MsgEnvelope transit_fee:Coins = InMsg;"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
     val coins by lazy { Coins.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgImportTr
     ) = cellBuilder {
-        storeRef { storeTlb(msgEnvelope, value.in_msg) }
-        storeRef { storeTlb(msgEnvelope, value.out_msg) }
+        storeRef { storeTlb(MsgEnvelope, value.in_msg) }
+        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
         storeTlb(coins, value.transit_fee)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgImportTr = cellSlice {
-        val inMsg = loadRef { loadTlb(msgEnvelope) }
-        val outMsg = loadRef { loadTlb(msgEnvelope) }
+        val inMsg = loadRef { loadTlb(MsgEnvelope) }
+        val outMsg = loadRef { loadTlb(MsgEnvelope) }
         val transitFee = loadTlb(coins)
         MsgImportTr(inMsg, outMsg, transitFee)
     }

@@ -10,15 +10,15 @@ import org.ton.tlb.*
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapNode<T : Any> {
+sealed interface HashMapNode<T> {
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(n: Int, typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
+        fun <X> tlbCodec(n: Int, typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
             HashMapNodeTlbCombinator(n, typeCodec)
     }
 }
 
-private class HashMapNodeTlbCombinator<X : Any>(
+private class HashMapNodeTlbCombinator<X>(
     val n: Int,
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapNode<X>>() {
@@ -46,7 +46,7 @@ private class HashMapNodeTlbCombinator<X : Any>(
         }
     }
 
-    private class HashMapNodeLeafTlbConstructor<X : Any>(
+    private class HashMapNodeLeafTlbConstructor<X>(
         val x: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeLeaf<X>>(
         schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
@@ -66,7 +66,7 @@ private class HashMapNodeTlbCombinator<X : Any>(
         }
     }
 
-    private class HashMapNodeForkTlbConstructor<X : Any>(
+    private class HashMapNodeForkTlbConstructor<X>(
         n: Int,
         x: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeFork<X>>(

@@ -11,7 +11,9 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -38,10 +40,7 @@ data class Transaction(
         require(prev_trans_hash.size == 256) { "required: prev_trans_hash.size == 256, actual: ${prev_trans_hash.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<Transaction> = TransactionTlbConstructor
-    }
+    companion object : TlbCodec<Transaction> by TransactionTlbConstructor.asTlbCombinator()
 }
 
 private object TransactionTlbConstructor : TlbConstructor<Transaction>(
@@ -54,7 +53,7 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
             "description:^TransactionDescr = Transaction;"
 ) {
     val accountStatus by lazy { AccountStatus.tlbCodec() }
-    val messageAny by lazy { Cell.tlbCodec(Message.tlbCodec(Cell.tlbCodec())) }
+    val messageAny by lazy { Cell.tlbCodec(Message.tlbCodec(AnyTlbConstructor)) }
     val maybeMessageAny by lazy { Maybe.tlbCodec(messageAny) }
     val hashMapEMessageAny by lazy { HashMapE.tlbCodec(15, messageAny) }
     val currencyCollection by lazy { CurrencyCollection.tlbCodec() }

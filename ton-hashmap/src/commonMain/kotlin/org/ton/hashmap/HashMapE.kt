@@ -8,24 +8,25 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import org.ton.tlb.exception.UnknownTlbConstructorException
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapE<T : Any> {
+sealed interface HashMapE<T> {
     fun <K> toMap(keyTransform: (BitString) -> K): Map<K, T>
     fun toMap(): Map<BitString, T>
 
     companion object {
         @JvmStatic
-        fun <T : Any> of(): HashMapE<T> = EmptyHashMapE()
+        fun <T> of(): HashMapE<T> = EmptyHashMapE()
 
         @JvmStatic
-        fun <X : Any> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapE<X>> =
+        fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapE<X>> =
             HashMapETlbCombinator(n, x)
     }
 }
 
-private class HashMapETlbCombinator<X : Any>(
+private class HashMapETlbCombinator<X>(
     n: Int,
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapE<X>>() {
@@ -43,9 +44,10 @@ private class HashMapETlbCombinator<X : Any>(
     override fun getConstructor(value: HashMapE<X>): TlbConstructor<out HashMapE<X>> = when (value) {
         is RootHashMapE -> rootConstructor
         is EmptyHashMapE -> emptyConstructor
+        else -> throw UnknownTlbConstructorException()
     }
 
-    private class EmptyHashMapETlbConstructor<X : Any> : TlbConstructor<EmptyHashMapE<X>>(
+    private class EmptyHashMapETlbConstructor<X> : TlbConstructor<EmptyHashMapE<X>>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
     ) {
         override fun storeTlb(
@@ -58,7 +60,7 @@ private class HashMapETlbCombinator<X : Any>(
         ): EmptyHashMapE<X> = EmptyHashMapE()
     }
 
-    private class RootHashMapETlbConstructor<X : Any>(
+    private class RootHashMapETlbConstructor<X>(
         n: Int,
         x: TlbCodec<X>
     ) : TlbConstructor<RootHashMapE<X>>(
@@ -81,7 +83,7 @@ private class HashMapETlbCombinator<X : Any>(
             cellSlice: CellSlice
         ): RootHashMapE<X> {
             val root = cellSlice.loadRef {
-                cellSlice.loadTlb(hashmapConstructor)
+                loadTlb(hashmapConstructor)
             }
             return RootHashMapE(root)
         }

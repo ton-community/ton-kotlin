@@ -21,21 +21,19 @@ data class KeyExtBlkRef(
 private object KeyExtBlkRefTlbConstructor : TlbConstructor<KeyExtBlkRef>(
     schema = "_ key:Bool blk_ref:ExtBlkRef = KeyExtBlkRef;"
 ) {
-    val extBlkRef by lazy { ExtBlkRef.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: KeyExtBlkRef
     ) = cellBuilder {
         storeBit(value.key)
-        storeTlb(extBlkRef, value.blk_ref)
+        storeTlb(ExtBlkRef, value.blk_ref)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): KeyExtBlkRef = cellSlice {
         val key = loadBit()
-        val blkRef = loadTlb(extBlkRef)
+        val blkRef = loadTlb(ExtBlkRef)
         KeyExtBlkRef(key, blkRef)
     }
 }

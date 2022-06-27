@@ -10,16 +10,16 @@ import org.ton.tlb.TlbConstructor
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface BinTree<X : Any> {
+sealed interface BinTree<X> {
     companion object {
         @JvmStatic
-        fun<X:Any> tlbCodec(
+        fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbCombinator<BinTree<X>> = BinTreeTlbCombinator(x)
     }
 }
 
-private class BinTreeTlbCombinator<X:Any>(
+private class BinTreeTlbCombinator<X>(
     val x: TlbCodec<X>
 ) : TlbCombinator<BinTree<X>>() {
     val leaf by lazy { BinTreeLeaf.tlbCodec(x) }

@@ -10,25 +10,25 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <X : Any> X?.toMaybe(): Maybe<X> = Maybe.of(this)
+inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface Maybe<X : Any> {
+sealed interface Maybe<X> {
     val value: X?
 
     companion object {
         @JvmStatic
-        fun <X : Any> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
+        fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
 
         @JvmStatic
-        fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x)
+        fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x)
     }
 }
 
 @SerialName("nothing")
 @Serializable
-class Nothing<X : Any> : Maybe<X> {
+class Nothing<X> : Maybe<X> {
     override val value: X? = null
     override fun hashCode(): Int = 0
     override fun equals(other: Any?): Boolean = other is Nothing<*>
@@ -36,11 +36,11 @@ class Nothing<X : Any> : Maybe<X> {
 
 @SerialName("just")
 @Serializable
-data class Just<X : Any>(
+data class Just<X>(
     override val value: X
 ) : Maybe<X>
 
-private class MaybeTlbCombinator<X : Any>(
+private class MaybeTlbCombinator<X>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<Maybe<X>>() {
     private val nothingConstructor by lazy {
@@ -61,7 +61,7 @@ private class MaybeTlbCombinator<X : Any>(
         is Nothing -> nothingConstructor
     }
 
-    private class NothingConstructor<X : Any> : TlbConstructor<Nothing<X>>(
+    private class NothingConstructor<X> : TlbConstructor<Nothing<X>>(
         schema = "nothing\$0 {X:Type} = Maybe X;"
     ) {
         private val nothing = Nothing<X>()
@@ -77,7 +77,7 @@ private class MaybeTlbCombinator<X : Any>(
         ): Nothing<X> = nothing
     }
 
-    private class JustConstructor<X : Any>(
+    private class JustConstructor<X>(
         val typeCodec: TlbCodec<X>
     ) : TlbConstructor<Just<X>>(
         schema = "just\$1 {X:Type} value:X = Maybe X;"

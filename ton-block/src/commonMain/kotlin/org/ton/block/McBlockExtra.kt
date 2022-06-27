@@ -7,6 +7,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
@@ -23,10 +24,7 @@ data class McBlockExtra(
     val mint_msg: Maybe<InMsg>,
     val config: ConfigParams?
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<McBlockExtra> = McBlockExtraTlbConstructor
-    }
+    companion object : TlbCodec<McBlockExtra> by McBlockExtraTlbConstructor.asTlbCombinator()
 }
 
 private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(

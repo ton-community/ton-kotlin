@@ -23,21 +23,20 @@ data class MsgExportDeqImm(
 private object MsgExportDeqImmTlbConstructor : TlbConstructor<MsgExportDeqImm>(
     schema = "msg_export_deq_imm\$100 out_msg:^MsgEnvelope reimport:^InMsg = OutMsg;"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
     val inMsg by lazy { InMsg.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgExportDeqImm
     ) = cellBuilder {
-        storeRef { storeTlb(msgEnvelope, value.out_msg) }
+        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
         storeRef { storeTlb(inMsg, value.reimport) }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportDeqImm = cellSlice {
-        val outMsg = loadRef { loadTlb(msgEnvelope) }
+        val outMsg = loadRef { loadTlb(MsgEnvelope) }
         val reimport = loadRef { loadTlb(inMsg) }
         MsgExportDeqImm(outMsg, reimport)
     }

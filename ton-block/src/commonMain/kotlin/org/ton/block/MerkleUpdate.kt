@@ -12,7 +12,7 @@ import org.ton.tlb.storeTlb
 
 @SerialName("merkle_update")
 @Serializable
-data class MerkleUpdate<X : Any>(
+data class MerkleUpdate<X>(
     val old_hash: BitString,
     val new_hash: BitString,
     val old: X,
@@ -25,13 +25,13 @@ data class MerkleUpdate<X : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<MerkleUpdate<X>> = MerkleUpdateTlbConstructor(x)
     }
 }
 
-private class MerkleUpdateTlbConstructor<X : Any>(
+private class MerkleUpdateTlbConstructor<X>(
     val x: TlbCodec<X>
 ) : TlbConstructor<MerkleUpdate<X>>(
     schema = "!merkle_update#02 {X:Type} old_hash:bits256 new_hash:bits256 old:^X new:^X = MERKLE_UPDATE X;"

@@ -4,7 +4,7 @@ import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
 import org.ton.tlb.exception.ParseTlbException
 
-abstract class AbstractTlbConstructor<T : Any>(
+abstract class AbstractTlbConstructor<T>(
     @Language("TL-B")
     val schema: String,
     id: BitString? = null
@@ -36,13 +36,19 @@ abstract class AbstractTlbConstructor<T : Any>(
     }
 }
 
-abstract class TlbConstructor<T : Any>(
+abstract class TlbConstructor<T>(
     @Language("TL-B")
     schema: String,
     id: BitString? = null
-) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T>
+) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T> {
+    fun asTlbCombinator(): TlbCombinator<T> = object : TlbCombinator<T>() {
+        override val constructors: List<TlbConstructor<out T>> = listOf(this@TlbConstructor)
 
-abstract class TlbNegatedConstructor<T : Any>(
+        override fun getConstructor(value: T): TlbConstructor<out T> = this@TlbConstructor
+    }
+}
+
+abstract class TlbNegatedConstructor<T>(
     @Language("TL-B")
     schema: String,
     id: BitString? = null

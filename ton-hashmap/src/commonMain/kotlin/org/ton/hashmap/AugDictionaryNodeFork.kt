@@ -11,7 +11,7 @@ import org.ton.tlb.storeTlb
 
 @SerialName("ahmn_fork")
 @Serializable
-data class AugDictionaryNodeFork<X : Any, Y : Any>(
+data class AugDictionaryNodeFork<X, Y>(
     val left: AugDictionaryEdge<X, Y>,
     val right: AugDictionaryEdge<X, Y>,
     override val extra: Y,
@@ -20,7 +20,7 @@ data class AugDictionaryNodeFork<X : Any, Y : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
@@ -28,7 +28,7 @@ data class AugDictionaryNodeFork<X : Any, Y : Any>(
     }
 }
 
-private class AugDictionaryNodeForkTlbConstructor<X : Any, Y : Any>(
+private class AugDictionaryNodeForkTlbConstructor<X, Y>(
     n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
@@ -37,19 +37,16 @@ private class AugDictionaryNodeForkTlbConstructor<X : Any, Y : Any>(
             "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;"
 ) {
     val n = n - 1
-    val edge by lazy {
-        AugDictionaryEdge.tlbCodec(n, x, y)
-    }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AugDictionaryNodeFork<X, Y>
     ) = cellBuilder {
         storeRef {
-            storeTlb(edge, value.left)
+            storeTlb(AugDictionaryEdge.tlbCodec(n, x, y), value.left)
         }
         storeRef {
-            storeTlb(edge, value.right)
+            storeTlb(AugDictionaryEdge.tlbCodec(n, x, y), value.right)
         }
         storeTlb(y, value.extra)
     }
@@ -58,10 +55,15 @@ private class AugDictionaryNodeForkTlbConstructor<X : Any, Y : Any>(
         cellSlice: CellSlice
     ): AugDictionaryNodeFork<X, Y> = cellSlice {
         val left = loadRef {
-            loadTlb(edge)
+            loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
         }
-        val right = loadRef {
-            loadTlb(edge)
+        val right = try {
+            loadRef {
+                loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
+            }
+        } catch (e: Exception) {
+            println("LEFT: $left")
+            throw e
         }
         val extra = loadTlb(y)
         AugDictionaryNodeFork(left, right, extra)

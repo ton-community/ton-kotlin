@@ -11,21 +11,21 @@ import org.ton.tlb.storeTlb
 
 @SerialName("ahmn_leaf")
 @Serializable
-data class AugDictionaryNodeLeaf<X : Any, Y : Any>(
+data class AugDictionaryNodeLeaf<X, Y>(
     override val extra: Y, val value: X
 ) : AugDictionaryNode<X, Y> {
     override fun toString(): String = "ahmn_leaf(extra:$extra value:$value)"
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             x: TlbCodec<X>,
             y: TlbCodec<Y>
         ): TlbConstructor<AugDictionaryNodeLeaf<X, Y>> = AugDictionaryNodeLeafTlbConstructor(x, y)
     }
 }
 
-private class AugDictionaryNodeLeafTlbConstructor<X : Any, Y : Any>(
+private class AugDictionaryNodeLeafTlbConstructor<X, Y>(
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
 ) : TlbConstructor<AugDictionaryNodeLeaf<X, Y>>(

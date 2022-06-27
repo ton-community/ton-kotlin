@@ -14,14 +14,14 @@ import org.ton.tlb.TlbConstructor
 
 @Serializable
 @SerialName("update_hashes")
-data class HashUpdate<X : Any>(
+data class HashUpdate<X>(
     val old_hash: BitString,
     val new_hash: BitString
 ) {
     companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbConstructor<HashUpdate<X>> =
+        fun <X> tlbCodec(x: TlbCodec<X>): TlbConstructor<HashUpdate<X>> =
             HashUpdateTlbConstructor as TlbConstructor<HashUpdate<X>>
     }
 }

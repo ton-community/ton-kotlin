@@ -28,17 +28,18 @@ fun interface TlbNegatedLoader<T> : TlbLoader<T> {
 interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
 interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
 
-fun <T : Any> CellSlice.loadTlb(codec: TlbLoader<T>): T {
+
+fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
 }
 
-fun <T : Any> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
+fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
     return codec.loadNegatedTlb(this)
 }
 
-fun <T : Any> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
+fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
     codec.storeTlb(this, value)
 }
 
-fun <T : Any> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
+fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
     codec.storeNegatedTlb(this, value)

@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 @SerialName("capabilities")
@@ -12,10 +13,7 @@ data class GlobalVersion(
     val version: Long,
     val capabilities: Long
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<GlobalVersion> = GlobalVersionTlbConstructor
-    }
+    companion object : TlbCodec<GlobalVersion> by GlobalVersionTlbConstructor.asTlbCombinator()
 }
 
 private object GlobalVersionTlbConstructor : TlbConstructor<GlobalVersion>(

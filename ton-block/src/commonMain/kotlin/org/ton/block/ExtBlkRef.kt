@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 @SerialName("ext_blk_ref")
@@ -20,10 +21,7 @@ data class ExtBlkRef(
         require(file_hash.size == 256) { "required: fileHash.size = 256, actual: ${file_hash.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ExtBlkRef> = ExtBlkRefTlbConstructor
-    }
+    companion object : TlbCodec<ExtBlkRef> by ExtBlkRefTlbConstructor
 }
 
 private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(

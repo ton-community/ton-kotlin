@@ -22,7 +22,6 @@ data class MsgDiscardTr(
 private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
     schema = "msg_discard_tr\$111 in_msg:^MsgEnvelope transaction_id:uint64 fwd_fee:Coins proof_delivered:^Cell = InMsg;"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
     val coins by lazy { Coins.tlbCodec() }
 
     override fun storeTlb(
@@ -30,7 +29,7 @@ private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
         value: MsgDiscardTr
     ) = cellBuilder {
         storeRef {
-            storeTlb(msgEnvelope, value.in_msg)
+            storeTlb(MsgEnvelope, value.in_msg)
         }
         storeUInt(value.transaction_id, 64)
         storeTlb(coins, value.fwd_fee)
@@ -41,7 +40,7 @@ private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
         cellSlice: CellSlice
     ): MsgDiscardTr = cellSlice {
         val inMsg = loadRef {
-            loadTlb(msgEnvelope)
+            loadTlb(MsgEnvelope)
         }
         val transactionId = loadUInt(64).toLong()
         val fwdFee = loadTlb(coins)

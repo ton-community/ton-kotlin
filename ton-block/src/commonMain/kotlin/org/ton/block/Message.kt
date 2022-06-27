@@ -11,7 +11,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
 @Serializable
-data class Message<X : Any>(
+data class Message<X>(
     val info: CommonMsgInfo,
     val init: Maybe<Either<StateInit, StateInit>>,
     val body: Either<X, X>
@@ -38,13 +38,17 @@ data class Message<X : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<Message<X>> = MessageTlbConstructor(x)
     }
+
+    override fun toString(): String {
+        return "Message(info=$info, init=$init, body=$body)".replace("\n", "")
+    }
 }
 
-private class MessageTlbConstructor<X : Any>(
+private class MessageTlbConstructor<X>(
     x: TlbCodec<X>
 ) : TlbConstructor<Message<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfo " +

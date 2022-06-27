@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -15,7 +16,7 @@ data class TrStoragePhase(
     val storage_fees_due: Maybe<Coins>,
     val status_change: AccStatusChange
 ) {
-    companion object {
+    companion object : TlbCodec<TrStoragePhase> by TrStoragePhaseTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrStoragePhase> = TrStoragePhaseTlbConstructor
     }

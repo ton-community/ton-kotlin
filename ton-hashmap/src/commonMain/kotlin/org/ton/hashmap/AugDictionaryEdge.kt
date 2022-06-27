@@ -8,7 +8,7 @@ import org.ton.tlb.*
 
 @SerialName("ahm_edge")
 @Serializable
-data class AugDictionaryEdge<X : Any, Y : Any>(
+data class AugDictionaryEdge<X, Y>(
     val label: HashMapLabel,
     val node: AugDictionaryNode<X, Y>
 ) {
@@ -16,7 +16,7 @@ data class AugDictionaryEdge<X : Any, Y : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
@@ -24,7 +24,7 @@ data class AugDictionaryEdge<X : Any, Y : Any>(
     }
 }
 
-private class AugDictionaryEdgeTlbConstructor<X : Any, Y : Any>(
+private class AugDictionaryEdgeTlbConstructor<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>,

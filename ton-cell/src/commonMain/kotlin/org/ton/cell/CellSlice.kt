@@ -54,7 +54,7 @@ interface CellSlice {
     operator fun component1(): BitString = bits
     operator fun component2(): List<Cell> = refs
 
-    operator fun <T : Any> invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
+    operator fun <T> invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
 
     companion object {
         @JvmStatic

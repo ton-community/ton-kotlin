@@ -6,7 +6,7 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("hme_root")
-data class RootHashMapE<T : Any>(
+data class RootHashMapE<T>(
     val root: HashMapEdge<T>
 ) : HashMapE<T> {
     override fun <K> toMap(keyTransform: (BitString) -> K): Map<K, T> = toMap().mapKeys { (key, _) ->

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("hmn_fork")
-class HashMapNodeFork<T : Any>(
+class HashMapNodeFork<T>(
     val left: HashMapEdge<T>,
     val right: HashMapEdge<T>
 ) : HashMapNode<T> {

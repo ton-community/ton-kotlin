@@ -6,7 +6,7 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("merkle_proof")
-data class MerkleProof<X : Any>(
+data class MerkleProof<X>(
     val virtual_hash: BitString,
     val depth: Int,
     val virtual_root: X

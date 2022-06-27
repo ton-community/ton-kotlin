@@ -48,7 +48,7 @@ private object McStateExtraTlbConstructor : TlbConstructor<McStateExtra>(
     val configParams by lazy { ConfigParams.tlbCodec() }
     val validatorInfo by lazy { ValidatorInfo.tlbCodec() }
     val oldMcBlocksInfo by lazy { AugDictionary.tlbCodec(32, KeyExtBlkRef.tlbCodec(), KeyMaxLt.tlbCodec()) }
-    val maybeExtBlkRef by lazy { Maybe.tlbCodec(ExtBlkRef.tlbCodec()) }
+    val maybeExtBlkRef by lazy { Maybe.tlbCodec(ExtBlkRef) }
     val blockCreateStats by lazy { BlockCreateStats.tlbCodec() }
     val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
 

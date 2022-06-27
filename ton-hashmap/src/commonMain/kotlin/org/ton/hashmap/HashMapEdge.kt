@@ -9,7 +9,7 @@ import org.ton.tlb.*
 
 @Serializable
 @SerialName("hm_edge")
-data class HashMapEdge<T : Any>(
+data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) {
@@ -29,13 +29,13 @@ data class HashMapEdge<T : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
+        fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
             HashMapEdgeTlbConstructor(n, x)
     }
 }
 
 
-private class HashMapEdgeTlbConstructor<X : Any>(
+private class HashMapEdgeTlbConstructor<X>(
     val n: Int,
     val x: TlbCodec<X>
 ) : TlbConstructor<HashMapEdge<X>>(

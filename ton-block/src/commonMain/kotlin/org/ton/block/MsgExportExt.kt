@@ -6,7 +6,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
@@ -25,22 +25,21 @@ data class MsgExportExt(
 private object MsgExportExtTlbConstructor : TlbConstructor<MsgExportExt>(
     schema = "msg_export_ext\$000 msg:^(Message Any) transaction:^Transaction = OutMsg;"
 ) {
-    val messageAny by lazy { Message.tlbCodec(Cell.tlbCodec()) }
-    val transaction by lazy { Transaction.tlbCodec() }
+    val messageAny by lazy { Message.tlbCodec(AnyTlbConstructor) }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgExportExt
     ) = cellBuilder {
         storeRef { storeTlb(messageAny, value.msg) }
-        storeRef { storeTlb(transaction, value.transaction) }
+        storeRef { storeTlb(Transaction, value.transaction) }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportExt = cellSlice {
         val msg = loadRef { loadTlb(messageAny) }
-        val transaction = loadRef { loadTlb(transaction) }
+        val transaction = loadRef { loadTlb(Transaction) }
         MsgExportExt(msg, transaction)
     }
 }

@@ -3,10 +3,13 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.AugDictionary
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
@@ -25,14 +28,11 @@ data class BlockExtra(
         require(created_by.size == 256) { "expected: created_by.size == 256, actual: ${created_by.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlockExtra> = BlockExtraTlbConstructor
-    }
+    companion object : TlbCodec<BlockExtra> by BlockExtraTlbConstructor.asTlbCombinator()
 }
 
 private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
-    schema = "block_extra in_msg_descr:^InMsgDescr\n" +
+    schema = "block_extra#4a33f6fd in_msg_descr:^InMsgDescr\n" +
             "  out_msg_descr:^OutMsgDescr\n" +
             "  account_blocks:^ShardAccountBlocks\n" +
             "  rand_seed:bits256\n" +
@@ -44,11 +44,11 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
     val shardAccountBlock by lazy {
         AugDictionary.tlbCodec(
             256,
-            AccountBlock.tlbCodec(),
+            AccountBlock,
             CurrencyCollection.tlbCodec()
         )
     }
-    val maybeMcBlockExtra by lazy { Maybe.tlbCodec(McBlockExtra.tlbCodec()) }
+    val maybeMcBlockExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McBlockExtra)) }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

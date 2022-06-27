@@ -21,15 +21,13 @@ data class EnqueuedMsg(
 private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
     schema = "_ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;\n"
 ) {
-    val msgEnvelope by lazy { MsgEnvelope.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: EnqueuedMsg
     ) = cellBuilder {
         storeUInt(value.enqueued_lt, 64)
         storeRef {
-            storeTlb(msgEnvelope, value.out_msg)
+            storeTlb(MsgEnvelope, value.out_msg)
         }
     }
 
@@ -38,7 +36,7 @@ private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
     ): EnqueuedMsg = cellSlice {
         val enqueuedLt = loadUInt(64).toLong()
         val outMsg = loadRef {
-            loadTlb(msgEnvelope)
+            loadTlb(MsgEnvelope)
         }
         EnqueuedMsg(enqueuedLt, outMsg)
     }

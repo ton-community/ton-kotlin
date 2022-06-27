@@ -16,7 +16,7 @@ data class VarUInteger(
     val len: Int,
     @Serializable(BigIntSerializer::class)
     val value: BigInt
-) : Number() {
+) {
     constructor(byte: Byte) : this(BigInt(byte))
     constructor(short: Short) : this(BigInt(short))
     constructor(int: Int) : this(BigInt(int))
@@ -26,13 +26,13 @@ data class VarUInteger(
         value = value
     )
 
-    override fun toByte(): Byte = value.toByte()
-    override fun toChar(): Char = value.toChar()
-    override fun toDouble(): Double = throw UnsupportedOperationException()
-    override fun toFloat(): Float = throw UnsupportedOperationException()
-    override fun toInt(): Int = value.toInt()
-    override fun toLong(): Long = value.toLong()
-    override fun toShort(): Short = value.toShort()
+    fun toByte(): Byte = value.toByte()
+    fun toChar(): Char = value.toChar()
+    fun toDouble(): Double = throw UnsupportedOperationException()
+    fun toFloat(): Float = throw UnsupportedOperationException()
+    fun toInt(): Int = value.toInt()
+    fun toLong(): Long = value.toLong()
+    fun toShort(): Short = value.toShort()
 
     companion object {
         @JvmStatic
@@ -55,7 +55,7 @@ data class VarUInteger(
             cellSlice: CellSlice
         ): VarUInteger = cellSlice {
             val len = loadUIntLes(n).toInt()
-            val value = loadUInt(len)
+            val value = loadUInt(len * 8)
             VarUInteger(len, value)
         }
     }

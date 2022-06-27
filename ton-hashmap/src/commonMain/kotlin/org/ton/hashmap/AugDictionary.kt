@@ -10,12 +10,12 @@ import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface AugDictionary<X : Any, Y : Any> {
+sealed interface AugDictionary<X, Y> {
     val extra: Y
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
@@ -23,7 +23,7 @@ sealed interface AugDictionary<X : Any, Y : Any> {
     }
 }
 
-private class AugDictionaryTlbCombinator<X : Any, Y : Any>(
+private class AugDictionaryTlbCombinator<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>

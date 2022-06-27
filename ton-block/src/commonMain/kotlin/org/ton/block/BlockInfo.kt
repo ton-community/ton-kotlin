@@ -2,8 +2,11 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -20,7 +23,7 @@ data class BlockInfo(
     val want_merge: Boolean,
     val key_block: Boolean,
     val vert_seqno_incr: Boolean,
-    val flags: Int,
+    val flags: BitString,
     val seq_no: Int,
     val vert_seq_no: Int,
     val shard: ShardIdent,
@@ -39,14 +42,12 @@ data class BlockInfo(
     val prev_seq_no: Int get() = seq_no - 1
 
     init {
-        require(flags <= 1) { "expected: flags <= 1, actual: $flags" }
-        require(vert_seq_no >= 0 && vert_seqno_incr) { "expected: vert_seq_no >= vert_seqno_incr, actual: $vert_seq_no" }
+        require(flags.size == 8) { "expected: flags.size == 8, actual: ${flags.size}" }
+        require(flags.subList(1, flags.lastIndex).all { !it }) { "expected: flags <= 1, actual: $flags" }
+        require(vert_seq_no >= 0) { "expected: vert_seq_no >= vert_seqno_incr, actual: $vert_seq_no" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlockInfo> = BlockInfoTlbConstructor
-    }
+    companion object : TlbCodec<BlockInfo> by BlockInfoTlbConstructor.asTlbCombinator()
 }
 
 private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
@@ -71,10 +72,6 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
             "prev_vert_ref:vert_seqno_incr?^(BlkPrevInfo 0) " +
             "= BlockInfo;"
 ) {
-    val shardIdent by lazy { ShardIdent.tlbCodec() }
-    val globalVersion by lazy { GlobalVersion.tlbCodec() }
-    val blkMasterInfo by lazy { BlkMasterInfo.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BlockInfo
@@ -88,10 +85,10 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         storeBit(value.want_merge)
         storeBit(value.key_block)
         storeBit(value.vert_seqno_incr)
-        storeUInt(value.flags, 8)
-        storeUInt(value.seq_no, 8)
-        storeUInt(value.vert_seq_no, 8)
-        storeTlb(shardIdent, value.shard)
+        storeBits(value.flags.asReversed())
+        storeUInt(value.seq_no, 32)
+        storeUInt(value.vert_seq_no, 32)
+        storeTlb(ShardIdent, value.shard)
         storeUInt(value.gen_utime, 32)
         storeUInt(value.start_lt, 64)
         storeUInt(value.end_lt, 64)
@@ -99,12 +96,12 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         storeUInt(value.gen_catchain_seqno, 32)
         storeUInt(value.min_ref_mc_seqno, 32)
         storeUInt(value.prev_key_block_seqno, 32)
-        if (value.flags and 128 == 128 && value.gen_software != null) {
-            storeTlb(globalVersion, value.gen_software)
+        if (value.flags[0] && value.gen_software != null) {
+            storeTlb(GlobalVersion, value.gen_software)
         }
         if (value.not_master && value.master_ref != null) {
             storeRef {
-                storeTlb(blkMasterInfo, value.master_ref)
+                storeTlb(BlkMasterInfo, value.master_ref)
             }
         }
         storeRef {
@@ -129,10 +126,10 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val wantMerge = loadBit()
         val keyBlock = loadBit()
         val verSeqnoIncr = loadBit()
-        val flags = loadUInt(8).toInt()
-        val seqNo = loadUInt(8).toInt()
-        val vertSeqNo = loadUInt(8).toInt()
-        val shard = loadTlb(shardIdent)
+        val flags = loadBitString(8).asReversed().toBitString()
+        val seqNo = loadUInt(32).toInt()
+        val vertSeqNo = loadUInt(32).toInt()
+        val shard = loadTlb(ShardIdent)
         val genUtime = loadUInt(32).toLong()
         val startLt = loadUInt(64).toLong()
         val endLt = loadUInt(64).toLong()
@@ -140,11 +137,11 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val genCatchainSeqno = loadUInt(32).toLong()
         val minRefMcSeqno = loadUInt(32).toLong()
         val prevKeyBlockSeqno = loadUInt(32).toLong()
-        val genSoftware = if (flags and 128 == 128) {
-            loadTlb(globalVersion)
+        val genSoftware = if (flags[0]) {
+            loadTlb(GlobalVersion)
         } else null
         val masterRef = if (notMaster) {
-            loadRef { loadTlb(blkMasterInfo) }
+            loadRef { loadTlb(BlkMasterInfo) }
         } else null
         val prevRef = loadRef { loadTlb(BlkPrevInfo.tlbCodec(afterMerge)) }
         val prevVertRef = if (verSeqnoIncr) {

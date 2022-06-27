@@ -11,7 +11,7 @@ import org.ton.tlb.storeTlb
 
 @SerialName("ahme_root")
 @Serializable
-data class AugDictionaryRoot<X : Any, Y : Any>(
+data class AugDictionaryRoot<X, Y>(
     val root: AugDictionaryEdge<X, Y>,
     override val extra: Y
 ) : AugDictionary<X, Y> {
@@ -19,7 +19,7 @@ data class AugDictionaryRoot<X : Any, Y : Any>(
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
@@ -27,7 +27,7 @@ data class AugDictionaryRoot<X : Any, Y : Any>(
     }
 }
 
-private class AugDictionaryRootTlbConstructor<X : Any, Y : Any>(
+private class AugDictionaryRootTlbConstructor<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
@@ -42,14 +42,18 @@ private class AugDictionaryRootTlbConstructor<X : Any, Y : Any>(
         cellBuilder: CellBuilder,
         value: AugDictionaryRoot<X, Y>
     ) = cellBuilder {
-        storeTlb(edge, value.root)
+        storeRef {
+            storeTlb(edge, value.root)
+        }
         storeTlb(y, value.extra)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AugDictionaryRoot<X, Y> = cellSlice {
-        val root = loadTlb(edge)
+        val root = loadRef {
+            loadTlb(edge)
+        }
         val extra = loadTlb(y)
         AugDictionaryRoot(root, extra)
     }

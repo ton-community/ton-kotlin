@@ -3,6 +3,7 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -19,14 +20,21 @@ data class ValueFlow(
     val created: CurrencyCollection,
     val minted: CurrencyCollection
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ValueFlow> = ValueFlowTlbConstructor
-    }
+    companion object : TlbCodec<ValueFlow> by ValueFlowTlbConstructor.asTlbCombinator()
 }
 
 private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
-    schema = "value_flow ^[ from_prev_blk:CurrencyCollection " + "to_next_blk:CurrencyCollection " + "imported:CurrencyCollection " + "exported:CurrencyCollection ] " + "fees_collected:CurrencyCollection " + "^[ " + "fees_imported:CurrencyCollection " + "recovered:CurrencyCollection " + "created:CurrencyCollection " + "minted:CurrencyCollection " + "] = ValueFlow;"
+    schema = "value_flow#b8e48dfb ^[ from_prev_blk:CurrencyCollection " +
+            "to_next_blk:CurrencyCollection " +
+            "imported:CurrencyCollection " +
+            "exported:CurrencyCollection ] " +
+            "fees_collected:CurrencyCollection " +
+            "^[ " +
+            "fees_imported:CurrencyCollection " +
+            "recovered:CurrencyCollection " +
+            "created:CurrencyCollection " +
+            "minted:CurrencyCollection " +
+            "] = ValueFlow;"
 ) {
     val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
 

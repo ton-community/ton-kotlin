@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -13,28 +14,23 @@ import org.ton.tlb.storeTlb
 data class BlkMasterInfo(
     val master: ExtBlkRef
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlkMasterInfo> = BlkMasterInfoTlbConstructor
-    }
+    companion object : TlbCodec<BlkMasterInfo> by BlkMasterInfoTlbConstructor
 }
 
 private object BlkMasterInfoTlbConstructor : TlbConstructor<BlkMasterInfo>(
     schema = "master_info\$_ master:ExtBlkRef = BlkMasterInfo;"
 ) {
-    val extBlkRef by lazy { ExtBlkRef.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BlkMasterInfo
     ) = cellBuilder {
-        storeTlb(extBlkRef, value.master)
+        storeTlb(ExtBlkRef, value.master)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): BlkMasterInfo = cellSlice {
-        val master = loadTlb(extBlkRef)
+        val master = loadTlb(ExtBlkRef)
         BlkMasterInfo(master)
     }
 }

@@ -56,12 +56,11 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
             "custom:(Maybe ^McStateExtra) " +
             "= ShardStateUnsplit;"
 ) {
-    val shardIdent by lazy { ShardIdent.tlbCodec() }
     val outMsgQueueInfo by lazy { OutMsgQueueInfo.tlbCodec() }
     val shardAccounts by lazy { AugDictionary.tlbCodec(256, ShardAccount.tlbCodec(), DepthBalanceInfo.tlbCodec()) }
     val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
     val libraries by lazy { HashMapE.tlbCodec(256, LibDescr.tlbCodec()) }
-    val maybeBlkMasterInfo by lazy { Maybe.tlbCodec(BlkMasterInfo.tlbCodec()) }
+    val maybeBlkMasterInfo by lazy { Maybe.tlbCodec(BlkMasterInfo) }
     val maybeMcStateExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McStateExtra.tlbCodec())) }
 
     override fun storeTlb(
@@ -69,7 +68,7 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
         value: ShardStateUnsplit
     ) = cellBuilder {
         storeUInt(value.global_id, 32)
-        storeTlb(shardIdent, value.shard_id)
+        storeTlb(ShardIdent, value.shard_id)
         storeUInt(value.seq_no, 32)
         storeUInt(value.vert_seq_no, 8)
         storeUInt(value.min_ref_mc_seqno, 32)
@@ -95,7 +94,7 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
         cellSlice: CellSlice
     ): ShardStateUnsplit = cellSlice {
         val globalId = loadUInt(32).toLong()
-        val shardId = loadTlb(shardIdent)
+        val shardId = loadTlb(ShardIdent)
         val seqNo = loadUInt(32).toLong()
         val verSeqNo = loadUInt(8).toInt()
         val genUtime = loadUInt(32).toLong()

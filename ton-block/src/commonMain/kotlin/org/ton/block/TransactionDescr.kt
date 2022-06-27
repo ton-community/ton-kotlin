@@ -19,9 +19,14 @@ sealed interface TransactionDescr {
 private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>() {
     val ord by lazy { TransOrd.tlbCodec() }
     val storage by lazy { TransStorage.tlbCodec() }
+    val tickTock by lazy { TransTickTock.tlbCodec() }
+    val mergeInstall by lazy { TransMergeInstall.tlbCodec() }
+    val mergePrepare by lazy { TransMergePrepare.tlbCodec() }
+    val splitInstall by lazy { TransSplitInstall.tlbCodec() }
+    val splitPrepare by lazy { TransSplitPrepare.tlbCodec() }
 
     override val constructors: List<TlbConstructor<out TransactionDescr>> by lazy {
-        listOf(ord, storage)
+        listOf(ord, storage, tickTock, mergeInstall, mergePrepare, splitInstall, splitPrepare)
     }
 
     override fun getConstructor(
@@ -29,10 +34,10 @@ private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>()
     ): TlbConstructor<out TransactionDescr> = when (value) {
         is TransOrd -> ord
         is TransStorage -> storage
-        is TransTickTock -> TODO()
-        is TransMergeInstall -> TODO()
-        is TransMergePrepare -> TODO()
-        is TransSplitInstall -> TODO()
-        is TransSplitPrepare -> TODO()
+        is TransTickTock -> tickTock
+        is TransMergeInstall -> mergeInstall
+        is TransMergePrepare -> mergePrepare
+        is TransSplitInstall -> splitInstall
+        is TransSplitPrepare -> splitPrepare
     }
 }

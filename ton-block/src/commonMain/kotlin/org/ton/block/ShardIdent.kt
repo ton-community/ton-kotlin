@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 @SerialName("shard_ident")
@@ -17,10 +18,7 @@ data class ShardIdent(
         require(shard_pfx_bits <= 60) { "expected: shard_pfx_bits <= 60, actual: $shard_pfx_bits" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ShardIdent> = ShardIdentTlbConstructor
-    }
+    companion object : TlbCodec<ShardIdent> by ShardIdentTlbConstructor.asTlbCombinator()
 }
 
 private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(

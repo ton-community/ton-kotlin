@@ -11,18 +11,18 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("bt_leaf")
-data class BinTreeLeaf<X : Any>(
+data class BinTreeLeaf<X>(
     val leaf: X
 ) : BinTree<X> {
     companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<BinTreeLeaf<X>> = BinTreeTlbConstructor(x)
     }
 }
 
-private class BinTreeTlbConstructor<X : Any>(
+private class BinTreeTlbConstructor<X>(
     val x: TlbCodec<X>
 ) : TlbConstructor<BinTreeLeaf<X>>(
     schema = "bt_leaf\$0 {X:Type} leaf:X = BinTree X;"

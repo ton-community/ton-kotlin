@@ -87,12 +87,12 @@ sealed interface Either<X, Y> {
         }
 
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
+        fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
             EitherTlbCombinator(x, y)
     }
 }
 
-private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<X, Y>>() {
+private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<X, Y>>() {
     private val leftCodec by lazy {
         LeftTlbConstructor<X, Y>(x)
     }
@@ -109,7 +109,7 @@ private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<
         is Either.Right -> rightCodec
     }
 
-    class LeftTlbConstructor<X : Any, Y : Any>(val x: TlbCodec<X>) : TlbConstructor<Either.Left<X, Y>>(
+    class LeftTlbConstructor<X, Y>(val x: TlbCodec<X>) : TlbConstructor<Either.Left<X, Y>>(
         schema = "left\$0 {X:Type} {Y:Type} value:X = Either X Y;"
     ) {
         override fun storeTlb(
@@ -126,7 +126,7 @@ private class EitherTlbCombinator<X : Any, Y : Any>(x: TlbCodec<X>, y: TlbCodec<
         }
     }
 
-    class RightTlbConstructor<X : Any, Y : Any>(val y: TlbCodec<Y>) : TlbConstructor<Either.Right<X, Y>>(
+    class RightTlbConstructor<X, Y>(val y: TlbCodec<Y>) : TlbConstructor<Either.Right<X, Y>>(
         schema = "right\$1 {X:Type} {Y:Type} value:Y = Either X Y;"
     ) {
         override fun storeTlb(

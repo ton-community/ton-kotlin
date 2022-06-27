@@ -8,15 +8,16 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.exception.UnknownTlbConstructorException
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface AugDictionaryNode<X : Any, Y : Any> {
+sealed interface AugDictionaryNode<X, Y> {
     val extra: Y
 
     companion object {
         @JvmStatic
-        fun <X : Any, Y : Any> tlbCodec(
+        fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
@@ -24,7 +25,7 @@ sealed interface AugDictionaryNode<X : Any, Y : Any> {
     }
 }
 
-private class AugDictionaryNodeTlbCombinator<X : Any, Y : Any>(
+private class AugDictionaryNodeTlbCombinator<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
@@ -43,10 +44,11 @@ private class AugDictionaryNodeTlbCombinator<X : Any, Y : Any>(
         when (value) {
             is AugDictionaryNodeFork -> fork
             is AugDictionaryNodeLeaf -> leaf
+            else -> throw UnknownTlbConstructorException()
         }
 
     override fun loadTlb(cellSlice: CellSlice): AugDictionaryNode<X, Y> {
-        return if (n == 0) {
+        return if (n <= 0) {
             leaf.loadTlb(cellSlice)
         } else {
             fork.loadTlb(cellSlice)

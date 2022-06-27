@@ -12,6 +12,8 @@ inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
 inline fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
 inline fun BitString(hex: String): BitString = BitString.of(hex)
 
+inline fun Iterable<Boolean>.toBitString(): BitString = BitString(this)
+inline fun BooleanArray.toBitString(): BitString = BitString(*this)
 inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
 
 @Serializable(with = FiftHexBitStringSerializer::class)

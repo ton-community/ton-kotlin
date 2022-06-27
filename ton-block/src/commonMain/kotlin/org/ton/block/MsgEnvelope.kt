@@ -5,8 +5,9 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
@@ -18,10 +19,7 @@ data class MsgEnvelope(
     val fwd_fee_remaining: Coins,
     val msg: Message<Cell>
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<MsgEnvelope> = MsgEnvelopeTlbConstructor
-    }
+    companion object : TlbCodec<MsgEnvelope> by MsgEnvelopeTlbConstructor.asTlbCombinator()
 }
 
 private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
@@ -36,7 +34,7 @@ private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
         Coins.tlbCodec()
     }
     val messageAny by lazy {
-        Message.tlbCodec(Cell.tlbCodec())
+        Message.tlbCodec(AnyTlbConstructor)
     }
 
     override fun storeTlb(
