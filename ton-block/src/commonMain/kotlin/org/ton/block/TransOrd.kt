@@ -3,7 +3,9 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
@@ -36,11 +38,10 @@ private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
             "destroyed:Bool " +
             "= TransactionDescr;"
 ) {
-    val maybeTrStoragePhase by lazy { Maybe.tlbCodec(TrStoragePhase.tlbCodec()) }
-    val maybeTrCreditPhase by lazy { Maybe.tlbCodec(TrCreditPhase.tlbCodec()) }
-    val trComputePhase by lazy { TrComputePhase.tlbCodec() }
-    val maybeTrActionPhase by lazy { Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase.tlbCodec())) }
-    val maybeTrBouncePhase by lazy { Maybe.tlbCodec(TrBouncePhase.tlbCodec()) }
+    val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
+    val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase.tlbCodec())
+    val maybeTrActionPhase = Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase))
+    val maybeTrBouncePhase = Maybe.tlbCodec(TrBouncePhase.tlbCodec())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -49,7 +50,7 @@ private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
         storeBit(value.credit_first)
         storeTlb(maybeTrStoragePhase, value.storage_ph)
         storeTlb(maybeTrCreditPhase, value.credit_ph)
-        storeTlb(trComputePhase, value.compute_ph)
+        storeTlb(TrComputePhase, value.compute_ph)
         storeTlb(maybeTrActionPhase, value.action)
         storeBit(value.aborted)
         storeTlb(maybeTrBouncePhase, value.bounce)
@@ -62,7 +63,7 @@ private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
         val creditFirst = loadBit()
         val storagePh = loadTlb(maybeTrStoragePhase)
         val creditPh = loadTlb(maybeTrCreditPhase)
-        val computePh = loadTlb(trComputePhase)
+        val computePh = loadTlb(TrComputePhase)
         val action = loadTlb(maybeTrActionPhase)
         val aborted = loadBit()
         val bounce = loadTlb(maybeTrBouncePhase)

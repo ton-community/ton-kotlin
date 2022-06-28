@@ -12,5 +12,5 @@ fun main() {
     val (block, time) = measureTimedValue {
         Block.loadTlb(cell.beginParse())
     }
-    println(block)
+    println("block time: $time")
 }

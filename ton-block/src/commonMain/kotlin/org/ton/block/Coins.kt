@@ -18,11 +18,11 @@ import org.ton.tlb.storeTlb
 data class Coins(
     val amount: VarUInteger = VarUInteger(0)
 ) {
-    companion object {
+    companion object : TlbCodec<Coins> by CoinsTlbConstructor {
         private val NANOCOINS = 1_000_000_000
 
         @JvmStatic
-        fun tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor()
+        fun tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor
 
         @JvmStatic
         fun of(coins: Long): Coins = Coins(VarUInteger(BigInt(coins) * NANOCOINS))
@@ -36,12 +36,10 @@ data class Coins(
     }
 }
 
-private class CoinsTlbConstructor : TlbConstructor<Coins>(
+private object CoinsTlbConstructor : TlbConstructor<Coins>(
     schema = "nanocoins\$_ amount:(VarUInteger 16) = Coins;"
 ) {
-    private val varUIntegerCodec by lazy {
-        VarUInteger.tlbCodec(16)
-    }
+    private val varUIntegerCodec = VarUInteger.tlbCodec(16)
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: Coins

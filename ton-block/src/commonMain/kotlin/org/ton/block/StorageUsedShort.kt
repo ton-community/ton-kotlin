@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -13,18 +16,16 @@ data class StorageUsedShort(
     val cells: VarUInteger,
     val bits: VarUInteger
 ) {
-    companion object {
+    companion object : TlbCodec<StorageUsedShort> by StorageUsedShortTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<StorageUsedShort> = StorageUsedShortTlbConstructor()
+        fun tlbCodec(): TlbConstructor<StorageUsedShort> = StorageUsedShortTlbConstructor
     }
 }
 
-private class StorageUsedShortTlbConstructor : TlbConstructor<StorageUsedShort>(
+private object StorageUsedShortTlbConstructor : TlbConstructor<StorageUsedShort>(
     schema = "storage_used_short\$_ cells:(VarUInteger 7) bits:(VarUInteger 7) = StorageUsedShort;"
 ) {
-    private val varUInteger7Codec by lazy {
-        VarUInteger.tlbCodec(7)
-    }
+    private val varUInteger7Codec = VarUInteger.tlbCodec(7)
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: StorageUsedShort

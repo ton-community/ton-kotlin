@@ -2,7 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
@@ -27,31 +29,23 @@ private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
             "status_change:AccStatusChange " +
             "= TrStoragePhase;"
 ) {
-    val coins by lazy {
-        Coins.tlbCodec()
-    }
-    val maybeCoins by lazy {
-        Maybe.tlbCodec(coins)
-    }
-    val accStatusChange by lazy {
-        AccStatusChange.tlbCodec()
-    }
+    val maybeCoins = Maybe.tlbCodec(Coins)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TrStoragePhase
     ) = cellBuilder {
-        storeTlb(coins, value.storage_fees_collected)
+        storeTlb(Coins, value.storage_fees_collected)
         storeTlb(maybeCoins, value.storage_fees_due)
-        storeTlb(accStatusChange, value.status_change)
+        storeTlb(AccStatusChange, value.status_change)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): TrStoragePhase = cellSlice {
-        val storageFeesCollected = loadTlb(coins)
+        val storageFeesCollected = loadTlb(Coins)
         val storageFeesDue = loadTlb(maybeCoins)
-        val statusChange = loadTlb(accStatusChange)
+        val statusChange = loadTlb(AccStatusChange)
         TrStoragePhase(storageFeesCollected, storageFeesDue, statusChange)
     }
 }

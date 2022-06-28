@@ -6,7 +6,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.BitString
-import org.ton.cell.Cell
 import org.ton.cell.*
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
@@ -51,13 +50,13 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
             "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
             "description:^TransactionDescr = Transaction;"
 ) {
-    val accountStatus by lazy { AccountStatus.tlbCodec() }
-    val messageAny by lazy { Cell.tlbCodec(Message.tlbCodec(AnyTlbConstructor)) }
-    val maybeMessageAny by lazy { Maybe.tlbCodec(messageAny) }
-    val hashMapEMessageAny by lazy { HashMapE.tlbCodec(15, messageAny) }
-    val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
-    val hashUpdateAccount by lazy { HashUpdate.tlbCodec(Account.tlbCodec()) }
-    val transactionDescr by lazy { TransactionDescr.tlbCodec() }
+    val accountStatus = AccountStatus.tlbCodec()
+    val messageAny = Cell.tlbCodec(Message.tlbCodec(AnyTlbConstructor))
+    val maybeMessageAny = Maybe.tlbCodec(messageAny)
+    val hashMapEMessageAny = HashMapE.tlbCodec(15, messageAny)
+    val currencyCollection = CurrencyCollection.tlbCodec()
+    val hashUpdateAccount = HashUpdate.tlbCodec(Account.tlbCodec())
+    val transactionDescr = TransactionDescr.tlbCodec()
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

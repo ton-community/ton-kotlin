@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -12,7 +15,7 @@ import org.ton.tlb.storeTlb
 data class TrPhaseComputeSkipped(
     val reason: ComputeSkipReason
 ) : TrComputePhase {
-    companion object {
+    companion object : TlbCodec<TrPhaseComputeSkipped> by TrPhaseComputeSkippedTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrPhaseComputeSkipped> = TrPhaseComputeSkippedTlbConstructor
     }
@@ -21,21 +24,17 @@ data class TrPhaseComputeSkipped(
 private object TrPhaseComputeSkippedTlbConstructor : TlbConstructor<TrPhaseComputeSkipped>(
     schema = "tr_phase_compute_skipped\$0 reason:ComputeSkipReason = TrComputePhase;"
 ) {
-    val computeSkipReason by lazy {
-        ComputeSkipReason.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TrPhaseComputeSkipped
     ) = cellBuilder {
-        storeTlb(computeSkipReason, value.reason)
+        storeTlb(ComputeSkipReason, value.reason)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): TrPhaseComputeSkipped = cellSlice {
-        val reason = loadTlb(computeSkipReason)
+        val reason = loadTlb(ComputeSkipReason)
         TrPhaseComputeSkipped(reason)
     }
 }

@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 
@@ -19,10 +20,7 @@ enum class AccStatusChange {
     DELETED // frozen -> deleted
     ;
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<AccStatusChange> = AccStatusChangeTlbCombinator
-    }
+    companion object : TlbCodec<AccStatusChange> by AccStatusChangeTlbCombinator
 }
 
 private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>() {

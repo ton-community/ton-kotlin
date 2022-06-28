@@ -17,13 +17,20 @@ class DataCell private constructor(
     override val cellType: CellType
 ) : Cell {
     init {
-        when(cellType) {
+        when (cellType) {
             ORDINARY -> Cell.checkRefsCount(refs.size)
             PRUNED_BRANCH -> Cell.checkRefsCount(0)
             LIBRARY_REFERENCE -> Cell.checkRefsCount(refs.size, 1..Cell.MAX_REFS)
             MERKLE_PROOF -> Cell.checkRefsCount(1)
             MERKLE_UPDATE -> Cell.checkRefsCount(2)
         }
+    }
+
+    private val hash by lazy {
+        sha256(representation())
+    }
+    private val hashCode by lazy {
+        hash.contentHashCode()
     }
 
     override val isExotic: Boolean = cellType.isExotic
@@ -56,7 +63,7 @@ class DataCell private constructor(
 
     override fun descriptors(): ByteArray = byteArrayOf(referencesDescriptor(), bitsDescriptor())
 
-    override fun hash(): ByteArray = sha256(representation())
+    override fun hash(): ByteArray = hash
 
     override fun toString(): String = buildString {
         Cell.toString(cell = this@DataCell, appendable = this, firstChild = true, lastChild = true)
@@ -75,7 +82,7 @@ class DataCell private constructor(
         return true
     }
 
-    override fun hashCode(): Int = hash().contentHashCode()
+    override fun hashCode(): Int = hashCode
 
     /* TODO:
       int get_serialized_size(bool with_hashes = false) const {

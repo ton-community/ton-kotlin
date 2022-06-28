@@ -6,8 +6,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.loadTlb
@@ -35,7 +38,7 @@ data class TrActionPhase(
         require(action_list_hash.size == 256) { "required: action_list_hash.size == 256, actual: ${action_list_hash.size}" }
     }
 
-    companion object {
+    companion object : TlbCodec<TrActionPhase> by TrActionPhaseTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrActionPhase> = TrActionPhaseTlbConstructor
     }
@@ -50,10 +53,8 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
             "action_list_hash:bits256 tot_msg_size:StorageUsedShort " +
             "= TrActionPhase;"
 ) {
-    val accStatusChange by lazy { AccStatusChange.tlbCodec() }
-    val maybeCoins by lazy { Maybe.tlbCodec(Coins.tlbCodec()) }
-    val maybeInt32 by lazy { Maybe.tlbCodec(IntTlbConstructor.int(32)) }
-    val storageUsedShort by lazy { StorageUsedShort.tlbCodec() }
+    val maybeCoins = Maybe.tlbCodec(Coins)
+    val maybeInt32 = Maybe.tlbCodec(IntTlbConstructor.int(32))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -62,7 +63,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         storeBit(value.success)
         storeBit(value.valid)
         storeBit(value.no_funds)
-        storeTlb(accStatusChange, value.status_change)
+        storeTlb(AccStatusChange, value.status_change)
         storeTlb(maybeCoins, value.total_fwd_fees)
         storeTlb(maybeCoins, value.total_action_fees)
         storeInt(value.result_code, 32)
@@ -72,7 +73,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         storeUInt(value.skipped_actions, 16)
         storeUInt(value.msgs_created, 16)
         storeBits(value.action_list_hash)
-        storeTlb(storageUsedShort, value.tot_msg_size)
+        storeTlb(StorageUsedShort, value.tot_msg_size)
     }
 
     override fun loadTlb(
@@ -81,7 +82,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val success = loadBit()
         val valid = loadBit()
         val noFunds = loadBit()
-        val statusChange = loadTlb(accStatusChange)
+        val statusChange = loadTlb(AccStatusChange)
         val totalFwdFees = loadTlb(maybeCoins)
         val totalActionFees = loadTlb(maybeCoins)
         val resultCode = loadInt(32).toInt()
@@ -91,7 +92,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val skippedActions = loadUInt(16).toInt()
         val msgCreated = loadUInt(16).toInt()
         val actionListHash = loadBitString(256)
-        val totMsgSize = loadTlb(storageUsedShort)
+        val totMsgSize = loadTlb(StorageUsedShort)
         TrActionPhase(
             success,
             valid,

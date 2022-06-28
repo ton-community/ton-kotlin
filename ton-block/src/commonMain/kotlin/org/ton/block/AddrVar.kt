@@ -48,9 +48,7 @@ data class AddrVar(
 private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
     schema = "addr_var\$11 anycast:(Maybe Anycast) addr_len:(## 9) workchain_id:int32 address:(bits addr_len) = MsgAddressInt;"
 ) {
-    private val maybeAnycastCodec by lazy {
-        Maybe.tlbCodec(Anycast.tlbCodec())
-    }
+    private val maybeAnycastCodec = Maybe.tlbCodec(Anycast.tlbCodec())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

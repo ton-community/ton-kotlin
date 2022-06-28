@@ -24,12 +24,8 @@ data class CurrencyCollection(
 private object CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(
     schema = "currencies\$_ coins:Coins other:ExtraCurrencyCollection = CurrencyCollection;"
 ) {
-    private val coinsCodec by lazy {
-        Coins.tlbCodec()
-    }
-    private val extraCurrencyCollectionCodec by lazy {
-        ExtraCurrencyCollection.tlbCodec()
-    }
+    private val coinsCodec = Coins.tlbCodec()
+    private val extraCurrencyCollectionCodec = ExtraCurrencyCollection.tlbCodec()
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: CurrencyCollection

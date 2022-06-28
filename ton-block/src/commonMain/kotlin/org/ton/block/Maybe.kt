@@ -44,18 +44,13 @@ data class Just<X>(
 private class MaybeTlbCombinator<X>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<Maybe<X>>() {
-    private val nothingConstructor by lazy {
-        NothingConstructor<X>()
-    }
-    private val justConstructor by lazy {
-        JustConstructor(typeCodec)
-    }
+    private val nothingConstructor = NothingConstructor<X>()
+    private val justConstructor = JustConstructor(typeCodec)
 
-    override val constructors: List<TlbConstructor<out Maybe<X>>> by lazy {
+    override val constructors: List<TlbConstructor<out Maybe<X>>> =
         listOf(
             nothingConstructor, justConstructor
         )
-    }
 
     override fun getConstructor(value: Maybe<X>): TlbConstructor<out Maybe<X>> = when (value) {
         is Just -> justConstructor

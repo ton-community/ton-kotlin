@@ -94,12 +94,8 @@ sealed interface Either<X, Y> {
 }
 
 private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<X, Y>>() {
-    private val leftCodec by lazy {
-        LeftTlbConstructor<X, Y>(x)
-    }
-    private val rightCodec by lazy {
-        RightTlbConstructor<X, Y>(y)
-    }
+    private val leftCodec = LeftTlbConstructor<X, Y>(x)
+    private val rightCodec = RightTlbConstructor<X, Y>(y)
 
     override val constructors: List<TlbConstructor<out Either<X, Y>>> = listOf(
         leftCodec, rightCodec
