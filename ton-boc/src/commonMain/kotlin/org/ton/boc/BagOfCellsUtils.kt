@@ -242,12 +242,13 @@ private fun serializeBagOfCells(
     }
 }.readBytes()
 
+@OptIn(ExperimentalUnsignedTypes::class)
 private fun Input.readInt(bytes: Int): Int {
     return when (bytes) {
-        1 -> readByte().toInt()
-        2 -> readShort().toInt()
-        3 -> (readByte().toInt() shl Short.SIZE_BITS) + readShort().toInt()
-        else -> readInt()
+        1 -> readUByte().toInt()
+        2 -> readUShort().toInt()
+        3 -> (readUShort().toInt() shl UShort.SIZE_BITS) + readUShort().toInt()
+        else -> readInt() // TODO
     }
 }
 
