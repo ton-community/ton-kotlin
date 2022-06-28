@@ -5,6 +5,7 @@ import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.exception.CellOverflowException
+import org.ton.cell.storeRef
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.logger.Logger
