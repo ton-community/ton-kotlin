@@ -42,6 +42,7 @@ private class UnaryTlbCombinator : TlbNegatedCombinator<Unary>() {
     override fun getConstructor(value: Unary): TlbNegatedConstructor<out Unary> = when (value) {
         is UnarySuccess -> unarySuccessConstructor
         is UnaryZero -> unaryZeroConstructor
+        else -> TODO()
     }
 
     private class UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(

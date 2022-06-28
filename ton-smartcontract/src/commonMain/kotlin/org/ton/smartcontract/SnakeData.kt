@@ -3,6 +3,7 @@ package org.ton.smartcontract
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.loadRef
 import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbNegatedConstructor
 import org.ton.tlb.loadNegatedTlb
