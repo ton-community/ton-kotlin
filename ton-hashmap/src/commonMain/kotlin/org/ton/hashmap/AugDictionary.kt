@@ -13,6 +13,8 @@ import org.ton.tlb.TlbConstructor
 sealed interface AugDictionary<X, Y> {
     val extra: Y
 
+    fun nodes(): Sequence<Pair<X, Y>>
+
     companion object {
         @JvmStatic
         fun <X, Y> tlbCodec(

@@ -17,6 +17,8 @@ data class AugDictionaryNodeFork<X, Y>(
 ) : AugDictionaryNode<X, Y> {
     override fun toString(): String = "ahmn_fork(left:$left right:$right extra:$extra)"
 
+    fun nodes(): Sequence<Pair<X, Y>> = left.nodes() + right.nodes()
+
     companion object {
         @JvmStatic
         fun <X, Y> tlbCodec(
@@ -56,13 +58,8 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
         val left = loadRef {
             loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
         }
-        val right = try {
-            loadRef {
-                loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
-            }
-        } catch (e: Exception) {
-            println("LEFT: $left")
-            throw e
+        val right = loadRef {
+            loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
         }
         val extra = loadTlb(y)
         AugDictionaryNodeFork(left, right, extra)

@@ -16,6 +16,8 @@ data class AugDictionaryRoot<X, Y>(
 ) : AugDictionary<X, Y> {
     override fun toString(): String = "ahme_root(root:$root extra:$extra)"
 
+    override fun nodes(): Sequence<Pair<X, Y>> = root.nodes()
+
     companion object {
         @JvmStatic
         fun <X, Y> tlbCodec(

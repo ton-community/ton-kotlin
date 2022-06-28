@@ -2,7 +2,9 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.*
 
 @SerialName("ahm_edge")
@@ -12,6 +14,13 @@ data class AugDictionaryEdge<X, Y>(
     val node: AugDictionaryNode<X, Y>
 ) {
     override fun toString(): String = "ahm_edge(label:$label node:$node)"
+
+    fun nodes(): Sequence<Pair<X, Y>> {
+        return when (node) {
+            is AugDictionaryNodeFork -> node.nodes()
+            is AugDictionaryNodeLeaf -> sequenceOf(node.value to node.extra)
+        }
+    }
 
     companion object {
         @JvmStatic
