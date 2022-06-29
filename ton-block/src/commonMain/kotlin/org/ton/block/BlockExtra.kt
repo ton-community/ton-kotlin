@@ -66,8 +66,8 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
         val inMsgDescr = loadRef { loadTlb(inMsgDescr) }
         val outMsgDescr = loadRef { loadTlb(outMsgDescr) }
         val accountBlocks = loadRef { loadTlb(shardAccountBlock) }
-        val randSeed = loadBitString(256)
-        val createdBy = loadBitString(256)
+        val randSeed = loadBits(256)
+        val createdBy = loadBits(256)
         val custom = loadTlb(maybeMcBlockExtra)
         BlockExtra(inMsgDescr, outMsgDescr, accountBlocks, randSeed, createdBy, custom)
     }

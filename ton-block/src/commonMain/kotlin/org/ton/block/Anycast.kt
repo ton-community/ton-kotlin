@@ -43,7 +43,7 @@ private object AnycastTlbConstructor : TlbConstructor<Anycast>(
         cellSlice: CellSlice
     ): Anycast = cellSlice {
         val depth = loadUIntLeq(30).toInt()
-        val rewritePfx = loadBitString(depth)
+        val rewritePfx = loadBits(depth)
         Anycast(depth, rewritePfx)
     }
 }

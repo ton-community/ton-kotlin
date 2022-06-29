@@ -49,9 +49,9 @@ private class MerkleUpdateTlbConstructor<X>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): MerkleUpdate<X> = cellSlice {
-        val oldHash = loadBitString(256)
-        val newHash = loadBitString(256)
-        val old  = loadRef()
+        val oldHash = loadBits(256)
+        val newHash = loadBits(256)
+        val old = loadRef()
         val new = loadRef()
         // TODO: hash check
         MerkleUpdate(oldHash, newHash, old, new)

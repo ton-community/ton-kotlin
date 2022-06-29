@@ -50,7 +50,7 @@ data class SnakeDataTail(
         }
 
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, SnakeDataTail> {
-            val b = cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
+            val b = cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitsPosition)
             return 0 to SnakeDataTail(b)
         }
     }
@@ -88,7 +88,7 @@ data class SnakeDataCons(
         }
 
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, SnakeDataCons> {
-            val b = cellSlice.loadBitString(cellSlice.bits.size - cellSlice.bitsPosition)
+            val b = cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitsPosition)
             val (n, next) = cellSlice.loadRef {
                 cellSlice.loadNegatedTlb(snakeData)
             }

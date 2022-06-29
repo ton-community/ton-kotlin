@@ -42,7 +42,7 @@ private object AddrExternTlbConstructor : TlbConstructor<AddrExtern>(
         cellSlice: CellSlice
     ): AddrExtern = cellSlice {
         val len = loadUInt(9).toInt()
-        val externalAddress = loadBitString(len)
+        val externalAddress = loadBits(len)
         AddrExtern(len, externalAddress)
     }
 }

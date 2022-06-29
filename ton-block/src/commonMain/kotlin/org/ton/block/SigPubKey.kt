@@ -3,7 +3,9 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 
 @Serializable
@@ -34,7 +36,7 @@ private object SigPubKeyTlbConstructor : TlbConstructor<SigPubKey>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): SigPubKey = cellSlice {
-        val pubkey = loadBitString(256)
+        val pubkey = loadBits(256)
         SigPubKey(pubkey)
     }
 }

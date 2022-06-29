@@ -75,7 +75,7 @@ private class HashMapLabelTlbCombinator(
             cellSlice: CellSlice
         ): Pair<Int, HashMapLabelShort> {
             val (n, len) = cellSlice.loadNegatedTlb(Unary)
-            val s = cellSlice.loadBitString(n)
+            val s = cellSlice.loadBits(n)
             return n to HashMapLabelShort(len, s)
         }
     }
@@ -101,7 +101,7 @@ private class HashMapLabelTlbCombinator(
             cellSlice: CellSlice
         ): Pair<Int, HashMapLabelLong> = cellSlice {
             val n = loadUIntLeq(m).toInt()
-            val s = loadBitString(n)
+            val s = loadBits(n)
             n to HashMapLabelLong(n, s)
         }
 

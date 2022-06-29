@@ -19,8 +19,6 @@ data class MsgDiscardFin(
 private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
     schema = "msg_discard_fin\$110 in_msg:^MsgEnvelope transaction_id:uint64 fwd_fee:Coins = InMsg;"
 ) {
-    val coins by lazy { Coins.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgDiscardFin
@@ -29,7 +27,7 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
             storeTlb(MsgEnvelope, value.in_msg)
         }
         storeUInt(value.transaction_id, 64)
-        storeTlb(coins, value.fwd_fee)
+        storeTlb(Coins, value.fwd_fee)
     }
 
     override fun loadTlb(
@@ -39,7 +37,7 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
             loadTlb(MsgEnvelope)
         }
         val transactionId = loadUInt(64).toLong()
-        val fwdFee = loadTlb(coins)
+        val fwdFee = loadTlb(Coins)
         MsgDiscardFin(inMsg, transactionId, fwdFee)
     }
 }

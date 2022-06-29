@@ -3,7 +3,9 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
@@ -43,8 +45,8 @@ private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
     ): SplitMergeInfo = cellSlice {
         val curShardPfxLen = loadUInt(6).toInt()
         val accSplitDepth = loadUInt(6).toInt()
-        val thisAddr = loadBitString(256)
-        val siblingAddr = loadBitString(256)
+        val thisAddr = loadBits(256)
+        val siblingAddr = loadBits(256)
         SplitMergeInfo(curShardPfxLen, accSplitDepth, thisAddr, siblingAddr)
     }
 }

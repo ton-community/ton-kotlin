@@ -39,7 +39,7 @@ class StateInitTest {
 
         stateInitCell.refs[1].parse {
             assertEquals(BigInt(0), loadUInt(32))
-            assertEquals(BitString(publicKey), BitString(loadBits(256).toList()))
+            assertEquals(BitString(publicKey), loadBits(256))
         }
 
         assertEquals(hash, hex(stateInitCell.hash()))

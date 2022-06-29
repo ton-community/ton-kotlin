@@ -40,7 +40,7 @@ private object ConfigParamsTlbConstructor : TlbConstructor<ConfigParams>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ConfigParams = cellSlice {
-        val configAddr = loadBitString(256)
+        val configAddr = loadBits(256)
         val config = loadRef { loadTlb(hashmap) }
         ConfigParams(configAddr, config)
     }

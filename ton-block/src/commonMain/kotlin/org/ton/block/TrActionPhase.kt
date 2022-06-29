@@ -91,7 +91,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val specActions = loadUInt(16).toInt()
         val skippedActions = loadUInt(16).toInt()
         val msgCreated = loadUInt(16).toInt()
-        val actionListHash = loadBitString(256)
+        val actionListHash = loadBits(256)
         val totMsgSize = loadTlb(StorageUsedShort)
         TrActionPhase(
             success,

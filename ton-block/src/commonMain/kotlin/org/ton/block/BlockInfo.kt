@@ -125,7 +125,7 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val wantMerge = loadBit()
         val keyBlock = loadBit()
         val verSeqnoIncr = loadBit()
-        val flags = loadBitString(8).asReversed().toBitString()
+        val flags = loadBits(8).asReversed().toBitString()
         val seqNo = loadUInt(32).toInt()
         val vertSeqNo = loadUInt(32).toInt()
         val shard = loadTlb(ShardIdent)

@@ -23,8 +23,6 @@ data class MsgImportFin(
 private object MsgImportFinTlbConstructor : TlbConstructor<MsgImportFin>(
     schema = "msg_import_fin\$100 in_msg:^MsgEnvelope transaction:^Transaction fwd_fee:Coins = InMsg;"
 ) {
-    val coins by lazy { Coins.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgImportFin
@@ -35,7 +33,7 @@ private object MsgImportFinTlbConstructor : TlbConstructor<MsgImportFin>(
         storeRef {
             storeTlb(Transaction, value.transaction)
         }
-        storeTlb(coins, value.fwd_fee)
+        storeTlb(Coins, value.fwd_fee)
     }
 
     override fun loadTlb(
@@ -47,7 +45,7 @@ private object MsgImportFinTlbConstructor : TlbConstructor<MsgImportFin>(
         val transaction = loadRef {
             loadTlb(Transaction)
         }
-        val fwdFee = loadTlb(coins)
+        val fwdFee = loadTlb(Coins)
         MsgImportFin(inMsg, transaction, fwdFee)
     }
 }

@@ -6,6 +6,9 @@ actual typealias BigInt = BigInteger
 
 actual fun Number.toBigInt(): BigInt = when (this) {
     is Long -> BigInteger.valueOf(this)
+    is Int -> BigInteger.valueOf(this.toLong())
+    is Byte -> BigInteger.valueOf(this.toLong())
+    is Short -> BigInteger.valueOf(this.toLong())
     is BigInt -> this
     else -> BigInteger.valueOf(this.toLong())
 }

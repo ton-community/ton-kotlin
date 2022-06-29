@@ -166,7 +166,7 @@ private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
     ): AddrStd = cellSlice {
         val anycast = loadTlb(MaybeAnycast)
         val workchainId = loadInt(8).toInt()
-        val address = loadBitString(256)
+        val address = loadBits(256)
         AddrStd(anycast, workchainId, address)
     }
 }

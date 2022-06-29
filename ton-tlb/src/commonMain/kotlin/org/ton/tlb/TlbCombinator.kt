@@ -1,5 +1,6 @@
 package org.ton.tlb
 
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.UnknownTlbConstructorException
@@ -8,7 +9,7 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
     abstract val constructors: List<AbstractTlbConstructor<*>>
 
     private val sortedConstructors by lazy {
-        constructors.asSequence().sortedBy { it.id.size }
+        constructors.sortedBy { it.id.size }
     }
 
     abstract fun getConstructor(value: T): AbstractTlbConstructor<*>
@@ -21,11 +22,14 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
     }
 
     fun loadTlbConstructor(cellSlice: CellSlice): C {
+        var currentId = BitString.empty()
         val constructor = sortedConstructors.firstOrNull { constructor ->
-            val id = cellSlice.preloadBitString(constructor.id.size)
-            id == constructor.id
+            if (constructor.id.size > currentId.size) {
+                currentId = cellSlice.preloadBits(constructor.id.size)
+            }
+            currentId == constructor.id
         } ?: throw UnknownTlbConstructorException()
-        cellSlice.loadBits(constructor.id.size)
+        cellSlice.skipBits(constructor.id.size)
         @Suppress("UNCHECKED_CAST")
         return constructor as C
     }

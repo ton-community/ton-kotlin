@@ -1,6 +1,5 @@
 package org.ton.block
 
-import org.ton.cell.Cell
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
@@ -21,8 +20,6 @@ data class MsgDiscardTr(
 private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
     schema = "msg_discard_tr\$111 in_msg:^MsgEnvelope transaction_id:uint64 fwd_fee:Coins proof_delivered:^Cell = InMsg;"
 ) {
-    val coins by lazy { Coins.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgDiscardTr
@@ -31,7 +28,7 @@ private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
             storeTlb(MsgEnvelope, value.in_msg)
         }
         storeUInt(value.transaction_id, 64)
-        storeTlb(coins, value.fwd_fee)
+        storeTlb(Coins, value.fwd_fee)
         storeRef(value.proof_delivered)
     }
 
@@ -42,7 +39,7 @@ private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
             loadTlb(MsgEnvelope)
         }
         val transactionId = loadUInt(64).toLong()
-        val fwdFee = loadTlb(coins)
+        val fwdFee = loadTlb(Coins)
         val proofDelivered = loadRef()
         MsgDiscardTr(inMsg, transactionId, fwdFee, proofDelivered)
     }

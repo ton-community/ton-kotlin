@@ -1,5 +1,6 @@
 package org.ton.tlb.constructor
 
+import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -10,7 +11,8 @@ fun Cell.Companion.tlbCodec(): TlbCodec<Cell> = CellTlbConstructor
 fun <T> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellReferencedTlbConstructor(type)
 
 private object CellTlbConstructor : TlbConstructor<Cell>(
-    schema = "_ _:Cell = Cell;"
+    schema = "_ _:Cell = Cell;",
+    id = BitString.empty()
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: Cell
@@ -27,7 +29,7 @@ private object CellTlbConstructor : TlbConstructor<Cell>(
 
 private class CellReferencedTlbConstructor<T>(
     val type: TlbCodec<T>
-) : TlbConstructor<T>("") {
+) : TlbConstructor<T>("", id = BitString.empty()) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: T
     ) = cellBuilder {

@@ -48,10 +48,9 @@ private object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>
             "vm_init_state_hash:bits256 vm_final_state_hash:bits256 ] " +
             "= TrComputePhase;"
 ) {
-    val coins by lazy { Coins.tlbCodec() }
-    val varUInteger7 by lazy { VarUInteger.tlbCodec(7) }
-    val maybeVarUInteger3 by lazy { Maybe.tlbCodec(VarUInteger.tlbCodec(3)) }
-    val maybeInt32 by lazy { Maybe.tlbCodec(IntTlbConstructor(32)) }
+    val varUInteger7 = VarUInteger.tlbCodec(7)
+    val maybeVarUInteger3 = Maybe.tlbCodec(VarUInteger.tlbCodec(3))
+    val maybeInt32 = Maybe.tlbCodec(IntTlbConstructor(32))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -60,7 +59,7 @@ private object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>
         storeBit(value.success)
         storeBit(value.msg_state_used)
         storeBit(value.account_activated)
-        storeTlb(coins, value.gas_fees)
+        storeTlb(Coins, value.gas_fees)
         storeRef {
             storeTlb(varUInteger7, value.gas_used)
             storeTlb(varUInteger7, value.gas_limit)
@@ -80,7 +79,7 @@ private object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>
         val success = loadBit()
         val msgStateUsed = loadBit()
         val accountActivated = loadBit()
-        val gasFees = loadTlb(coins)
+        val gasFees = loadTlb(Coins)
         loadRef {
             val gasUsed = loadTlb(varUInteger7)
             val gasLimit = loadTlb(varUInteger7)
@@ -89,8 +88,8 @@ private object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>
             val exitCode = loadInt(32).toInt()
             val exitArg = loadTlb(maybeInt32).value?.toInt().toMaybe()
             val vmSteps = loadUInt(32).toLong()
-            val vmInitStateHash = loadBitString(256)
-            val vmFinalStateHash = loadBitString(256)
+            val vmInitStateHash = loadBits(256)
+            val vmFinalStateHash = loadBits(256)
             TrPhaseComputeVm(
                 success,
                 msgStateUsed,

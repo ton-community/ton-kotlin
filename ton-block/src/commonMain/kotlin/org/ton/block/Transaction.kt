@@ -82,9 +82,9 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): Transaction = cellSlice {
-        val accountAddr = loadBitString(256)
+        val accountAddr = loadBits(256)
         val lt = loadUInt(64).toLong()
-        val prevTransHash = loadBitString(256)
+        val prevTransHash = loadBits(256)
         val prevTransLt = loadUInt(64).toLong()
         val now = loadUInt(32).toLong()
         val outmsgCnt = loadUInt(15).toInt()

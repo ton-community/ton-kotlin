@@ -67,7 +67,7 @@ private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
         val anycast = loadTlb(MaybeAnycast)
         val addrLen = loadUInt(9).toInt()
         val workchainId = loadInt(32).toInt()
-        val address = loadBitString(addrLen)
+        val address = loadBits(addrLen)
         AddrVar(anycast, addrLen, workchainId, address)
     }
 }

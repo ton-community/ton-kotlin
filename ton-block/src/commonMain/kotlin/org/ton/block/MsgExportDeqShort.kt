@@ -3,7 +3,9 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 
 @Serializable
@@ -42,7 +44,7 @@ private object MsgExportDeqShortTlbConstructor : TlbConstructor<MsgExportDeqShor
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportDeqShort = cellSlice {
-        val msgEnvHash = loadBitString(256)
+        val msgEnvHash = loadBits(256)
         val nextWorkchain = loadInt(32).toInt()
         val nextAddrPfx = loadUInt(64).toLong()
         val importBlockLt = loadUInt(64).toLong()

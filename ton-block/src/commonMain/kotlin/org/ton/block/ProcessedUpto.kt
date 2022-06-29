@@ -39,7 +39,7 @@ private object ProcessedUptoTlbConstructor : TlbConstructor<ProcessedUpto>(
         cellSlice: CellSlice
     ): ProcessedUpto = cellSlice {
         val lastMsgLt = loadUInt(64).toLong()
-        val lastMsgHash = loadBitString(256)
+        val lastMsgHash = loadBits(256)
         ProcessedUpto(lastMsgLt, lastMsgHash)
     }
 }

@@ -54,7 +54,7 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountBlock = cellSlice {
-        val accountAddr = loadBitString(256)
+        val accountAddr = loadBits(256)
         val transactions = loadTlb(augDictionaryEdge)
         val stateUpdate = loadRef {
             loadTlb(hashUpdate)

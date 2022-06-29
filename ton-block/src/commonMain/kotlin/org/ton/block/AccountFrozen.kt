@@ -36,7 +36,7 @@ private object AccountFrozenTlbConstructor : TlbConstructor<AccountFrozen>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountFrozen = cellSlice {
-        val stateHash = loadBitString(256)
+        val stateHash = loadBits(256)
         AccountFrozen(stateHash)
     }
 }
