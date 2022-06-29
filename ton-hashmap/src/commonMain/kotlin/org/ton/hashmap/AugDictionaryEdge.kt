@@ -2,6 +2,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -39,11 +40,10 @@ private class AugDictionaryEdgeTlbConstructor<X, Y>(
 ) : TlbConstructor<AugDictionaryEdge<X, Y>>(
     schema = "ahm_edge#_ {n:#} {X:Type} {Y:Type} {l:#} {m:#} " +
             "label:(DictionaryLabel ~l n) {n = (~m) + l} " +
-            "node:(AugDictionaryNode m X Y) = AugDictionaryEdge n X Y;"
+            "node:(AugDictionaryNode m X Y) = AugDictionaryEdge n X Y;",
+    id = BitString.empty()
 ) {
-    val hashMapLabel by lazy {
-        HashMapLabel.tlbCodec(n)
-    }
+    val hashMapLabel = HashMapLabel.tlbCodec(n)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

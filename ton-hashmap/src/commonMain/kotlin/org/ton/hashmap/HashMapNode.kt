@@ -4,6 +4,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.tlb.*
 
@@ -21,16 +22,14 @@ private class HashMapNodeTlbCombinator<X>(
     val n: Int,
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapNode<X>>() {
-    private val leafConstructor by lazy {
+    private val leafConstructor =
         HashMapNodeLeafTlbConstructor(x)
-    }
-    private val forkConstructor by lazy {
-        HashMapNodeForkTlbConstructor(n, x)
-    }
 
-    override val constructors: List<TlbConstructor<out HashMapNode<X>>> by lazy {
+    private val forkConstructor =
+        HashMapNodeForkTlbConstructor(n, x)
+
+    override val constructors: List<TlbConstructor<out HashMapNode<X>>> =
         listOf(leafConstructor, forkConstructor)
-    }
 
     override fun getConstructor(value: HashMapNode<X>): TlbConstructor<out HashMapNode<X>> = when (value) {
         is HashMapNodeFork -> forkConstructor
@@ -49,6 +48,7 @@ private class HashMapNodeTlbCombinator<X>(
         val x: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeLeaf<X>>(
         schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
+        id = BitString.empty()
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
@@ -69,11 +69,10 @@ private class HashMapNodeTlbCombinator<X>(
         n: Int,
         x: TlbCodec<X>
     ) : TlbConstructor<HashMapNodeFork<X>>(
-        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;"
+        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;",
+        id = BitString.empty()
     ) {
-        private val hashmapConstructor by lazy {
-            HashMapEdge.tlbCodec(n - 1, x)
-        }
+        private val hashmapConstructor = HashMapEdge.tlbCodec(n - 1, x)
 
         override fun storeTlb(
             cellBuilder: CellBuilder,

@@ -25,21 +25,18 @@ data class CurrencyCollection(
 private object CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(
     schema = "currencies\$_ coins:Coins other:ExtraCurrencyCollection = CurrencyCollection;"
 ) {
-    private val coinsCodec = Coins.tlbCodec()
-    private val extraCurrencyCollectionCodec = ExtraCurrencyCollection.tlbCodec()
-
     override fun storeTlb(
         cellBuilder: CellBuilder, value: CurrencyCollection
     ) = cellBuilder {
-        storeTlb(coinsCodec, value.coins)
-        storeTlb(extraCurrencyCollectionCodec, value.other)
+        storeTlb(Coins, value.coins)
+        storeTlb(ExtraCurrencyCollection, value.other)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): CurrencyCollection = cellSlice {
-        val coins = loadTlb(coinsCodec)
-        val other = loadTlb(extraCurrencyCollectionCodec)
+        val coins = loadTlb(Coins)
+        val other = loadTlb(ExtraCurrencyCollection)
         CurrencyCollection(coins, other)
     }
 }

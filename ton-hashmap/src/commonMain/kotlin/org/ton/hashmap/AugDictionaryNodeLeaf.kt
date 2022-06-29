@@ -2,7 +2,10 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
@@ -28,7 +31,8 @@ private class AugDictionaryNodeLeafTlbConstructor<X, Y>(
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
 ) : TlbConstructor<AugDictionaryNodeLeaf<X, Y>>(
-    schema = "ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = AugDictionaryNode 0 X Y;"
+    schema = "ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = AugDictionaryNode 0 X Y;",
+    id = BitString.empty()
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

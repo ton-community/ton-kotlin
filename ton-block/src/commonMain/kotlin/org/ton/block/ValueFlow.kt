@@ -35,23 +35,21 @@ private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
             "minted:CurrencyCollection " +
             "] = ValueFlow;"
 ) {
-    val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder, value: ValueFlow
     ) = cellBuilder {
         storeRef {
-            storeTlb(currencyCollection, value.from_prev_blk)
-            storeTlb(currencyCollection, value.to_next_blk)
-            storeTlb(currencyCollection, value.imported)
-            storeTlb(currencyCollection, value.exported)
+            storeTlb(CurrencyCollection, value.from_prev_blk)
+            storeTlb(CurrencyCollection, value.to_next_blk)
+            storeTlb(CurrencyCollection, value.imported)
+            storeTlb(CurrencyCollection, value.exported)
         }
-        storeTlb(currencyCollection, value.fees_collected)
+        storeTlb(CurrencyCollection, value.fees_collected)
         storeRef {
-            storeTlb(currencyCollection, value.fees_imported)
-            storeTlb(currencyCollection, value.recovered)
-            storeTlb(currencyCollection, value.created)
-            storeTlb(currencyCollection, value.minted)
+            storeTlb(CurrencyCollection, value.fees_imported)
+            storeTlb(CurrencyCollection, value.recovered)
+            storeTlb(CurrencyCollection, value.created)
+            storeTlb(CurrencyCollection, value.minted)
         }
     }
 
@@ -60,19 +58,19 @@ private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
     ): ValueFlow = cellSlice {
         val (fromPrevBlk, toNextBlk, imported, exported) = loadRef {
             arrayOf(
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
             )
         }
-        val feesCollected = loadTlb(currencyCollection)
+        val feesCollected = loadTlb(CurrencyCollection)
         val (feesImported, recovered, created, minted) = loadRef {
             arrayOf(
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
-                loadTlb(currencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection),
             )
         }
         ValueFlow(fromPrevBlk, toNextBlk, imported, exported, feesCollected, feesImported, recovered, created, minted)

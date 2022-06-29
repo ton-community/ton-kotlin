@@ -30,15 +30,11 @@ private class AugDictionaryNodeTlbCombinator<X, Y>(
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
 ) : TlbCombinator<AugDictionaryNode<X, Y>>() {
-    val leaf by lazy {
-        AugDictionaryNodeLeaf.tlbCodec(x, y)
-    }
-    val fork by lazy {
-        AugDictionaryNodeFork.tlbCodec(n, x, y)
-    }
-    override val constructors: List<TlbConstructor<out AugDictionaryNode<X, Y>>> by lazy {
+    val leaf = AugDictionaryNodeLeaf.tlbCodec(x, y)
+    val fork = AugDictionaryNodeFork.tlbCodec(n, x, y)
+
+    override val constructors: List<TlbConstructor<out AugDictionaryNode<X, Y>>> =
         listOf(leaf, fork)
-    }
 
     override fun getConstructor(value: AugDictionaryNode<X, Y>): TlbConstructor<out AugDictionaryNode<X, Y>> =
         when (value) {

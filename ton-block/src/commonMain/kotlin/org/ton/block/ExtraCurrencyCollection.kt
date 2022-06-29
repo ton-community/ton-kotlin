@@ -6,6 +6,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -15,7 +16,7 @@ import org.ton.tlb.storeTlb
 data class ExtraCurrencyCollection(
     val dict: HashMapE<VarUInteger> = HashMapE.of()
 ) {
-    companion object {
+    companion object : TlbCodec<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<ExtraCurrencyCollection> = ExtraCurrencyCollectionTlbConstructor
     }
@@ -24,8 +25,7 @@ data class ExtraCurrencyCollection(
 private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
     schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
 ) {
-    private val varUInteger32Codec = VarUInteger.tlbCodec(32)
-    private val hashMapE32Codec = HashMapE.tlbCodec(32, varUInteger32Codec)
+    private val hashMapE32Codec = HashMapE.tlbCodec(32, VarUInteger.tlbCodec(32))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

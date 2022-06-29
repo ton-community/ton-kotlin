@@ -2,6 +2,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -35,7 +36,8 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
     val y: TlbCodec<Y>
 ) : TlbConstructor<AugDictionaryNodeFork<X, Y>>(
     schema = "ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(AugDictionaryEdge n X Y) " +
-            "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;"
+            "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;",
+    id = BitString.empty()
 ) {
     val n = n - 1
 

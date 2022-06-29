@@ -2,6 +2,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -33,11 +34,10 @@ private class AugDictionaryRootTlbConstructor<X, Y>(
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>
 ) : TlbConstructor<AugDictionaryRoot<X, Y>>(
-    schema = "ahme_root\$1 {n:#} {X:Type} {Y:Type} root:^(AugDictionaryEdge n X Y) extra:Y = AugDictionary n X Y;"
+    schema = "ahme_root\$1 {n:#} {X:Type} {Y:Type} root:^(AugDictionaryEdge n X Y) extra:Y = AugDictionary n X Y;",
+    id = ID
 ) {
-    val edge by lazy {
-        AugDictionaryEdge.tlbCodec(n, x, y)
-    }
+    val edge = AugDictionaryEdge.tlbCodec(n, x, y)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -57,5 +57,9 @@ private class AugDictionaryRootTlbConstructor<X, Y>(
         }
         val extra = loadTlb(y)
         AugDictionaryRoot(root, extra)
+    }
+
+    companion object {
+        val ID = BitString(true)
     }
 }

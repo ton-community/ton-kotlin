@@ -5,7 +5,10 @@ package org.ton.hashmap
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.loadRef
+import org.ton.cell.storeRef
 import org.ton.tlb.*
 import org.ton.tlb.exception.UnknownTlbConstructorException
 
@@ -29,16 +32,13 @@ private class HashMapETlbCombinator<X>(
     n: Int,
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapE<X>>() {
-    private val rootConstructor by lazy {
-        RootHashMapETlbConstructor(n, x)
-    }
-    private val emptyConstructor by lazy {
-        EmptyHashMapETlbConstructor<X>()
-    }
+    private val rootConstructor = RootHashMapETlbConstructor(n, x)
 
-    override val constructors by lazy {
+    @Suppress("UNCHECKED_CAST")
+    private val emptyConstructor = EmptyHashMapETlbConstructor as TlbConstructor<EmptyHashMapE<X>>
+
+    override val constructors =
         listOf(rootConstructor, emptyConstructor)
-    }
 
     override fun getConstructor(value: HashMapE<X>): TlbConstructor<out HashMapE<X>> = when (value) {
         is RootHashMapE -> rootConstructor
@@ -46,28 +46,27 @@ private class HashMapETlbCombinator<X>(
         else -> throw UnknownTlbConstructorException()
     }
 
-    private class EmptyHashMapETlbConstructor<X> : TlbConstructor<EmptyHashMapE<X>>(
+    private object EmptyHashMapETlbConstructor : TlbConstructor<EmptyHashMapE<Any>>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: EmptyHashMapE<X>
+            value: EmptyHashMapE<Any>
         ) = Unit
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): EmptyHashMapE<X> = EmptyHashMapE()
+        ): EmptyHashMapE<Any> = EmptyHashMapE()
     }
 
     private class RootHashMapETlbConstructor<X>(
         n: Int,
         x: TlbCodec<X>
     ) : TlbConstructor<RootHashMapE<X>>(
-        schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;"
+        schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;",
+        id = ID
     ) {
-        private val hashmapConstructor by lazy {
-            HashMapEdge.tlbCodec(n, x)
-        }
+        private val hashmapConstructor = HashMapEdge.tlbCodec(n, x)
 
         override fun storeTlb(
             cellBuilder: CellBuilder,
@@ -85,6 +84,10 @@ private class HashMapETlbCombinator<X>(
                 loadTlb(hashmapConstructor)
             }
             return RootHashMapE(root)
+        }
+
+        companion object {
+            val ID = BitString(true)
         }
     }
 }

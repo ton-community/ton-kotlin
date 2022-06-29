@@ -1,6 +1,7 @@
 package org.ton.tlb.constructor
 
 import org.ton.bigint.BigInt
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -9,7 +10,8 @@ import org.ton.tlb.TlbConstructor
 open class UIntTlbConstructor(
     val length: Int
 ) : TlbConstructor<BigInt>(
-    schema = "uint\$_ = uint;"
+    schema = "uint\$_ = uint;",
+    id = BitString.empty()
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

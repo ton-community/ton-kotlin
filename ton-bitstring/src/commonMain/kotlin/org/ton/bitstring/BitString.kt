@@ -42,18 +42,21 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         const val MAX_LENGTH = 1023
 
         @JvmStatic
+        fun empty(): BitString = EmptyBitString
+
+        @JvmStatic
         fun of(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
             ByteBackedBitString.of(byteArray, size)
 
         @JvmStatic
         fun of(size: Int = 0): BitString {
-            if (size == 0) return EmptyBitString
+            if (size == 0) return empty()
             return ByteBackedBitString.of(size)
         }
 
         @JvmStatic
         fun binary(bits: String): BitString {
-            if (bits.isEmpty()) return EmptyBitString
+            if (bits.isEmpty()) return empty()
             return BitString(bits.map { char ->
                 when (char) {
                     '1' -> true
@@ -65,7 +68,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(vararg bits: Boolean): BitString {
-            if (bits.isEmpty()) return EmptyBitString
+            if (bits.isEmpty()) return empty()
             val bitString = ByteBackedMutableBitString.of(bits.size)
             bits.forEachIndexed { index, bit ->
                 bitString[index] = bit
@@ -76,7 +79,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         @JvmStatic
         fun of(bits: Iterable<Boolean>): BitString {
             val bitsList = bits.toList()
-            if (bitsList.isEmpty()) return EmptyBitString
+            if (bitsList.isEmpty()) return empty()
             val bitString = ByteBackedMutableBitString.of(bitsList.size)
             bitsList.forEachIndexed { index, bit ->
                 bitString[index] = bit
@@ -86,7 +89,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(hex: String): BitString {
-            if (hex.isEmpty()) return EmptyBitString
+            if (hex.isEmpty()) return empty()
             // True if bit string doesn't contain mod 4 number of bits
             val incomplete = hex.isNotEmpty() && hex.last() == '_'
 

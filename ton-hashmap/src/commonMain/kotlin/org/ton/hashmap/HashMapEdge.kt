@@ -3,7 +3,8 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.tlb.*
 
 @Serializable
@@ -38,11 +39,10 @@ private class HashMapEdgeTlbConstructor<X>(
     val n: Int,
     val x: TlbCodec<X>
 ) : TlbConstructor<HashMapEdge<X>>(
-    schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;"
+    schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;",
+    id = BitString.empty()
 ) {
-    private val hashMapLabelCodec by lazy {
-        HashMapLabel.tlbCodec(n)
-    }
+    private val hashMapLabelCodec = HashMapLabel.tlbCodec(n)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

@@ -47,7 +47,8 @@ data class Just<X>(
 private class MaybeTlbCombinator<X>(
     typeCodec: TlbCodec<X>
 ) : TlbCombinator<Maybe<X>>() {
-    private val nothingConstructor = NothingConstructor<X>()
+    @Suppress("UNCHECKED_CAST")
+    private val nothingConstructor = NothingConstructor as TlbConstructor<Nothing<X>>
     private val justConstructor = JustConstructor(typeCodec)
 
     override val constructors: List<TlbConstructor<out Maybe<X>>> =
@@ -60,25 +61,21 @@ private class MaybeTlbCombinator<X>(
         is Nothing -> nothingConstructor
     }
 
-    private class NothingConstructor<X> : TlbConstructor<Nothing<X>>(
+    private object NothingConstructor : TlbConstructor<Nothing<Any>>(
         schema = "nothing\$0 {X:Type} = Maybe X;",
-        id = ID
+        id = BitString(false)
     ) {
-        private val nothing = Nothing<X>()
+        private val nothing = Nothing<Any>()
 
         override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: Nothing<X>
+            value: Nothing<Any>
         ) {
         }
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): Nothing<X> = nothing
-
-        companion object {
-            val ID = BitString(false)
-        }
+        ): Nothing<Any> = nothing
     }
 
     private class JustConstructor<X>(

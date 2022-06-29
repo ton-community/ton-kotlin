@@ -1,6 +1,7 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -59,9 +60,9 @@ private class MessageTlbConstructor<X>(
 ) : TlbConstructor<Message<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfo " +
             "init:(Maybe (Either StateInit ^StateInit)) " +
-            "body:(Either X ^X) = Message X;"
+            "body:(Either X ^X) = Message X;",
+    id = BitString.empty()
 ) {
-    private val Init = Maybe(Either(StateInit, Cell.tlbCodec(StateInit)))
     private val Body = Either(x, Cell.tlbCodec(x))
 
     override fun storeTlb(
@@ -79,6 +80,10 @@ private class MessageTlbConstructor<X>(
         val init = loadTlb(Init)
         val body = loadTlb(Body)
         Message(info, init, body)
+    }
+
+    companion object {
+        private val Init = Maybe(Either(StateInit, Cell.tlbCodec(StateInit)))
     }
 }
 
