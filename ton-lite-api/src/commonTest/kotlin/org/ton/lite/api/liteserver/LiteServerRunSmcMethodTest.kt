@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

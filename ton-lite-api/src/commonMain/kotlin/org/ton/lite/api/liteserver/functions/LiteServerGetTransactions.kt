@@ -1,6 +1,6 @@
 @file:UseSerializers(HexByteArraySerializer::class)
 
-package org.ton.lite.api.liteserver
+package org.ton.lite.api.liteserver.functions
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
@@ -8,18 +8,28 @@ import kotlinx.serialization.UseSerializers
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
+import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.lite.api.liteserver.LiteServerTransactionList
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
 
+interface LiteServerGetTransactionsFunction : LiteServerQueryFunction {
+    suspend fun query(query: LiteServerGetTransactions) =
+        query(query, LiteServerGetTransactions, LiteServerTransactionList)
+
+    suspend fun getTransactions(count: Int, account: LiteServerAccountId, lt: Long, hash: ByteArray) =
+        query(LiteServerGetTransactions(count, account, lt, hash))
+}
+
 @Serializable
 data class LiteServerGetTransactions(
-        val count: Int,
-        val account: LiteServerAccountId,
-        val lt: Long,
-        @Serializable(Base64ByteArraySerializer::class)
-        val hash: ByteArray
+    val count: Int,
+    val account: LiteServerAccountId,
+    val lt: Long,
+    @Serializable(Base64ByteArraySerializer::class)
+    val hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -56,8 +66,8 @@ data class LiteServerGetTransactions(
     }
 
     companion object : TlConstructor<LiteServerGetTransactions>(
-            type = LiteServerGetTransactions::class,
-            schema = "liteServer.getTransactions count:# account:liteServer.accountId lt:long hash:int256 = liteServer.TransactionList"
+        type = LiteServerGetTransactions::class,
+        schema = "liteServer.getTransactions count:# account:liteServer.accountId lt:long hash:int256 = liteServer.TransactionList"
     ) {
         override fun decode(input: Input): LiteServerGetTransactions {
             val count = input.readIntTl()

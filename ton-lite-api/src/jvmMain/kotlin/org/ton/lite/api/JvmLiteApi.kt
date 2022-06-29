@@ -17,6 +17,6 @@ interface JvmLiteApi : LiteApi, CoroutineScope {
         queryCodec: TlConstructor<Q>,
         answerCodec: TlConstructor<A>
     ): CompletableFuture<A> = async {
-        sendQuery(query, queryCodec, answerCodec)
+        query(query, queryCodec, answerCodec)
     }.asCompletableFuture()
 }

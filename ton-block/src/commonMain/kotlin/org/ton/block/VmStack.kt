@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -15,7 +18,7 @@ data class VmStack(
 ) {
     constructor(stack: VmStackList) : this(stack.count(), stack)
 
-    companion object {
+    companion object : TlbCodec<VmStack> by VmStackTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<VmStack> = VmStackTlbConstructor
     }

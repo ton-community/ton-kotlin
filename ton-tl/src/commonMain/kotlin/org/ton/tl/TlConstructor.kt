@@ -18,8 +18,8 @@ abstract class TlConstructor<T : Any>(
 
     fun calculatePadding(size: Int): Int = (size % 4).let { if (it > 0) 4 - it else 0 }
 
-    fun encodeBoxed(message: T): ByteArray = buildPacket {
-        encodeBoxed(this, message)
+    override fun encodeBoxed(value: T): ByteArray = buildPacket {
+        encodeBoxed(this, value)
         val padding = calculatePadding(size)
         repeat(padding) {
             writeByte(0)

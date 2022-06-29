@@ -10,6 +10,10 @@ interface TlEncoder<T : Any> {
     fun encode(output: Output, value: T)
     fun encodeBoxed(output: Output, value: T)
 
+    fun encodeBoxed(value: T): ByteArray = buildPacket {
+        encodeBoxed(this, value)
+    }.readBytes()
+
     fun Output.writeByteLength(length: Int) {
         if (length <= 253) {
             writeByte(length.toByte())

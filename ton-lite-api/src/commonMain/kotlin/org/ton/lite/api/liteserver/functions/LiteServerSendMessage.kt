@@ -1,4 +1,4 @@
-package org.ton.lite.api.liteserver
+package org.ton.lite.api.liteserver.functions
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
@@ -8,11 +8,21 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.hex
+import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
+
+fun interface LiteServerSendMessageFunction : LiteServerQueryFunction {
+    suspend fun query(query: LiteServerSendMessage): LiteServerSendMsgStatus =
+        query(query, LiteServerSendMessage, LiteServerSendMsgStatus)
+
+    suspend fun sendMessage(body: ByteArray) = query(LiteServerSendMessage(body))
+    suspend fun sendMessage(bagOfCells: BagOfCells) = query(LiteServerSendMessage(bagOfCells))
+    suspend fun sendMessage(message: Message<Cell>) = query(LiteServerSendMessage(message))
+}
 
 @Serializable
 data class LiteServerSendMessage(

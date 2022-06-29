@@ -46,7 +46,7 @@ data class LiteServerRunMethodResult(
 
     fun resultStack(): VmStack? =
         resultBagOfCells()?.roots?.first()?.parse {
-            loadTlb(vmStackCodec)
+            loadTlb(VmStack)
         }
 
     fun resultValues(): List<VmStackValue>? =
@@ -111,8 +111,6 @@ data class LiteServerRunMethodResult(
         type = LiteServerRunMethodResult::class,
         schema = "liteServer.runMethodResult mode:# id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:mode.0?bytes proof:mode.0?bytes state_proof:mode.1?bytes init_c7:mode.3?bytes lib_extras:mode.4?bytes exit_code:int result:mode.2?bytes = liteServer.RunMethodResult"
     ) {
-        private val vmStackCodec by lazy { VmStack.tlbCodec() }
-
         override fun encode(output: Output, value: LiteServerRunMethodResult) {
             output.writeIntLittleEndian(value.mode)
             output.writeTl(TonNodeBlockIdExt, value.id)

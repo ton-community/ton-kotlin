@@ -23,15 +23,21 @@ suspend fun main() {
     var blockId: TonNodeBlockIdExt? = null
     while (true) {
         val currentBlockId = liteClient.getMasterchainInfo().last
-        if (blockId != currentBlockId) {
+        if (blockId == currentBlockId) {
+            delay(1000)
+            continue
+        } else {
             blockId = currentBlockId
-            val (block, duration) = liteClient.getBlock(currentBlockId).dataBagOfCells().roots.first().parse {
-                measureTimedValue {
-                    Block.TlbCombinator.loadTlb(this)
-                }
-            }
-            println("${block.info.seq_no} $duration")
         }
-        delay(1000)
+
+        val (block, duration) = liteClient.getBlock(currentBlockId).dataBagOfCells().roots.first().parse {
+            measureTimedValue {
+                Block.TlbCombinator.loadTlb(this)
+            }
+        }
+        println("${block.info.seq_no} $duration")
+//        val header = liteClient.getBlockHeader(blockId, 0)
+//        println("  header: $header")
+        val shardInfo = liteClient.getShardInfo(blockId, 0)
     }
 }
