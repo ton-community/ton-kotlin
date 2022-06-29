@@ -2,9 +2,12 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -36,6 +39,8 @@ data class Message<X>(
     )
 
     companion object {
+        val Any = tlbCodec(AnyTlbConstructor)
+
         @JvmStatic
         fun <X> tlbCodec(
             x: TlbCodec<X>
@@ -47,6 +52,8 @@ data class Message<X>(
     }
 }
 
+operator fun <X> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)
+
 private class MessageTlbConstructor<X>(
     x: TlbCodec<X>
 ) : TlbConstructor<Message<X>>(
@@ -54,28 +61,23 @@ private class MessageTlbConstructor<X>(
             "init:(Maybe (Either StateInit ^StateInit)) " +
             "body:(Either X ^X) = Message X;"
 ) {
-    private val commonMsgInfoCodec by lazy { CommonMsgInfo.tlbCodec() }
-    private val stateInitCodec by lazy { StateInit.tlbCodec() }
-    private val referencedStateInitCodec by lazy { Cell.tlbCodec(stateInitCodec) }
-    private val eitherStateInitCodec by lazy { Either.tlbCodec(stateInitCodec, referencedStateInitCodec) }
-    private val maybeEitherCodec by lazy { Maybe.tlbCodec(eitherStateInitCodec) }
-    private val referencedXCodec by lazy { Cell.tlbCodec(x) }
-    private val eitherXCodec by lazy { Either.tlbCodec(x, referencedXCodec) }
+    private val Init = Maybe(Either(StateInit, Cell.tlbCodec(StateInit)))
+    private val Body = Either(x, Cell.tlbCodec(x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: Message<X>
     ) = cellBuilder {
-        storeTlb(commonMsgInfoCodec, value.info)
-        storeTlb(maybeEitherCodec, value.init)
-        storeTlb(eitherXCodec, value.body)
+        storeTlb(CommonMsgInfo, value.info)
+        storeTlb(Init, value.init)
+        storeTlb(Body, value.body)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): Message<X> = cellSlice {
-        val info = loadTlb(commonMsgInfoCodec)
-        val init = loadTlb(maybeEitherCodec)
-        val body = loadTlb(eitherXCodec)
+        val info = loadTlb(CommonMsgInfo)
+        val init = loadTlb(Init)
+        val body = loadTlb(Body)
         Message(info, init, body)
     }
 }

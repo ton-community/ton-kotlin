@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -22,39 +23,29 @@ data class ExtInMsgInfo(
         importFee: Coins = Coins()
     ) : this(AddrNone, dest, importFee)
 
-    companion object {
+    companion object : TlbCodec<ExtInMsgInfo> by ExtInMsgInfoTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<ExtInMsgInfo> = ExtInMsgInfoTlbConstructor()
+        fun tlbCodec(): TlbConstructor<ExtInMsgInfo> = ExtInMsgInfoTlbConstructor
     }
 }
 
-private class ExtInMsgInfoTlbConstructor : TlbConstructor<ExtInMsgInfo>(
+private object ExtInMsgInfoTlbConstructor : TlbConstructor<ExtInMsgInfo>(
     schema = "ext_in_msg_info\$10 src:MsgAddressExt dest:MsgAddressInt import_fee:Coins = CommonMsgInfo;"
 ) {
-    private val msgAddressExtCodec by lazy {
-        MsgAddressExt.tlbCodec()
-    }
-    private val msgAddressIntCodec by lazy {
-        MsgAddressInt.tlbCodec()
-    }
-    private val coinsCodec by lazy {
-        Coins.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder, value: ExtInMsgInfo
     ) = cellBuilder {
-        storeTlb(msgAddressExtCodec, value.src)
-        storeTlb(msgAddressIntCodec, value.dest)
-        storeTlb(coinsCodec, value.importFee)
+        storeTlb(MsgAddressExt, value.src)
+        storeTlb(MsgAddressInt, value.dest)
+        storeTlb(Coins, value.importFee)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): ExtInMsgInfo = cellSlice {
-        val src = loadTlb(msgAddressExtCodec)
-        val dest = loadTlb(msgAddressIntCodec)
-        val importFee = loadTlb(coinsCodec)
+        val src = loadTlb(MsgAddressExt)
+        val dest = loadTlb(MsgAddressInt)
+        val importFee = loadTlb(Coins)
         ExtInMsgInfo(src, dest, importFee)
     }
 }

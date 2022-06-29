@@ -5,6 +5,7 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -93,6 +94,8 @@ sealed interface Either<X, Y> {
     }
 }
 
+operator fun <X, Y> Either.Companion.invoke(x: TlbCodec<X>, y: TlbCodec<Y>) = tlbCodec(x, y)
+
 private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<X, Y>>() {
     private val leftCodec = LeftTlbConstructor<X, Y>(x)
     private val rightCodec = RightTlbConstructor<X, Y>(y)
@@ -107,7 +110,8 @@ private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCom
     }
 
     class LeftTlbConstructor<X, Y>(val x: TlbCodec<X>) : TlbConstructor<Either.Left<X, Y>>(
-        schema = "left\$0 {X:Type} {Y:Type} value:X = Either X Y;"
+        schema = "left\$0 {X:Type} {Y:Type} value:X = Either X Y;",
+        id = ID
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder, value: Either.Left<X, Y>
@@ -121,10 +125,15 @@ private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCom
             val value = loadTlb(x)
             Either.Left(value)
         }
+
+        companion object {
+            val ID = BitString(false)
+        }
     }
 
     class RightTlbConstructor<X, Y>(val y: TlbCodec<Y>) : TlbConstructor<Either.Right<X, Y>>(
-        schema = "right\$1 {X:Type} {Y:Type} value:Y = Either X Y;"
+        schema = "right\$1 {X:Type} {Y:Type} value:Y = Either X Y;",
+        id = ID
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
@@ -138,6 +147,10 @@ private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCom
         ): Either.Right<X, Y> = cellSlice {
             val value = loadTlb(y)
             Either.Right(value)
+        }
+
+        companion object {
+            val ID = BitString(true)
         }
     }
 }

@@ -11,25 +11,20 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 @JsonClassDiscriminator("@type")
 sealed interface IntermediateAddress {
-    companion object {
+    companion object : TlbCodec<IntermediateAddress> by IntermediateAddressTlbCombinator {
         @JvmStatic
         fun tlbCodec(): TlbCodec<IntermediateAddress> = IntermediateAddressTlbCombinator
     }
 }
 
 private object IntermediateAddressTlbCombinator : TlbCombinator<IntermediateAddress>() {
-    val regular by lazy {
-        IntermediateAddressRegular.tlbCodec()
-    }
-    val simple by lazy {
-        IntermediateAddressSimple.tlbCodec()
-    }
-    val ext by lazy {
-        IntermediateAddressExt.tlbCodec()
-    }
-    override val constructors: List<TlbConstructor<out IntermediateAddress>> by lazy {
-        listOf(regular, simple, ext)
-    }
+    val regular = IntermediateAddressRegular.tlbCodec()
+    val simple = IntermediateAddressSimple.tlbCodec()
+    val ext = IntermediateAddressExt.tlbCodec()
+
+    override val constructors: List<TlbConstructor<out IntermediateAddress>> = listOf(
+        regular, simple, ext
+    )
 
     override fun getConstructor(
         value: IntermediateAddress

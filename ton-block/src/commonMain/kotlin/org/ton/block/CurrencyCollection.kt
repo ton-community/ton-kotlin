@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -15,7 +16,7 @@ data class CurrencyCollection(
     val coins: Coins,
     val other: ExtraCurrencyCollection = ExtraCurrencyCollection()
 ) {
-    companion object {
+    companion object : TlbCodec<CurrencyCollection> by CurrencyCollectionTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<CurrencyCollection> = CurrencyCollectionTlbConstructor
     }

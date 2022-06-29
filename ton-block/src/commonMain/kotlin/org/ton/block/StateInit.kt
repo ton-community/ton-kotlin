@@ -3,9 +3,12 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.hashmap.EmptyHashMapE
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
@@ -31,46 +34,38 @@ data class StateInit(
         splitDepth.toMaybe(), special.toMaybe(), code.toMaybe(), data.toMaybe(), library
     )
 
-    companion object {
+    companion object : TlbCodec<StateInit> by StateInitTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<StateInit> = StateInitTlbConstructor()
+        fun tlbCodec(): TlbConstructor<StateInit> = StateInitTlbConstructor
     }
 }
 
-private class StateInitTlbConstructor : TlbConstructor<StateInit>(
+private object StateInitTlbConstructor : TlbConstructor<StateInit>(
     schema = "_ split_depth:(Maybe (## 5)) special:(Maybe TickTock) code:(Maybe ^Cell) data:(Maybe ^Cell) library:(HashmapE 256 SimpleLib) = StateInit;"
 ) {
-    private val maybeUint5Codec by lazy {
-        Maybe.tlbCodec(UIntTlbConstructor.int(5))
-    }
-    private val maybeTickTockCodec by lazy {
-        Maybe.tlbCodec(TickTock.tlbCodec())
-    }
-    private val maybeCell by lazy {
-        Maybe.tlbCodec(Cell.tlbCodec())
-    }
-    private val hashMapESimpleLibCodec by lazy {
-        HashMapE.tlbCodec(256, SimpleLib.tlbCodec())
-    }
+    private val Maybe5 = Maybe(UIntTlbConstructor.int(5))
+    private val MaybeTickTock = Maybe(TickTock)
+    private val MaybeCell = Maybe(Cell.tlbCodec())
+    private val Library = HashMapE.tlbCodec(256, SimpleLib)
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: StateInit
     ) = cellBuilder {
-        storeTlb(maybeUint5Codec, value.split_depth)
-        storeTlb(maybeTickTockCodec, value.special)
-        storeTlb(maybeCell, value.code)
-        storeTlb(maybeCell, value.data)
-        storeTlb(hashMapESimpleLibCodec, value.library)
+        storeTlb(Maybe5, value.split_depth)
+        storeTlb(MaybeTickTock, value.special)
+        storeTlb(MaybeCell, value.code)
+        storeTlb(MaybeCell, value.data)
+        storeTlb(Library, value.library)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): StateInit = cellSlice {
-        val splitDepth = loadTlb(maybeUint5Codec)
-        val special = loadTlb(maybeTickTockCodec)
-        val code = loadTlb(maybeCell)
-        val data = loadTlb(maybeCell)
-        val library = loadTlb(hashMapESimpleLibCodec)
+        val splitDepth = loadTlb(Maybe5)
+        val special = loadTlb(MaybeTickTock)
+        val code = loadTlb(MaybeCell)
+        val data = loadTlb(MaybeCell)
+        val library = loadTlb(Library)
         StateInit(splitDepth, special, code, data, library)
     }
 }

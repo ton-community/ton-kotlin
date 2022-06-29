@@ -7,6 +7,7 @@ import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -39,7 +40,7 @@ data class AddrVar(
         address.toBitString()
     )
 
-    companion object {
+    companion object : TlbCodec<AddrVar> by AddrVarTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AddrVar> = AddrVarTlbConstructor
     }
@@ -48,13 +49,13 @@ data class AddrVar(
 private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
     schema = "addr_var\$11 anycast:(Maybe Anycast) addr_len:(## 9) workchain_id:int32 address:(bits addr_len) = MsgAddressInt;"
 ) {
-    private val maybeAnycastCodec = Maybe.tlbCodec(Anycast.tlbCodec())
+    private val MaybeAnycast = Maybe(Anycast)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AddrVar
     ) = cellBuilder {
-        storeTlb(maybeAnycastCodec, value.anycast)
+        storeTlb(MaybeAnycast, value.anycast)
         storeUInt(value.addr_len, 9)
         storeInt(value.workchainId, 32)
         storeBits(value.address)
@@ -63,7 +64,7 @@ private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AddrVar = cellSlice {
-        val anycast = loadTlb(maybeAnycastCodec)
+        val anycast = loadTlb(MaybeAnycast)
         val addrLen = loadUInt(9).toInt()
         val workchainId = loadInt(32).toInt()
         val address = loadBitString(addrLen)

@@ -11,7 +11,6 @@ import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -50,13 +49,10 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
             "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
             "description:^TransactionDescr = Transaction;"
 ) {
-    val accountStatus = AccountStatus.tlbCodec()
-    val messageAny = Cell.tlbCodec(Message.tlbCodec(AnyTlbConstructor))
-    val maybeMessageAny = Maybe.tlbCodec(messageAny)
-    val hashMapEMessageAny = HashMapE.tlbCodec(15, messageAny)
-    val currencyCollection = CurrencyCollection.tlbCodec()
+    val RefMessageAny = Cell.tlbCodec(Message.Any)
+    val maybeMessageAny = Maybe(RefMessageAny)
+    val hashMapEMessageAny = HashMapE.tlbCodec(15, RefMessageAny)
     val hashUpdateAccount = HashUpdate.tlbCodec(Account.tlbCodec())
-    val transactionDescr = TransactionDescr.tlbCodec()
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -68,18 +64,18 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         storeUInt(value.prev_trans_lt, 64)
         storeUInt(value.now, 32)
         storeUInt(value.outmsg_cnt, 15)
-        storeTlb(accountStatus, value.orig_status)
-        storeTlb(accountStatus, value.end_status)
+        storeTlb(AccountStatus, value.orig_status)
+        storeTlb(AccountStatus, value.end_status)
         storeRef {
             storeTlb(maybeMessageAny, value.in_msg)
             storeTlb(hashMapEMessageAny, value.out_msgs)
         }
-        storeTlb(currencyCollection, value.total_fees)
+        storeTlb(CurrencyCollection, value.total_fees)
         storeRef {
             storeTlb(hashUpdateAccount, value.state_update)
         }
         storeRef {
-            storeTlb(transactionDescr, value.description)
+            storeTlb(TransactionDescr, value.description)
         }
     }
 
@@ -92,17 +88,17 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         val prevTransLt = loadUInt(64).toLong()
         val now = loadUInt(32).toLong()
         val outmsgCnt = loadUInt(15).toInt()
-        val origStatus = loadTlb(accountStatus)
-        val endStatus = loadTlb(accountStatus)
+        val origStatus = loadTlb(AccountStatus)
+        val endStatus = loadTlb(AccountStatus)
         val (inMsg, outMsgs) = loadRef {
             loadTlb(maybeMessageAny) to loadTlb(hashMapEMessageAny)
         }
-        val totalFees = loadTlb(currencyCollection)
+        val totalFees = loadTlb(CurrencyCollection)
         val stateUpdate = loadRef {
             loadTlb(hashUpdateAccount)
         }
         val description = loadRef {
-            loadTlb(transactionDescr)
+            loadTlb(TransactionDescr)
         }
         Transaction(
             accountAddr,

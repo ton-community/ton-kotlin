@@ -23,7 +23,7 @@ data class Anycast(
         require(depth in 1..30) { "required: depth in 1..30, actual: $depth" }
     }
 
-    companion object {
+    companion object : TlbCodec<Anycast> by AnycastTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor
     }

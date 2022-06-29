@@ -2,11 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
@@ -26,36 +24,27 @@ private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
             "next_addr:IntermediateAddress fwd_fee_remaining:Coins " +
             "msg:^(Message Any) = MsgEnvelope;"
 ) {
-    val intermediateAddress by lazy {
-        IntermediateAddress.tlbCodec()
-    }
-    val coins by lazy {
-        Coins.tlbCodec()
-    }
-    val messageAny by lazy {
-        Message.tlbCodec(AnyTlbConstructor)
-    }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgEnvelope
     ) = cellBuilder {
-        storeTlb(intermediateAddress, value.cur_addr)
-        storeTlb(intermediateAddress, value.next_addr)
-        storeTlb(coins, value.fwd_fee_remaining)
+        storeTlb(IntermediateAddress, value.cur_addr)
+        storeTlb(IntermediateAddress, value.next_addr)
+        storeTlb(Coins, value.fwd_fee_remaining)
         storeRef {
-            storeTlb(messageAny, value.msg)
+            storeTlb(Message.Any, value.msg)
         }
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgEnvelope = cellSlice {
-        val curAddr = loadTlb(intermediateAddress)
-        val nextAddr = loadTlb(intermediateAddress)
-        val fwdFeeRemaining = loadTlb(coins)
+        val curAddr = loadTlb(IntermediateAddress)
+        val nextAddr = loadTlb(IntermediateAddress)
+        val fwdFeeRemaining = loadTlb(Coins)
         val msg = loadRef {
-            loadTlb(messageAny)
+            loadTlb(Message.Any)
         }
         MsgEnvelope(curAddr, nextAddr, fwdFeeRemaining, msg)
     }

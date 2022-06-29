@@ -5,6 +5,7 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -26,6 +27,8 @@ sealed interface Maybe<X> {
         fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x)
     }
 }
+
+operator fun <X> Maybe.Companion.invoke(x: TlbCodec<X>): TlbCodec<Maybe<X>> = tlbCodec(x)
 
 @SerialName("nothing")
 @Serializable
@@ -58,7 +61,8 @@ private class MaybeTlbCombinator<X>(
     }
 
     private class NothingConstructor<X> : TlbConstructor<Nothing<X>>(
-        schema = "nothing\$0 {X:Type} = Maybe X;"
+        schema = "nothing\$0 {X:Type} = Maybe X;",
+        id = ID
     ) {
         private val nothing = Nothing<X>()
 
@@ -71,12 +75,17 @@ private class MaybeTlbCombinator<X>(
         override fun loadTlb(
             cellSlice: CellSlice
         ): Nothing<X> = nothing
+
+        companion object {
+            val ID = BitString(false)
+        }
     }
 
     private class JustConstructor<X>(
         val typeCodec: TlbCodec<X>
     ) : TlbConstructor<Just<X>>(
-        schema = "just\$1 {X:Type} value:X = Maybe X;"
+        schema = "just\$1 {X:Type} value:X = Maybe X;",
+        id = ID
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
@@ -90,6 +99,10 @@ private class MaybeTlbCombinator<X>(
         ): Just<X> = cellSlice {
             val value = cellSlice.loadTlb(typeCodec)
             Just(value)
+        }
+
+        companion object {
+            val ID = BitString(true)
         }
     }
 }

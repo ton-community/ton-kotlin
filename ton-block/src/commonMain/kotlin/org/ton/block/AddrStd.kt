@@ -14,6 +14,7 @@ import org.ton.crypto.base64
 import org.ton.crypto.base64url
 import org.ton.crypto.crc16
 import org.ton.crypto.hex
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -54,7 +55,7 @@ data class AddrStd(
         bounceable: Boolean = true
     ): String = toString(this, userFriendly, urlSafe, testOnly, bounceable)
 
-    companion object {
+    companion object : TlbCodec<AddrStd> by AddrStdTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
 
@@ -149,13 +150,13 @@ data class AddrStd(
 private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
     schema = "addr_std\$10 anycast:(Maybe Anycast) workchain_id:int8 address:bits256 = MsgAddressInt;"
 ) {
-    private val maybeAnycastCodec = Maybe.tlbCodec(Anycast.tlbCodec())
+    private val MaybeAnycast = Maybe(Anycast)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AddrStd
     ) = cellBuilder {
-        storeTlb(maybeAnycastCodec, value.anycast)
+        storeTlb(MaybeAnycast, value.anycast)
         storeInt(value.workchainId, 8)
         storeBits(value.address)
     }
@@ -163,7 +164,7 @@ private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AddrStd = cellSlice {
-        val anycast = loadTlb(maybeAnycastCodec)
+        val anycast = loadTlb(MaybeAnycast)
         val workchainId = loadInt(8).toInt()
         val address = loadBitString(256)
         AddrStd(anycast, workchainId, address)

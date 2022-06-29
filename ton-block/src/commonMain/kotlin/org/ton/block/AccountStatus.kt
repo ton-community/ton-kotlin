@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 
@@ -21,7 +22,7 @@ enum class AccountStatus {
     @SerialName("acc_state_nonexist")
     NONEXIST;
 
-    companion object {
+    companion object : TlbCodec<AccountStatus> by AccountStatusTlbCombinator {
         @JvmStatic
         fun tlbCodec(): TlbCombinator<AccountStatus> = AccountStatusTlbCombinator
     }

@@ -36,27 +36,17 @@ data class IntMsgInfo(
 private class IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
     schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool " + "src:MsgAddressInt dest:MsgAddressInt " + "value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins " + "created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
 ) {
-    private val msgAddressIntCodec by lazy {
-        MsgAddressInt.tlbCodec()
-    }
-    private val currencyCollectionCodec by lazy {
-        CurrencyCollection.tlbCodec()
-    }
-    private val coinsCodec by lazy {
-        Coins.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder, value: IntMsgInfo
     ) = cellBuilder {
         storeBit(value.ihrDisabled)
         storeBit(value.bounce)
         storeBit(value.bounced)
-        storeTlb(msgAddressIntCodec, value.src)
-        storeTlb(msgAddressIntCodec, value.dest)
-        storeTlb(currencyCollectionCodec, value.value)
-        storeTlb(coinsCodec, value.ihrFee)
-        storeTlb(coinsCodec, value.fwdFee)
+        storeTlb(MsgAddressInt, value.src)
+        storeTlb(MsgAddressInt, value.dest)
+        storeTlb(CurrencyCollection, value.value)
+        storeTlb(Coins, value.ihrFee)
+        storeTlb(Coins, value.fwdFee)
         storeUInt(value.createdLt, 64)
         storeUInt(value.createdAt, 32)
     }
@@ -67,11 +57,11 @@ private class IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
         val ihrDisabled = loadBit()
         val bounce = loadBit()
         val bounced = loadBit()
-        val src = loadTlb(msgAddressIntCodec)
-        val dest = loadTlb(msgAddressIntCodec)
-        val value = loadTlb(currencyCollectionCodec)
-        val ihrFee = loadTlb(coinsCodec)
-        val fwdFee = loadTlb(coinsCodec)
+        val src = loadTlb(MsgAddressInt)
+        val dest = loadTlb(MsgAddressInt)
+        val value = loadTlb(CurrencyCollection)
+        val ihrFee = loadTlb(Coins)
+        val fwdFee = loadTlb(Coins)
         val createdLt = loadUInt(64).toLong()
         val createdAt = loadUInt(32).toInt()
         IntMsgInfo(

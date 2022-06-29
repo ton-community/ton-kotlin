@@ -4,13 +4,14 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface TransactionDescr {
-    companion object {
+    companion object : TlbCodec<TransactionDescr> by TransactionDescrTlbCombinator {
         @JvmStatic
         fun tlbCodec(): TlbCombinator<TransactionDescr> = TransactionDescrTlbCombinator
     }

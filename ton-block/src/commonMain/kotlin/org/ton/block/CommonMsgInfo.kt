@@ -4,32 +4,26 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface CommonMsgInfo {
-    companion object {
+    companion object : TlbCodec<CommonMsgInfo> by CommonMsgInfoTlbCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator()
+        fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator
     }
 }
 
-private class CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
-    private val intMsgInfoConstructor by lazy {
-        IntMsgInfo.tlbCodec()
-    }
-    private val extInMsgConstructor by lazy {
-        ExtInMsgInfo.tlbCodec()
-    }
-    private val extOutMsgInfoConstructor by lazy {
-        ExtOutMsgInfo.tlbCodec()
-    }
+private object CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
+    private val intMsgInfoConstructor = IntMsgInfo.tlbCodec()
+    private val extInMsgConstructor = ExtInMsgInfo.tlbCodec()
+    private val extOutMsgInfoConstructor = ExtOutMsgInfo.tlbCodec()
 
-    override val constructors: List<TlbConstructor<out CommonMsgInfo>> by lazy {
+    override val constructors: List<TlbConstructor<out CommonMsgInfo>> =
         listOf(intMsgInfoConstructor, extInMsgConstructor, extOutMsgInfoConstructor)
-    }
 
     override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
         is IntMsgInfo -> intMsgInfoConstructor

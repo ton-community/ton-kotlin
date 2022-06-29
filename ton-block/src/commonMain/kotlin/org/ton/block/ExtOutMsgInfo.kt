@@ -21,25 +21,18 @@ data class ExtOutMsgInfo(
 ) : CommonMsgInfo {
     companion object {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<ExtOutMsgInfo> = ExtOutMsgInfoTlbConstructor()
+        fun tlbCodec(): TlbConstructor<ExtOutMsgInfo> = ExtOutMsgInfoTlbConstructor
     }
 }
 
-private class ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
+private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     schema = "ext_out_msg_info\$11 src:MsgAddressInt dest:MsgAddressExt created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
 ) {
-    private val msgAddressIntCodec by lazy {
-        MsgAddressInt.tlbCodec()
-    }
-    private val msgAddressExtCodec by lazy {
-        MsgAddressExt.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder, value: ExtOutMsgInfo
     ) = cellBuilder {
-        storeTlb(msgAddressIntCodec, value.src)
-        storeTlb(msgAddressExtCodec, value.dest)
+        storeTlb(MsgAddressInt, value.src)
+        storeTlb(MsgAddressExt, value.dest)
         storeUInt(value.createdLt, 64)
         storeUInt(value.createdAt, 32)
     }
@@ -47,8 +40,8 @@ private class ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ExtOutMsgInfo = cellSlice {
-        val src = loadTlb(msgAddressIntCodec)
-        val dest = loadTlb(msgAddressExtCodec)
+        val src = loadTlb(MsgAddressInt)
+        val dest = loadTlb(MsgAddressExt)
         val createdLt = loadUInt(64).toLong()
         val createdAt = loadUInt(32).toInt()
         ExtOutMsgInfo(src, dest, createdLt, createdAt)
