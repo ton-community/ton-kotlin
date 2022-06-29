@@ -34,7 +34,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
     fun toBooleanArray(): BooleanArray
     fun toMutableBitString(): MutableBitString
 
-    override fun subList(fromIndex: Int, toIndex: Int): BitString
+    override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
 
     override fun toString(): String
 
@@ -46,19 +46,26 @@ interface BitString : List<Boolean>, Comparable<BitString> {
             ByteBackedBitString.of(byteArray, size)
 
         @JvmStatic
-        fun of(size: Int = 0): BitString = ByteBackedBitString.of(size)
+        fun of(size: Int = 0): BitString {
+            if (size == 0) return EmptyBitString
+            return ByteBackedBitString.of(size)
+        }
 
         @JvmStatic
-        fun binary(bits: String): BitString = BitString(bits.map { char ->
-            when (char) {
-                '1' -> true
-                '0' -> false
-                else -> throw IllegalArgumentException("Invalid bit: `$char`")
-            }
-        })
+        fun binary(bits: String): BitString {
+            if (bits.isEmpty()) return EmptyBitString
+            return BitString(bits.map { char ->
+                when (char) {
+                    '1' -> true
+                    '0' -> false
+                    else -> throw IllegalArgumentException("Invalid bit: `$char`")
+                }
+            })
+        }
 
         @JvmStatic
         fun of(vararg bits: Boolean): BitString {
+            if (bits.isEmpty()) return EmptyBitString
             val bitString = ByteBackedMutableBitString.of(bits.size)
             bits.forEachIndexed { index, bit ->
                 bitString[index] = bit
@@ -69,6 +76,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         @JvmStatic
         fun of(bits: Iterable<Boolean>): BitString {
             val bitsList = bits.toList()
+            if (bitsList.isEmpty()) return EmptyBitString
             val bitString = ByteBackedMutableBitString.of(bitsList.size)
             bitsList.forEachIndexed { index, bit ->
                 bitString[index] = bit
@@ -78,6 +86,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun of(hex: String): BitString {
+            if (hex.isEmpty()) return EmptyBitString
             // True if bit string doesn't contain mod 4 number of bits
             val incomplete = hex.isNotEmpty() && hex.last() == '_'
 
@@ -90,7 +99,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
                         .map { bit -> bit == '1' } // Convert character to bits it represents
                 }
                 .flatten()
-                .toList()
+                .toMutableList()
                 .dropLastWhile { incomplete && !it } // drop last elements up to first `1`, if incomplete
                 .dropLast(if (incomplete) 1 else 0) // if incomplete, drop the 1 as well
 
