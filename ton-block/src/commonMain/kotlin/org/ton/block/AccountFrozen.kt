@@ -17,6 +17,8 @@ data class AccountFrozen(
         require(state_hash.size == 256) { "required: state_hash.size == 256, actual: ${state_hash.size}" }
     }
 
+    override fun toString(): String = "account_frozen(state_hash:$state_hash)"
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AccountFrozen> = AccountFrozenTlbConstructor

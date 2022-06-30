@@ -15,5 +15,5 @@ data class RootHashMapE<T>(
 
     override fun toMap(): Map<BitString, T> = root.toMap()
 
-    override fun toString(): String = "hme_root(root=$root)"
+    override fun toString(): String = "hme_root(root:$root)"
 }

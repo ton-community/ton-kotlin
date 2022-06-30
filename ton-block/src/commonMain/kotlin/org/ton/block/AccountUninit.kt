@@ -10,6 +10,8 @@ import org.ton.tlb.TlbConstructor
 @SerialName("account_uninit")
 object AccountUninit : AccountState {
     fun tlbCodec(): TlbConstructor<AccountUninit> = AccountUninitTlbConstructor
+
+    override fun toString(): String = "account_uninit"
 }
 
 private object AccountUninitTlbConstructor : TlbConstructor<AccountUninit>(

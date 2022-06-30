@@ -15,6 +15,8 @@ data class AccountActive(
     @SerialName("_")
     val init: StateInit
 ) : AccountState {
+    override fun toString(): String = "account_active($init)"
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AccountActive> = AccountActiveTlbConstructor
@@ -24,21 +26,17 @@ data class AccountActive(
 private object AccountActiveTlbConstructor : TlbConstructor<AccountActive>(
     schema = "account_active\$1 _:StateInit = AccountState;"
 ) {
-    val stateInit by lazy {
-        StateInit.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AccountActive
     ) = cellBuilder {
-        storeTlb(stateInit, value.init)
+        storeTlb(StateInit, value.init)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountActive = cellSlice {
-        val init = loadTlb(stateInit)
+        val init = loadTlb(StateInit)
         AccountActive(init)
     }
 }

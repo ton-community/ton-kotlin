@@ -18,6 +18,8 @@ import org.ton.tlb.storeTlb
 data class Coins(
     val amount: VarUInteger = VarUInteger(0)
 ) {
+    override fun toString(): String = "nanocoins(amount:$amount)"
+
     companion object : TlbCodec<Coins> by CoinsTlbConstructor {
         private val NANOCOINS = 1_000_000_000
 

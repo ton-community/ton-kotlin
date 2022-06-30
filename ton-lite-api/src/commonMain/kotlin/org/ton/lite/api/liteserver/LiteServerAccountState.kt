@@ -7,6 +7,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.block.Account
+import org.ton.boc.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
@@ -15,6 +17,7 @@ import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import org.ton.tlb.loadTlb
 
 @Serializable
 data class LiteServerAccountState(
@@ -29,6 +32,11 @@ data class LiteServerAccountState(
         @Serializable(Base64ByteArraySerializer::class)
         val state: ByteArray
 ) {
+    fun stateToBagOfCells(): BagOfCells = BagOfCells(state)
+    fun stateToAccount(): Account = stateToBagOfCells().first().parse {
+        loadTlb(Account)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

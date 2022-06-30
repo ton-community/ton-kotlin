@@ -19,6 +19,8 @@ data class TickTock(
 ) {
     fun toPair(): Pair<Boolean, Boolean> = tick to tock
 
+    override fun toString(): String = "tick_tock(tick:$tick tock:$tock)"
+
     companion object : TlbCodec<TickTock> by TickTockTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor

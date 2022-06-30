@@ -42,4 +42,7 @@ fun hex(s: String): ByteArray {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun String.encodeHex(): ByteArray = hex(this)
+inline fun String.decodeHex(): ByteArray = hex(this)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun ByteArray.encodeHex(): String = hex(this)

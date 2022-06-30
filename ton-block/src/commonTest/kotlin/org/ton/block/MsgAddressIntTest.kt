@@ -10,17 +10,17 @@ class MsgAddressIntTest {
     fun `parse raw addresses`() {
         val addr1 =
             AddrStd.parseRaw("-1:3333333333333333333333333333333333333333333333333333333333333333")
-        assertEquals(-1, addr1.workchainId)
+        assertEquals(-1, addr1.workchain_id)
         assertEquals(BitString("3333333333333333333333333333333333333333333333333333333333333333"), addr1.address)
 
         val addr2 =
             AddrStd.parseRaw("0:83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8")
-        assertEquals(0, addr2.workchainId)
+        assertEquals(0, addr2.workchain_id)
         assertEquals(BitString("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"), addr2.address)
 
         val addr3 =
             AddrStd.parseRaw("-1:dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5")
-        assertEquals(-1, addr3.workchainId)
+        assertEquals(-1, addr3.workchain_id)
         assertEquals(BitString("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"), addr3.address)
     }
 
@@ -28,7 +28,7 @@ class MsgAddressIntTest {
     fun `parse user-friendly base64(url) addresses`() {
         val bounceableAddr1 =
             AddrStd.parseUserFriendly("Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF")
-        assertEquals(-1, bounceableAddr1.workchainId)
+        assertEquals(-1, bounceableAddr1.workchain_id)
         assertEquals(
             BitString("3333333333333333333333333333333333333333333333333333333333333333"),
             bounceableAddr1.address
@@ -36,7 +36,7 @@ class MsgAddressIntTest {
 
         val nonBounceableAddr1 =
             AddrStd.parseUserFriendly("Uf8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMxYA")
-        assertEquals(-1, nonBounceableAddr1.workchainId)
+        assertEquals(-1, nonBounceableAddr1.workchain_id)
         assertEquals(
             BitString("3333333333333333333333333333333333333333333333333333333333333333"),
             nonBounceableAddr1.address
@@ -46,7 +46,7 @@ class MsgAddressIntTest {
 
         val bounceableAddr2 =
             AddrStd.parseUserFriendly("EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N")
-        assertEquals(0, bounceableAddr2.workchainId)
+        assertEquals(0, bounceableAddr2.workchain_id)
         assertEquals(
             BitString("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"),
             bounceableAddr2.address
@@ -54,7 +54,7 @@ class MsgAddressIntTest {
 
         val nonBounceableAddr2 =
             AddrStd.parseUserFriendly("UQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqEBI")
-        assertEquals(0, nonBounceableAddr2.workchainId)
+        assertEquals(0, nonBounceableAddr2.workchain_id)
         assertEquals(
             BitString("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"),
             nonBounceableAddr2.address
@@ -65,7 +65,7 @@ class MsgAddressIntTest {
 
         val bounceableAddr3 =
             AddrStd.parseUserFriendly("Ef_dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN-xWdr")
-        assertEquals(-1, bounceableAddr3.workchainId)
+        assertEquals(-1, bounceableAddr3.workchain_id)
         assertEquals(
             BitString("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"),
             bounceableAddr3.address
@@ -73,7 +73,7 @@ class MsgAddressIntTest {
 
         val nonBounceableAddr3 =
             AddrStd.parseUserFriendly("Uf_dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN-xTqu")
-        assertEquals(-1, nonBounceableAddr3.workchainId)
+        assertEquals(-1, nonBounceableAddr3.workchain_id)
         assertEquals(
             BitString("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"),
             nonBounceableAddr3.address
@@ -83,7 +83,7 @@ class MsgAddressIntTest {
 
         val bounceableAddr4 =
             AddrStd.parseUserFriendly("Ef/dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN+xWdr")
-        assertEquals(-1, bounceableAddr4.workchainId)
+        assertEquals(-1, bounceableAddr4.workchain_id)
         assertEquals(
             BitString("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"),
             bounceableAddr4.address
@@ -91,7 +91,7 @@ class MsgAddressIntTest {
 
         val nonBounceableAddr4 =
             AddrStd.parseUserFriendly("Uf/dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN+xTqu")
-        assertEquals(-1, nonBounceableAddr4.workchainId)
+        assertEquals(-1, nonBounceableAddr4.workchain_id)
         assertEquals(
             BitString("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"),
             nonBounceableAddr4.address

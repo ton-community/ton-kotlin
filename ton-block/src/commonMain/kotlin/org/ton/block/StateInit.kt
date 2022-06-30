@@ -1,6 +1,5 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -15,7 +14,6 @@ import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-@SerialName("state_init")
 @Serializable
 data class StateInit(
     val split_depth: Maybe<Int>,
@@ -33,6 +31,8 @@ data class StateInit(
     ) : this(
         splitDepth.toMaybe(), special.toMaybe(), code.toMaybe(), data.toMaybe(), library
     )
+
+    override fun toString(): String = "split_depth:$split_depth special:$special code:$code data:$data library:$library"
 
     companion object : TlbCodec<StateInit> by StateInitTlbConstructor {
         @JvmStatic

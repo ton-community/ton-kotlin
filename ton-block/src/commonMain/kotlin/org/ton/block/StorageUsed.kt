@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -12,36 +15,35 @@ import org.ton.tlb.storeTlb
 data class StorageUsed(
     val cells: VarUInteger,
     val bits: VarUInteger,
-    @SerialName("public_cells")
-    val publicCells: VarUInteger,
+    val public_cells: VarUInteger,
 ) {
-    companion object {
+    companion object : TlbCodec<StorageUsed> by StorageUsedTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<StorageUsed> = StorageUsedTlbConstructor()
+        fun tlbCodec(): TlbConstructor<StorageUsed> = StorageUsedTlbConstructor
     }
+
+    override fun toString() = "storage_used(cells:$cells bits:$bits public_cells:$public_cells)"
 }
 
-private class StorageUsedTlbConstructor : TlbConstructor<StorageUsed>(
+private object StorageUsedTlbConstructor : TlbConstructor<StorageUsed>(
     schema = "storage_used\$_ cells:(VarUInteger 7) bits:(VarUInteger 7) public_cells:(VarUInteger 7) = StorageUsed;"
 ) {
-    private val varUInteger7Codec by lazy {
-        VarUInteger.tlbCodec(7)
-    }
+    private val varUInteger7 = VarUInteger.tlbCodec(7)
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: StorageUsed
     ) = cellBuilder {
-        storeTlb(varUInteger7Codec, value.cells)
-        storeTlb(varUInteger7Codec, value.bits)
-        storeTlb(varUInteger7Codec, value.publicCells)
+        storeTlb(varUInteger7, value.cells)
+        storeTlb(varUInteger7, value.bits)
+        storeTlb(varUInteger7, value.public_cells)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): StorageUsed = cellSlice {
-        val cells = loadTlb(varUInteger7Codec)
-        val bits = loadTlb(varUInteger7Codec)
-        val publicCells = loadTlb(varUInteger7Codec)
+        val cells = loadTlb(varUInteger7)
+        val bits = loadTlb(varUInteger7)
+        val publicCells = loadTlb(varUInteger7)
         StorageUsed(cells, bits, publicCells)
     }
 }

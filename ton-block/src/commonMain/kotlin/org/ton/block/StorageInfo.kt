@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -11,10 +14,8 @@ import org.ton.tlb.storeTlb
 @Serializable
 data class StorageInfo(
     val used: StorageUsed,
-    @SerialName("last_paid")
-    val lastPaid: Int,
-    @SerialName("due_payment")
-    val duePayment: Maybe<Coins>
+    val last_paid: Int,
+    val due_payment: Maybe<Coins>
 ) {
     constructor(used: StorageUsed, lastPaid: Int, duePayment: Coins? = null) : this(
         used,
@@ -22,34 +23,31 @@ data class StorageInfo(
         duePayment.toMaybe()
     )
 
-    companion object {
+    override fun toString(): String = "storage_info(used:$used last_paid:$last_paid due_payment:$due_payment)"
+
+    companion object : TlbCodec<StorageInfo> by StorageInfoTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<StorageInfo> = StorageInfoTlbConstructor()
+        fun tlbCodec(): TlbConstructor<StorageInfo> = StorageInfoTlbConstructor
     }
 }
 
-private class StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
+private object StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
     schema = "storage_info\$_ used:StorageUsed last_paid:uint32 due_payment:(Maybe Coins) = StorageInfo;"
 ) {
-    private val storageUsedCodec by lazy {
-        StorageUsed.tlbCodec()
-    }
-    private val maybeCoins by lazy {
-        Maybe.tlbCodec(Coins.tlbCodec())
-    }
+    private val maybeCoins = Maybe(Coins)
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: StorageInfo
     ) = cellBuilder {
-        storeTlb(storageUsedCodec, value.used)
-        storeUInt(value.lastPaid, 32)
-        storeTlb(maybeCoins, value.duePayment)
+        storeTlb(StorageUsed, value.used)
+        storeUInt(value.last_paid, 32)
+        storeTlb(maybeCoins, value.due_payment)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): StorageInfo = cellSlice {
-        val used = loadTlb(storageUsedCodec)
+        val used = loadTlb(StorageUsed)
         val lastPaid = loadUInt(32).toInt()
         val duePayment = loadTlb(maybeCoins)
         StorageInfo(used, lastPaid, duePayment)

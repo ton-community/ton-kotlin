@@ -23,6 +23,8 @@ data class Anycast(
         require(depth in 1..30) { "required: depth in 1..30, actual: $depth" }
     }
 
+    override fun toString(): String = "anycast_info(depth:$depth rewrite_pfx:$rewrite_pfx)"
+
     companion object : TlbCodec<Anycast> by AnycastTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbCodec<Anycast> = AnycastTlbConstructor

@@ -11,6 +11,8 @@ import org.ton.tlb.TlbConstructor
 object AccountNone : Account {
     @JvmStatic
     fun tlbCodec(): TlbConstructor<AccountNone> = AccountNoneTlbConstructor
+
+    override fun toString(): String = "account_none"
 }
 
 private object AccountNoneTlbConstructor : TlbConstructor<AccountNone>(

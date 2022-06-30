@@ -9,5 +9,5 @@ class HashMapNodeFork<T>(
     val left: HashMapEdge<T>,
     val right: HashMapEdge<T>
 ) : HashMapNode<T> {
-    override fun toString() = "hmn_fork(left=$left, right=$right)"
+    override fun toString() = "hmn_fork(left:$left right:$right)"
 }

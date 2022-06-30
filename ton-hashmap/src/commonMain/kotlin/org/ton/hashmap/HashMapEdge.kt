@@ -13,7 +13,7 @@ data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) {
-    override fun toString(): String = "hm_edge(label=$label, node=$node)"
+    override fun toString(): String = "hm_edge(label:$label node:$node)"
 
     private fun nodes(): Sequence<Pair<BitString, T>> {
         val parentLabel = label.s

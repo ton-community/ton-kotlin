@@ -16,6 +16,8 @@ data class CurrencyCollection(
     val coins: Coins,
     val other: ExtraCurrencyCollection = ExtraCurrencyCollection()
 ) {
+    override fun toString(): String = "currencies(coins:$coins other:$other)"
+
     companion object : TlbCodec<CurrencyCollection> by CurrencyCollectionTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<CurrencyCollection> = CurrencyCollectionTlbConstructor

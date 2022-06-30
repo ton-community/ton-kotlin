@@ -5,7 +5,9 @@ import kotlinx.serialization.Serializable
 import org.ton.bigint.BigInt
 import org.ton.bigint.BigIntSerializer
 import org.ton.bigint.bitLength
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
@@ -32,6 +34,8 @@ data class VarUInteger(
     fun toInt(): Int = value.toInt()
     fun toLong(): Long = value.toLong()
     fun toShort(): Short = value.toShort()
+
+    override fun toString(): String = "var_uint(len:$len value:$value)"
 
     companion object {
         @JvmStatic

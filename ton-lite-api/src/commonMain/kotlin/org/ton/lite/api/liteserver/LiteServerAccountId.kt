@@ -25,7 +25,7 @@ data class LiteServerAccountId(
         check(id.size == 32)
     }
 
-    constructor(addrStd: AddrStd) : this(addrStd.workchainId, addrStd.address.toByteArray())
+    constructor(addrStd: AddrStd) : this(addrStd.workchain_id, addrStd.address.toByteArray())
 
     fun toMsgAddressIntStd(): AddrStd = AddrStd(workchain, id)
 

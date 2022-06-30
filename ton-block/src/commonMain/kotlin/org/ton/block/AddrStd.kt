@@ -27,7 +27,7 @@ inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 @SerialName("addr_std")
 data class AddrStd(
     val anycast: Maybe<Anycast>,
-    override val workchainId: Int,
+    override val workchain_id: Int,
     val address: BitString
 ) : MsgAddressInt {
     init {
@@ -47,6 +47,8 @@ data class AddrStd(
         workchainId,
         address
     )
+
+    override fun toString(): String = "addr_std(anycast:$anycast workchain_id:$workchain_id address:$address)"
 
     fun toString(
         userFriendly: Boolean = true,
@@ -68,7 +70,7 @@ data class AddrStd(
             bounceable: Boolean = true
         ): String {
             return if (userFriendly) {
-                val raw = byteArrayOf(tag(testOnly, bounceable), address.workchainId.toByte()) +
+                val raw = byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()) +
                         address.address.toByteArray() + crc(address, testOnly, bounceable).toShort().toBigInt()
                     .toByteArray()
                 if (urlSafe) {
@@ -77,7 +79,7 @@ data class AddrStd(
                     base64(raw)
                 }
             } else {
-                address.workchainId.toString() + ":" + hex(address.address.toByteArray())
+                address.workchain_id.toString() + ":" + hex(address.address.toByteArray())
             }
         }
 
@@ -136,7 +138,7 @@ data class AddrStd(
 
         private fun crc(address: AddrStd, testOnly: Boolean, bounceable: Boolean): Int =
             crc16(
-                byteArrayOf(tag(testOnly, bounceable), address.workchainId.toByte()),
+                byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()),
                 address.address.toByteArray()
             )
 
@@ -157,7 +159,7 @@ private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
         value: AddrStd
     ) = cellBuilder {
         storeTlb(MaybeAnycast, value.anycast)
-        storeInt(value.workchainId, 8)
+        storeInt(value.workchain_id, 8)
         storeBits(value.address)
     }
 

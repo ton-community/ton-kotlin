@@ -36,13 +36,16 @@ class Nothing<X> : Maybe<X> {
     override val value: X? = null
     override fun hashCode(): Int = 0
     override fun equals(other: Any?): Boolean = other is Nothing<*>
+    override fun toString(): String = "nothing"
 }
 
 @SerialName("just")
 @Serializable
 data class Just<X>(
     override val value: X
-) : Maybe<X>
+) : Maybe<X> {
+    override fun toString(): String = "just(value:$value)"
+}
 
 private class MaybeTlbCombinator<X>(
     typeCodec: TlbCodec<X>

@@ -20,36 +20,28 @@ data class AccountInfo(
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AccountInfo> = AccountInfoTlbConstructor
     }
+
+    override fun toString(): String = "account(addr:$addr storage_stat:$storage_stat storage:$storage)"
 }
 
 private object AccountInfoTlbConstructor : TlbConstructor<AccountInfo>(
     schema = "account\$1 addr:MsgAddressInt storage_stat:StorageInfo storage:AccountStorage = Account;"
 ) {
-    val msgAddressInt by lazy {
-        MsgAddressInt.tlbCodec()
-    }
-    val storageInfo by lazy {
-        StorageInfo.tlbCodec()
-    }
-    val accountStorage by lazy {
-        AccountStorage.tlbCodec()
-    }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AccountInfo
     ) = cellBuilder {
-        storeTlb(msgAddressInt, value.addr)
-        storeTlb(storageInfo, value.storage_stat)
-        storeTlb(accountStorage, value.storage)
+        storeTlb(MsgAddressInt, value.addr)
+        storeTlb(StorageInfo, value.storage_stat)
+        storeTlb(AccountStorage, value.storage)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountInfo = cellSlice {
-        val addr = loadTlb(msgAddressInt)
-        val storageStat = loadTlb(storageInfo)
-        val storage = loadTlb(accountStorage)
+        val addr = loadTlb(MsgAddressInt)
+        val storageStat = loadTlb(StorageInfo)
+        val storage = loadTlb(AccountStorage)
         AccountInfo(addr, storageStat, storage)
     }
 }

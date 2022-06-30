@@ -17,7 +17,7 @@ import org.ton.tlb.storeTlb
 data class AddrVar(
     val anycast: Maybe<Anycast>,
     val addr_len: Int,
-    override val workchainId: Int,
+    override val workchain_id: Int,
     val address: BitString
 ) : MsgAddressInt {
     init {
@@ -40,6 +40,9 @@ data class AddrVar(
         address.toBitString()
     )
 
+    override fun toString(): String =
+        "addr_var(anycast:$anycast addr_len:$addr_len workchain_id:$workchain_id address:$address)"
+
     companion object : TlbCodec<AddrVar> by AddrVarTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AddrVar> = AddrVarTlbConstructor
@@ -57,7 +60,7 @@ private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
     ) = cellBuilder {
         storeTlb(MaybeAnycast, value.anycast)
         storeUInt(value.addr_len, 9)
-        storeInt(value.workchainId, 32)
+        storeInt(value.workchain_id, 32)
         storeBits(value.address)
     }
 
