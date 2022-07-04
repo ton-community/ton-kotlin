@@ -30,9 +30,11 @@ data class VmCellSlice(
     )
 
     fun toCellSlice(): CellSlice = cell.beginParse().run {
+        skipBits(stBits)
+        loadRefs(stRef)
         CellSlice.of(
-            loadBits(stBits),
-            loadRefs(stRef)
+            loadBits(endBits - stBits),
+            loadRefs(endRef - stRef)
         )
     }
 
