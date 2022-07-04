@@ -71,25 +71,17 @@ class DataCell private constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
+        if (other == null) return false
+        if (other !is Cell) return false
 
-        other as DataCell
-
+        if (cellType != other.cellType) return false
         if (bits != other.bits) return false
         if (refs != other.refs) return false
-        if (cellType != other.cellType) return false
 
         return true
     }
 
     override fun hashCode(): Int = hashCode
-
-    /* TODO:
-      int get_serialized_size(bool with_hashes = false) const {
-    return ((get_bits() + 23) >> 3) +
-           (with_hashes ? get_level_mask().get_hashes_count() * (hash_bytes + depth_bytes) : 0);
-     */
-    fun serializedSize(withHashes: Boolean = false): Int = 0
 
     private fun referencesDescriptor(): Byte =
         (refs.size + 8 * (if (isExotic) 1 else 0) + 32 * levelMask.level).toByte()

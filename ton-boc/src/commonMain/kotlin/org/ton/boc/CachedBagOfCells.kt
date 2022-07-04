@@ -8,8 +8,6 @@ class CachedBagOfCells(
     override val roots: List<Cell>
 ) : BagOfCells {
     private var cellCount = 0
-    private var intermediateRefs = 0
-    private var dataBytes = 0
     private var cellHashmap = HashMap<Cell, Int>()
     private var cellList = ArrayList<CellInfo>()
     private var rootList = ArrayList<RootInfo>()
@@ -34,11 +32,17 @@ class CachedBagOfCells(
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BagOfCells) return false
+        if (roots != other.roots) return false
+        return true
+    }
+
+    override fun hashCode(): Int = roots.hashCode()
 
     private fun clearCells() {
         cellCount = 0
-        intermediateRefs = 0
-        dataBytes = 0
         cellHashmap.clear()
         cellList.clear()
         rootList.clear()
@@ -68,7 +72,6 @@ class CachedBagOfCells(
         cell.refs.forEach { reference ->
             val referenceIndex = importCell(reference, depth + 1)
             sumChildWeight += cellList[referenceIndex].weight
-            intermediateRefs++
             referenceIndexes.add(referenceIndex)
         }
         check(cellList.size == cellCount)
@@ -80,31 +83,29 @@ class CachedBagOfCells(
             weight = min(0xFF, sumChildWeight)
         )
         cellList.add(cellInfo)
-        dataBytes += cell.serializedSize()
         return cellCount++
     }
 
     private fun reorderCells() {
-        var intermediateHashes = 0
         for (i in cellList.lastIndex downTo 0) {
             val cellInfo = cellList[i]
             var sum = MAX_CELL_WEIGHT - 1
             var mask = 0
-            var c = cellInfo.referencesIndexes.size
+            var overlimitedRefs = cellInfo.referencesIndexes.size
             cellInfo.referencesIndexes.forEachIndexed { j, referenceIndex ->
                 val referenceInfo = cellList[referenceIndex]
                 val limit = (MAX_CELL_WEIGHT - 1 + j) / cellInfo.referencesIndexes.size
                 if (referenceInfo.weight <= limit) {
                     sum -= referenceInfo.weight
-                    c--
+                    overlimitedRefs--
                     mask = mask or (1 shl j)
                 }
             }
-            if (c != 0) {
+            if (overlimitedRefs > 0) {
                 cellInfo.referencesIndexes.forEachIndexed { j, referenceIndex ->
                     if ((mask and (1 shl j)) == 0) {
                         val referenceInfo = cellList[referenceIndex]
-                        val limit = sum++ / c
+                        val limit = sum++ / overlimitedRefs
                         if (referenceInfo.weight > limit) {
                             referenceInfo.weight = limit
                         }
@@ -122,14 +123,6 @@ class CachedBagOfCells(
                 cellInfo.weight = sum
             } else {
                 cellInfo.weight = 0
-                intermediateHashes += cellInfo.hashesCount
-            }
-        }
-        var topHashes = 0
-        rootList.forEach { rootInfo ->
-            val cellInfo = cellList[rootInfo.index]
-            if (cellInfo.weight != 0) {
-                topHashes += cellInfo.hashesCount
             }
         }
         if (cellCount > 0) {
@@ -208,24 +201,6 @@ class CachedBagOfCells(
         return cellInfo.newIndex
     }
 
-    /* TODO:
-  int get_serialized_size(bool with_hashes = false) const {
-return ((get_bits() + 23) >> 3) +
-       (with_hashes ? get_level_mask().get_hashes_count() * (hash_bytes + depth_bytes) : 0);
- */
-    private fun Cell.serializedSize(withHashes: Boolean = false): Int {
-        return 0
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is BagOfCells) return false
-        if (roots != other.roots) return false
-        return true
-    }
-
-    override fun hashCode(): Int = roots.hashCode()
-
     private enum class Revisit {
         PREVISIT,
         VISIT,
@@ -241,9 +216,6 @@ return ((get_bits() + 23) >> 3) +
         var shouldCache: Boolean = false
     ) {
         val isSpecial: Boolean get() = weight == 0
-
-        override fun toString(): String =
-            "CellInfo(referencesIndexes=$referencesIndexes, hashesCount=$hashesCount, weight=$weight, newIndex=$newIndex, shouldCache=$shouldCache, isSpecial=$isSpecial, cell=${cell.bits})"
     }
 
     private data class RootInfo(

@@ -9,7 +9,7 @@ import org.ton.cell.exception.CellOverflowException
 fun Cell(hex: String, vararg refs: Cell): Cell =
     Cell.of(hex, *refs)
 
-fun Cell(bits: BitString = BitString(), refs: Iterable<Cell> = emptyList(), type: CellType = CellType.ORDINARY) =
+fun Cell(bits: BitString = BitString.empty(), refs: Iterable<Cell> = emptyList(), type: CellType = CellType.ORDINARY) =
     Cell.of(bits, refs, type)
 
 fun Cell(bits: BitString, vararg refs: Cell): Cell =

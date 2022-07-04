@@ -8,5 +8,10 @@ kotlin {
                 implementation(libs.serialization.json)
             }
         }
+        commonTest {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }

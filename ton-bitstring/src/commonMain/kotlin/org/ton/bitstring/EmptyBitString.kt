@@ -28,7 +28,15 @@ internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
 
     override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString(ByteArray(1), 0)
 
-    override fun toString(): String = "_"
+    override fun toString(): String = ""
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        if (other !is BitString) return false
+        if (other.size != 0) return false
+        return true
+    }
 
     override fun compareTo(other: BitString): Int = -1
 }
