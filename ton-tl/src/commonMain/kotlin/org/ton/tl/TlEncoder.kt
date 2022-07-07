@@ -25,3 +25,17 @@ interface TlEncoder<T : Any> {
         }
     }
 }
+
+fun <R : Any> Output.writeFlagTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
+    if (value != null) {
+        writeFlagTl(flag, index) {
+            encoder.encode(this, value)
+        }
+    }
+}
+
+fun Output.writeFlagTl(flag: Int, index: Int, block: Output.() -> Unit) {
+    if (flag and (1 shl index) != 0) {
+        block()
+    }
+}

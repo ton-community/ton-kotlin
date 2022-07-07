@@ -33,6 +33,14 @@ interface TlDecoder<T : Any> {
     }
 }
 
+fun <R : Any> Input.readFlagTl(flag: Int, index: Int, decoder: TlDecoder<R>) =
+    readFlagTl(flag, index) { decoder.decode(this) }
+
+fun <R : Any> Input.readFlagTl(flag: Int, index: Int, block: Input.() -> R) =
+    if (flag and (1 shl index) != 0) {
+        block()
+    } else null
+
 fun <R : Any> Input.readTl(decoder: TlDecoder<R>) = decoder.decode(this)
 fun <R : Any> Input.readTl(combinator: TlCombinator<R>) = combinator.decodeBoxed(this)
 fun <R : Enum<R>> Input.readTl(enum: EnumTlCombinator<R>) = enum.decodeBoxed(this)

@@ -3,27 +3,31 @@
 package org.ton.api.tonnode
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.bitstring.BitString
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.crypto.encodeHex
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 
 @Serializable
 data class TonNodeBlockIdExt(
-        val workchain: Int,
-        val shard: Long,
-        val seqno: Int,
-        @SerialName("root_hash")
-        @Serializable(Base64ByteArraySerializer::class)
-        val rootHash: ByteArray,
-        @SerialName("file_hash")
-        @Serializable(Base64ByteArraySerializer::class)
-        val fileHash: ByteArray
+    val workchain: Int,
+    val shard: Long,
+    val seqno: Int,
+    val root_hash: ByteArray,
+    val file_hash: ByteArray
 ) {
+    constructor(
+        workchain: Int,
+        shard: Long,
+        seqno: Int,
+        root_hash: BitString,
+        file_hash: BitString
+    ) : this(workchain, shard, seqno, root_hash.toByteArray(), file_hash.toByteArray())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -33,8 +37,8 @@ data class TonNodeBlockIdExt(
         if (workchain != other.workchain) return false
         if (shard != other.shard) return false
         if (seqno != other.seqno) return false
-        if (!rootHash.contentEquals(other.rootHash)) return false
-        if (!fileHash.contentEquals(other.fileHash)) return false
+        if (!root_hash.contentEquals(other.root_hash)) return false
+        if (!file_hash.contentEquals(other.file_hash)) return false
 
         return true
     }
@@ -43,8 +47,8 @@ data class TonNodeBlockIdExt(
         var result = workchain
         result = 31 * result + shard.hashCode()
         result = 31 * result + seqno
-        result = 31 * result + rootHash.contentHashCode()
-        result = 31 * result + fileHash.contentHashCode()
+        result = 31 * result + root_hash.contentHashCode()
+        result = 31 * result + file_hash.contentHashCode()
         return result
     }
 
@@ -55,32 +59,34 @@ data class TonNodeBlockIdExt(
         append(shard)
         append(", seqno=")
         append(seqno)
-        append(", rootHash=")
-        append(hex(rootHash))
-        append(", fileHash=")
-        append(hex(fileHash))
+        append(", root_hash=")
+        append(root_hash.encodeHex())
+        append(", file_hash=")
+        append(file_hash.encodeHex())
         append(")")
     }
 
-    companion object : TlConstructor<TonNodeBlockIdExt>(
-            type = TonNodeBlockIdExt::class,
-            schema = "tonNode.blockIdExt workchain:int shard:long seqno:int root_hash:int256 file_hash:int256 = tonNode.BlockIdExt"
-    ) {
-        override fun decode(input: Input): TonNodeBlockIdExt {
-            val workchain = input.readIntTl()
-            val shard = input.readLongTl()
-            val seqno = input.readIntTl()
-            val rootHash = input.readInt256Tl()
-            val fileHash = input.readInt256Tl()
-            return TonNodeBlockIdExt(workchain, shard, seqno, rootHash, fileHash)
-        }
+    companion object : TlCodec<TonNodeBlockIdExt> by TonNodeBlockIdExtTlConstructor
+}
 
-        override fun encode(output: Output, value: TonNodeBlockIdExt) {
-            output.writeIntTl(value.workchain)
-            output.writeLongTl(value.shard)
-            output.writeIntTl(value.seqno)
-            output.writeInt256Tl(value.rootHash)
-            output.writeInt256Tl(value.fileHash)
-        }
+private object TonNodeBlockIdExtTlConstructor : TlConstructor<TonNodeBlockIdExt>(
+    type = TonNodeBlockIdExt::class,
+    schema = "tonNode.blockIdExt workchain:int shard:long seqno:int root_hash:int256 file_hash:int256 = tonNode.BlockIdExt"
+) {
+    override fun decode(input: Input): TonNodeBlockIdExt {
+        val workchain = input.readIntTl()
+        val shard = input.readLongTl()
+        val seqno = input.readIntTl()
+        val rootHash = input.readInt256Tl()
+        val fileHash = input.readInt256Tl()
+        return TonNodeBlockIdExt(workchain, shard, seqno, rootHash, fileHash)
+    }
+
+    override fun encode(output: Output, value: TonNodeBlockIdExt) {
+        output.writeIntTl(value.workchain)
+        output.writeLongTl(value.shard)
+        output.writeIntTl(value.seqno)
+        output.writeInt256Tl(value.root_hash)
+        output.writeInt256Tl(value.file_hash)
     }
 }

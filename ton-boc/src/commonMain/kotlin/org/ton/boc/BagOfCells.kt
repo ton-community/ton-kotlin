@@ -2,6 +2,7 @@ package org.ton.boc
 
 import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
+import org.ton.crypto.encodeHex
 
 fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
 fun BagOfCells(roots: Iterable<Cell>): BagOfCells = BagOfCells.of(roots)
@@ -32,7 +33,11 @@ interface BagOfCells : Iterable<Cell> {
 
         @JvmStatic
         fun of(byteArray: ByteArray): BagOfCells {
-            return ByteReadPacket(byteArray).readBagOfCell()
+            try {
+                return ByteReadPacket(byteArray).readBagOfCell()
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Can't load BoC: ${byteArray.encodeHex()}", e)
+            }
         }
     }
 }

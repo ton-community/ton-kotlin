@@ -12,10 +12,12 @@ import org.ton.tlb.*
 data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
-) {
+) : Iterable<Pair<BitString, T>> {
     override fun toString(): String = "hm_edge(label:$label node:$node)"
 
-    private fun nodes(): Sequence<Pair<BitString, T>> {
+    override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
+
+    fun nodes(): Sequence<Pair<BitString, T>> {
         val parentLabel = label.s
         return when (node) {
             is HashMapNodeLeaf -> sequenceOf(parentLabel to node.value)
@@ -24,8 +26,6 @@ data class HashMapEdge<T>(
             }
         }
     }
-
-    fun toMap(): Map<BitString, T> = nodes().toMap()
 
     companion object {
         @JvmStatic

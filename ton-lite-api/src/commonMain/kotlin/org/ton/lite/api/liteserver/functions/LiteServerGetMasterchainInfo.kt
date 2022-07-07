@@ -5,8 +5,8 @@ import org.ton.lite.api.liteserver.LiteServerMasterchainInfo
 import org.ton.tl.TlConstructor
 
 fun interface LiteServerGetMasterchainInfoFunction : LiteServerQueryFunction {
-    suspend fun getMasterchainInfo(): LiteServerMasterchainInfo =
-        query(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo)
+    suspend fun getMasterchainInfo(seqno: Int = -1): LiteServerMasterchainInfo =
+        query(LiteServerGetMasterchainInfo, LiteServerGetMasterchainInfo, LiteServerMasterchainInfo, seqno)
 }
 
 object LiteServerGetMasterchainInfo : TlConstructor<LiteServerGetMasterchainInfo>(

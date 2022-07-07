@@ -152,7 +152,7 @@ abstract class AdnlTcpClient(
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
-        check(length <= Short.MAX_VALUE) { "Too big packet: $length" }
+        check(length <= Int.MAX_VALUE) { "Too big packet: $length" }
 
         val nonce = input.readPacket(32).readBytes()
         val payload = input.readPacket(length - 64).readBytes()

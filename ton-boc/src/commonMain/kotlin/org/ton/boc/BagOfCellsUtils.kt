@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellType
+import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -14,15 +15,15 @@ fun Input.readBagOfCell(): BagOfCells {
     val hashCrc32: Boolean
     val hasCacheBits: Boolean
     val flags: Int
-    val sizeBytes: Int
+    val refSize: Int
     when (prefix) {
         BagOfCells.BOC_GENERIC_MAGIC -> {
             val firstByte = readByte().toInt() and 0xFF
-            hasIdx = (firstByte and 128) != 0
-            hashCrc32 = (firstByte and 64) != 0
-            hasCacheBits = (firstByte and 32) != 0
+            hasIdx = (firstByte and 0b1000_0000) != 0
+            hashCrc32 = (firstByte and 0b0100_0000) != 0
+            hasCacheBits = (firstByte and 0b0010_0000) != 0
             flags = (firstByte and 16) * 2 + (firstByte and 8)
-            sizeBytes = firstByte and 0b0000_0111
+            refSize = firstByte and 0b0000_0111
         }
 
         BagOfCells.BOC_INDEXED_MAGIC -> {
@@ -47,23 +48,33 @@ fun Input.readBagOfCell(): BagOfCells {
     }
 
     // Counters
-    val offsetBytes = readByte().toInt()
-    val cellCount = readInt(sizeBytes)
-    val rootsCount = readInt(sizeBytes)
-    val absentCount = readInt(sizeBytes)
-    val totalCellsSize = readInt(offsetBytes)
+    val offsetSize = readByte().toInt()
+    val cellCount = readInt(refSize)
+    val rootsCount = readInt(refSize)
+    val absentCount = readInt(refSize)
+    val totalCellsSize = readInt(offsetSize)
 
     // Roots
     val rootIndexes = IntArray(rootsCount) {
-        readInt(sizeBytes)
+        readInt(refSize)
     }
 
-    // Index
-    val indexes = if (hasIdx) {
-        IntArray(cellCount) {
-            readInt(offsetBytes)
+    val indexes: IntArray?
+    if (hasIdx) {
+        var prevOffset = 0
+        indexes = IntArray(cellCount)
+        repeat(cellCount) { index ->
+            var offset = readInt(offsetSize)
+            if (hasCacheBits) {
+                offset = offset shr 1
+            }
+            check(prevOffset <= offset) { "bag-of-cells error: offset of cell #$index must be higher, than $prevOffset" }
+            indexes[index] = offset
+            prevOffset = offset
         }
-    } else null
+    } else {
+        indexes = null
+    }
 
     val cellBits = Array(cellCount) { BitString() }
     val cellRefs = Array(cellCount) { intArrayOf() }
@@ -90,10 +101,11 @@ fun Input.readBagOfCell(): BagOfCells {
             val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
 
             if (hasHashes) {
-                val hashes = Array(level + 1) {
+                val hashCount = LevelMask(level).level + 1
+                val hashes = Array(hashCount) {
                     readBytes(32)
                 }
-                val depth = IntArray(level + 1) {
+                val depth = IntArray(hashCount) {
                     readShort().toInt()
                 }
             }
@@ -105,7 +117,7 @@ fun Input.readBagOfCell(): BagOfCells {
             val cellSize = BitString.findAugmentTag(cellData)
             cellBits[cellIndex] = BitString(cellData, cellSize)
             cellRefs[cellIndex] = IntArray(refsCount) { k ->
-                val refIndex = readInt(sizeBytes)
+                val refIndex = readInt(refSize)
                 check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
                 check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
                 refIndex
@@ -247,8 +259,8 @@ private fun Input.readInt(bytes: Int): Int {
     return when (bytes) {
         1 -> readUByte().toInt()
         2 -> readUShort().toInt()
-        3 -> (readUShort().toInt() shl UShort.SIZE_BITS) + readUShort().toInt()
-        else -> readInt() // TODO
+        3 -> (readUByte().toInt() shl 16) or (readUByte().toInt() shl 8) or (readUByte().toInt())
+        else -> readUInt().toInt()
     }
 }
 

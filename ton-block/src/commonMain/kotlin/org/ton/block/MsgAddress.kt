@@ -1,35 +1,29 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.exception.UnknownTlbConstructorException
 
 @Serializable
 sealed interface MsgAddress {
-    companion object {
+    companion object : TlbCodec<MsgAddress> by MsgAddressTlbCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<MsgAddress> = MsgAddressTlbCombinator()
+        fun tlbCodec(): TlbCombinator<MsgAddress> = MsgAddressTlbCombinator
     }
 }
 
-private class MsgAddressTlbCombinator : TlbCombinator<MsgAddress>() {
-    private val msgAddressInt by lazy {
-        MsgAddressInt.tlbCodec()
-    }
-    private val msgAddressExt by lazy {
-        MsgAddressExt.tlbCodec()
-    }
+private object MsgAddressTlbCombinator : TlbCombinator<MsgAddress>() {
+    private val msgAddressInt = MsgAddressInt.tlbCodec()
+    private val msgAddressExt = MsgAddressExt.tlbCodec()
 
-    override val constructors: List<TlbConstructor<out MsgAddress>> by lazy {
+    override val constructors: List<TlbConstructor<out MsgAddress>> =
         msgAddressInt.constructors + msgAddressExt.constructors
-    }
 
     override fun getConstructor(value: MsgAddress): TlbConstructor<out MsgAddress> {
         return when (value) {
             is MsgAddressInt -> msgAddressInt.getConstructor(value)
             is MsgAddressExt -> msgAddressExt.getConstructor(value)
-            else -> throw UnknownTlbConstructorException()
         }
     }
 }

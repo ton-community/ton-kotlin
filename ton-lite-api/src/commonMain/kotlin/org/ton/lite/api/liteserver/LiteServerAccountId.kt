@@ -8,7 +8,7 @@ import kotlinx.serialization.UseSerializers
 import org.ton.block.AddrStd
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.encodeHex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.readIntTl
@@ -51,7 +51,7 @@ data class LiteServerAccountId(
         append("LiteServerAccountId(workchain=")
         append(workchain)
         append(", id=")
-        append(base64(id))
+        append(id.encodeHex())
         append(")")
     }
 

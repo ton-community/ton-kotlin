@@ -10,9 +10,10 @@ import org.ton.tlb.TlbConstructor
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface AugDictionary<X, Y> {
+sealed interface AugDictionary<X, Y> : Iterable<Pair<X, Y>> {
     val extra: Y
 
+    override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
     fun nodes(): Sequence<Pair<X, Y>>
 
     companion object {

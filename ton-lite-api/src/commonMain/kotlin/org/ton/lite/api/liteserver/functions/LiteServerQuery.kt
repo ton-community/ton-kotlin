@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.encodeHex
 import org.ton.lite.api.liteserver.LiteServerError
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -17,8 +17,21 @@ import org.ton.tl.constructors.writeBytesTl
 interface LiteServerQueryFunction {
     suspend fun query(liteServerQuery: LiteServerQuery): ByteArray
 
-    suspend fun <Q : Any, A : Any> query(query: Q, queryCodec: TlCodec<Q>, answerCodec: TlCodec<A>): A {
-        val queryBytes = queryCodec.encodeBoxed(query)
+    suspend fun <Q : Any, A : Any> query(
+        query: Q,
+        queryCodec: TlCodec<Q>,
+        answerCodec: TlCodec<A>,
+        seqno: Int = -1
+    ): A {
+        var queryBytes = queryCodec.encodeBoxed(query)
+        if (seqno >= 0) {
+            queryBytes = LiteServerWaitMasterchainSeqno.encodeBoxed(
+                LiteServerWaitMasterchainSeqno(
+                    seqno,
+                    Int.MAX_VALUE
+                )
+            ) + queryBytes
+        }
         val liteServerQuery = LiteServerQuery(queryBytes)
         val answerBytes = query(liteServerQuery)
         val errorByteInput = ByteReadPacket(answerBytes)
@@ -49,7 +62,7 @@ data class LiteServerQuery(
 
     override fun toString(): String = buildString {
         append("LiteServerQuery(data=")
-        append(base64(data))
+        append(data.encodeHex())
         append(")")
     }
 

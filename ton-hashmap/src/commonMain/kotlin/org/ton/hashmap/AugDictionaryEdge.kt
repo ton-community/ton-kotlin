@@ -13,9 +13,10 @@ import org.ton.tlb.*
 data class AugDictionaryEdge<X, Y>(
     val label: HashMapLabel,
     val node: AugDictionaryNode<X, Y>
-) {
+) : Iterable<Pair<X, Y>> {
     override fun toString(): String = "ahm_edge(label:$label node:$node)"
 
+    override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
     fun nodes(): Sequence<Pair<X, Y>> {
         return when (node) {
             is AugDictionaryNodeFork -> node.nodes()

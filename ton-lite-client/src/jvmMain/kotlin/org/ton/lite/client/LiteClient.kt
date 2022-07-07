@@ -32,6 +32,10 @@ open class LiteClient(
         adnlTcpClient.connect()
     }
 
+    suspend fun disconnect() = apply {
+        adnlTcpClient.disconnect()
+    }
+
     override suspend fun sendRawQuery(byteArray: ByteArray): ByteArray =
         adnlTcpClient.sendQuery(byteArray)
 

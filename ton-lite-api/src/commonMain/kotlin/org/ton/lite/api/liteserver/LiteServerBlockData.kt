@@ -3,6 +3,7 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.block.Block
 import org.ton.boc.BagOfCells
 import org.ton.crypto.hex
 import org.ton.tl.TlConstructor
@@ -10,6 +11,7 @@ import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import org.ton.tlb.loadTlb
 
 @Serializable
 data class LiteServerBlockData(
@@ -17,6 +19,10 @@ data class LiteServerBlockData(
     val data: ByteArray
 ) {
     fun dataBagOfCells(): BagOfCells = BagOfCells(data)
+
+    fun toBlock(): Block = dataBagOfCells().first().parse {
+        loadTlb(Block)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

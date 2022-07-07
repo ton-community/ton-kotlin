@@ -3,6 +3,7 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 import org.ton.tl.readTl
@@ -39,6 +40,8 @@ data class LiteServerBlockTransactions(
         result = 31 * result + proof.contentHashCode()
         return result
     }
+
+    companion object : TlCodec<LiteServerBlockTransactions> by LiteServerBlockTransactionsTlConstructor
 }
 
 private object LiteServerBlockTransactionsTlConstructor : TlConstructor<LiteServerBlockTransactions>(

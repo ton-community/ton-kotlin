@@ -9,11 +9,8 @@ import org.ton.bitstring.BitString
 data class RootHashMapE<T>(
     val root: HashMapEdge<T>
 ) : HashMapE<T> {
-    override fun <K> toMap(keyTransform: (BitString) -> K): Map<K, T> = toMap().mapKeys { (key, _) ->
-        keyTransform(key)
-    }
 
-    override fun toMap(): Map<BitString, T> = root.toMap()
+    override fun nodes(): Sequence<Pair<BitString, T>> = root.nodes()
 
     override fun toString(): String = "hme_root(root:$root)"
 }

@@ -15,6 +15,9 @@ import org.ton.tlb.storeTlb
 data class BinTreeLeaf<X>(
     val leaf: X
 ) : BinTree<X> {
+
+    override fun nodes(): Sequence<X> = sequenceOf(leaf)
+
     companion object {
         @JvmStatic
         fun <X> tlbCodec(

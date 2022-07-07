@@ -14,6 +14,9 @@ data class BinTreeFork<X>(
     val left: BinTree<X>,
     val right: BinTree<X>
 ) : BinTree<X> {
+
+    override fun nodes(): Sequence<X> = left.nodes() + right.nodes()
+
     companion object {
         @JvmStatic
         fun <X> tlbCodec(

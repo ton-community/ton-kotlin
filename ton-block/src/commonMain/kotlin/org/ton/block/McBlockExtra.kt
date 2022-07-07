@@ -22,6 +22,7 @@ data class McBlockExtra(
     val mint_msg: Maybe<InMsg>,
     val config: ConfigParams?
 ) {
+
     companion object : TlbCodec<McBlockExtra> by McBlockExtraTlbConstructor.asTlbCombinator()
 }
 

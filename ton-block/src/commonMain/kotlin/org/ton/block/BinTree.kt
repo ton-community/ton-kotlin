@@ -10,7 +10,11 @@ import org.ton.tlb.TlbConstructor
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface BinTree<X> {
+sealed interface BinTree<X> : Iterable<X> {
+
+    override fun iterator(): Iterator<X> = nodes().iterator()
+    fun nodes(): Sequence<X>
+
     companion object {
         @JvmStatic
         fun <X> tlbCodec(

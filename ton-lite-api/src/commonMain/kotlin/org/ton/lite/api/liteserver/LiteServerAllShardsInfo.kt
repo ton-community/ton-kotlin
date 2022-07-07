@@ -3,6 +3,8 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.boc.BagOfCells
+import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
@@ -16,6 +18,8 @@ data class LiteServerAllShardsInfo(
     val proof: ByteArray,
     val data: ByteArray
 ) {
+    fun dataBagOfCells() = BagOfCells(data)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -34,6 +38,16 @@ data class LiteServerAllShardsInfo(
         result = 31 * result + proof.contentHashCode()
         result = 31 * result + data.contentHashCode()
         return result
+    }
+
+    override fun toString(): String = buildString {
+        append("LiteServerAllShardsInfo(id=")
+        append(id)
+        append(", proof=")
+        append(proof.encodeHex())
+        append(", data=")
+        append(data.encodeHex())
+        append(")")
     }
 
     companion object : TlCodec<LiteServerAllShardsInfo> by LiteServerAllShardsInfoTlConstructor

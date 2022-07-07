@@ -5,9 +5,8 @@ package org.ton.lite.api.liteserver.functions
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.encodeHex
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionList
 import org.ton.tl.TlConstructor
@@ -28,7 +27,6 @@ data class LiteServerGetTransactions(
     val count: Int,
     val account: LiteServerAccountId,
     val lt: Long,
-    @Serializable(Base64ByteArraySerializer::class)
     val hash: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -61,7 +59,7 @@ data class LiteServerGetTransactions(
         append(", lt=")
         append(lt)
         append(", hash=")
-        append(base64(hash))
+        append(hash.encodeHex())
         append(")")
     }
 

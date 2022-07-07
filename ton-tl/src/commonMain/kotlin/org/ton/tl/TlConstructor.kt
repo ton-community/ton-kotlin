@@ -10,11 +10,10 @@ import kotlin.reflect.full.createType
 abstract class TlConstructor<T : Any>(
     val type: KType,
     @Language("TL")
-    val schema: String
-) : TlCodec<T> {
-    constructor(type: KClass<T>, schema: String) : this(type.createType(), schema)
-
+    val schema: String,
     val id: Int = crc32(schema)
+) : TlCodec<T> {
+    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema)) : this(type.createType(), schema, id)
 
     fun calculatePadding(size: Int): Int = (size % 4).let { if (it > 0) 4 - it else 0 }
 

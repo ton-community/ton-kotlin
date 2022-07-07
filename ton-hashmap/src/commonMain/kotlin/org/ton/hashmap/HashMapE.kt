@@ -14,9 +14,11 @@ import org.ton.tlb.exception.UnknownTlbConstructorException
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapE<T> {
-    fun <K> toMap(keyTransform: (BitString) -> K): Map<K, T>
-    fun toMap(): Map<BitString, T>
+sealed interface HashMapE<T> : Iterable<Pair<BitString, T>> {
+
+    override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
+    fun nodes(): Sequence<Pair<BitString, T>>
+    fun toMap(): Map<BitString, T> = nodes().toMap()
 
     companion object {
         @JvmStatic

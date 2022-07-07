@@ -1,5 +1,6 @@
 package org.ton.lite.api
 
+import org.ton.lite.api.liteserver.LiteServerLookupBlockFunction
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 
@@ -16,8 +17,14 @@ interface LiteApi :
     LiteServerRunSmcMethodFunction,
     LiteServerGetShardInfoFunction,
     LiteServerGetAllShardsInfoFunction,
-
+    LiteServerGetOneTransactionFunction,
     LiteServerGetTransactionsFunction,
+    LiteServerLookupBlockFunction,
+    LiteServerListBlockTransactionsFunction,
+    LiteServerGetBlockProofFunction,
+    LiteServerGetConfigAllFunction,
+    LiteServerGetConfigParamsFunction,
+    LiteServerGetValidatorStatsFunction,
 
     LiteServerQueryFunction {
 
