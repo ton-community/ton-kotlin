@@ -1,0 +1,68 @@
+# Test coverage for TON SDK
+
+- Cryptography
+    - sha256
+        - basic checks:
+            - [different length](https://github.com/ton-blockchain/ton/blob/eb86234a1120fc3f9c6b390f4471cfd92b875044/tdutils/test/crypto.cpp#L179)
+            - [expected values](https://github.com/ton-blockchain/ton/blob/eb86234a1120fc3f9c6b390f4471cfd92b875044/tdutils/test/crypto.cpp#L243)
+        - check usage in cell hash computation
+    - crc32c
+        - check mistakes in signed/unsigned conversions
+        - wrong crc32c table
+            - [expected values](https://github.com/ton-blockchain/ton/blob/eb86234a1120fc3f9c6b390f4471cfd92b875044/tdutils/test/crypto.cpp#L278)
+            - checks in `serialized_boc#b5ee9c72.crc32c:has_crc32c?uint32`
+                - [serialization](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L169)
+                - deserialization
+            - checks in `serialized_boc_idx_crc32c#acc3a728.crc32c:uint32`
+                - serialization
+                - deserialization
+    - crc32
+        - check mistakes in signed/unsigned conversions
+        - wrong crc32 table
+            - check usage in TL constructor prefixes
+                - serialization boxed types
+                - deserialization boxed types
+            - check usage in TL-B constructor prefixes
+                - serialization
+                - deserialization
+    - crc16
+        - check mistakes in signed/unsigned conversions
+        - wrong crc16 table
+            - [basic checks](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/Crc16Test.kt)
+            - check usage in `liteServer.runSmcMethod` function in Lite-API for method names
+    - hex
+        - check `UPPER CASE` and `lower case`
+        - check invalid characters
+        - [basic checks with expected values](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/HexTest.kt)
+        - incomplete hex (`AA_`) aka Fift-hex should be implemented as a separate function that reuses basic
+          hex-function
+- BitString
+    - [BitString creation](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L11)
+    - [BitString concatenation without shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L44)
+    - [BitString concatenation with shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L57)
+    - [BitString concatenation with double-shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L68)
+    - [BitString.toString() on a zero number](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L107)
+    - [BitString assertions for all tests](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L114)
+        - [from binary == from hex](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L119)
+        - [from binary toString() == from hex toString()](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L121)
+        - [from binary toBooleanArray() == from hex toBooleanArray()](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L125)
+        - [from binary toByteArray() == from hex toByteArray()](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L126)
+        - [from binary .size == from hex .size](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L127)
+        - [from binary with the specified size == from hex with the specified size](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L128)
+        - [created from byte array](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L132)
+        - [created from boolean array](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L133)
+- Cell
+    - check `cell.bits.size` in `0..1023`
+    - check references count
+        - check for `ORDINARY(-1)` in `0..4`
+        - check for `PRUNED(1)` == `0`
+        - check for `LIBRARY_REFERENCE(1)` in `1..4`
+        - check for `MERKLE_PROOF(2)` == `1`
+        - check for `MERKLE_UPDATE(3)` == `2`
+    - [check representation bytes](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L97)
+        - [check computation of max depth](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonTest/kotlin/org/ton/cell/CellTest.kt#L9)
+        - [check computation of cell descriptors d1,d2](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonTest/kotlin/org/ton/cell/CellTest.kt#L81)
+            - [check reference descriptor (d1)](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L86)
+            - [check bits descriptor (d2)](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L89)
+        - [check augment bytes](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L92)
+    - check computation of cell hash
