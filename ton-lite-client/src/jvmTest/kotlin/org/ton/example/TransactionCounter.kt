@@ -1,3 +1,4 @@
+
 import kotlinx.coroutines.delay
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.AccountBlock
@@ -5,6 +6,7 @@ import org.ton.block.AddrStd
 import org.ton.block.Block
 import org.ton.cell.Cell
 import org.ton.crypto.base64
+import org.ton.lite.api.liteserver.LiteServerError
 import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
@@ -30,14 +32,24 @@ private suspend fun transactionsRealtime(liteClient: LiteClient) {
             delay(2500)
             continue
         }
-        lastSeqno = blockId.seqno
-        println("[$lastSeqno]")
-        val accountBlocks = liteClient.getAccountBlocks(blockId)
+        println("[$blockId]")
+        val accountBlocks = try {
+            liteClient.getAccountBlocks(blockId)
+        } catch (e: LiteServerError) {
+            // not in db
+            if (e.code == 651) {
+                println(e.toString())
+                continue
+            } else {
+                throw e
+            }
+        }
         accountBlocks.forEach { (addr, account) ->
             val inMsgCount = account.transactions.count { it.first.in_msg.value != null }
             val outMsgCount = account.transactions.sumOf { it.first.out_msgs.count() }
             println("  ${addr.toString(true)} - in:$inMsgCount out:$outMsgCount")
         }
+        lastSeqno = blockId.seqno
     }
 }
 
@@ -49,6 +61,7 @@ private suspend fun LiteClient.getAccountBlocks(blockId: TonNodeBlockIdExt): Map
     val accounts = LinkedHashMap<AddrStd, AccountBlock>()
     accounts.putAll(block.accountBlocks(blockId.workchain))
     block.collectWorkchainBlockIds().forEach {
+        println(it.toString())
         accounts.putAll(getAccountBlocks(it))
     }
     return accounts

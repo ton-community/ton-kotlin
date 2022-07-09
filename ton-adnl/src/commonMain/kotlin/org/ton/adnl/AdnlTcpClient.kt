@@ -5,12 +5,14 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import org.ton.adnl.exception.InvalidAdnlHashException
 import org.ton.api.adnl.AdnlPing
 import org.ton.api.adnl.AdnlPong
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.bitstring.BitString
+import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.crypto.sha256
 import org.ton.logger.Logger
@@ -152,19 +154,25 @@ abstract class AdnlTcpClient(
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
-        check(length <= UShort.MAX_VALUE.toInt()) { "Too big packet: $length" }
 
         val nonce = input.readPacket(32).readBytes()
         val payload = input.readPacket(length - 64).readBytes()
         val hash = input.readPacket(32).readBytes()
 
         val actualHash = sha256(nonce, payload)
-        check(hash.contentEquals(actualHash)) {
-            "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} payload: ${
-                hex(
-                    payload
-                )
-            }"
+
+        logger.debug { "RECEIVE: hash:${hash.encodeHex()} length:$length nonce:${hex(nonce)} payload:${hex(payload)}" }
+
+        if (!hash.contentEquals(actualHash)) {
+            val exception = InvalidAdnlHashException(
+                "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} length:$length nonce:${hex(nonce)} payload: ${
+                    hex(payload)
+                }"
+            )
+            println(exception)
+            if (readln().lowercase().contains("throw")) {
+                throw exception
+            }
         }
 
         return payload

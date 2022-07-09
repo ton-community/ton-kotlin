@@ -112,28 +112,29 @@ data class AddrStd(
                 base64(address)
             }
 
-            require(raw.size == 36)
-            return AddrStd(
+            require(raw.size == 36) { "invalid byte-array size expected: 36, actual: ${raw.size}" }
+            check((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) {
+                "unknown address tag"
+            }
+
+            val addrStd = AddrStd(
                 workchainId = raw[1].toInt(),
                 address = raw.sliceArray(2..33)
-            ).apply {
-                val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
-                if (testOnly) {
-                    // not 0x80 = 0x7F; here we clean the test only flag
-                    raw[0] = raw[0] and 0x7F.toByte()
-                }
+            )
 
-                check((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) { "unknown address tag" }
-
-                val bounceable = raw[0] == 0x11.toByte()
-                check(
-                    (crc(
-                        this,
-                        testOnly,
-                        bounceable
-                    ) == raw[34].toUByte().toInt() * 256 + raw[35].toUByte().toInt())
-                ) { "CRC check failed" }
+            val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
+            if (testOnly) {
+                // not 0x80 = 0x7F; here we clean the test only flag
+                raw[0] = raw[0] and 0x7F.toByte()
             }
+            val bounceable = raw[0] == 0x11.toByte()
+            val expectedChecksum = raw[34].toUByte().toInt() * 256 + raw[35].toUByte().toInt()
+            val actualChecksum = crc(addrStd, testOnly, bounceable)
+            check(expectedChecksum == actualChecksum) {
+                "CRC check failed"
+            }
+
+            return addrStd
         }
 
         private fun crc(address: AddrStd, testOnly: Boolean, bounceable: Boolean): Int =

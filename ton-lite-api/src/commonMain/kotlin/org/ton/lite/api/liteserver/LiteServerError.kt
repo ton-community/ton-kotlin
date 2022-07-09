@@ -10,14 +10,14 @@ import org.ton.tl.constructors.writeStringTl
 
 @Serializable
 data class LiteServerError(
-        val code: Int,
-        override val message: String
-) : RuntimeException("$code $message") {
-    override fun fillInStackTrace(): Throwable? = null
+    val code: Int,
+    override val message: String
+) : RuntimeException("[$code] $message") {
+    override fun toString(): String = "[$code] $message"
 
     companion object : TlConstructor<LiteServerError>(
-            type = LiteServerError::class,
-            schema = "liteServer.error code:int message:string = liteServer.Error"
+        type = LiteServerError::class,
+        schema = "liteServer.error code:int message:string = liteServer.Error"
     ) {
         override fun decode(input: Input): LiteServerError {
             val code = input.readIntTl()

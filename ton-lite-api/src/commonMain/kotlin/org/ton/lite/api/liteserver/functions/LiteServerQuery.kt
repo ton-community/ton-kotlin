@@ -22,7 +22,7 @@ interface LiteServerQueryFunction {
         queryCodec: TlCodec<Q>,
         answerCodec: TlCodec<A>,
         seqno: Int = -1
-    ): A {
+    ): A = try {
         var queryBytes = queryCodec.encodeBoxed(query)
         if (seqno >= 0) {
             queryBytes = LiteServerWaitMasterchainSeqno.encodeBoxed(
@@ -38,7 +38,11 @@ interface LiteServerQueryFunction {
         if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
             throw LiteServerError.decode(errorByteInput)
         }
-        return answerCodec.decodeBoxed(answerBytes)
+        answerCodec.decodeBoxed(answerBytes)
+    } catch (e: LiteServerError) {
+        throw e.copy(message = "${e.message} query: $query")
+    } catch (e: Exception) {
+        throw RuntimeException("Can't process query: $query", e)
     }
 }
 

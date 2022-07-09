@@ -6,7 +6,11 @@ class PrintLnLogger(
 ) : Logger {
     override fun log(level: Logger.Level, message: () -> String) {
         if (level >= this.level) {
-            println("[$name] [${level.name}] ${message()}")
+            if (level == Logger.Level.DEBUG) {
+                println("\u001B[37m[$name] [${level.name}] ${message()}\u001B[0m")
+            } else {
+                println("[$name] [${level.name}] ${message()}")
+            }
         }
     }
 }
