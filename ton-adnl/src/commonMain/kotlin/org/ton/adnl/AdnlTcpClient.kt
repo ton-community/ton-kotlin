@@ -5,7 +5,6 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.ton.adnl.exception.InvalidAdnlHashException
 import org.ton.api.adnl.AdnlPing
 import org.ton.api.adnl.AdnlPong
 import org.ton.api.adnl.message.AdnlMessage
@@ -163,16 +162,10 @@ abstract class AdnlTcpClient(
 
         logger.debug { "RECEIVE: hash:${hash.encodeHex()} length:$length nonce:${hex(nonce)} payload:${hex(payload)}" }
 
-        if (!hash.contentEquals(actualHash)) {
-            val exception = InvalidAdnlHashException(
-                "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} length:$length nonce:${hex(nonce)} payload: ${
-                    hex(payload)
-                }"
-            )
-            println(exception)
-            if (readln().lowercase().contains("throw")) {
-                throw exception
-            }
+        check(hash.contentEquals(actualHash)) {
+            "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} length:$length nonce:${hex(nonce)} payload: ${
+                hex(payload)
+            }"
         }
 
         return payload
