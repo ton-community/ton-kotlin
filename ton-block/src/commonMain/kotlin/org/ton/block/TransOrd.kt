@@ -27,6 +27,19 @@ data class TransOrd(
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TransOrd> = TransOrdTlbConstructor
     }
+
+    override fun toString(): String = buildString {
+        append("(trans_ord\n")
+        append("credit_first:$credit_first ")
+        append("storage_ph:$storage_ph ")
+        append("credit_ph:$credit_ph ")
+        append("compute_ph:$compute_ph ")
+        append("action:$action ")
+        append("aborted:$aborted ")
+        append("bounce:$bounce ")
+        append("destroyed:$destroyed")
+        append(")")
+    }
 }
 
 private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(

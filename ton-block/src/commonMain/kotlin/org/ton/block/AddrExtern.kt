@@ -22,6 +22,15 @@ data class AddrExtern(
     constructor(externalAddress: ByteArray) : this(externalAddress.toBitString())
     constructor(externalAddress: BitString) : this(externalAddress.size, externalAddress)
 
+    override fun toString(): String = buildString {
+        append("(addr_extern\n")
+        append("len:")
+        append(len)
+        append(" external_address:")
+        append(external_address)
+        append(")")
+    }
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<AddrExtern> = AddrExternTlbConstructor

@@ -16,7 +16,7 @@ import org.ton.tlb.storeTlb
 data class AugDictionaryEmpty<X, Y>(
     override val extra: Y
 ) : AugDictionary<X, Y> {
-    override fun toString(): String = "ahme_empty(extra:$extra)"
+    override fun toString(): String = "(ahme_empty\nextra:$extra)"
 
     override fun nodes(): Sequence<Pair<X, Y>> = emptySequence()
 

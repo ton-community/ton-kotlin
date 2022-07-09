@@ -44,9 +44,9 @@ sealed interface Either<X, Y> {
             return true
         }
 
-        override fun hashCode(): Int = value?.hashCode() ?: 0
+        override fun hashCode(): Int = value.hashCode()
 
-        override fun toString(): String = "Left(value=$value)"
+        override fun toString(): String = "(left\nvalue:$value)"
     }
 
     @SerialName("right")
@@ -71,9 +71,9 @@ sealed interface Either<X, Y> {
             return true
         }
 
-        override fun hashCode(): Int = value?.hashCode() ?: 0
+        override fun hashCode(): Int = value.hashCode()
 
-        override fun toString(): String = "Right(value=$value)"
+        override fun toString(): String = "(right\nvalue:$value)"
     }
 
     companion object {

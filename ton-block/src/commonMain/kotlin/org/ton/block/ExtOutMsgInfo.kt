@@ -14,11 +14,23 @@ import org.ton.tlb.storeTlb
 data class ExtOutMsgInfo(
     val src: MsgAddressInt,
     val dest: MsgAddressExt,
-    @SerialName("created_lt")
-    val createdLt: Long,
-    @SerialName("created_at")
-    val createdAt: Int
+    val created_lt: Long,
+    val created_at: Int
 ) : CommonMsgInfo {
+
+    override fun toString(): String = buildString {
+        append("(ext_out_msg_info\n")
+        append("src:")
+        append(src)
+        append(" dest:")
+        append(dest)
+        append(" created_lt:")
+        append(created_lt)
+        append(" created_at:")
+        append(created_at)
+        append(")")
+    }
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<ExtOutMsgInfo> = ExtOutMsgInfoTlbConstructor
@@ -33,8 +45,8 @@ private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     ) = cellBuilder {
         storeTlb(MsgAddressInt, value.src)
         storeTlb(MsgAddressExt, value.dest)
-        storeUInt(value.createdLt, 64)
-        storeUInt(value.createdAt, 32)
+        storeUInt(value.created_lt, 64)
+        storeUInt(value.created_at, 32)
     }
 
     override fun loadTlb(

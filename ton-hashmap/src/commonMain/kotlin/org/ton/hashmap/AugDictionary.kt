@@ -27,20 +27,15 @@ sealed interface AugDictionary<X, Y> : Iterable<Pair<X, Y>> {
 }
 
 private class AugDictionaryTlbCombinator<X, Y>(
-    val n: Int,
-    val x: TlbCodec<X>,
-    val y: TlbCodec<Y>
+    n: Int,
+    x: TlbCodec<X>,
+    y: TlbCodec<Y>
 ) : TlbCombinator<AugDictionary<X, Y>>() {
-    val empty by lazy {
-        AugDictionaryEmpty.tlbCodec<X, Y>(y)
-    }
-    val root by lazy {
-        AugDictionaryRoot.tlbCodec(n, x, y)
-    }
+    val empty = AugDictionaryEmpty.tlbCodec<X, Y>(y)
+    val root = AugDictionaryRoot.tlbCodec(n, x, y)
 
-    override val constructors: List<TlbConstructor<out AugDictionary<X, Y>>> by lazy {
+    override val constructors: List<TlbConstructor<out AugDictionary<X, Y>>> =
         listOf(empty, root)
-    }
 
     override fun getConstructor(
         value: AugDictionary<X, Y>

@@ -12,5 +12,5 @@ data class RootHashMapE<T>(
 
     override fun nodes(): Sequence<Pair<BitString, T>> = root.nodes()
 
-    override fun toString(): String = "hme_root(root:$root)"
+    override fun toString(): String = "(hme_root\nroot:$root)"
 }

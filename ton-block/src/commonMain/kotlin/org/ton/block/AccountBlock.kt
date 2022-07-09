@@ -16,10 +16,21 @@ import org.ton.tlb.storeTlb
 data class AccountBlock(
     val account_addr: BitString,
     val transactions: AugDictionaryEdge<Transaction, CurrencyCollection>,
-    val state_update: HashUpdate<Account>
+    val state_update: HashUpdate
 ) {
     init {
         require(account_addr.size == 256) { "expected: account_addr.size == 256, actual: ${account_addr.size}" }
+    }
+
+    override fun toString(): String = buildString {
+        append("(acc_trans\n")
+        append("account_addr:")
+        append(account_addr)
+        append(" transactions:")
+        append(transactions)
+        append(" state_update:^")
+        append(state_update)
+        append(")")
     }
 
     companion object : TlbCodec<AccountBlock> by AccountBlockTlbConstructor.asTlbCombinator()
@@ -38,7 +49,6 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
             CurrencyCollection.tlbCodec()
         )
     }
-    val hashUpdate by lazy { HashUpdate.tlbCodec(Account.tlbCodec()) }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -47,7 +57,7 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
         storeBits(value.account_addr)
         storeTlb(augDictionaryEdge, value.transactions)
         storeRef {
-            storeTlb(hashUpdate, value.state_update)
+            storeTlb(HashUpdate, value.state_update)
         }
     }
 
@@ -57,7 +67,7 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
         val accountAddr = loadBits(256)
         val transactions = loadTlb(augDictionaryEdge)
         val stateUpdate = loadRef {
-            loadTlb(hashUpdate)
+            loadTlb(HashUpdate)
         }
         AccountBlock(accountAddr, transactions, stateUpdate)
     }

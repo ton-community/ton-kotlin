@@ -152,14 +152,20 @@ abstract class AdnlTcpClient(
         val length = input.readIntLittleEndian()
 
         check(length >= 64) { "Too small packet: $length" }
-        check(length <= Int.MAX_VALUE) { "Too big packet: $length" }
+        check(length <= UShort.MAX_VALUE.toInt()) { "Too big packet: $length" }
 
         val nonce = input.readPacket(32).readBytes()
         val payload = input.readPacket(length - 64).readBytes()
         val hash = input.readPacket(32).readBytes()
 
         val actualHash = sha256(nonce, payload)
-        check(hash.contentEquals(actualHash)) { "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)}" }
+        check(hash.contentEquals(actualHash)) {
+            "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} payload: ${
+                hex(
+                    payload
+                )
+            }"
+        }
 
         return payload
     }

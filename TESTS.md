@@ -42,6 +42,7 @@
     - [BitString concatenation with shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L57)
     - [BitString concatenation with double-shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L68)
     - [BitString.toString() on a zero number](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L107)
+    - [check BitString.size in `0..1023`](https://github.com/andreypfau/ton-kotlin/blob/3b02ad6c729e14fff8c023801062f9505cc6ed4a/ton-bitstring/src/commonMain/kotlin/org/ton/bitstring/ByteBackedBitString.kt#L167)
     - [BitString assertions for all tests](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L114)
         - [from binary == from hex](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L119)
         - [from binary toString() == from hex toString()](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L121)
@@ -56,9 +57,9 @@
     - check references count
         - check for `ORDINARY(-1)` in `0..4`
         - check for `PRUNED(1)` == `0`
-        - check for `LIBRARY_REFERENCE(1)` in `1..4`
-        - check for `MERKLE_PROOF(2)` == `1`
-        - check for `MERKLE_UPDATE(3)` == `2`
+        - check for `LIBRARY_REFERENCE(2)` in `1..4`
+        - check for `MERKLE_PROOF(3)` == `1`
+        - check for `MERKLE_UPDATE(4)` == `2`
     - [check representation bytes](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L97)
         - [check computation of max depth](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonTest/kotlin/org/ton/cell/CellTest.kt#L9)
         - [check computation of cell descriptors d1,d2](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonTest/kotlin/org/ton/cell/CellTest.kt#L81)
@@ -66,3 +67,6 @@
             - [check bits descriptor (d2)](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L89)
         - [check augment bytes](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L92)
     - check computation of cell hash
+        - usage of sha256
+- 
+    

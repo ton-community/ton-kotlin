@@ -15,6 +15,13 @@ import org.ton.tlb.storeTlb
 data class TrPhaseComputeSkipped(
     val reason: ComputeSkipReason
 ) : TrComputePhase {
+    override fun toString(): String = buildString {
+        append("(tr_phase_compute_skipped\n")
+        append("reason:")
+        append(reason)
+        append(")")
+    }
+
     companion object : TlbCodec<TrPhaseComputeSkipped> by TrPhaseComputeSkippedTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrPhaseComputeSkipped> = TrPhaseComputeSkippedTlbConstructor

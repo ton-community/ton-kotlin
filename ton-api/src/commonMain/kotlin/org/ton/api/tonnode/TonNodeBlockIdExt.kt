@@ -53,15 +53,15 @@ data class TonNodeBlockIdExt(
     }
 
     override fun toString(): String = buildString {
-        append("TonNodeBlockIdExt(workchain=")
+        append("(")
         append(workchain)
-        append(", shard=")
-        append(shard)
-        append(", seqno=")
+        append(":")
+        append(shard.toULong().toString(16))
+        append(":")
         append(seqno)
-        append(", root_hash=")
+        append(" root_hash:")
         append(root_hash.encodeHex())
-        append(", file_hash=")
+        append(" file_hash:")
         append(file_hash.encodeHex())
         append(")")
     }

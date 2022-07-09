@@ -2,6 +2,7 @@
 
 package org.ton.tlb
 
+import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 
@@ -29,6 +30,10 @@ fun interface TlbNegatedLoader<T> : TlbLoader<T> {
 
 interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
 interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
+
+inline fun <T> Cell.parse(tlbCodec: TlbCodec<T>): T = parse {
+    loadTlb(tlbCodec)
+}
 
 inline fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)

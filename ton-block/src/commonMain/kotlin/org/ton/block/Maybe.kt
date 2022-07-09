@@ -44,7 +44,7 @@ class Nothing<X> : Maybe<X> {
 data class Just<X>(
     override val value: X
 ) : Maybe<X> {
-    override fun toString(): String = "just(value:$value)"
+    override fun toString(): String = "(just\nvalue:$value)"
 }
 
 private class MaybeTlbCombinator<X>(

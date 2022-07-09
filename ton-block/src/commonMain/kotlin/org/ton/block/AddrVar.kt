@@ -40,8 +40,18 @@ data class AddrVar(
         address.toBitString()
     )
 
-    override fun toString(): String =
-        "addr_var(anycast:$anycast addr_len:$addr_len workchain_id:$workchain_id address:$address)"
+    override fun toString(): String = buildString {
+        append("(addr_var\n")
+        append("anycast:")
+        append(anycast)
+        append(" addr_len:")
+        append(addr_len)
+        append(" workchain_id:")
+        append(workchain_id)
+        append(" address:")
+        append(address)
+        append(")")
+    }
 
     companion object : TlbCodec<AddrVar> by AddrVarTlbConstructor {
         @JvmStatic

@@ -11,16 +11,24 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 enum class AccountStatus {
     @SerialName("acc_state_uninit")
-    UNINIT,
+    UNINIT {
+        override fun toString(): String = "acc_state_uninit"
+    },
 
     @SerialName("acc_state_frozen")
-    FROZEN,
+    FROZEN {
+        override fun toString(): String = "acc_state_frozen"
+    },
 
     @SerialName("acc_state_active")
-    ACTIVE,
+    ACTIVE {
+        override fun toString(): String = "acc_state_active"
+    },
 
     @SerialName("acc_state_nonexist")
-    NONEXIST;
+    NONEXIST {
+        override fun toString(): String = "acc_state_nonexist"
+    };
 
     companion object : TlbCodec<AccountStatus> by AccountStatusTlbCombinator {
         @JvmStatic

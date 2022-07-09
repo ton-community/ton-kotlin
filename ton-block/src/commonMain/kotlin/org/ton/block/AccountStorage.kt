@@ -17,7 +17,7 @@ data class AccountStorage(
     val balance: CurrencyCollection,
     val state: AccountState
 ) {
-    override fun toString(): String = "account_storage(last_trans_lt:$last_trans_lt balance:$balance state:$state)"
+    override fun toString(): String = "(account_storage\nlast_trans_lt:$last_trans_lt balance:$balance state:$state)"
 
     companion object : TlbCodec<AccountStorage> by AccountStorageTlbConstructor {
         @JvmStatic

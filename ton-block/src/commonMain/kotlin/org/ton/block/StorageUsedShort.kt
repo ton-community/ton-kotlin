@@ -20,6 +20,14 @@ data class StorageUsedShort(
         @JvmStatic
         fun tlbCodec(): TlbConstructor<StorageUsedShort> = StorageUsedShortTlbConstructor
     }
+
+    override fun toString(): String = buildString {
+        append("(storage_used_short\ncells:")
+        append(cells)
+        append(" bits:")
+        append(bits)
+        append(")")
+    }
 }
 
 private object StorageUsedShortTlbConstructor : TlbConstructor<StorageUsedShort>(

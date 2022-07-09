@@ -12,7 +12,7 @@ data class HashMapLabelSame(
 ) : HashMapLabel {
     override val s: BitString get() = BitString(*BooleanArray(n) { v })
 
-    override fun toString() = "hml_same(v:$v n:$n)"
+    override fun toString() = "(hml_same\nv:$v n:$n)"
 
     companion object {
         @JvmStatic

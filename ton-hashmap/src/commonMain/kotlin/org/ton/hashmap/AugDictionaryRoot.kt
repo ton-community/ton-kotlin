@@ -15,7 +15,7 @@ data class AugDictionaryRoot<X, Y>(
     val root: AugDictionaryEdge<X, Y>,
     override val extra: Y
 ) : AugDictionary<X, Y> {
-    override fun toString(): String = "ahme_root(root:$root extra:$extra)"
+    override fun toString(): String = "(ahme_root\nroot:$root extra:$extra)"
 
     override fun nodes(): Sequence<Pair<X, Y>> = root.nodes()
 

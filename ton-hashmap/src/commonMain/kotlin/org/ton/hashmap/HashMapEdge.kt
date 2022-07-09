@@ -13,7 +13,7 @@ data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>> {
-    override fun toString(): String = "hm_edge(label:$label node:$node)"
+    override fun toString(): String = "(hm_edge\nlabel:$label node:$node)"
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
 

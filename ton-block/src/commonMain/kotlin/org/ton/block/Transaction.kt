@@ -29,7 +29,7 @@ data class Transaction(
     val in_msg: Maybe<Message<Cell>>,
     val out_msgs: HashMapE<Message<Cell>>,
     val total_fees: CurrencyCollection,
-    val state_update: HashUpdate<Account>,
+    val state_update: HashUpdate,
     val description: TransactionDescr
 ) {
     init {
@@ -37,7 +37,44 @@ data class Transaction(
         require(prev_trans_hash.size == 256) { "required: prev_trans_hash.size == 256, actual: ${prev_trans_hash.size}" }
     }
 
+    fun toCell(): Cell = CellBuilder.createCell {
+        storeTlb(Transaction, this@Transaction)
+    }
+
+    fun hash(): ByteArray = toCell().hash()
+
     companion object : TlbCodec<Transaction> by TransactionTlbConstructor.asTlbCombinator()
+
+    override fun toString(): String = buildString {
+        append("(transaction\n")
+        append("account_addr:")
+        append(account_addr)
+        append(" lt:")
+        append(lt)
+        append(" prev_trans_hash:")
+        append(prev_trans_hash)
+        append(" prev_trans_lt:")
+        append(prev_trans_lt)
+        append(" now:")
+        append(now)
+        append(" outmsg_cnt:")
+        append(outmsg_cnt)
+        append(" orig_status:")
+        append(orig_status)
+        append(" end_status:")
+        append(end_status)
+        append(" in_msg:")
+        append(in_msg)
+        append(" out_msgs:")
+        append(out_msgs)
+        append(" total_fees:")
+        append(total_fees)
+        append(" state_update:")
+        append(state_update)
+        append(" description:")
+        append(description)
+        append(")")
+    }
 }
 
 private object TransactionTlbConstructor : TlbConstructor<Transaction>(
@@ -52,7 +89,6 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
     val RefMessageAny = Cell.tlbCodec(Message.Any)
     val maybeMessageAny = Maybe(RefMessageAny)
     val hashMapEMessageAny = HashMapE.tlbCodec(15, RefMessageAny)
-    val hashUpdateAccount = HashUpdate.tlbCodec(Account.tlbCodec())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -72,7 +108,7 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         }
         storeTlb(CurrencyCollection, value.total_fees)
         storeRef {
-            storeTlb(hashUpdateAccount, value.state_update)
+            storeTlb(HashUpdate, value.state_update)
         }
         storeRef {
             storeTlb(TransactionDescr, value.description)
@@ -91,11 +127,13 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         val origStatus = loadTlb(AccountStatus)
         val endStatus = loadTlb(AccountStatus)
         val (inMsg, outMsgs) = loadRef {
-            loadTlb(maybeMessageAny) to loadTlb(hashMapEMessageAny)
+            val inMsg = loadTlb(maybeMessageAny)
+            val outMsgs = loadTlb(hashMapEMessageAny)
+            inMsg to outMsgs
         }
         val totalFees = loadTlb(CurrencyCollection)
         val stateUpdate = loadRef {
-            loadTlb(hashUpdateAccount)
+            loadTlb(HashUpdate)
         }
         val description = loadRef {
             loadTlb(TransactionDescr)

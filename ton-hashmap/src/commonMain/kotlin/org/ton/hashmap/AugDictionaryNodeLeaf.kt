@@ -16,7 +16,7 @@ import org.ton.tlb.storeTlb
 data class AugDictionaryNodeLeaf<X, Y>(
     override val extra: Y, val value: X
 ) : AugDictionaryNode<X, Y> {
-    override fun toString(): String = "ahmn_leaf(extra:$extra value:$value)"
+    override fun toString(): String = "(ahmn_leaf\nextra:$extra value:$value)"
 
     companion object {
         @JvmStatic

@@ -17,7 +17,7 @@ data class AccountFrozen(
         require(state_hash.size == 256) { "required: state_hash.size == 256, actual: ${state_hash.size}" }
     }
 
-    override fun toString(): String = "account_frozen(state_hash:$state_hash)"
+    override fun toString(): String = "(account_frozen\nstate_hash:$state_hash)"
 
     companion object {
         @JvmStatic
@@ -26,7 +26,7 @@ data class AccountFrozen(
 }
 
 private object AccountFrozenTlbConstructor : TlbConstructor<AccountFrozen>(
-    schema = "account_frozen\$01 state_hash:bits256 = AccountState"
+    schema = "account_frozen\$01 state_hash:bits256 = AccountState;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

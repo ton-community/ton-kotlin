@@ -35,7 +35,7 @@ data class VarUInteger(
     fun toLong(): Long = value.toLong()
     fun toShort(): Short = value.toShort()
 
-    override fun toString(): String = "var_uint(len:$len value:$value)"
+    override fun toString(): String = value.toString()
 
     companion object {
         @JvmStatic

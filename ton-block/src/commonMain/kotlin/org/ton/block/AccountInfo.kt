@@ -21,7 +21,7 @@ data class AccountInfo(
         fun tlbCodec(): TlbConstructor<AccountInfo> = AccountInfoTlbConstructor
     }
 
-    override fun toString(): String = "account(addr:$addr storage_stat:$storage_stat storage:$storage)"
+    override fun toString(): String = "(account\naddr:$addr storage_stat:$storage_stat storage:$storage)"
 }
 
 private object AccountInfoTlbConstructor : TlbConstructor<AccountInfo>(

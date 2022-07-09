@@ -17,11 +17,10 @@ data class AugDictionaryEdge<X, Y>(
     override fun toString(): String = "ahm_edge(label:$label node:$node)"
 
     override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
-    fun nodes(): Sequence<Pair<X, Y>> {
-        return when (node) {
-            is AugDictionaryNodeFork -> node.nodes()
-            is AugDictionaryNodeLeaf -> sequenceOf(node.value to node.extra)
-        }
+
+    fun nodes(): Sequence<Pair<X, Y>> = when (node) {
+        is AugDictionaryNodeFork -> node.nodes()
+        is AugDictionaryNodeLeaf -> sequenceOf(node.value to node.extra)
     }
 
     companion object {

@@ -39,17 +39,17 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
             "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;",
     id = BitString.empty()
 ) {
-    val n = n - 1
+    val edge = AugDictionaryEdge.tlbCodec(n - 1, x, y)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: AugDictionaryNodeFork<X, Y>
     ) = cellBuilder {
         storeRef {
-            storeTlb(AugDictionaryEdge.tlbCodec(n, x, y), value.left)
+            storeTlb(edge, value.left)
         }
         storeRef {
-            storeTlb(AugDictionaryEdge.tlbCodec(n, x, y), value.right)
+            storeTlb(edge, value.right)
         }
         storeTlb(y, value.extra)
     }
@@ -58,10 +58,10 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
         cellSlice: CellSlice
     ): AugDictionaryNodeFork<X, Y> = cellSlice {
         val left = loadRef {
-            loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
+            loadTlb(edge)
         }
         val right = loadRef {
-            loadTlb(AugDictionaryEdge.tlbCodec(n, x, y))
+            loadTlb(edge)
         }
         val extra = loadTlb(y)
         AugDictionaryNodeFork(left, right, extra)

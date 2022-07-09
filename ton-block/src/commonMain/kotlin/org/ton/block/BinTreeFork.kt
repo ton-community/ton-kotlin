@@ -17,6 +17,15 @@ data class BinTreeFork<X>(
 
     override fun nodes(): Sequence<X> = left.nodes() + right.nodes()
 
+    override fun toString(): String = buildString {
+        append("(bt_fork\n")
+        append("left:^")
+        append(left)
+        append(" right:^")
+        append(right)
+        append(")")
+    }
+
     companion object {
         @JvmStatic
         fun <X> tlbCodec(

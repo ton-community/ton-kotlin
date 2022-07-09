@@ -12,5 +12,5 @@ data class HashMapLabelShort(
 ) : HashMapLabel {
     constructor(s: BitString) : this(Unary(s.size), s)
 
-    override fun toString() = "hml_short(len:$len s:$s)"
+    override fun toString() = "(hml_short len:$len s:$s)"
 }

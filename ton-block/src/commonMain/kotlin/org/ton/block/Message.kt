@@ -48,8 +48,15 @@ data class Message<X>(
         ): TlbConstructor<Message<X>> = MessageTlbConstructor(x)
     }
 
-    override fun toString(): String {
-        return "Message(info=$info, init=$init, body=$body)".replace("\n", "")
+    override fun toString(): String = buildString {
+        append("(message\n")
+        append("info:")
+        append(info)
+        append(" init:")
+        append(init)
+        append(" body:")
+        append(body.toString())
+        append(")")
     }
 }
 

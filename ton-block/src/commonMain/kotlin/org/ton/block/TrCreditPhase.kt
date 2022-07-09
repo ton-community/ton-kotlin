@@ -2,7 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -16,6 +18,14 @@ data class TrCreditPhase(
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrCreditPhase> = TrCreditPhaseTlbConstructor
+    }
+
+    override fun toString(): String = buildString {
+        append("(tr_phase_credit\ndue_fees_collected:")
+        append(due_fees_collected)
+        append(" credit:")
+        append(credit)
+        append(")")
     }
 }
 

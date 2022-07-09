@@ -2,9 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.BigInt
-import org.ton.bigint.plus
-import org.ton.bigint.times
+import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -18,7 +16,13 @@ import org.ton.tlb.storeTlb
 data class Coins(
     val amount: VarUInteger = VarUInteger(0)
 ) {
-    override fun toString(): String = "nanocoins(amount:$amount)"
+    override fun toString(): String = buildString {
+        val full = amount.value / NANOCOINS
+        val decimal = amount.value - full
+        append(full)
+        append(".")
+        append(decimal.toString().padStart(9, '0'))
+    }
 
     companion object : TlbCodec<Coins> by CoinsTlbConstructor {
         private val NANOCOINS = 1_000_000_000

@@ -42,11 +42,11 @@ interface CellSlice {
     fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
 
-    fun loadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
-    fun preloadUIntLeq(max: Int) = loadUInt(BigInt(max).bitLength)
+    fun loadUIntLeq(max: Int) = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
+    fun preloadUIntLeq(max: Int) = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
 
-    fun loadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
-    fun preloadUIntLes(max: Int) = loadUInt(BigInt(max - 1).bitLength)
+    fun loadUIntLes(max: Int) = loadUIntLeq(max - 1)
+    fun preloadUIntLes(max: Int) = loadUIntLeq(max - 1)
 
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 

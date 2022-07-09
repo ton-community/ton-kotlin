@@ -11,13 +11,19 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 enum class ComputeSkipReason {
     @SerialName("cskip_no_state")
-    NO_STATE,
+    NO_STATE {
+        override fun toString(): String = "cskip_no_state"
+    },
 
     @SerialName("cskip_bad_state")
-    BAD_STATE,
+    BAD_STATE {
+        override fun toString(): String = "cskip_bad_state"
+    },
 
     @SerialName("cskip_no_gas")
-    NO_GAS
+    NO_GAS {
+        override fun toString(): String = "cskip_bad_state"
+    }
     ;
 
     companion object : TlbCodec<ComputeSkipReason> by ComputeSkipReasonTlbCombinator {

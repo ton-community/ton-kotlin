@@ -38,9 +38,42 @@ data class TrActionPhase(
         require(action_list_hash.size == 256) { "required: action_list_hash.size == 256, actual: ${action_list_hash.size}" }
     }
 
+
     companion object : TlbCodec<TrActionPhase> by TrActionPhaseTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrActionPhase> = TrActionPhaseTlbConstructor
+    }
+
+    override fun toString(): String = buildString {
+        append("(tr_phase_action\nsuccess:")
+        append(success)
+        append(" valid:")
+        append(valid)
+        append(" no_funds:")
+        append(no_funds)
+        append(" status_change:")
+        append(status_change)
+        append(" total_fwd_fees:")
+        append(total_fwd_fees)
+        append(" total_action_fees:")
+        append(total_action_fees)
+        append(" result_code:")
+        append(result_code)
+        append(" result_arg:")
+        append(result_arg)
+        append(" tot_actions:")
+        append(tot_actions)
+        append(" spec_actions:")
+        append(spec_actions)
+        append(" skipped_actions:")
+        append(skipped_actions)
+        append(" msgs_created:")
+        append(msgs_created)
+        append(" action_list_hash:")
+        append(action_list_hash)
+        append(" tot_msg_size:")
+        append(tot_msg_size)
+        append(")")
     }
 }
 

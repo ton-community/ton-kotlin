@@ -15,8 +15,7 @@ import org.ton.tlb.storeTlb
 data class ExtInMsgInfo(
     val src: MsgAddressExt,
     val dest: MsgAddressInt,
-    @SerialName("import_fee")
-    val importFee: Coins = Coins()
+    val import_fee: Coins = Coins()
 ) : CommonMsgInfo {
     constructor(
         dest: MsgAddressInt,
@@ -26,6 +25,14 @@ data class ExtInMsgInfo(
     companion object : TlbCodec<ExtInMsgInfo> by ExtInMsgInfoTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<ExtInMsgInfo> = ExtInMsgInfoTlbConstructor
+    }
+
+    override fun toString(): String = buildString {
+        append("(ext_in_msg_info\n")
+        append("src:$src ")
+        append("dest:$dest ")
+        append("import_fee:$import_fee")
+        append(")")
     }
 }
 
@@ -37,7 +44,7 @@ private object ExtInMsgInfoTlbConstructor : TlbConstructor<ExtInMsgInfo>(
     ) = cellBuilder {
         storeTlb(MsgAddressExt, value.src)
         storeTlb(MsgAddressInt, value.dest)
-        storeTlb(Coins, value.importFee)
+        storeTlb(Coins, value.import_fee)
     }
 
     override fun loadTlb(

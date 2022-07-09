@@ -32,9 +32,40 @@ data class TrPhaseComputeVm(
         require(vm_final_state_hash.size == 256) { "required: vm_final_state_hash.size == 256, actual: ${vm_final_state_hash.size}" }
     }
 
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrPhaseComputeVm> = TrPhaseComputeVmTlbConstructor
+    }
+
+    override fun toString(): String = buildString {
+        append("(tr_phase_compute_vm\nsuccess:")
+        append(success)
+        append(" msg_state_used:")
+        append(msg_state_used)
+        append(" account_activated:")
+        append(account_activated)
+        append(" gas_fees:")
+        append(gas_fees)
+        append(" gas_used:")
+        append(gas_used)
+        append(" gas_limit:")
+        append(gas_limit)
+        append(" gas_credit:")
+        append(gas_credit)
+        append(" mode:")
+        append(mode)
+        append(" exit_code:")
+        append(exit_code)
+        append(" exit_arg:")
+        append(exit_arg)
+        append(" vm_steps:")
+        append(vm_steps)
+        append(" vm_init_state_hash:")
+        append(vm_init_state_hash)
+        append(" vm_final_state_hash:")
+        append(vm_final_state_hash)
+        append(")")
     }
 }
 

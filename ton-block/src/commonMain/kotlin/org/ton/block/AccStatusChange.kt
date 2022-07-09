@@ -11,13 +11,19 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 enum class AccStatusChange {
     @SerialName("acst_unchanged")
-    UNCHANGED, // x -> x
+    UNCHANGED {
+        override fun toString(): String = "acst_unchanged"
+    }, // x -> x
 
     @SerialName("acst_frozen")
-    FROZEN, // init -> frozen
+    FROZEN {
+        override fun toString(): String = "acst_frozen"
+    }, // init -> frozen
 
     @SerialName("acst_deleted")
-    DELETED // frozen -> deleted
+    DELETED {
+        override fun toString(): String = "acst_deleted"
+    } // frozen -> deleted
     ;
 
     companion object : TlbCodec<AccStatusChange> by AccStatusChangeTlbCombinator

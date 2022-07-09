@@ -21,6 +21,16 @@ data class TrStoragePhase(
         @JvmStatic
         fun tlbCodec(): TlbConstructor<TrStoragePhase> = TrStoragePhaseTlbConstructor
     }
+
+    override fun toString(): String = buildString {
+        append("(tr_phase_storage\nstorage_fees_collected:")
+        append(storage_fees_collected)
+        append(" storage_fees_due:")
+        append(storage_fees_due)
+        append(" status_change:")
+        append(status_change)
+        append(")")
+    }
 }
 
 private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(

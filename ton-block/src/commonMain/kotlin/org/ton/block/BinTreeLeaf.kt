@@ -18,6 +18,13 @@ data class BinTreeLeaf<X>(
 
     override fun nodes(): Sequence<X> = sequenceOf(leaf)
 
+    override fun toString(): String = buildString {
+        append("(bt_leaf\n")
+        append("leaf:")
+        append(leaf)
+        append(")")
+    }
+
     companion object {
         @JvmStatic
         fun <X> tlbCodec(

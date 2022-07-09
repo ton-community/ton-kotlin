@@ -15,24 +15,26 @@ import org.ton.tlb.TlbConstructor
 
 @Serializable
 @SerialName("update_hashes")
-data class HashUpdate<X>(
+data class HashUpdate(
     val old_hash: BitString,
     val new_hash: BitString
 ) {
-    companion object {
-        @Suppress("UNCHECKED_CAST")
-        @JvmStatic
-        fun <X> tlbCodec(x: TlbCodec<X>): TlbConstructor<HashUpdate<X>> =
-            HashUpdateTlbConstructor as TlbConstructor<HashUpdate<X>>
+    override fun toString(): String = buildString {
+        append("(update_hashes\n")
+        append("old_hash:$old_hash")
+        append(" new_hash:$new_hash")
+        append(")")
     }
+
+    companion object : TlbCodec<HashUpdate> by HashUpdateTlbConstructor.asTlbCombinator()
 }
 
-private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate<*>>(
+private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate>(
     schema = "update_hashes#72 {X:Type} old_hash:bits256 new_hash:bits256 = HASH_UPDATE X;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: HashUpdate<*>
+        value: HashUpdate
     ) = cellBuilder {
         storeBits(value.old_hash)
         storeBits(value.new_hash)
@@ -40,9 +42,9 @@ private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate<*>>(
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): HashUpdate<*> = cellSlice {
+    ): HashUpdate = cellSlice {
         val oldHash = loadBits(256)
         val newHash = loadBits(256)
-        HashUpdate<Unit>(oldHash, newHash)
+        HashUpdate(oldHash, newHash)
     }
 }

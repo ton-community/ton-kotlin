@@ -9,4 +9,13 @@ data class ActionChangeLibrary(
     val mode: Int,
     @Suppress("SpellCheckingInspection")
     val libref: LibRef
-) : OutAction
+) : OutAction {
+    override fun toString(): String = buildString {
+        append("(action_change_library\n")
+        append("mode:")
+        append(mode)
+        append(" libref:")
+        append(libref)
+        append(")")
+    }
+}

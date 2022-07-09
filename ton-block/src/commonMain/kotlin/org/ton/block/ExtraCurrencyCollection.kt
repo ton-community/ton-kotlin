@@ -16,7 +16,7 @@ import org.ton.tlb.storeTlb
 data class ExtraCurrencyCollection(
     val dict: HashMapE<VarUInteger> = HashMapE.of()
 ) {
-    override fun toString(): String = "extra_currencies(dict:$dict)"
+    override fun toString(): String = "(extra_currencies\ndict:$dict)"
 
     companion object : TlbCodec<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor {
         @JvmStatic
