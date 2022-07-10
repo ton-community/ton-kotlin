@@ -110,7 +110,8 @@
     - [check .toString() raw address](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L104)
     - [check .toString() user-friendly (base64) address](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L140)
 - Coins
-    - TODO
+    - String to BigInt (nanocoins) coins conversion
+    - BigInt (nanocoins) to string conversion
 - Smart Contract interfaces
     - Wallet Contracts
         - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/test/typescripted/wallet-contract.test.js)
