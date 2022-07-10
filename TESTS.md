@@ -68,5 +68,34 @@
         - [check augment bytes](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-cell/src/commonMain/kotlin/org/ton/cell/DataCell.kt#L92)
     - check computation of cell hash
         - usage of sha256
-- 
-    
+- CellSlice
+    - check `.endParse()` throws exception if `bitsPosition != bits.size`
+    - check `.loadRef()` underflow if `refsPosition > refs.size`
+    - check `.loadBit()` use-cases
+        - check bits overflow if `bitsPosition == bits.size`
+    - check `.loadBits(bits: Int)` use-cases
+        - check bits overflow
+        - check that `bits` in `0..1023` range
+    - check `.loadInt(bits: Int)`
+        - check bits overflow
+        - check that `bits` in `0..257` range
+    - check `.loadUint(bits: Int)`
+        - check bits overflow
+        - check returns positive integer
+        - check that `bits` in `0..257` range
+    - check `.toString()` returns string in `x{FF},2` format where `2` equals `refs.size`
+- CellBuilder
+    - check `beginCell().endCell()` equals empty cell
+    - check `beginCell().storeBit(true).endCell()` size equals 1
+    - check storing BitString with size divide by 8
+    - check storing BitString with size divide by 4
+    - check storing BitString with size not divide by 4
+    - check storing more than 1023 bits
+    - [check storing ints](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-cell/src/commonTest/kotlin/org/ton/cell/CellBuilderTest.kt#L50)
+- Bag-of-Cells
+    - [check Bag-of-Cells (de)serialization equals](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/jvmTest/kotlin/BagOfCellsTest.kt#L12)
+    - check Bag-of-Cells crc32c checksum calculation
+    - [check that cell offset indexes greater than previous](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L71)
+    - [check cell references count in `0..4`](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L95)
+    - [check invalid cell reference indexes](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L121)
+    - check cell order

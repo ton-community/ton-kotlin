@@ -10,7 +10,7 @@ class CachedBagOfCells(
     private var cellCount = 0
     private var cellHashmap = HashMap<Cell, Int>()
     private var cellList = ArrayList<CellInfo>()
-    private var rootList = ArrayList<RootInfo>()
+    private var rootIndexes = ArrayList<Int>(roots.size)
     private var revisitIndex = 0
     private var cellListTmp = ArrayList<CellInfo>()
 
@@ -45,14 +45,14 @@ class CachedBagOfCells(
         cellCount = 0
         cellHashmap.clear()
         cellList.clear()
-        rootList.clear()
+        rootIndexes.clear()
     }
 
     private fun importCells() {
         clearCells()
         roots.forEach { rootCell ->
             val index = importCell(rootCell, 0)
-            rootList.add(RootInfo(rootCell, index))
+            rootIndexes.add(index)
         }
         reorderCells()
         check(cellCount != 0)
@@ -76,11 +76,11 @@ class CachedBagOfCells(
         }
         check(cellList.size == cellCount)
         cellHashmap[cell] = cellCount
+        val weight = min(0xFF, sumChildWeight)
         val cellInfo = CellInfo(
             cell,
             referenceIndexes,
-            hashesCount = cell.levelMask.hashesCount,
-            weight = min(0xFF, sumChildWeight)
+            weight
         )
         cellList.add(cellInfo)
         return cellCount++
@@ -130,16 +130,18 @@ class CachedBagOfCells(
             cellListTmp.clear()
             cellListTmp.ensureCapacity(cellCount)
 
-            rootList.forEach { rootInfo ->
-                revisit(rootInfo.index, Revisit.PREVISIT)
-                revisit(rootInfo.index, Revisit.VISIT)
+            rootIndexes.forEach { rootIndex ->
+                revisit(rootIndex, Revisit.PREVISIT)
+                revisit(rootIndex, Revisit.VISIT)
             }
-            rootList.forEach { rootInfo ->
-                revisit(rootInfo.index, Revisit.ALLOCATE)
+            rootIndexes.forEach { rootIndex ->
+                revisit(rootIndex, Revisit.ALLOCATE)
             }
-            rootList.forEach { rootInfo ->
-                rootInfo.index = cellList[rootInfo.index].newIndex
-            }
+            rootIndexes = ArrayList(
+                rootIndexes.map { rootIndex ->
+                    cellList[rootIndex].newIndex
+                }
+            )
             check(revisitIndex == cellCount) { "revisitIndex: $revisitIndex, cellCount: $cellCount" }
             check(cellList.size == cellListTmp.size) { "cellList.size: ${cellList.size}, cellListTmp.size: ${cellListTmp.size}" }
             cellList = ArrayList(cellListTmp.asReversed())
@@ -159,20 +161,16 @@ class CachedBagOfCells(
         }
         if (force == Revisit.PREVISIT) {
             // previsit
-            return if (cellInfo.newIndex != -1) {
-                // already previsited or visited
-                cellInfo.newIndex
-            } else {
+            if (cellInfo.newIndex == -1) {
                 for (j in cellInfo.referencesIndexes.lastIndex downTo 0) {
                     val childIndex = cellInfo.referencesIndexes[j]
-                    val child = cellList[childIndex]
-                    // either previsit or visit child, depending on whether it is special
-                    val childForce = if (child.isSpecial) Revisit.VISIT else Revisit.PREVISIT
+                    // either previsit or visit child, depending on it weight
+                    val childForce = if (cellInfo.weight == 0) Revisit.VISIT else Revisit.PREVISIT
                     revisit(childIndex, childForce)
                 }
                 cellInfo.newIndex = -2
-                cellInfo.newIndex
             }
+            return cellInfo.newIndex
         }
         if (force == Revisit.ALLOCATE) {
             // time to allocate
@@ -185,8 +183,8 @@ class CachedBagOfCells(
             // already revisited
             return cellInfo.newIndex
         }
-        if (cellInfo.isSpecial) {
-            // if current cell is special, previsit it first
+        if (cellInfo.weight == 0) {
+            // if current cell weight == 0, previsit it first
             revisit(cellIndex, Revisit.PREVISIT)
         }
         // visit children
@@ -209,18 +207,10 @@ class CachedBagOfCells(
 
     private data class CellInfo(
         val cell: Cell,
-        var referencesIndexes: MutableList<Int> = ArrayList(),
-        var hashesCount: Int = 0,
+        var referencesIndexes: ArrayList<Int>,
         var weight: Int = 0,
         var newIndex: Int = -1,
         var shouldCache: Boolean = false
-    ) {
-        val isSpecial: Boolean get() = weight == 0
-    }
-
-    private data class RootInfo(
-        val cell: Cell,
-        var index: Int = -1
     )
 
     companion object {
