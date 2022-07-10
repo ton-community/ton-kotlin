@@ -30,12 +30,15 @@
         - wrong crc16 table
             - [basic checks](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/Crc16Test.kt)
             - check usage in `liteServer.runSmcMethod` function in Lite-API for method names
-    - hex
-        - check `UPPER CASE` and `lower case`
-        - check invalid characters
-        - [basic checks with expected values](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/HexTest.kt)
-        - incomplete hex (`AA_`) aka Fift-hex should be implemented as a separate function that reuses basic
-          hex-function
+            - check usage in user-friendly (base64) address parsing
+  - hex
+      - check `UPPER CASE` and `lower case`
+      - check invalid characters
+      - [basic checks with expected values](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/HexTest.kt)
+      - incomplete hex (`AA_`) aka Fift-hex should be implemented as a separate function that reuses basic
+        hex-function
+  - ed25519 keypair
+      - [check expected keypair generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L42)
 - BitString
     - [BitString creation](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L11)
     - [BitString concatenation without shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L44)
@@ -98,4 +101,41 @@
     - [check that cell offset indexes greater than previous](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L71)
     - [check cell references count in `0..4`](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L95)
     - [check invalid cell reference indexes](https://github.com/andreypfau/ton-kotlin/blob/addf79aeed62e87da74049aa1e720f96a791edde/ton-boc/src/commonMain/kotlin/org/ton/boc/BagOfCellsUtils.kt#L121)
-    - check cell order
+    - [check cell depth less than 1024](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-boc/src/commonMain/kotlin/org/ton/boc/CachedBagOfCells.kt#L62)
+    - [check cell order algorithm. TODO: make unit-tests for illegal cell order](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-boc/src/commonMain/kotlin/org/ton/boc/CachedBagOfCells.kt#L89)
+- Addresses
+    - [check raw address parsing](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L10)
+    - [check user-friendly (base64) address parsing](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L28)
+        - [check crc16 checksum calculation & validation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonMain/kotlin/org/ton/block/AddrStd.kt#L133)
+    - [check .toString() raw address](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L104)
+    - [check .toString() user-friendly (base64) address](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-block/src/commonTest/kotlin/org/ton/block/MsgAddressIntTest.kt#L140)
+- Coins
+    - TODO
+- Smart Contract interfaces
+    - Wallet Contracts
+        - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/test/typescripted/wallet-contract.test.js)
+        - WalletV1R3
+            - [check expected StateInit cell generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L49)
+            - [check expected address calculation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L63)
+            - [check expected non-bounceable address calculation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L72)
+            - [check expected bounceable address calculation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L81)
+            - [check expected external message cell for initialization generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L90)
+            - [check expected Bag-of-Cell for deploy generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L104)
+            - [check expected external message cell with wallet commentary generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L128)
+            - [check expected Bag-of-Cell for transfer generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L143)
+            - [example usage](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Example.kt#L19)
+        - WalletV2R2
+            - same cases like in WalletV1R3
+        - WalletV3R2
+            - same cases like in WalletV1R3
+        - WalletV4R2
+            - same cases like in WalletV1R3
+            - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/src/test-wallet4.js)
+    - NFT
+        - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/src/test-nft.js)
+    - Jettons
+        - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/src/test-jetton.js)
+    - DNS
+        - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/src/test-dns.js)
+    - Payments
+        - [tonweb test-cases](https://github.com/toncenter/tonweb/blob/master/src/test-payments.js)
