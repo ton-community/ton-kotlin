@@ -4,6 +4,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.loadRef
+import org.ton.hashmap.HashMapNode
 import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbNegatedConstructor
 import org.ton.tlb.loadNegatedTlb
@@ -29,6 +30,14 @@ sealed interface SnakeData {
         override fun getConstructor(value: SnakeData): TlbNegatedConstructor<out SnakeData> = when (value) {
             is SnakeDataTail -> snakeDataTail
             is SnakeDataCons -> snakeDataCons
+        }
+
+        override fun loadTlb(cellSlice: CellSlice): SnakeData {
+            return if(cellSlice.refs.lastIndex > cellSlice.refsPosition) {
+                snakeDataCons.loadTlb(cellSlice) // More references available, this is a cons
+            } else {
+                snakeDataTail.loadTlb(cellSlice) // No more refs, this has to be a tail
+            }
         }
     }
 }
