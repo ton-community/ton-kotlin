@@ -1,10 +1,10 @@
 package org.ton.lite.client
 
 import kotlinx.coroutines.Dispatchers
-import org.ton.adnl.AdnlPublicKey
 import org.ton.adnl.AdnlTcpClient
 import org.ton.adnl.AdnlTcpClientImpl
 import org.ton.adnl.ipv4
+import org.ton.api.pub.PublicKeyEd25519
 import org.ton.lite.api.LiteApi
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
@@ -17,7 +17,7 @@ open class LiteClient(
         port: Int,
         publicKey: ByteArray,
         logger: Logger = PrintLnLogger("TON LiteClient")
-    ) : this(AdnlTcpClientImpl(host, port, AdnlPublicKey(publicKey), Dispatchers.Default, logger))
+    ) : this(AdnlTcpClientImpl(host, port, PublicKeyEd25519(publicKey), Dispatchers.Default, logger))
 
     override val logger get() = adnlTcpClient.logger
 

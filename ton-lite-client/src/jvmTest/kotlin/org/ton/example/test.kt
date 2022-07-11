@@ -17,5 +17,5 @@ fun main() {
 }
 
 private object AdnlTlCombinator : TlCombinator<Any>(
-    AdnlMessage.constructors + AdnlPing + AdnlPong
+    AdnlMessage + AdnlPing + AdnlPong
 )

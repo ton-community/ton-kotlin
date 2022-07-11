@@ -52,6 +52,6 @@ private object LiteServerGetBlockProofTlConstructor : TlConstructor<LiteServerGe
     override fun encode(output: Output, value: LiteServerGetBlockProof) {
         output.writeIntTl(value.mode)
         output.writeTl(TonNodeBlockIdExt, value.known_block)
-        output.writeFlagTl(value.mode, 0, TonNodeBlockIdExt, value.target_block)
+        output.writeOptionalTl(value.mode, 0, TonNodeBlockIdExt, value.target_block)
     }
 }

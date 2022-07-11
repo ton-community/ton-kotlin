@@ -10,6 +10,7 @@ import org.ton.api.adnl.AdnlPong
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
+import org.ton.api.pub.PublicKey
 import org.ton.bitstring.BitString
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
@@ -28,14 +29,14 @@ import kotlin.time.measureTime
 abstract class AdnlTcpClient(
     val host: String,
     val port: Int,
-    val publicKey: AdnlPublicKey,
+    val publicKey: PublicKey,
     protected val dispatcher: CoroutineContext,
     val logger: Logger = PrintLnLogger("TON ADNL")
 ) {
     constructor(
         ipv4: Int,
         port: Int,
-        publicKey: AdnlPublicKey,
+        publicKey: PublicKey,
         dispatcher: CoroutineContext
     ) : this(ipv4(ipv4), port, publicKey, dispatcher)
 
@@ -181,6 +182,6 @@ abstract class AdnlTcpClient(
     }
 
     private object AdnlTlCombinator : TlCombinator<Any>(
-        AdnlMessage.constructors + AdnlPing + AdnlPong
+        AdnlMessage + AdnlPing + AdnlPong
     )
 }

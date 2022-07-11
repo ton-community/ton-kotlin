@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.ton.tl.constructors.writeIntTl
 
 interface TlEncoder<T : Any> {
     fun encode(value: T): ByteArray = buildPacket {
@@ -26,15 +27,24 @@ interface TlEncoder<T : Any> {
     }
 }
 
-fun <R : Any> Output.writeFlagTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
+fun Output.writeFlagTl(vararg booleans: Boolean): Int {
+    var flag = 0
+    booleans.forEachIndexed { index, value ->
+        flag = flag or ((if (value) 1 else 0) shl index)
+    }
+    writeIntTl(flag)
+    return flag
+}
+
+fun <R : Any> Output.writeOptionalTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
     if (value != null) {
-        writeFlagTl(flag, index) {
+        writeOptionalTl(flag, index) {
             encoder.encode(this, value)
         }
     }
 }
 
-fun Output.writeFlagTl(flag: Int, index: Int, block: Output.() -> Unit) {
+fun Output.writeOptionalTl(flag: Int, index: Int, block: Output.() -> Unit) {
     if (flag and (1 shl index) != 0) {
         block()
     }

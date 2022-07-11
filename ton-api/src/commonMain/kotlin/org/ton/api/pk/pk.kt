@@ -6,8 +6,9 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.api.pub.PublicKeyEd25519
+import org.ton.api.pub.*
 import org.ton.crypto.Ed25519
+import org.ton.crypto.X25519
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
@@ -15,19 +16,28 @@ import org.ton.tl.constructors.writeBytesTl
 
 @JsonClassDiscriminator("@type")
 interface PrivateKey {
+    fun publicKey(): PublicKey
+    fun toByteArray(): ByteArray
+
     companion object : TlCombinator<PrivateKey>(
-            PrivateKeyUnencrypted,
-            PrivateKeyEd25519,
-            PrivateKeyAes,
-            PrivateKeyOverlay
+        PrivateKeyUnencrypted,
+        PrivateKeyEd25519,
+        PrivateKeyAes,
+        PrivateKeyOverlay
     )
+
+    fun sign(byteArray: ByteArray): ByteArray
 }
 
 @SerialName("pk.unenc")
 @Serializable
 data class PrivateKeyUnencrypted(
-        val data: ByteArray
+    val data: ByteArray
 ) : PrivateKey {
+    override fun toByteArray(): ByteArray = data.copyOf()
+    override fun publicKey() = PublicKeyUnencrypted(data)
+    override fun sign(byteArray: ByteArray): ByteArray = throw UnsupportedOperationException()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -44,8 +54,8 @@ data class PrivateKeyUnencrypted(
     }
 
     companion object : TlConstructor<PrivateKeyUnencrypted>(
-            type = PrivateKeyUnencrypted::class,
-            schema = "pk.unenc data:bytes = PrivateKey"
+        type = PrivateKeyUnencrypted::class,
+        schema = "pk.unenc data:bytes = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyUnencrypted) {
             output.writeBytesTl(value.data)
@@ -61,17 +71,19 @@ data class PrivateKeyUnencrypted(
 @SerialName("pk.ed25519")
 @Serializable
 data class PrivateKeyEd25519(
-        val key: ByteArray
+    val key: ByteArray
 ) : PrivateKey {
     init {
         require(key.size == 32) { "key size expected: 32 actual: ${key.size}" }
     }
 
-    fun publicKey(): PublicKeyEd25519 = PublicKeyEd25519(
+    override fun toByteArray(): ByteArray = key.copyOf()
+
+    override fun publicKey() = PublicKeyEd25519(
         Ed25519.publicKey(key)
     )
 
-    fun sign(byteArray: ByteArray): ByteArray =
+    override fun sign(byteArray: ByteArray): ByteArray =
         Ed25519.sign(key, byteArray)
 
     override fun equals(other: Any?): Boolean {
@@ -109,8 +121,23 @@ data class PrivateKeyEd25519(
 @SerialName("pk.aes")
 @Serializable
 data class PrivateKeyAes(
-        val key: ByteArray
+    val key: ByteArray
 ) : PrivateKey {
+    override fun toByteArray(): ByteArray = key.copyOf()
+    override fun publicKey() = PublicKeyAes(
+        X25519.convertToEd25519(X25519.publicKey(key))
+    )
+
+    fun sharedSecret(publicKey: PublicKey): ByteArray {
+        return when (publicKey) {
+            is PublicKeyAes -> X25519.sharedKey(key, publicKey.key)
+            is PublicKeyEd25519 -> X25519.sharedKey(key, Ed25519.convertToX25519(publicKey.key))
+            else -> throw UnsupportedOperationException()
+        }
+    }
+
+    override fun sign(byteArray: ByteArray): ByteArray = throw UnsupportedOperationException()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -127,8 +154,8 @@ data class PrivateKeyAes(
     }
 
     companion object : TlConstructor<PrivateKeyAes>(
-            type = PrivateKeyAes::class,
-            schema = "pk.aes key:int256 = PrivateKey"
+        type = PrivateKeyAes::class,
+        schema = "pk.aes key:int256 = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyAes) {
             output.writeFully(value.key)
@@ -144,18 +171,22 @@ data class PrivateKeyAes(
 @SerialName("pk.overlay")
 @Serializable
 data class PrivateKeyOverlay(
-        val name: String
+    val name: ByteArray
 ) : PrivateKey {
+    override fun toByteArray(): ByteArray = name.copyOf()
+    override fun publicKey(): PublicKeyOverlay = PublicKeyOverlay(name)
+    override fun sign(byteArray: ByteArray): ByteArray = throw UnsupportedOperationException()
+
     companion object : TlConstructor<PrivateKeyOverlay>(
-            type = PrivateKeyOverlay::class,
-            schema = "pk.overlay name:bytes = PrivateKey"
+        type = PrivateKeyOverlay::class,
+        schema = "pk.overlay name:bytes = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyOverlay) {
-            output.writeBytesTl(value.name.encodeToByteArray())
+            output.writeBytesTl(value.name)
         }
 
         override fun decode(input: Input): PrivateKeyOverlay {
-            val name = input.readBytesTl().decodeToString()
+            val name = input.readBytesTl()
             return PrivateKeyOverlay(name)
         }
     }

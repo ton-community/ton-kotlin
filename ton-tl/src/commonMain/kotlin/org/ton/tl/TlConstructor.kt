@@ -30,7 +30,7 @@ abstract class TlConstructor<T : Any>(
         encode(output, value)
     }
 
-    fun <R : Any> Output.writeBoxedTl(message: R, codec: TlConstructor<R>) = codec.encodeBoxed(this, message)
+    fun <R : Any> Output.writeBoxedTl(codec: TlCodec<R>, value: R) = codec.encodeBoxed(this, value)
 
     override fun decodeBoxed(input: Input): T {
         val actualId = input.readIntLittleEndian()

@@ -4,8 +4,8 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 
 class AesByteReadChannel(
-        val channel: ByteReadChannel,
-        val aes: AdnlAes,
+    val channel: ByteReadChannel,
+    val aes: AdnlAesCipher,
 ) : ByteReadChannel by channel {
     override suspend fun readByte(): Byte = aes.encrypt {
         writeByte(channel.readByte())
