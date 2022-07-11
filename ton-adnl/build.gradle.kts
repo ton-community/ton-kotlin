@@ -13,6 +13,7 @@ kotlin {
                 implementation(libs.serialization.json)
                 implementation(projects.tonLogger)
                 implementation(libs.atomicfu)
+                implementation(libs.datetime)
             }
         }
         commonTest {

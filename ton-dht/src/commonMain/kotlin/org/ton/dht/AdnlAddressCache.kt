@@ -1,4 +1,4 @@
-package org.ton.adnl.internal
+package org.ton.dht
 
 import io.ktor.util.collections.*
 import kotlinx.atomicfu.atomic

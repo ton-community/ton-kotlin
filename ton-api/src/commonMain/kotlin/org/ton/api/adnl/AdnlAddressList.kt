@@ -16,7 +16,7 @@ data class AdnlAddressList(
     val reinit_date: Int = Instant.now().epochSecond.toInt(),
     val priority: Int = 0,
     val expire_at: Int = 0
-) : Iterable<AdnlAddress> by addrs {
+) : List<AdnlAddress> by addrs {
     companion object : TlConstructor<AdnlAddressList>(
         type = AdnlAddressList::class,
         schema = "adnl.addressList addrs:(vector adnl.Address) version:int reinit_date:int priority:int expire_at:int = adnl.AddressList"

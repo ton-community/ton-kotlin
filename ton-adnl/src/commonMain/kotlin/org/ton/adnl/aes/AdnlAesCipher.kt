@@ -1,4 +1,4 @@
-package org.ton.adnl
+package org.ton.adnl.aes
 
 import io.ktor.utils.io.core.*
 import org.ton.crypto.AesCtr
@@ -22,16 +22,6 @@ class AdnlAesCipher(
     }
 
     companion object {
-        fun packetCipher(
-            sharedSecret: ByteArray, checksum: ByteArray
-        ): AdnlAesCipher {
-            try {
-                return secure(sharedSecret, checksum)
-            } finally {
-                sharedSecret.fill(0)
-            }
-        }
-
         @Suppress("UnnecessaryVariable")
         fun secure(secret: ByteArray, digest: ByteArray): AdnlAesCipher {
             val x = secret

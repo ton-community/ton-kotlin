@@ -1,10 +1,11 @@
-package org.ton.adnl
+package org.ton.adnl.client
 
 import io.ktor.util.collections.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlPing
 import org.ton.api.adnl.AdnlPong
 import org.ton.api.adnl.message.AdnlMessage

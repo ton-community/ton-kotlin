@@ -1,61 +1,56 @@
 package org.ton.adnl.node
 
-import io.ktor.utils.io.core.*
+import io.ktor.util.*
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
-import org.ton.adnl.exception.AdnlNodeEngineClosedException
+import org.ton.api.adnl.AdnlPacketContents
+import java.io.Closeable
 import kotlin.coroutines.CoroutineContext
-
-internal val QUERY_COROUTINE = CoroutineName("query-context")
 
 interface AdnlNodeEngine : CoroutineScope, Closeable {
     val dispatcher: CoroutineDispatcher
+
     private val closed: Boolean
         get() = !(coroutineContext[Job]?.isActive ?: false)
 
-    suspend fun execute(data: AdnlRequestData): AdnlResponseData
+    fun start()
 
-    fun install(node: AdnlNodeExecutor) {
-        node.sendPipeline.intercept(AdnlSendPipeline.ENGINE) { content ->
-            val builder = AdnlRequestBuilder().apply {
-                takeFromWithExecutionContext(context)
-                body = content as ByteArray
-            }
+    suspend fun sendPacket(
+        peer: AdnlPeer,
+        packet: AdnlPacketContents,
+        subChannelSide: AdnlSubChannelSide?
+    )
+}
 
-            node.monitor.raise(AdnlRequestIsReadyForSending, builder)
+abstract class AdnlNodeEngineBase(
+    private val engineName: String
+) : AdnlNodeEngine {
+    private val closed = atomic(false)
 
-            val requestData = builder.build()
-            val responseData = executeWithinCallContext(requestData)
-            val query = AdnlQuery(node, requestData, responseData)
+    override val coroutineContext: CoroutineContext by lazy {
+        SilentSupervisor() + dispatcher + CoroutineName("$engineName-context")
+    }
 
-            val response = query.response
-            node.monitor.raise(AdnlResponseReceived, response)
+    override fun close() {
+        if (!closed.compareAndSet(false, true)) return
 
-            response.coroutineContext.job.invokeOnCompletion {
-                if (it != null) {
-                    node.monitor.raise(AdnlResponseCancelled, response)
-                }
-            }
+        val requestJob = coroutineContext[Job] as? CompletableJob ?: return
 
-            proceedWith(query)
+        requestJob.complete()
+        requestJob.invokeOnCompletion {
+            dispatcher.close()
         }
     }
+}
 
-    private suspend fun executeWithinCallContext(requestData: AdnlRequestData): AdnlResponseData {
-        val callContext = createCallContext(requestData.executionContext)
-        val context = callContext + AdnlQueryContextElement(callContext)
-        return withContext(context) {
-            if (closed) {
-                throw AdnlNodeEngineClosedException()
-            }
-            execute(requestData)
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun CoroutineDispatcher.close() {
+    try {
+        when (this) {
+            is CloseableCoroutineDispatcher -> close()
+            is io.ktor.utils.io.core.Closeable -> close()
         }
+    } catch (ignore: Throwable) {
+        // Some closeable dispatchers like Dispatchers.IO can't be closed.
     }
-
-    private suspend fun createCallContext(parentJob: Job): CoroutineContext {
-        val callJob = Job(parentJob)
-        val callContext = coroutineContext + callJob + QUERY_COROUTINE
-        attackToUserJob(callJob)
-        return callContext
-    }
-
 }

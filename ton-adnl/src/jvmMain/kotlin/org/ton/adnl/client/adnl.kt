@@ -6,10 +6,13 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withContext
-import org.ton.api.pk.PrivateKeyAes
+import org.ton.adnl.aes.AdnlAesCipher
+import org.ton.adnl.aes.AesByteReadChannel
+import org.ton.adnl.aes.AesByteWriteChannel
+import org.ton.adnl.client.AdnlTcpClient
+import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKey
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.sha256
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
@@ -62,29 +65,19 @@ class AdnlTcpClientImpl(
         val inputCipher = AdnlAesCipher(nonce.copyOfRange(0, 32), nonce.copyOfRange(64, 80))
         val outputCipher = AdnlAesCipher(nonce.copyOfRange(32, 64), nonce.copyOfRange(80, 96))
 
-        val handshake = buildHandshakePayload(nonce)
-        connection.output.writeFully(handshake)
+        val handshake = AdnlHandshake(
+            payload = nonce,
+            local = PrivateKeyEd25519(SecureRandom.nextBytes(32)),
+            other = publicKey
+        )
+        connection.output.writePacket {
+            AdnlHandshake.encode(this, handshake)
+        }
         connection.output.flush()
 
         input = AesByteReadChannel(connection.input, inputCipher)
         output = AesByteWriteChannel(connection.output, outputCipher)
 
         check(receiveRaw().isEmpty()) { "Invalid handshake response" }
-    }
-
-    private fun buildHandshakePayload(
-        nonce: ByteArray,
-    ): ByteArray {
-        val checksum = sha256(nonce)
-        val buf = nonce.copyOf(96)
-        val local = PrivateKeyAes(SecureRandom.nextBytes(32))
-
-        publicKey.toAdnlIdShort().id.copyInto(buf, destinationOffset = 0, startIndex = 0, endIndex = 32)
-        local.publicKey().key.copyInto(buf, destinationOffset = 32, startIndex = 0, endIndex = 32)
-        checksum.copyInto(buf, destinationOffset = 64, startIndex = 0, endIndex = 32)
-
-        val sharedSecret = local.sharedSecret(publicKey)
-        val cipher = AdnlAesCipher.packetCipher(sharedSecret, checksum)
-        return buf + cipher.encrypt(nonce)
     }
 }

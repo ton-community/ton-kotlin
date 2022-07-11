@@ -8,11 +8,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.*
 import org.ton.crypto.Ed25519
+import org.ton.crypto.SecureRandom
 import org.ton.crypto.X25519
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
+import kotlin.random.Random
 
 @JsonClassDiscriminator("@type")
 interface PrivateKey {
@@ -107,6 +109,8 @@ data class PrivateKeyEd25519(
         type = PrivateKeyEd25519::class,
         schema = "pk.ed25519 key:int256 = PrivateKey"
     ) {
+        fun random(random: Random = SecureRandom) = PrivateKeyEd25519(random.nextBytes(32))
+
         override fun encode(output: Output, value: PrivateKeyEd25519) {
             output.writeFully(value.key)
         }
@@ -123,6 +127,8 @@ data class PrivateKeyEd25519(
 data class PrivateKeyAes(
     val key: ByteArray
 ) : PrivateKey {
+    constructor(privateKey: PrivateKey) : this(privateKey.toByteArray())
+
     override fun toByteArray(): ByteArray = key.copyOf()
     override fun publicKey() = PublicKeyAes(
         X25519.convertToEd25519(X25519.publicKey(key))

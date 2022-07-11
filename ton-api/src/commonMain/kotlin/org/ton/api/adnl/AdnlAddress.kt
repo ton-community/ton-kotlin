@@ -19,11 +19,11 @@ import org.ton.tl.readTl
 import org.ton.tl.writeTl
 
 @JsonClassDiscriminator("@type")
-interface AdnlAddress {
+sealed interface AdnlAddress {
     companion object : TlCombinator<AdnlAddress>(
-            AdnlAddressUdp,
-            AdnlAddressUdp6,
-            AdnlAddressTunnel
+        AdnlAddressUdp,
+        AdnlAddressUdp6,
+        AdnlAddressTunnel
     )
 }
 

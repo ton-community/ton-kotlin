@@ -1,47 +1,30 @@
-package org.ton.adnl
+package org.ton.adnl.node
 
-import io.ktor.network.selector.*
-import io.ktor.network.sockets.*
+import io.ktor.util.collections.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableSharedFlow
 import org.ton.api.adnl.AdnlAddress
-import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlNode
+import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
 class AdnlNodeImpl(
-    val config: AdnlNode,
-    val scope: CoroutineContext,
+    val privateKey: PrivateKey,
+    scope: CoroutineContext,
     val logger: Logger = PrintLnLogger("ADNL")
 ) : CoroutineScope {
+    private val publicKey: PublicKey by lazy { privateKey.publicKey() }
     protected val supervisorJob = SupervisorJob()
     override val coroutineContext: CoroutineContext = scope + supervisorJob
 
-    private val peers = ConcurrentHashMap<PublicKey, AdnlNode>()
+    private val peers = ConcurrentMap<PublicKey, AdnlNode>()
 
-    private lateinit var socket: BoundDatagramSocket
-    val outgoing get() = socket.outgoing
-    val incoming get() = socket.incoming
-
-    val outgoingFlow = MutableSharedFlow<ByteArray>()
-
-    fun start() {
-        val bindAddress = config.addrList.filterIsInstance<AdnlAddressUdp>().first()
-        socket = aSocket(SelectorManager()).udp().bind(
-            localAddress = InetSocketAddress(
-                ipv4(bindAddress.ip),
-                bindAddress.port
-            )
-        )
-    }
-
-    fun addPeer(adnlNode: AdnlNode): List<AdnlAddress>? {
-        if (adnlNode.id == config.id) return null
+    fun addPeer(peer: AdnlPeer): List<AdnlAddress>? {
+        val adnlNode = peer.node
+        if (adnlNode.id == privateKey.publicKey()) return null
         val currentIdNode = peers[adnlNode.id]
         val newAddresses = if (currentIdNode != null) {
             val newAddressList = (currentIdNode.addrList.addrs + adnlNode.addrList.addrs).distinct()
@@ -57,14 +40,15 @@ class AdnlNodeImpl(
             peers[adnlNode.id] = adnlNode
             adnlNode.addrList.asSequence()
         }.toList()
-        logger.debug { "Added ADNL peer with addresses: $newAddresses, id: ${adnlNode.id} to: ${config.id}" }
+        logger.debug { "Added ADNL peer with addresses: $newAddresses, id: ${adnlNode.id} to: $publicKey" }
         return newAddresses
     }
 
+    fun removePeer(peer: AdnlPeer) = removePeer(peer.node)
     fun removePeer(adnlNode: AdnlNode) = removePeer(adnlNode.id)
     fun removePeer(publicKey: PublicKey) {
         if (peers.remove(publicKey) == null) {
-            logger.warn { "Try to remove peer: $publicKey from unknown node: ${config.id}" }
+            logger.warn { "Try to remove peer: $publicKey from unknown node: $publicKey" }
         }
     }
 }

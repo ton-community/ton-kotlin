@@ -1,11 +1,20 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
+import org.ton.api.adnl.AdnlNodes.Companion.writeBoxedTl
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
+// total packet length:
+//   for full packet:
+//     32 (dst) + 64 (encryption overhead) + 4 (magic) + 36 (pubkey) + 4 + M (sum of messages) +
+//              + A1 + A2 + 8 + 8 + 4 + 4 + 4 + 4 + 68 (signature) + 16 (r1) + 16 (r2) =
+//              = 272 + M + A1 + A2
+//   for channel:
+//     32 (channel id) + 32 (encryption overhead) + 4 (magic) + 4 + M (sum of messages) +
+//              + A1 + A2 + 8 + 8 + 4 + 4 + 16(r1) + 16(r2) = 128 + M + A1 + A2
 data class AdnlPacketContents(
     val rand1: ByteArray,
     val from: PublicKey?,
@@ -23,8 +32,25 @@ data class AdnlPacketContents(
     val signature: ByteArray?,
     val rand2: ByteArray
 ) {
+    init {
+        if (message != null && messages != null) {
+            throw IllegalArgumentException("both fields `message` and `messages` set")
+        }
+        if (from != null && from_short != null && from.toAdnlIdShort() != from_short) {
+            throw IllegalArgumentException("`from` and `from_short` mismatch")
+        }
+        if (address != null && address.addrs.isEmpty()) {
+            throw IllegalArgumentException("`address` contains empty list")
+        }
+        if (priority_address != null && priority_address.addrs.isEmpty()) {
+            throw IllegalArgumentException("`priority_address` contains empty list")
+        }
+    }
+
+    fun messages(): List<AdnlMessage> = message?.let { listOf(it) } ?: messages ?: emptyList()
+
     fun toByteArray(): ByteArray = buildPacket {
-        writeTl(AdnlPacketContents, this@AdnlPacketContents)
+        writeBoxedTl(AdnlPacketContents, this@AdnlPacketContents)
     }.readBytes()
 
     override fun equals(other: Any?): Boolean {

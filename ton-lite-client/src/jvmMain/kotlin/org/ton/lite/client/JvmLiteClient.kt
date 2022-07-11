@@ -1,7 +1,7 @@
 package org.ton.lite.client
 
 import kotlinx.coroutines.asCoroutineDispatcher
-import org.ton.adnl.AdnlTcpClient
+import org.ton.adnl.client.AdnlTcpClient
 import org.ton.lite.api.JvmLiteApi
 import java.util.concurrent.ExecutorService
 import kotlin.coroutines.CoroutineContext

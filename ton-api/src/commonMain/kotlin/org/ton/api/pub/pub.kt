@@ -121,12 +121,8 @@ data class PublicKeyEd25519(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PublicKeyEd25519
-
+        if (other !is PublicKeyEd25519) return false
         if (!key.contentEquals(other.key)) return false
-
         return true
     }
 

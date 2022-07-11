@@ -1,9 +1,9 @@
-package org.ton.adnl.dht
+package org.ton.dht
 
 import io.ktor.util.collections.*
 import kotlinx.atomicfu.AtomicInt
-import org.ton.adnl.AdnlNodeImpl
-import org.ton.adnl.internal.AdnlAddressCache
+import org.ton.adnl.node.AdnlNodeImpl
+import org.ton.adnl.node.AdnlPeer
 import org.ton.api.adnl.AdnlNode
 import org.ton.api.pub.PublicKey
 import org.ton.logger.Logger
@@ -19,14 +19,15 @@ class DhtNodeImpl(
         it.logger.level = logger.level
     }
 
-    fun addPeer(peer: AdnlNode): Boolean {
+    fun addPeer(peer: AdnlPeer): Boolean {
         if (adnl.addPeer(peer) == null) return false
-        if (knownPeers.put(peer.id)) {
-            val affinity = adnl.config.id affinity peer.id
+        val nodeId = peer.node.id
+        if (knownPeers.put(nodeId)) {
+            val affinity = adnl.currentPeer.node.id affinity peer.node.id
             val bucket = buckets.getOrPut(affinity) { ConcurrentMap() }
-            val oldNode = bucket[peer.id]
-            if ((oldNode?.addrList?.version ?: -1) < peer.addrList.version) {
-                bucket[peer.id] = peer
+            val oldNode = bucket[nodeId]
+            if ((oldNode?.addrList?.version ?: -1) < peer.node.addrList.version) {
+                bucket[nodeId] = peer.node
             }
         } else {
             setGoodPeer(peer)
@@ -34,7 +35,7 @@ class DhtNodeImpl(
         return true
     }
 
-    fun setGoodPeer(peer: AdnlNode) = setGoodPeer(peer.id)
+    fun setGoodPeer(peer: AdnlPeer) = setGoodPeer(peer.node.id)
     fun setGoodPeer(peer: PublicKey) {
         while (true) {
             val count = badPeers[peer]
