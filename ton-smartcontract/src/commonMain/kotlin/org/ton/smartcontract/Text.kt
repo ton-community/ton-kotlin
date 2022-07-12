@@ -9,12 +9,12 @@ data class Text(
 ) {
     companion object : TlbCodec<Text> by TextCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<Text> = TextCombinator
+        fun tlbCombinator(): TlbCombinator<Text> = TextCombinator
     }
 }
 
 private object TextCombinator : TlbCombinator<Text>() {
-    override val constructors: List<TlbConstructor<out Text>> by lazy { listOf(TextConstructor) }
+    override val constructors: List<TlbConstructor<out Text>> = listOf(TextConstructor)
 
     override fun getConstructor(value: Text): TlbConstructor<out Text> = TextConstructor
 

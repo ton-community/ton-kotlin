@@ -18,14 +18,13 @@ sealed interface FullContent {
 
     companion object : TlbCodec<FullContent> by FullContentCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<FullContent> = FullContentCombinator
+        fun tlbCombinator(): TlbCombinator<FullContent> = FullContentCombinator
     }
 }
 
 private object FullContentCombinator : TlbCombinator<FullContent>() {
-    override val constructors: List<TlbConstructor<out FullContent>> by lazy {
+    override val constructors: List<TlbConstructor<out FullContent>> =
         listOf(FullContentOnChainConstructor, FullContentOffChainConstructor)
-    }
 
     override fun getConstructor(value: FullContent): TlbConstructor<out FullContent> = when (value) {
         is FullContent.OnChain -> FullContentOnChainConstructor

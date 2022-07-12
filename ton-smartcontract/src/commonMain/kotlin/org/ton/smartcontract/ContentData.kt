@@ -11,17 +11,16 @@ sealed interface ContentData {
 
     companion object : TlbCodec<ContentData> by ContentDataCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<ContentData> = ContentDataCombinator
+        fun tlbCombinator(): TlbCombinator<ContentData> = ContentDataCombinator
     }
 }
 
 private object ContentDataCombinator : TlbCombinator<ContentData>() {
-    override val constructors: List<TlbConstructor<out ContentData>> by lazy {
+    override val constructors: List<TlbConstructor<out ContentData>> =
         listOf(
             ContentDataSnakeConstructor,
             ContentDataChunksConstructor
         )
-    }
 
     override fun getConstructor(value: ContentData): TlbConstructor<out ContentData> = when (value) {
         is ContentData.Snake -> ContentDataSnakeConstructor
