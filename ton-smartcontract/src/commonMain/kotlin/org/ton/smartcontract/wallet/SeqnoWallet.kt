@@ -8,7 +8,7 @@ import org.ton.lite.api.liteserver.LiteServerAccountId
 /**
  * Most wallets implement sequence number (seqno) in order to circumvent replay attacks
  */
-interface SeqnoWalletContract : WalletContract {
+interface SeqnoWallet : Wallet {
     /**
      * Get most recent seqno
      */

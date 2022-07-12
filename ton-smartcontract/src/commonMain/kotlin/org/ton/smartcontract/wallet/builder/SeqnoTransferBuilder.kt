@@ -1,9 +1,9 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.builder
 
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 
-interface SeqnoTransferMessageBuilder : TransferMessageBuilder {
+interface SeqnoTransferBuilder : TransferBuilder {
     var seqno: Int
 
     override fun buildData(builder: CellBuilder.() -> Unit): Cell = super.buildData {

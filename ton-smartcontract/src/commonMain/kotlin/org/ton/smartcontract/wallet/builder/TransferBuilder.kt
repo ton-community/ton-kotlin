@@ -1,4 +1,4 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.builder
 
 import org.ton.block.*
 import org.ton.cell.Cell
@@ -9,23 +9,35 @@ import org.ton.lite.api.LiteApi
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 
-interface TransferMessageBuilder {
-    val liteApi: LiteApi
-    val source: MsgAddressInt
-    var destination: MsgAddressInt
+interface TransferBuilder {
+    val lite_api: LiteApi
+    val src: MsgAddressInt
+
+    var dest: MsgAddressInt
     var amount: Coins
     var payload: Cell
     var bounce: Boolean
-    var sendMode: Int
-    var destinationStateInit: StateInit?
+    var send_mode: Int
+    var dest_state_init: StateInit?
+
+    var comment: String
+        get() = TODO()
+        set(value) {
+            val commentBytes = comment.encodeToByteArray()
+            require(commentBytes.size <= 123) { TODO("comment is too long: ${commentBytes.size} bytes provided, 123 max supported") }
+            payload = CellBuilder.createCell {
+                storeUInt(0, 32) // op == 0 for comments
+                storeBytes(commentBytes)
+            }
+        }
 
     fun buildData(builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell { apply(builder) }
 
     fun build(): Message<Cell> = Message(
-        info = ExtInMsgInfo(source),
+        info = ExtInMsgInfo(src),
         init = null,
         body = buildData {
-            storeUInt(sendMode, 8)
+            storeUInt(send_mode, 8)
             storeRef {
                 val messageRelaxed = MessageRelaxed(
                     info = CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
@@ -33,12 +45,12 @@ interface TransferMessageBuilder {
                         bounce = bounce,
                         bounced = false,
                         src = AddrNone,
-                        dest = destination,
+                        dest = dest,
                         value = CurrencyCollection(
                             coins = amount
                         )
                     ),
-                    init = destinationStateInit,
+                    init = dest_state_init,
                     body = payload,
                     storeBodyInRef = false
                 )

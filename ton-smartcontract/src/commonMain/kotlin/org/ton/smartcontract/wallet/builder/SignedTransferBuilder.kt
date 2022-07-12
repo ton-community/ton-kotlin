@@ -1,9 +1,9 @@
-package org.ton.smartcontract.wallet
+package org.ton.smartcontract.wallet.builder
 
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 
-interface Ed25519TransferMessageBuilder : TransferMessageBuilder {
+interface SignedTransferBuilder : TransferBuilder {
     fun signCell(data: Cell): ByteArray
 
     override fun buildData(builder: CellBuilder.() -> Unit): Cell {

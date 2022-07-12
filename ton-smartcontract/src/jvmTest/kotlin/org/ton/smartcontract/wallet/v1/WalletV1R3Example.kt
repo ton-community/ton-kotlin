@@ -18,16 +18,16 @@ private fun liteClient() = LiteClient(
 
 suspend fun main() {
     val liteClient = liteClient()
-    val wallet = WalletV1R3(liteClient, privateKey)
+    val wallet = TransferWalletV1R3(privateKey)
     val address = wallet.address()
     println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
-    println("Corresponding public key is ${hex(wallet.privateKey.publicKey().key).uppercase()}")
+    println("Corresponding public key is ${hex(wallet.publicKey().key).uppercase()}")
 
     liteClient.connect()
     val block = liteClient.getMasterchainInfo().last
 
-    println("seqno: ${wallet.seqno(block)}")
-    println("get_public_key: ${wallet.getPublicKey(block)}")
+    println("seqno: ${wallet.seqno(liteClient, block)}")
+    println("get_public_key: ${wallet.getPublicKey(liteClient, block)}")
 }

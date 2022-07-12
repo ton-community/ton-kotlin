@@ -29,7 +29,7 @@ class WalletV1R3Test {
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     )
 
-    private fun wallet() = WalletV1R3(liteClient(), privateKey)
+    private fun wallet() = TransferWalletV1R3(privateKey)
 
     @Test
     fun `test private key`() {
@@ -116,13 +116,13 @@ class WalletV1R3Test {
         assertContentEquals(expected, actual)
     }
 
-    private fun WalletV1R3.exampleTransferMessage(comment: String) = createTransferMessage(
-        dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm"),
-        bounce = true,
-        amount = Coins.of(1),
-        seqno = 1,
-        payload = createCommentPayload(comment)
-    )
+    private fun V1TransferBuilder.exampleTransferMessage(text: String) = this.apply {
+        dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm")
+        bounce = true
+        amount = Coins.of(1)
+        seqno = 1
+        comment = text
+    }.build()
 
     @Test
     fun `test transfer message with 'Hello TON' comment`() {
