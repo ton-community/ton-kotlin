@@ -2,28 +2,23 @@ package org.ton.smartcontract
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 data class Text(
     val data: SnakeData
 ) {
-    companion object {
+    companion object : TlbCodec<Text> by TextCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<Text> = TextTlbCombinator()
+        fun tlbCodec(): TlbCombinator<Text> = TextCombinator
     }
 }
 
-private class TextTlbCombinator : TlbCombinator<Text>() {
-    private val textConstructor by lazy { TextConstructor() }
+private object TextCombinator : TlbCombinator<Text>() {
+    override val constructors: List<TlbConstructor<out Text>> by lazy { listOf(TextConstructor) }
 
-    override val constructors: List<TlbConstructor<out Text>> by lazy { listOf(textConstructor) }
+    override fun getConstructor(value: Text): TlbConstructor<out Text> = TextConstructor
 
-    override fun getConstructor(value: Text): TlbConstructor<out Text> = textConstructor
-
-    private class TextConstructor : TlbConstructor<Text>(
+    private object TextConstructor : TlbConstructor<Text>(
         schema = "text#_ {n:#} data:(SnakeData ~n) = Text;"
     ) {
         private val snakeDataCodec by lazy { SnakeData.tlbCodec() }
