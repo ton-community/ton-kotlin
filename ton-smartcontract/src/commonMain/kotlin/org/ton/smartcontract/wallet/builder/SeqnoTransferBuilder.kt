@@ -6,7 +6,7 @@ import org.ton.cell.CellBuilder
 interface SeqnoTransferBuilder : TransferBuilder {
     var seqno: Int
 
-    override fun buildData(builder: CellBuilder.() -> Unit): Cell = super.buildData {
+    override fun createData(builder: CellBuilder.() -> Unit): Cell = super.createData {
         storeUInt(seqno, 32)
         apply(builder)
     }

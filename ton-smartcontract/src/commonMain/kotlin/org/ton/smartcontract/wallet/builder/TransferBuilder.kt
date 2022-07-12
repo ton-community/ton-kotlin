@@ -31,12 +31,12 @@ interface TransferBuilder {
             }
         }
 
-    fun buildData(builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell { apply(builder) }
+    fun createData(builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell { apply(builder) }
 
-    fun build(): Message<Cell> = Message(
+    fun createMessage(): Message<Cell> = Message(
         info = ExtInMsgInfo(src),
         init = null,
-        body = buildData {
+        body = createData {
             storeUInt(send_mode, 8)
             storeRef {
                 val messageRelaxed = MessageRelaxed(

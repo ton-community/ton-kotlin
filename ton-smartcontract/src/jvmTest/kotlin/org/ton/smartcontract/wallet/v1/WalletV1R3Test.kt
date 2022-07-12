@@ -1,5 +1,6 @@
 package org.ton.smartcontract.wallet.v1
 
+import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Coins
 import org.ton.block.Message
@@ -122,12 +123,13 @@ class WalletV1R3Test {
         amount = Coins.of(1)
         seqno = 1
         comment = text
-    }.build()
+    }
 
     @Test
     fun `test transfer message with 'Hello TON' comment`() {
         val wallet = wallet()
-        val message = wallet.exampleTransferMessage("Hello TON")
+        val message =
+            runBlocking { wallet.beginTransfer(liteClient()).exampleTransferMessage("Hello TON").createMessage() }
         val actual = CellBuilder.createCell {
             storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
         }
@@ -142,7 +144,8 @@ class WalletV1R3Test {
     @Test
     fun `test transfer BOC with 'Hello TON' comment`() {
         val wallet = wallet()
-        val message = wallet.exampleTransferMessage("Hello TON")
+        val message =
+            runBlocking { wallet.beginTransfer(liteClient()).exampleTransferMessage("Hello TON").createMessage() }
         val actual =
             BagOfCells(CellBuilder.createCell {
                 storeTlb(Message.tlbCodec(AnyTlbConstructor), message)

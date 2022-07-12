@@ -4,8 +4,8 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 
 interface SignedSeqnoTransferBuilder : SignedTransferBuilder, SeqnoTransferBuilder {
-    override fun buildData(builder: CellBuilder.() -> Unit): Cell =
-        super<SignedTransferBuilder>.buildData {
-            super<SeqnoTransferBuilder>.buildData(builder)
+    override fun createData(builder: CellBuilder.() -> Unit): Cell =
+        super<SignedTransferBuilder>.createData {
+            super<SeqnoTransferBuilder>.createData(builder)
         }
 }

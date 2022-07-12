@@ -1,18 +1,6 @@
 package org.ton.smartcontract.wallet.v1
 
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.lite.api.LiteApi
-import org.ton.smartcontract.wallet.BasicTransferWallet
 
-class TransferWalletV1R2(private val private_key: PrivateKeyEd25519) :
-    BasicTransferWallet<V1TransferBuilder>(private_key),
-    WalletV1R2 {
-    override suspend fun transfer(lite_api: LiteApi, builder: V1TransferBuilder.() -> Unit) {
-        V1TransferBuilder(
-            private_key = private_key,
-            lite_api = lite_api,
-            src = address(),
-            seqno = seqno(lite_api)
-        )
-    }
-}
+class TransferWalletV1R2(private_key: PrivateKeyEd25519, override val workchain_id: Int = 0) :
+    V1TransferWallet(private_key, workchain_id), WalletV1R2
