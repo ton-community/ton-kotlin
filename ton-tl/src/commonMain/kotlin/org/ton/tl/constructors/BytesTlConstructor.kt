@@ -12,14 +12,14 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
 ) {
     override fun decode(input: Input): ByteArray {
         var resultLength = input.readUByte().toInt()
-        val resultAlignedLength: Int
+        var resultAlignedLength: Int
         if (resultLength < 254) {
-            resultAlignedLength = (resultLength ushr 2) shl 2
+            resultAlignedLength = resultLength + 1
         } else if (resultLength == 254) {
             resultLength = input.readUByte().toInt() +
                     (input.readUByte().toInt() shl 8) +
                     (input.readUByte().toInt() shl 16)
-            resultAlignedLength = ((resultLength + 3) ushr 2) shl 2
+            resultAlignedLength = resultLength + 4
         } else {
             val resultLengthLong = input.readUByte().toLong() +
                     (input.readUByte().toLong() shl 8) +
@@ -32,10 +32,12 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
                 throw IllegalStateException("Too big byte array: $resultLengthLong")
             }
             resultLength = resultLengthLong.toInt()
-            resultAlignedLength = ((resultLength + 3) ushr 2) shl 2
+            resultAlignedLength = resultLength + 8
         }
         val result = input.readBytes(resultLength)
-        input.discard(resultAlignedLength)
+        while (resultAlignedLength++ % 4 > 0) {
+            input.discardExact(1)
+        }
         return result
     }
 
@@ -49,6 +51,7 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
             output.writeUByte((length and 255).toUByte())
             output.writeUByte(((length shr 8) and 255).toUByte())
             output.writeUByte((length shr 16).toUByte())
+            length += 4
         } else if (length < Int.MAX_VALUE) {
             output.writeUByte(255u)
             output.writeUByte((length and 255).toUByte())
@@ -58,11 +61,12 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
             output.writeByte(0)
             output.writeByte(0)
             output.writeByte(0)
+            length += 8
         } else {
             throw IllegalStateException("Too big byte array: $length")
         }
         output.writeFully(value)
-        repeat(length and 3) {
+        while (length++ % 4 > 0) {
             output.writeByte(0)
         }
     }
