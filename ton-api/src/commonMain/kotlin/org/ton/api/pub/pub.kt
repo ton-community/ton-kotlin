@@ -24,8 +24,8 @@ interface PublicKey {
     fun toAdnlIdShort(): AdnlIdShort
 
     companion object : TlCombinator<PublicKey>(
-        PublicKeyUnencrypted,
         PublicKeyEd25519.tlConstructor(),
+        PublicKeyUnencrypted,
         PublicKeyAes,
         PublicKeyOverlay
     )

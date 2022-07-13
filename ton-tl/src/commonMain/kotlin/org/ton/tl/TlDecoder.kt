@@ -20,18 +20,6 @@ interface TlDecoder<T : Any> {
         }
         return length
     }
-
-    // Same as readByteLength(), but returns number of bytes read as second pair element
-    fun Input.readByteLengthEx(): Pair<Int, Int> {
-        var length = readByte().toInt() and 0xFF
-        if (length >= 254) {
-            length = (readByte().toInt() and 0xFF) or
-                    ((readByte().toInt() and 0xFF) shl 8) or
-                    ((readByte().toInt() and 0xFF) shl 16)
-            return Pair(length, 4)
-        }
-        return Pair(length, 1)
-    }
 }
 
 fun Input.readFlagTl() = readIntTl()

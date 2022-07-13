@@ -5,9 +5,12 @@ import kotlinx.atomicfu.AtomicInt
 import org.ton.adnl.node.AdnlNodeImpl
 import org.ton.adnl.node.AdnlPeer
 import org.ton.api.adnl.AdnlNode
+import org.ton.api.dht.DhtPing
+import org.ton.api.dht.DhtPong
 import org.ton.api.pub.PublicKey
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
+import kotlin.random.Random
 
 class DhtNodeImpl(
     private val adnl: AdnlNodeImpl,
@@ -23,10 +26,10 @@ class DhtNodeImpl(
         if (adnl.addPeer(peer) == null) return false
         val nodeId = peer.node.id
         if (knownPeers.put(nodeId)) {
-            val affinity = adnl.currentPeer.node.id affinity peer.node.id
+            val affinity = adnl.publicKey affinity peer.node.id
             val bucket = buckets.getOrPut(affinity) { ConcurrentMap() }
             val oldNode = bucket[nodeId]
-            if ((oldNode?.addrList?.version ?: -1) < peer.node.addrList.version) {
+            if ((oldNode?.addr_list?.version ?: -1) < peer.node.addr_list.version) {
                 bucket[nodeId] = peer.node
             }
         } else {
@@ -50,6 +53,16 @@ class DhtNodeImpl(
             }
         }
     }
+
+    suspend fun ping(destination: AdnlPeer, query: DhtPing): DhtPong =
+        destination.query(
+            adnl.privateKey,
+            query,
+            DhtPong
+        )
+
+    suspend fun ping(destination: AdnlPeer, randomId: Long = Random.nextLong()): DhtPong =
+        ping(destination, DhtPing(randomId))
 
     companion object {
         val MAX_PEERS = 65536

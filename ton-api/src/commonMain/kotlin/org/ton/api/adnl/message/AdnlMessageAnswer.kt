@@ -17,7 +17,7 @@ import org.ton.tl.constructors.writeInt256Tl
 data class AdnlMessageAnswer(
     @SerialName("query_id")
     @Serializable(Base64ByteArraySerializer::class)
-    val queryId: ByteArray,
+    val query_id: ByteArray,
     @Serializable(Base64ByteArraySerializer::class)
     val answer: ByteArray
 ) : AdnlMessage {
@@ -27,21 +27,21 @@ data class AdnlMessageAnswer(
 
         other as AdnlMessageAnswer
 
-        if (!queryId.contentEquals(other.queryId)) return false
+        if (!query_id.contentEquals(other.query_id)) return false
         if (!answer.contentEquals(other.answer)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = queryId.contentHashCode()
+        var result = query_id.contentHashCode()
         result = 31 * result + answer.contentHashCode()
         return result
     }
 
     override fun toString() = buildString {
         append("AdnlMessageAnswer(queryId=")
-        append(base64(queryId))
+        append(base64(query_id))
         append(", answer=")
         append(base64(answer))
         append(")")
@@ -52,7 +52,7 @@ data class AdnlMessageAnswer(
         schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageAnswer) {
-            output.writeInt256Tl(value.queryId)
+            output.writeInt256Tl(value.query_id)
             output.writeBytesTl(value.answer)
         }
 

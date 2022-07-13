@@ -4,6 +4,7 @@ import io.ktor.util.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import org.ton.api.adnl.AdnlPacketContents
+import org.ton.api.pub.PublicKey
 import java.io.Closeable
 import kotlin.coroutines.CoroutineContext
 
@@ -16,10 +17,16 @@ interface AdnlNodeEngine : CoroutineScope, Closeable {
     fun start()
 
     suspend fun sendPacket(
-        peer: AdnlPeer,
         packet: AdnlPacketContents,
-        subChannelSide: AdnlSubChannelSide?
+        subChannelSide: AdnlSubChannelSide
     )
+
+    suspend fun sendPacket(
+        packet: AdnlPacketContents,
+        publicKey: PublicKey
+    )
+
+    suspend fun receivePacket(): AdnlPacketContents
 }
 
 abstract class AdnlNodeEngineBase(

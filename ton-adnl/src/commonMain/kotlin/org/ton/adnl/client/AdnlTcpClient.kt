@@ -13,6 +13,7 @@ import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.pub.PublicKey
 import org.ton.bitstring.BitString
+import org.ton.crypto.SecureRandom
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.crypto.sha256
@@ -23,7 +24,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -88,14 +88,6 @@ abstract class AdnlTcpClient(
         deferred.await()
     }
 
-    protected fun launchKeepAliveJob(delay: Duration) =
-        CoroutineScope(dispatcher + supervisorJob + CoroutineName("ADNL Keep Alive")).launch {
-            while (isActive) {
-                ping()
-                delay(delay)
-            }
-        }
-
     protected fun launchIoJob() {
         CoroutineScope(dispatcher + supervisorJob + exceptionHandler + CoroutineName("ADNL I/O INPUT")).launch {
             outputFlow.collect { outputPacket ->
@@ -112,7 +104,7 @@ abstract class AdnlTcpClient(
             inputFlow.collect { rawInput ->
                 when (val adnlPacket = AdnlTlCombinator.decodeBoxed(rawInput)) {
                     is AdnlMessageAnswer -> {
-                        val queryId = BitString(adnlPacket.queryId)
+                        val queryId = BitString(adnlPacket.query_id)
                         val deferred = requireNotNull(queryMap[queryId]) {
                             "Unexpected AdnlMessageAnswer with queryId: $queryId"
                         }
@@ -176,7 +168,7 @@ abstract class AdnlTcpClient(
     private fun nextQueryId(): BitString {
         var nextId: BitString
         while (true) {
-            nextId = BitString(Random.nextBytes(256 / Byte.SIZE_BITS))
+            nextId = BitString(SecureRandom.nextBytes(256 / Byte.SIZE_BITS))
             if (!queryMap.containsKey(nextId)) break
         }
         return nextId

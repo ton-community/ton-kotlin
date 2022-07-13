@@ -3,10 +3,12 @@
 package org.ton.api.pk
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.*
+import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.X25519
@@ -16,8 +18,8 @@ import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import kotlin.random.Random
 
-@JsonClassDiscriminator("@type")
-interface PrivateKey {
+@Serializable
+sealed interface PrivateKey {
     fun publicKey(): PublicKey
     fun toByteArray(): ByteArray
 
@@ -31,6 +33,7 @@ interface PrivateKey {
     fun sign(byteArray: ByteArray): ByteArray
 }
 
+@JsonClassDiscriminator("@type")
 @SerialName("pk.unenc")
 @Serializable
 data class PrivateKeyUnencrypted(
@@ -70,9 +73,12 @@ data class PrivateKeyUnencrypted(
     }
 }
 
+@Polymorphic
+@JsonClassDiscriminator("@type")
 @SerialName("pk.ed25519")
 @Serializable
 data class PrivateKeyEd25519(
+    @Serializable(Base64ByteArraySerializer::class)
     val key: ByteArray
 ) : PrivateKey {
     init {
@@ -122,6 +128,7 @@ data class PrivateKeyEd25519(
     }
 }
 
+@JsonClassDiscriminator("@type")
 @SerialName("pk.aes")
 @Serializable
 data class PrivateKeyAes(
@@ -174,6 +181,7 @@ data class PrivateKeyAes(
     }
 }
 
+@JsonClassDiscriminator("@type")
 @SerialName("pk.overlay")
 @Serializable
 data class PrivateKeyOverlay(

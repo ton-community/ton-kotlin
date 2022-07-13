@@ -1,38 +1,63 @@
 package org.ton.adnl.node
 
+import io.ktor.util.collections.*
 import kotlinx.atomicfu.AtomicInt
 import kotlinx.atomicfu.AtomicLong
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
-import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlNode
 import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.adnl.message.AdnlMessage
+import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.pk.PrivateKey
 import org.ton.crypto.SecureRandom
+import org.ton.tl.TlCodec
+import org.ton.tl.TlObject
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
 class AdnlPeer(
     val engine: AdnlNodeEngine,
-    val address: AdnlAddress,
     val node: AdnlNode,
     override val coroutineContext: CoroutineContext
 ) : CoroutineScope {
     private val receiveState = PeerState()
     private val sendState = PeerState()
+    private val queries = ConcurrentMap<QueryId, Query<*, *>>()
+    private val queryMutex = Mutex()
+
+    // TODO: Rewrite for concurrency
+    suspend fun <Q : TlObject<Q>, A : TlObject<A>> query(
+        source: PrivateKey,
+        queryBody: Q,
+        answerCodec: TlCodec<A>
+    ): A {
+        val query = Query(queryBody, answerCodec)
+        queries[query.id] = query
+        val queryMsg = query.createMessageQuery()
+
+        queryMutex.withLock {
+            sendMessage(source, true, AdnlChannel.zero(), queryMsg)
+            val answerMsg = receiveMessages()
+                .filterIsInstance<AdnlMessageAnswer>()
+                .first { it.query_id.contentEquals(query.id.value) }
+            return answerCodec.decodeBoxed(answerMsg.answer)
+        }
+    }
 
     suspend fun sendMessage(
         source: PrivateKey,
         priority: Boolean,
-        channel: AdnlChannel? = null,
+        channel: AdnlChannel,
         vararg messages: AdnlMessage
     ): MessageRepeat {
         @Suppress("NAME_SHADOWING")
         var priority = priority
         val repeat = if (priority) {
-            if (channel == null) {
+            if (channel == AdnlChannel.zero()) {
                 // No need if no channel
                 priority = false
             } else {
@@ -53,34 +78,39 @@ class AdnlPeer(
         val sourcePublicKey = source.publicKey()
         var packet = AdnlPacketContents(
             rand1 = generateRandom(),
-            from = if (channel != null) null else sourcePublicKey,
-            from_short = if (channel != null) null else sourcePublicKey.toAdnlIdShort(),
+            from = if (channel != AdnlChannel.zero()) null else sourcePublicKey,
+            from_short = if (channel != AdnlChannel.zero()) null else sourcePublicKey.toAdnlIdShort(),
             message = if (messages.size == 1) messages[0] else null,
             messages = if (messages.size > 1) messages.toList() else null,
-            address = node.addrList,
-            priority_address = null,
+            address = if (!priority) node.addr_list else null,
+            priority_address = if (priority) node.addr_list else null,
             seqno = sendState.nextSeqno(priority),
             confirm_seqno = receiveState.seqno(priority),
             recv_addr_list_version = null,
             recv_priority_addr_list_version = null,
-            reinit_date = if (channel != null) null else receiveState.reinitDate.value,
-            dst_reinit_date = if (channel != null) null else sendState.reinitDate.value,
+            reinit_date = if (channel != AdnlChannel()) null else receiveState.reinitDate.value,
+            dst_reinit_date = if (channel != AdnlChannel()) null else sendState.reinitDate.value,
             signature = null,
             rand2 = generateRandom()
         )
-        if (channel == null) {
+        val subChannelSide = if (priority) {
+            channel.send.priority
+        } else {
+            channel.send.ordinary
+        }
+        if (channel == AdnlChannel.zero()) {
             val signature = source.sign(packet.toByteArray())
             packet = packet.copy(signature = signature)
-            engine.sendPacket(this, packet, null)
+            engine.sendPacket(packet, sourcePublicKey)
         } else {
-            val subChannelSide = if (priority) {
-                channel.send.priority
-            } else {
-                channel.send.ordinary
-            }
-            engine.sendPacket(this, packet, subChannelSide)
+            engine.sendPacket(packet, subChannelSide)
         }
         return repeat
+    }
+
+    suspend fun receiveMessages(): List<AdnlMessage> {
+        val packet = engine.receivePacket()
+        return packet.messages()
     }
 
     private fun generateRandom(random: Random = SecureRandom) = random.nextBytes(16)

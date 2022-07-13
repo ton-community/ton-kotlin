@@ -1,19 +1,24 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.readVectorTl
 import org.ton.tl.constructors.writeIntTl
 import org.ton.tl.constructors.writeVectorTl
-import java.time.Instant
 
+@SerialName("adnl.addressList")
+@Polymorphic
 @Serializable
+@JsonClassDiscriminator("@type")
 data class AdnlAddressList(
-    val addrs: List<AdnlAddress>,
-    val version: Int = Instant.now().epochSecond.toInt(),
-    val reinit_date: Int = Instant.now().epochSecond.toInt(),
+    val addrs: List<AdnlAddress> = emptyList(),
+    val version: Int = 0,
+    val reinit_date: Int = 0,
     val priority: Int = 0,
     val expire_at: Int = 0
 ) : List<AdnlAddress> by addrs {

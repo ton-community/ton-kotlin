@@ -4,9 +4,9 @@ import org.ton.adnl.aes.AdnlAesCipher
 import org.ton.crypto.sha256
 
 class AdnlSubChannelSide(
-    val id: ByteArray,
-    val secret: ByteArray,
-    val priority: Boolean
+    val id: ByteArray = ByteArray(32),
+    val secret: ByteArray = ByteArray(32),
+    val priority: Boolean = false
 ) {
     fun encrypt(payload: ByteArray): ByteArray {
         val cipher = AdnlAesCipher.secure(secret, payload)
@@ -24,11 +24,15 @@ class AdnlSubChannelSide(
 }
 
 class AdnlChannelSide(
-    val ordinary: AdnlSubChannelSide,
-    val priority: AdnlSubChannelSide
+    val ordinary: AdnlSubChannelSide = AdnlSubChannelSide(),
+    val priority: AdnlSubChannelSide = AdnlSubChannelSide()
 )
 
 class AdnlChannel(
-    val recv: AdnlChannelSide,
-    val send: AdnlChannelSide
-)
+    val recv: AdnlChannelSide = AdnlChannelSide(),
+    val send: AdnlChannelSide = AdnlChannelSide()
+) {
+    companion object {
+        fun zero() = AdnlChannel()
+    }
+}

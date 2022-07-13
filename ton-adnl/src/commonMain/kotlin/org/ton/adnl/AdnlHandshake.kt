@@ -6,6 +6,7 @@ import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pk.PrivateKeyAes
 import org.ton.api.pub.PublicKey
+import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
 
 class AdnlHandshake(
@@ -32,6 +33,7 @@ class AdnlHandshake(
 
             output.writeFully(preimage)
             output.writeFully(cipher.encrypt(handshake.payload))
+            println("encrypt payload: ${handshake.payload.encodeHex()}")
         }
 
         fun decode(input: Input, keys: Map<AdnlIdShort, PublicKey>, length: Int = 0) {

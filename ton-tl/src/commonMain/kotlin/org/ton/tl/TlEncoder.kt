@@ -30,8 +30,13 @@ interface TlEncoder<T : Any> {
 fun Output.writeFlagTl(vararg booleans: Boolean): Int {
     var flag = 0
     booleans.forEachIndexed { index, value ->
-        flag = flag or ((if (value) 1 else 0) shl index)
+        if (value) {
+            val mask = 1 shl index
+            println("mask: $mask")
+            flag = flag or mask
+        }
     }
+    println("write: ${flag} - ${flag.toString(16)} ${flag.toString(2).padStart(32, '0')}")
     writeIntTl(flag)
     return flag
 }

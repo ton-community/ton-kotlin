@@ -2,6 +2,8 @@ package org.ton.tl
 
 import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 abstract class TlCombinator<T : Any>(
     val constructors: List<TlConstructor<out T>>
@@ -18,9 +20,14 @@ abstract class TlCombinator<T : Any>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun findConstructor(type: KClass<out T>): TlConstructor<T> {
+    fun findConstructor(type: KClass<out T>): TlConstructor<T> = findConstructor(type.createType())
+
+    @Suppress("UNCHECKED_CAST")
+    fun findConstructor(type: KType): TlConstructor<T> {
         val constructor = checkNotNull(
-            constructors.find { it.type == type }
+            constructors.find { constructor ->
+                constructor.type == type
+            }
         ) {
             "Invalid type. actual: $type"
         }

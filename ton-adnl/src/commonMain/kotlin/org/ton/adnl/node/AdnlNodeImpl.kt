@@ -1,6 +1,7 @@
 package org.ton.adnl.node
 
 import io.ktor.util.collections.*
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.ton.api.adnl.AdnlAddress
@@ -13,32 +14,32 @@ import kotlin.coroutines.CoroutineContext
 
 class AdnlNodeImpl(
     val privateKey: PrivateKey,
-    scope: CoroutineContext,
+    scope: CoroutineContext = CoroutineName("ADNL Node"),
     val logger: Logger = PrintLnLogger("ADNL")
 ) : CoroutineScope {
-    private val publicKey: PublicKey by lazy { privateKey.publicKey() }
-    protected val supervisorJob = SupervisorJob()
-    override val coroutineContext: CoroutineContext = scope + supervisorJob
-
+    private val supervisorJob = SupervisorJob()
     private val peers = ConcurrentMap<PublicKey, AdnlNode>()
+
+    val publicKey: PublicKey by lazy { privateKey.publicKey() }
+    override val coroutineContext: CoroutineContext = scope + supervisorJob
 
     fun addPeer(peer: AdnlPeer): List<AdnlAddress>? {
         val adnlNode = peer.node
         if (adnlNode.id == privateKey.publicKey()) return null
         val currentIdNode = peers[adnlNode.id]
         val newAddresses = if (currentIdNode != null) {
-            val newAddressList = (currentIdNode.addrList.addrs + adnlNode.addrList.addrs).distinct()
+            val newAddressList = (currentIdNode.addr_list.addrs + adnlNode.addr_list.addrs).distinct()
             peers[adnlNode.id] = adnlNode.copy(
-                addrList = adnlNode.addrList.copy(
+                addr_list = adnlNode.addr_list.copy(
                     addrs = newAddressList.distinct()
                 )
             )
-            adnlNode.addrList.asSequence().filter { address ->
-                address !in currentIdNode.addrList
+            adnlNode.addr_list.asSequence().filter { address ->
+                address !in currentIdNode.addr_list
             }
         } else {
             peers[adnlNode.id] = adnlNode
-            adnlNode.addrList.asSequence()
+            adnlNode.addr_list.asSequence()
         }.toList()
         logger.debug { "Added ADNL peer with addresses: $newAddresses, id: ${adnlNode.id} to: $publicKey" }
         return newAddresses

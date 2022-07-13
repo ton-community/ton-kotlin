@@ -1,5 +1,6 @@
 package org.ton.lite.api
 
+import org.ton.crypto.encodeHex
 import org.ton.lite.api.liteserver.LiteServerLookupBlockFunction
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
@@ -34,6 +35,8 @@ interface LiteApi :
 
     override suspend fun query(liteServerQuery: LiteServerQuery): ByteArray {
         val liteServerQueryBytes = LiteServerQuery.encodeBoxed(liteServerQuery)
+        println("LiteServerQuery: ${liteServerQueryBytes.encodeHex()}")
+        println("  $liteServerQuery")
         return sendRawQuery(liteServerQueryBytes)
     }
 }

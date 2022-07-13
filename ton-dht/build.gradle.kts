@@ -14,5 +14,10 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        jvmTest {
+            dependencies {
+                api(libs.coroutines.jvm)
+            }
+        }
     }
 }

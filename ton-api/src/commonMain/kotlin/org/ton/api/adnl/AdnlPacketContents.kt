@@ -3,9 +3,13 @@ package org.ton.api.adnl
 import io.ktor.utils.io.core.*
 import org.ton.api.adnl.AdnlNodes.Companion.writeBoxedTl
 import org.ton.api.adnl.message.AdnlMessage
+import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.tl.*
+import org.ton.tl.TlCodec
+import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
+import org.ton.tl.readFlagTl
+import org.ton.tl.writeOptionalTl
 
 // total packet length:
 //   for full packet:
@@ -17,6 +21,7 @@ import org.ton.tl.constructors.*
 //              + A1 + A2 + 8 + 8 + 4 + 4 + 16(r1) + 16(r2) = 128 + M + A1 + A2
 data class AdnlPacketContents(
     val rand1: ByteArray,
+    val flags: Int,
     val from: PublicKey?,
     val from_short: AdnlIdShort?,
     val message: AdnlMessage?,
@@ -32,6 +37,52 @@ data class AdnlPacketContents(
     val signature: ByteArray?,
     val rand2: ByteArray
 ) {
+    constructor(
+        rand1: ByteArray,
+        from: PublicKey?,
+        from_short: AdnlIdShort?,
+        message: AdnlMessage?,
+        messages: List<AdnlMessage>?,
+        address: AdnlAddressList?,
+        priority_address: AdnlAddressList?,
+        seqno: Long?,
+        confirm_seqno: Long?,
+        recv_addr_list_version: Int?,
+        recv_priority_addr_list_version: Int?,
+        reinit_date: Int?,
+        dst_reinit_date: Int?,
+        signature: ByteArray?,
+        rand2: ByteArray
+    ) : this(
+        rand1,
+        (if (from != null) FLAG_FROM else 0) or
+                (if (from_short != null) FLAG_FROM_SHORT else 0) or
+                (if (message != null) FLAG_MESSAGE else 0) or
+                (if (messages != null) FLAG_MESSAGES else 0) or
+                (if (address != null) FLAG_ADDRESS else 0) or
+                (if (priority_address != null) FLAG_PRIORITY_ADDRESS else 0) or
+                (if (seqno != null) FLAG_SEQNO else 0) or
+                (if (confirm_seqno != null) FLAG_CONFIRM_SEQNO else 0) or
+                (if (recv_addr_list_version != null) FLAG_RECV_ADDR_VERSION else 0) or
+                (if (recv_priority_addr_list_version != null) FLAG_RECV_PRIORITY_ADDR_VERSION else 0) or
+                (if (reinit_date != null) FLAG_REINIT_DATE else 0) or
+                (if (signature != null) FLAG_SIGNATURE else 0),
+        from,
+        from_short,
+        message,
+        messages,
+        address,
+        priority_address,
+        seqno,
+        confirm_seqno,
+        recv_addr_list_version,
+        recv_priority_addr_list_version,
+        reinit_date,
+        dst_reinit_date,
+        signature,
+        rand2
+    )
+
     init {
         if (message != null && messages != null) {
             throw IllegalArgumentException("both fields `message` and `messages` set")
@@ -53,6 +104,13 @@ data class AdnlPacketContents(
         writeBoxedTl(AdnlPacketContents, this@AdnlPacketContents)
     }.readBytes()
 
+    fun signed(privateKey: PrivateKey): AdnlPacketContents {
+        return copy(
+            flags = flags or FLAG_SIGNATURE,
+            signature = privateKey.sign(toByteArray())
+        )
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -60,6 +118,7 @@ data class AdnlPacketContents(
         other as AdnlPacketContents
 
         if (!rand1.contentEquals(other.rand1)) return false
+        if (flags != other.flags) return false
         if (from != other.from) return false
         if (from_short != other.from_short) return false
         if (message != other.message) return false
@@ -83,6 +142,7 @@ data class AdnlPacketContents(
 
     override fun hashCode(): Int {
         var result = rand1.contentHashCode()
+        result = 31 * result + flags
         result = 31 * result + (from?.hashCode() ?: 0)
         result = 31 * result + (from_short?.hashCode() ?: 0)
         result = 31 * result + (message?.hashCode() ?: 0)
@@ -100,7 +160,22 @@ data class AdnlPacketContents(
         return result
     }
 
-    companion object : TlCodec<AdnlPacketContents> by AdnlPacketContentsTlConstructor
+    companion object : TlCodec<AdnlPacketContents> by AdnlPacketContentsTlConstructor {
+        const val FLAG_FROM = 0x1
+        const val FLAG_FROM_SHORT = 0x2
+        const val FLAG_MESSAGE = 0x4
+        const val FLAG_MESSAGES = 0x8
+        const val FLAG_ADDRESS = 0x10
+        const val FLAG_PRIORITY_ADDRESS = 0x20
+        const val FLAG_SEQNO = 0x40
+        const val FLAG_CONFIRM_SEQNO = 0x80
+        const val FLAG_RECV_ADDR_VERSION = 0x100
+        const val FLAG_RECV_PRIORITY_ADDR_VERSION = 0x200
+        const val FLAG_REINIT_DATE = 0x400
+        const val FLAG_SIGNATURE = 0x800
+        const val FLAG_PRIORITY = 0x1000
+        const val FLAG_ALL = 0x1FFF
+    }
 }
 
 private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContents>(
@@ -122,13 +197,14 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
             " dst_reinit_date:flags.10?int" +
             " signature:flags.11?bytes" +
             " rand2:bytes" +
-            " = adnl.PacketContents"
+            " = adnl.PacketContents",
+    id = -784151159
 ) {
     val vectorAdnlMessage = VectorTlConstructor(AdnlMessage)
 
     override fun decode(input: Input): AdnlPacketContents {
         val rand1 = input.readBytesTl()
-        val flags = input.readFlagTl()
+        val flags = input.readIntTl()
         val from = input.readFlagTl(flags, 0, PublicKey)
         val from_short = input.readFlagTl(flags, 1, AdnlIdShort)
         val message = input.readFlagTl(flags, 2, AdnlMessage)
@@ -142,9 +218,10 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
         val reinit_date = input.readFlagTl(flags, 10, IntTlConstructor)
         val dst_reinit_date = input.readFlagTl(flags, 10, IntTlConstructor)
         val signature = input.readFlagTl(flags, 11, BytesTlConstructor)
-        val rand2 = input.readBytesTl()
+        val rand2 = input.readStringTl().encodeToByteArray()
         return AdnlPacketContents(
             rand1,
+            flags,
             from,
             from_short,
             message,
@@ -164,33 +241,28 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
 
     override fun encode(output: Output, value: AdnlPacketContents) {
         output.writeBytesTl(value.rand1)
-        val flag = output.writeFlagTl(
-            value.from != null,
-            value.from_short != null,
-            value.message != null,
-            value.messages != null,
-            value.address != null,
-            value.priority_address != null,
-            value.seqno != null,
-            value.confirm_seqno != null,
-            value.recv_addr_list_version != null,
-            value.recv_priority_addr_list_version != null,
-            value.reinit_date != null,
-            value.signature != null,
-        )
-        output.writeOptionalTl(flag, 0, PublicKey, value.from)
-        output.writeOptionalTl(flag, 1, AdnlIdShort, value.from_short)
-        output.writeOptionalTl(flag, 2, AdnlMessage, value.message)
-        output.writeOptionalTl(flag, 3, vectorAdnlMessage, value.messages)
-        output.writeOptionalTl(flag, 4, AdnlAddressList, value.address)
-        output.writeOptionalTl(flag, 5, AdnlAddressList, value.priority_address)
-        output.writeOptionalTl(flag, 6, LongTlConstructor, value.seqno)
-        output.writeOptionalTl(flag, 7, LongTlConstructor, value.confirm_seqno)
-        output.writeOptionalTl(flag, 8, IntTlConstructor, value.recv_addr_list_version)
-        output.writeOptionalTl(flag, 9, IntTlConstructor, value.recv_priority_addr_list_version)
-        output.writeOptionalTl(flag, 10, IntTlConstructor, value.reinit_date)
-        output.writeOptionalTl(flag, 10, IntTlConstructor, value.dst_reinit_date)
-        output.writeOptionalTl(flag, 11, BytesTlConstructor, value.signature)
+        output.writeIntTl(value.flags)
+        val bad = -1946584576
+        println("write: ${value.flags} - hex: ${value.flags.toString(16).padStart(8, '0')}")
+        println("read : $bad - hex: ${bad.toUInt().toString(16).padStart(8, '0')}")
+
+        // aaaaaaaa | 14 01 | 00 7a f9 8b
+        // 8b f9 7a 00 - actual
+        //
+
+        output.writeOptionalTl(value.flags, 0, PublicKey, value.from)
+        output.writeOptionalTl(value.flags, 1, AdnlIdShort, value.from_short)
+        output.writeOptionalTl(value.flags, 2, AdnlMessage, value.message)
+        output.writeOptionalTl(value.flags, 3, vectorAdnlMessage, value.messages)
+        output.writeOptionalTl(value.flags, 4, AdnlAddressList, value.address)
+        output.writeOptionalTl(value.flags, 5, AdnlAddressList, value.priority_address)
+        output.writeOptionalTl(value.flags, 6, LongTlConstructor, value.seqno)
+        output.writeOptionalTl(value.flags, 7, LongTlConstructor, value.confirm_seqno)
+        output.writeOptionalTl(value.flags, 8, IntTlConstructor, value.recv_addr_list_version)
+        output.writeOptionalTl(value.flags, 9, IntTlConstructor, value.recv_priority_addr_list_version)
+        output.writeOptionalTl(value.flags, 10, IntTlConstructor, value.reinit_date)
+        output.writeOptionalTl(value.flags, 10, IntTlConstructor, value.dst_reinit_date)
+        output.writeOptionalTl(value.flags, 11, BytesTlConstructor, value.signature)
         output.writeBytesTl(value.rand2)
     }
 }

@@ -14,33 +14,28 @@ import org.ton.tl.constructors.writeInt256Tl
 @SerialName("adnl.message.query")
 @Serializable
 data class AdnlMessageQuery(
-    @SerialName("query_id")
     @Serializable(Base64ByteArraySerializer::class)
-    val queryId: ByteArray,
+    val query_id: ByteArray,
     @Serializable(Base64ByteArraySerializer::class)
     val query: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlMessageQuery
-
-        if (!queryId.contentEquals(other.queryId)) return false
+        if (other !is AdnlMessageQuery) return false
+        if (!query_id.contentEquals(other.query_id)) return false
         if (!query.contentEquals(other.query)) return false
-
         return true
     }
 
     override fun hashCode(): Int {
-        var result = queryId.contentHashCode()
+        var result = query_id.contentHashCode()
         result = 31 * result + query.contentHashCode()
         return result
     }
 
     override fun toString() = buildString {
         append("AdnlMessageQuery(queryId=")
-        append(hex(queryId))
+        append(hex(query_id))
         append(", query=")
         append(hex(query))
         append(")")
@@ -51,7 +46,7 @@ data class AdnlMessageQuery(
         schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message"
     ) {
         override fun encode(output: Output, value: AdnlMessageQuery) {
-            output.writeInt256Tl(value.queryId)
+            output.writeInt256Tl(value.query_id)
             output.writeBytesTl(value.query)
         }
 
