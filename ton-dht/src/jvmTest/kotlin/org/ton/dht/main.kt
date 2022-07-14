@@ -9,7 +9,6 @@ import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.adnl.message.AdnlMessage
-import org.ton.api.adnl.message.AdnlMessageCreateChannel
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
@@ -105,13 +104,13 @@ val engine = AdnlNodeEngineCIO().apply {
     start(socket)
 }
 
-suspend fun createChannel() {
-    packet(
-        AdnlMessageCreateChannel(
-
-        )
-    )
-}
+//suspend fun createChannel() {
+//    packet(
+//        AdnlMessageCreateChannel(
+//
+//        )
+//    )
+//}
 
 suspend fun dhtQuery() {
     val dhtNode = DHT_NODES.first()

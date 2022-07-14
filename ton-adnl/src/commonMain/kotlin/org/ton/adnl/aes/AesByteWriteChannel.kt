@@ -2,10 +2,11 @@ package org.ton.adnl.aes
 
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import org.ton.crypto.aes.AesCtr
 
 class AesByteWriteChannel(
     val channel: ByteWriteChannel,
-    val aes: AdnlAesCipher,
+    val aes: AesCtr,
 ) : ByteWriteChannel by channel {
     override suspend fun writeByte(b: Byte) = channel.writeByte(aes.encrypt { writeByte(b) }.readByte())
 

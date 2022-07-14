@@ -18,7 +18,7 @@ actual object Ed25519 {
         return signature
     }
 
-    actual fun verify(message: ByteArray, publicKey: ByteArray, signature: ByteArray): Boolean {
+    actual fun verify(publicKey: ByteArray, message: ByteArray, signature: ByteArray): Boolean {
         return org.bouncycastle.math.ec.rfc8032.Ed25519.verify(signature, 0, publicKey, 0, message, 0, message.size)
     }
 

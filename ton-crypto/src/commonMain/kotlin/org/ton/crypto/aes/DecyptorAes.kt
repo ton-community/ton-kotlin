@@ -1,6 +1,5 @@
 package org.ton.crypto.aes
 
-import org.ton.crypto.AesCtr
 import org.ton.crypto.Decryptor
 import org.ton.crypto.sha256
 

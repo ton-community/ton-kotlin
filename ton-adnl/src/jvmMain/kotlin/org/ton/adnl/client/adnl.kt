@@ -12,8 +12,10 @@ import org.ton.adnl.aes.AesByteWriteChannel
 import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.AesCtr
+import org.ton.api.pub.PublicKeyUnencrypted
 import org.ton.crypto.SecureRandom
+import org.ton.crypto.aes.AesCtr
+import org.ton.crypto.hex
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import kotlin.coroutines.CoroutineContext
@@ -62,7 +64,12 @@ class AdnlTcpClientImpl(
     }
 
     private suspend fun performHandshake() {
-        val nonce = SecureRandom.nextBytes(160)
+        val nonce = if (publicKey is PublicKeyUnencrypted) {
+            ByteArray(160)
+        } else {
+            SecureRandom.nextBytes(160)
+        }
+        logger.debug { "nonce: ${hex(nonce)}" }
         val inputCipher = AesCtr(nonce.copyOfRange(0, 32), nonce.copyOfRange(64, 80))
         val outputCipher = AesCtr(nonce.copyOfRange(32, 64), nonce.copyOfRange(80, 96))
 
