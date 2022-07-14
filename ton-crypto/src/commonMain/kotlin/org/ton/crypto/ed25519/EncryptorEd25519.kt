@@ -3,25 +3,17 @@ package org.ton.crypto.ed25519
 import org.ton.crypto.Encryptor
 import org.ton.crypto.X25519
 import org.ton.crypto.aes.EncryptorAes
-import org.ton.crypto.encodeHex
-import org.ton.crypto.hex
 
 class EncryptorEd25519(
     private val publicKey: ByteArray
 ) : Encryptor {
     override fun encrypt(data: ByteArray): ByteArray {
-//        val privateKey = Ed25519.privateKey()
-        println("other public: ${hex(publicKey)}")
-        val privateKey = ByteArray(32)
-        val localPublic = Ed25519.publicKey(privateKey)
-        println("local public: ${hex(localPublic)}")
+        val privateKey = Ed25519.privateKey()
+        val decryptionKey = X25519.convertToEd25519(X25519.publicKey(privateKey))
         val secret = X25519.sharedKey(privateKey, Ed25519.convertToX25519(publicKey))
-        println("secret: ${secret.encodeHex()}")
         val aes = EncryptorAes(secret)
         val encryptedData = aes.encrypt(data)
-        return (localPublic + encryptedData).also {
-            println("result ed25519: ${it.encodeHex()}")
-        }
+        return decryptionKey + encryptedData
     }
 
     override fun verify(message: ByteArray, signature: ByteArray): Boolean =

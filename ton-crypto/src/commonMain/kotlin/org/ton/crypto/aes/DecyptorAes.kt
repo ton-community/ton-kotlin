@@ -14,11 +14,11 @@ class DecryptorAes(
         secret.copyInto(key, destinationOffset = 0, startIndex = 0, endIndex = 16)
         digest.copyInto(key, destinationOffset = 16, startIndex = 16, endIndex = 32)
 
-        val ctr = ByteArray(16)
-        digest.copyInto(ctr, destinationOffset = 0, startIndex = 0, endIndex = 4)
-        secret.copyInto(ctr, destinationOffset = 4, startIndex = 20, endIndex = 32)
+        val iv = ByteArray(16)
+        digest.copyInto(iv, destinationOffset = 0, startIndex = 0, endIndex = 4)
+        secret.copyInto(iv, destinationOffset = 4, startIndex = 20, endIndex = 32)
 
-        val cipher = AesCtr(key, ctr)
+        val cipher = AesCtr(key, iv)
         val decryptedData = cipher.encrypt(data)
 
         val actualDigest = sha256(decryptedData)

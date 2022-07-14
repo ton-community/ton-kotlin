@@ -19,7 +19,10 @@ actual class AesCtr actual constructor(
         it.init(Cipher.DECRYPT_MODE, secretKey, this.iv)
     }
 
-    actual fun encrypt(byteArray: ByteArray) = encryptCipher.update(byteArray)
+    actual fun encrypt(byteArray: ByteArray): ByteArray {
+        if (byteArray.isEmpty()) return byteArray
+        return encryptCipher.update(byteArray)
+    }
 
     actual suspend fun encrypt(packet: suspend BytePacketBuilder.() -> Unit): ByteReadPacket {
         val builder = BytePacketBuilder()
