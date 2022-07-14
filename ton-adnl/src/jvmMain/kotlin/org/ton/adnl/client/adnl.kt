@@ -1,17 +1,18 @@
-package org.ton.adnl
+package org.ton.adnl.client
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withContext
-import org.ton.adnl.aes.AdnlAesCipher
 import org.ton.adnl.aes.AesByteReadChannel
 import org.ton.adnl.aes.AesByteWriteChannel
-import org.ton.adnl.client.AdnlTcpClient
-import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.adnl.ipv4
+import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pub.PublicKey
+import org.ton.crypto.AesCtr
 import org.ton.crypto.SecureRandom
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
@@ -62,16 +63,12 @@ class AdnlTcpClientImpl(
 
     private suspend fun performHandshake() {
         val nonce = SecureRandom.nextBytes(160)
-        val inputCipher = AdnlAesCipher(nonce.copyOfRange(0, 32), nonce.copyOfRange(64, 80))
-        val outputCipher = AdnlAesCipher(nonce.copyOfRange(32, 64), nonce.copyOfRange(80, 96))
+        val inputCipher = AesCtr(nonce.copyOfRange(0, 32), nonce.copyOfRange(64, 80))
+        val outputCipher = AesCtr(nonce.copyOfRange(32, 64), nonce.copyOfRange(80, 96))
 
-        val handshake = AdnlHandshake(
-            payload = nonce,
-            local = PrivateKeyEd25519(SecureRandom.nextBytes(32)),
-            other = publicKey
-        )
         connection.output.writePacket {
-            AdnlHandshake.encode(this, handshake)
+            writeFully(AdnlIdShort.encodeBoxed(publicKey.toAdnlIdShort()))
+            writeFully(publicKey.encrypt(nonce))
         }
         connection.output.flush()
 

@@ -1,8 +1,8 @@
 package org.ton.lite.client
 
 import kotlinx.coroutines.Dispatchers
-import org.ton.adnl.AdnlTcpClientImpl
 import org.ton.adnl.client.AdnlTcpClient
+import org.ton.adnl.client.AdnlTcpClientImpl
 import org.ton.adnl.ipv4
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.lite.api.LiteApi

@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlNode
+import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
@@ -19,11 +20,17 @@ import org.ton.tl.writeTl
 data class DhtNode(
     val id: PublicKey,
     val addr_list: AdnlAddressList,
-    val version: Int,
+    val version: Int = 0,
     @Serializable(Base64ByteArraySerializer::class)
-    val signature: ByteArray
+    val signature: ByteArray = ByteArray(0)
 ) {
     fun toAdnlNode(): AdnlNode = AdnlNode(id, addr_list)
+
+    fun signed(privateKey: PrivateKey) = copy(
+        signature = privateKey.sign(
+            DhtNode.encodeBoxed(this)
+        )
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -1,6 +1,5 @@
 package org.ton.adnl.node
 
-import org.ton.adnl.aes.AdnlAesCipher
 import org.ton.crypto.sha256
 
 class AdnlSubChannelSide(

@@ -23,7 +23,7 @@ interface AdnlNodeEngine : CoroutineScope, Closeable {
 
     suspend fun sendPacket(
         packet: AdnlPacketContents,
-        publicKey: PublicKey
+        otherKey: PublicKey
     )
 
     suspend fun receivePacket(): AdnlPacketContents

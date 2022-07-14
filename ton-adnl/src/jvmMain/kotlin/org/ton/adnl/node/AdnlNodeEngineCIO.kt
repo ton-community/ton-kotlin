@@ -31,16 +31,20 @@ class AdnlNodeEngineCIO(
         Dispatchers.clientDispatcher(config.threadsCount, "adnl-cio-dispatcher")
     }
 
-    private val selectorManager by lazy {
+    val selectorManager by lazy {
         SelectorManager(dispatcher)
     }
     private lateinit var socket: AdnlSocket
 
     override fun start() {
         val rawSocket = aSocket(selectorManager).udp().bind(InetSocketAddress(config.host, config.port))
+        start(rawSocket)
+    }
+
+    fun start(datagramChannel: DatagramReadWriteChannel) {
         socket = AdnlSocket(
-            rawSocket,
-            rawSocket,
+            datagramChannel,
+            datagramChannel,
             coroutineContext
         )
     }

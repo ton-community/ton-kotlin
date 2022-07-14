@@ -1,7 +1,7 @@
 package org.ton.adnl
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
-import org.ton.adnl.aes.AdnlAesCipher
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pk.PrivateKeyAes
@@ -21,6 +21,7 @@ class AdnlHandshake(
             val localAes = PrivateKeyAes(handshake.local)
 
             handshake.other.toAdnlIdShort().id.copyInto(preimage, destinationOffset = 0, startIndex = 0, endIndex = 32)
+            println("WRITE -> : ${handshake.other.toAdnlIdShort().id.encodeBase64()}")
             localAes.publicKey().key.copyInto(preimage, destinationOffset = 32, startIndex = 0, endIndex = 32)
             checksum.copyInto(preimage, destinationOffset = 64, startIndex = 0, endIndex = 32)
 

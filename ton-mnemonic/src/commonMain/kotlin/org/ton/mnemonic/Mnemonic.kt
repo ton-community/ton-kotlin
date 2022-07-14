@@ -1,7 +1,7 @@
 package org.ton.mnemonic
 
-import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
+import org.ton.crypto.ed25519.Ed25519
 import org.ton.crypto.hmacSha512
 import org.ton.crypto.pbkdf2Sha512
 import kotlin.random.Random

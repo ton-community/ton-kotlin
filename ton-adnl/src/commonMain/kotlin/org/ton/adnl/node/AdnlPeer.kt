@@ -77,7 +77,6 @@ class AdnlPeer(
         }
         val sourcePublicKey = source.publicKey()
         var packet = AdnlPacketContents(
-            rand1 = generateRandom(),
             from = if (channel != AdnlChannel.zero()) null else sourcePublicKey,
             from_short = if (channel != AdnlChannel.zero()) null else sourcePublicKey.toAdnlIdShort(),
             message = if (messages.size == 1) messages[0] else null,
@@ -90,8 +89,6 @@ class AdnlPeer(
             recv_priority_addr_list_version = null,
             reinit_date = if (channel != AdnlChannel()) null else receiveState.reinitDate.value,
             dst_reinit_date = if (channel != AdnlChannel()) null else sendState.reinitDate.value,
-            signature = null,
-            rand2 = generateRandom()
         )
         val subChannelSide = if (priority) {
             channel.send.priority

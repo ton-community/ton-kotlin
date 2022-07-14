@@ -10,6 +10,7 @@ import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
 import org.ton.tl.readFlagTl
 import org.ton.tl.writeOptionalTl
+import kotlin.random.Random
 
 // total packet length:
 //   for full packet:
@@ -38,23 +39,21 @@ data class AdnlPacketContents(
     val rand2: ByteArray
 ) {
     constructor(
-        rand1: ByteArray,
-        from: PublicKey?,
-        from_short: AdnlIdShort?,
-        message: AdnlMessage?,
-        messages: List<AdnlMessage>?,
-        address: AdnlAddressList?,
-        priority_address: AdnlAddressList?,
-        seqno: Long?,
-        confirm_seqno: Long?,
-        recv_addr_list_version: Int?,
-        recv_priority_addr_list_version: Int?,
-        reinit_date: Int?,
-        dst_reinit_date: Int?,
-        signature: ByteArray?,
-        rand2: ByteArray
+        from: PublicKey? = null,
+        from_short: AdnlIdShort? = null,
+        message: AdnlMessage? = null,
+        messages: List<AdnlMessage>? = null,
+        address: AdnlAddressList? = null,
+        priority_address: AdnlAddressList? = null,
+        seqno: Long? = null,
+        confirm_seqno: Long? = null,
+        recv_addr_list_version: Int? = null,
+        recv_priority_addr_list_version: Int? = null,
+        reinit_date: Int? = null,
+        dst_reinit_date: Int? = null,
+        signature: ByteArray? = null,
     ) : this(
-        rand1,
+        rand1 = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15),
         (if (from != null) FLAG_FROM else 0) or
                 (if (from_short != null) FLAG_FROM_SHORT else 0) or
                 (if (message != null) FLAG_MESSAGE else 0) or
@@ -80,7 +79,7 @@ data class AdnlPacketContents(
         reinit_date,
         dst_reinit_date,
         signature,
-        rand2
+        rand2 = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15)
     )
 
     init {
