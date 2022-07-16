@@ -21,7 +21,7 @@ suspend fun main() {
     ).connect()
     val time = liteClient.getTime()
     println("[server time: $time] (${Instant.ofEpochSecond(time.now.toLong())})")
-//    transactionsRealtime(liteClient)
+    transactionsRealtime(liteClient)
 }
 
 private suspend fun transactionsRealtime(liteClient: LiteClient) {

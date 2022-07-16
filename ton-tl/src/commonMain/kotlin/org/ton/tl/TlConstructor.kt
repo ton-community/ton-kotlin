@@ -17,15 +17,8 @@ abstract class TlConstructor<T : Any>(
 ) : TlCodec<T> {
     constructor(type: KClass<T>, schema: String, id: Int = crc32(schema)) : this(type.createType(), schema, id)
 
-    fun calculatePadding(size: Int): Int = (size % 4).let { if (it > 0) 4 - it else 0 }
-
     override fun encodeBoxed(value: T): ByteArray = buildPacket {
-        val oldSize = size.toLong()
         encodeBoxed(this, value)
-        val newSize = size.toLong()
-        repeat((newSize - oldSize).toInt() and 3) {
-            writeByte(0)
-        }
     }.readBytes()
 
     override fun encodeBoxed(output: Output, value: T) {

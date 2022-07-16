@@ -16,17 +16,6 @@ interface TlEncoder<T : Any> {
     }.readBytes()
 
     fun hash(value: T): ByteArray = sha256(encodeBoxed(value))
-
-    fun Output.writeByteLength(length: Int) {
-        if (length <= 253) {
-            writeByte(length.toByte())
-        } else {
-            writeByte(254.toByte())
-            writeByte((length and 0xFF).toByte())
-            writeByte(((length and 0xFF00) shr 8).toByte())
-            writeByte(((length and 0xFF0000) shr 16).toByte())
-        }
-    }
 }
 
 fun <R : Any> Output.writeOptionalTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {

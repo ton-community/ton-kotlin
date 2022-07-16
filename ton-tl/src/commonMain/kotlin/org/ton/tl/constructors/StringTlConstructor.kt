@@ -9,15 +9,13 @@ object StringTlConstructor : TlConstructor<String>(
     schema = "string ? = String"
 ) {
     override fun decode(input: Input): String {
-        val size = input.readByteLength()
-        val bytes = input.readBytes(size)
+        val bytes = input.readBytesTl()
         return bytes.decodeToString()
     }
 
     override fun encode(output: Output, value: String) {
         val bytes = value.encodeToByteArray()
-        output.writeByteLength(bytes.size)
-        output.writeFully(bytes)
+        output.writeBytesTl(bytes)
     }
 }
 

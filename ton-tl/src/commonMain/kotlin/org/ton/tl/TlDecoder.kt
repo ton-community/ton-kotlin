@@ -2,7 +2,6 @@ package org.ton.tl
 
 import io.ktor.utils.io.core.*
 import org.ton.tl.constructors.EnumTlCombinator
-import org.ton.tl.constructors.readIntTl
 
 interface TlDecoder<T : Any> {
     fun decode(byteArray: ByteArray): T = decode(ByteReadPacket(byteArray))
@@ -10,19 +9,8 @@ interface TlDecoder<T : Any> {
 
     fun decodeBoxed(byteArray: ByteArray): T = decodeBoxed(ByteReadPacket(byteArray))
     fun decodeBoxed(input: Input): T
-
-    fun Input.readByteLength(): Int {
-        var length = readByte().toInt() and 0xFF
-        if (length >= 254) {
-            length = (readByte().toInt() and 0xFF) or
-                    ((readByte().toInt() and 0xFF) shl 8) or
-                    ((readByte().toInt() and 0xFF) shl 16)
-        }
-        return length
-    }
 }
 
-fun Input.readFlagTl() = readIntTl()
 fun <R : Any> Input.readFlagTl(flag: Int, index: Int, decoder: TlDecoder<R>) =
     readFlagTl(flag, index) { decoder.decode(this) }
 
