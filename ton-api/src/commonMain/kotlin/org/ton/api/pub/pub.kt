@@ -15,7 +15,6 @@ import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.writeTl
 
 @JsonClassDiscriminator("@type")
 interface PublicKey : Encryptor {
@@ -36,13 +35,7 @@ data class PublicKeyUnencrypted(
     val data: ByteArray
 ) : PublicKey, Encryptor by EncryptorNone {
 
-    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        sha256(
-            buildPacket {
-                writeTl(PublicKeyUnencrypted, this@PublicKeyUnencrypted)
-            }.readBytes()
-        )
-    )
+    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyUnencrypted.hash(this))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -86,13 +79,8 @@ data class PublicKeyAes(
     @Serializable(Base64ByteArraySerializer::class)
     val key: ByteArray
 ) : PublicKey, Encryptor by EncryptorAes(key) {
-    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        sha256(
-            buildPacket {
-                writeBoxedTl(PublicKeyAes, this@PublicKeyAes)
-            }.readBytes()
-        )
-    )
+
+    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyAes.hash(this))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -136,11 +124,7 @@ data class PublicKeyOverlay(
     val name: ByteArray
 ) : PublicKey, Encryptor by EncryptorFail {
     override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        sha256(
-            buildPacket {
-                writeBoxedTl(PublicKeyOverlay, this@PublicKeyOverlay)
-            }.readBytes()
-        )
+        PublicKeyOverlay.hash(this)
     )
 
     companion object : TlConstructor<PublicKeyOverlay>(
@@ -157,14 +141,14 @@ data class PublicKeyOverlay(
         }
     }
 
-    override fun verify(message: ByteArray, signature: ByteArray): Boolean {
-        if (signature.isNotEmpty()) return false
+    override fun verify(message: ByteArray, signature: ByteArray?): Boolean {
+        if (signature == null || signature.isNotEmpty()) return false
         val result = try {
             DhtKeyDescription.decodeBoxed(message)
         } catch (e: Exception) {
             return false
         }
-        if (result.updateRule != DhtUpdateRule.OVERLAY_NODES) return false
+        if (result.update_rule != DhtUpdateRule.OVERLAY_NODES) return false
         if (result.signature.isNotEmpty()) return false
         return true
     }

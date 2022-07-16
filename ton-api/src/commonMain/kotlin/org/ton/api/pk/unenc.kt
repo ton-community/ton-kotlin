@@ -34,6 +34,8 @@ data class PrivateKeyUnencrypted(
         return data.contentHashCode()
     }
 
+    override fun toString(): String = toAdnlIdShort().toString()
+
     companion object : TlConstructor<PrivateKeyUnencrypted>(
         type = PrivateKeyUnencrypted::class,
         schema = "pk.unenc data:bytes = PrivateKey"

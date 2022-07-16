@@ -103,11 +103,12 @@ data class AdnlAddressUdp6(
 @SerialName("adnl.address.tunnel")
 @Serializable
 data class AdnlAddressTunnel(
-        @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(Base64ByteArraySerializer::class)
         val to: ByteArray,
-        @SerialName("pubkey")
-        val pubKey: PublicKey
+    val pubkey: PublicKey
 ) : AdnlAddress {
+    constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -115,14 +116,14 @@ data class AdnlAddressTunnel(
         other as AdnlAddressTunnel
 
         if (!to.contentEquals(other.to)) return false
-        if (pubKey != other.pubKey) return false
+        if (pubkey != other.pubkey) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = to.contentHashCode()
-        result = 31 * result + pubKey.hashCode()
+        result = 31 * result + pubkey.hashCode()
         return result
     }
 
@@ -130,7 +131,7 @@ data class AdnlAddressTunnel(
         append("AdnlAddressTunnel(to=")
         append(base64(to))
         append(", pubKey=")
-        append(pubKey)
+        append(pubkey)
         append(")")
     }
 
@@ -140,7 +141,7 @@ data class AdnlAddressTunnel(
     ) {
         override fun encode(output: Output, value: AdnlAddressTunnel) {
             output.writeInt256Tl(value.to)
-            output.writeTl(PublicKey, value.pubKey)
+            output.writeTl(PublicKey, value.pubkey)
         }
 
         override fun decode(input: Input): AdnlAddressTunnel {

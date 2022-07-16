@@ -16,6 +16,8 @@ class EncryptorEd25519(
         return decryptionKey + encryptedData
     }
 
-    override fun verify(message: ByteArray, signature: ByteArray): Boolean =
-        Ed25519.verify(publicKey, message, signature)
+    override fun verify(message: ByteArray, signature: ByteArray?): Boolean {
+        if (signature == null || signature.isEmpty()) return false
+        return Ed25519.verify(publicKey, message, signature)
+    }
 }

@@ -6,3 +6,4 @@ import org.ton.api.adnl.AdnlAddressUdp
 
 fun AdnlAddressUdp.toSocketAddress() = InetSocketAddress(ipv4(ip), port)
 fun InetSocketAddress.toAdnlUdpAddress() = AdnlAddressUdp(ipv4(hostname), port)
+fun SocketAddress.toAdnlUdpAddress() = (this as InetSocketAddress).toAdnlUdpAddress()

@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.Decryptor
 import org.ton.crypto.SecureRandom
+import org.ton.crypto.X25519
 import org.ton.crypto.ed25519.DecryptorEd25519
 import org.ton.crypto.ed25519.Ed25519
 import org.ton.crypto.ed25519.KEY_SIZE
@@ -25,6 +26,9 @@ interface PrivateKeyEd25519 : PrivateKey {
 
     override fun publicKey() =
         PublicKeyEd25519(Ed25519.publicKey(key))
+
+    fun sharedSecret(publicKey: PublicKeyEd25519) =
+        X25519.sharedKey(publicKey.key, Ed25519.convertToX25519(publicKey.key))
 
     companion object : TlCodec<PrivateKeyEd25519> by PrivateKeyEd25519TlConstructor {
         const val KEY_SIZE = 32
@@ -57,7 +61,11 @@ private class PrivateKeyEd25519Impl(
         require(_key.size == PrivateKeyEd25519.KEY_SIZE) { "key size expected: 32 actual: ${_key.size}" }
     }
 
+    private val _publicKey: PublicKeyEd25519 by lazy { super.publicKey() }
+
     override val key: ByteArray get() = _key.copyOf()
+
+    override fun publicKey(): PublicKeyEd25519 = _publicKey
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -68,7 +76,7 @@ private class PrivateKeyEd25519Impl(
 
     override fun hashCode(): Int = _key.contentHashCode()
 
-    override fun toString(): String = "pk.ed25519@${hashCode()}"
+    override fun toString(): String = toAdnlIdShort().toString()
 }
 
 private object PrivateKeyEd25519TlConstructor : TlConstructor<PrivateKeyEd25519>(

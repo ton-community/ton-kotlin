@@ -1,6 +1,7 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
+import org.ton.api.SignedTlObject
 import org.ton.api.adnl.AdnlNodes.Companion.writeBoxedTl
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.pk.PrivateKey
@@ -35,9 +36,9 @@ data class AdnlPacketContents(
     val recv_priority_addr_list_version: Int?,
     val reinit_date: Int?,
     val dst_reinit_date: Int?,
-    val signature: ByteArray?,
+    override val signature: ByteArray?,
     val rand2: ByteArray
-) {
+) : SignedTlObject<AdnlPacketContents> {
     constructor(
         from: PublicKey? = null,
         from_short: AdnlIdShort? = null,
@@ -103,12 +104,13 @@ data class AdnlPacketContents(
         writeBoxedTl(AdnlPacketContents, this@AdnlPacketContents)
     }.readBytes()
 
-    fun signed(privateKey: PrivateKey): AdnlPacketContents {
-        return copy(
-            flags = flags or FLAG_SIGNATURE,
-            signature = privateKey.sign(toByteArray())
-        )
-    }
+    override fun signed(privateKey: PrivateKey) =
+        copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))
+
+    override fun verify(publicKey: PublicKey): Boolean =
+        publicKey.verify(tlCodec().encodeBoxed(copy(signature = ByteArray(0))), signature)
+
+    override fun tlCodec(): TlCodec<AdnlPacketContents> = AdnlPacketContentsTlConstructor
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -241,14 +243,6 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
     override fun encode(output: Output, value: AdnlPacketContents) {
         output.writeBytesTl(value.rand1)
         output.writeIntTl(value.flags)
-        val bad = -1946584576
-        println("write: ${value.flags} - hex: ${value.flags.toString(16).padStart(8, '0')}")
-        println("read : $bad - hex: ${bad.toUInt().toString(16).padStart(8, '0')}")
-
-        // aaaaaaaa | 14 01 | 00 7a f9 8b
-        // 8b f9 7a 00 - actual
-        //
-
         output.writeOptionalTl(value.flags, 0, PublicKey, value.from)
         output.writeOptionalTl(value.flags, 1, AdnlIdShort, value.from_short)
         output.writeOptionalTl(value.flags, 2, AdnlMessage, value.message)

@@ -28,9 +28,8 @@ data class PrivateKeyAes(
         return true
     }
 
-    override fun hashCode(): Int {
-        return key.contentHashCode()
-    }
+    override fun hashCode(): Int = key.contentHashCode()
+    override fun toString(): String = toAdnlIdShort().toString()
 
     companion object : TlConstructor<PrivateKeyAes>(
         type = PrivateKeyAes::class,

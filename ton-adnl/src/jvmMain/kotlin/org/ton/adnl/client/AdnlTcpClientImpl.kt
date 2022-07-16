@@ -2,14 +2,13 @@ package org.ton.adnl.client
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withContext
 import org.ton.adnl.aes.AesByteReadChannel
 import org.ton.adnl.aes.AesByteWriteChannel
 import org.ton.adnl.ipv4
+import org.ton.adnl.packet.AdnlHandshakePacket
 import org.ton.api.pub.PublicKey
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.aes.AesCtr
@@ -64,11 +63,9 @@ class AdnlTcpClientImpl(
         val nonce = SecureRandom.nextBytes(160)
         val inputCipher = AesCtr(nonce.copyOfRange(0, 32), nonce.copyOfRange(64, 80))
         val outputCipher = AesCtr(nonce.copyOfRange(32, 64), nonce.copyOfRange(80, 96))
+        val handshake = AdnlHandshakePacket(nonce, publicKey)
 
-        connection.output.writePacket {
-            writeFully(publicKey.toAdnlIdShort().id)
-            writeFully(publicKey.encrypt(nonce))
-        }
+        connection.output.writePacket(handshake.build())
         connection.output.flush()
 
         input = AesByteReadChannel(connection.input, inputCipher)

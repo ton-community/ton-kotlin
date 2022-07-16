@@ -23,6 +23,6 @@ class EncryptorAes(
         return digest + encryptedData
     }
 
-    override fun verify(message: ByteArray, signature: ByteArray): Boolean =
+    override fun verify(message: ByteArray, signature: ByteArray?): Boolean =
         throw IllegalStateException("Can't verify by AES encryptor")
 }

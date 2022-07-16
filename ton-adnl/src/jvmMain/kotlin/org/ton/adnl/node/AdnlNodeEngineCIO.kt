@@ -11,10 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
-import org.ton.adnl.ipv4
-import org.ton.api.adnl.*
-import org.ton.api.pub.PublicKey
-import org.ton.crypto.encodeHex
+import org.ton.adnl.packet.AdnlPacket
+import org.ton.api.adnl.AdnlPacketContents
 import kotlin.coroutines.CoroutineContext
 
 class AdnlNodeEngineCIO(
@@ -44,82 +42,19 @@ class AdnlNodeEngineCIO(
         )
     }
 
-    override suspend fun sendPacket(
-        packet: AdnlPacketContents,
-        subChannelSide: AdnlSubChannelSide
-    ) {
-        val record = AdnlChannelRecord(
-            packet,
-            subChannelSide
-        )
-        socket.output.send(record)
+    override suspend fun sendPacket(packet: AdnlPacket) {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun sendPacket(packet: AdnlPacketContents, otherKey: PublicKey) {
-        val record = AdnlHandshakeRecord(
-            packet,
-            otherKey
-        )
-        socket.output.send(record)
-    }
 
     override suspend fun receivePacket(): AdnlPacketContents =
-        socket.input.receive().packet
+        TODO()
 
     data class Config(
         val host: String = "0.0.0.0",
         val port: Int = 2222,
         val threadsCount: Int = 4
     )
-}
-
-private interface AdnlRecord {
-    val packet: AdnlPacketContents
-
-    fun datagrams(): Sequence<Datagram>
-
-    fun socketAddresses(): Sequence<SocketAddress> {
-        val adnlAddressSequence =
-            packet.priority_address?.addrs?.asSequence() ?: packet.address?.addrs?.asSequence() ?: emptySequence()
-        return adnlAddressSequence.map {
-            when (it) {
-                is AdnlAddressUdp -> InetSocketAddress(ipv4(it.ip), it.port)
-                is AdnlAddressUdp6 -> TODO()
-                is AdnlAddressTunnel -> TODO()
-            }
-        }
-    }
-}
-
-private class AdnlChannelRecord(
-    override val packet: AdnlPacketContents,
-    val subChannelSide: AdnlSubChannelSide
-) : AdnlRecord {
-    override fun datagrams(): Sequence<Datagram> {
-        val data = packet.toByteArray()
-        return socketAddresses().map { address ->
-            val payload = buildPacket {
-                writeFully(subChannelSide.key.encrypt(data))
-            }
-            Datagram(payload, address)
-        }
-    }
-}
-
-private class AdnlHandshakeRecord(
-    override val packet: AdnlPacketContents,
-    val publicKey: PublicKey
-) : AdnlRecord {
-    override fun datagrams(): Sequence<Datagram> {
-        val data = packet.toByteArray()
-        return socketAddresses().map { address ->
-            val payload = buildPacket {
-                writeFully(AdnlIdShort.encodeBoxed(publicKey.toAdnlIdShort()))
-                writeFully(publicKey.encrypt(data))
-            }
-            Datagram(payload, address)
-        }
-    }
 }
 
 @Suppress("OPT_IN_USAGE")
@@ -129,7 +64,7 @@ private class AdnlSocket(
     override val coroutineContext: CoroutineContext
 ) : CoroutineScope {
 
-    val input = produce<AdnlRecord>(CoroutineName("adnl-aes-input")) {
+    val input = produce<AdnlPacket>(CoroutineName("adnl-aes-input")) {
         try {
             loop@ while (true) {
                 val datagram = rawInput.receive()
@@ -145,30 +80,35 @@ private class AdnlSocket(
         }
     }
 
-    val output: SendChannel<AdnlRecord> = actor(CoroutineName("adnl-aes-output")) {
+    val output: SendChannel<AdnlPacket> = actor(CoroutineName("adnl-aes-output")) {
         for (record in channel) {
-            if (record.packet.priority_address != null) {
-                priorityOutput.send(record)
-            } else {
-                ordinaryOutput.send(record)
-            }
+//            if (record.contents.priority_address != null) {
+//                priorityOutput.send(record)
+//            } else {
+//                ordinaryOutput.send(record)
+//            }
+            ordinaryOutput.send(record)
         }
     }
 
-    private val ordinaryOutput = Channel<AdnlRecord>()
-    private val priorityOutput = Channel<AdnlRecord>()
+    private val ordinaryOutput = Channel<AdnlPacket>()
+    private val priorityOutput = Channel<AdnlPacket>()
 
     private val outputJob = launch {
         while (true) {
             try {
-                val record = select {
+                val packet = select {
                     priorityOutput.onReceive { it }
                     ordinaryOutput.onReceive { it }
                 }
-                record.datagrams().forEach { datagram ->
-                    println("SEND: ${datagram.packet.copy().readBytes().encodeHex()}")
-                    rawOutput.send(datagram)
-                }
+                TODO()
+//                val datagram = Datagram(
+//                    packet.build()
+//                )
+//                packet.datagrams().forEach { datagram ->
+//                    println("SEND: ${datagram.packet.copy().readBytes().encodeHex()}")
+//                    rawOutput.send(datagram)
+//                }
             } catch (cause: Throwable) {
                 priorityOutput.close(cause)
                 ordinaryOutput.close(cause)

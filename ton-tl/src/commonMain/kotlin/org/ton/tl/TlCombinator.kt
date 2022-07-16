@@ -4,6 +4,7 @@ import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
+import kotlin.reflect.full.isSupertypeOf
 
 abstract class TlCombinator<T : Any>(
     val constructors: List<TlConstructor<out T>>
@@ -26,7 +27,7 @@ abstract class TlCombinator<T : Any>(
     fun findConstructor(type: KType): TlConstructor<T> {
         val constructor = checkNotNull(
             constructors.find { constructor ->
-                constructor.type == type
+                constructor.type.isSupertypeOf(type)
             }
         ) {
             "Invalid type. actual: $type"

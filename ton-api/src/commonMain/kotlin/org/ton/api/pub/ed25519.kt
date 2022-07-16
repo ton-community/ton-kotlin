@@ -5,7 +5,6 @@ package org.ton.api.pub
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.api.adnl.AdnlAddressList.Companion.writeBoxedTl
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.crypto.Base64ByteArraySerializer
@@ -14,7 +13,6 @@ import org.ton.crypto.ed25519.Ed25519
 import org.ton.crypto.ed25519.EncryptorEd25519
 import org.ton.crypto.ed25519.KEY_SIZE
 import org.ton.crypto.hex
-import org.ton.crypto.sha256
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 
@@ -24,13 +22,7 @@ inline fun PublicKeyEd25519(byteArray: ByteArray) = PublicKeyEd25519.of(byteArra
 interface PublicKeyEd25519 : PublicKey, Encryptor {
     val key: ByteArray
 
-    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        sha256(
-            buildPacket {
-                writeBoxedTl(PublicKeyEd25519, this@PublicKeyEd25519)
-            }.readBytes()
-        )
-    )
+    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyEd25519.hash(this))
 
     companion object : TlCodec<PublicKeyEd25519> by PublicKeyEd25519TlConstructor {
         @JvmStatic
@@ -55,8 +47,12 @@ private class PublicKeyEd25519Impl(
     @Serializable(Base64ByteArraySerializer::class)
     private val _key: ByteArray
 ) : PublicKeyEd25519, Encryptor by EncryptorEd25519(_key) {
+    private val _adnlIdShort: AdnlIdShort by lazy { super.toAdnlIdShort() }
+
     override val key: ByteArray
         get() = _key.copyOf()
+
+    override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

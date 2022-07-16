@@ -1,7 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.tl.constructors.writeIntTl
+import org.ton.crypto.sha256
 
 interface TlEncoder<T : Any> {
     fun encode(value: T): ByteArray = buildPacket {
@@ -15,6 +15,8 @@ interface TlEncoder<T : Any> {
         encodeBoxed(this, value)
     }.readBytes()
 
+    fun hash(value: T): ByteArray = sha256(encodeBoxed(value))
+
     fun Output.writeByteLength(length: Int) {
         if (length <= 253) {
             writeByte(length.toByte())
@@ -25,20 +27,6 @@ interface TlEncoder<T : Any> {
             writeByte(((length and 0xFF0000) shr 16).toByte())
         }
     }
-}
-
-fun Output.writeFlagTl(vararg booleans: Boolean): Int {
-    var flag = 0
-    booleans.forEachIndexed { index, value ->
-        if (value) {
-            val mask = 1 shl index
-            println("mask: $mask")
-            flag = flag or mask
-        }
-    }
-    println("write: ${flag} - ${flag.toString(16)} ${flag.toString(2).padStart(32, '0')}")
-    writeIntTl(flag)
-    return flag
 }
 
 fun <R : Any> Output.writeOptionalTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {

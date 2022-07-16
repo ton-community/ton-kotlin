@@ -19,6 +19,8 @@ data class PrivateKeyOverlay(
 ) : PrivateKey, Decryptor by DecryptorFail {
     override fun publicKey() = PublicKeyOverlay(name)
 
+    override fun toString(): String = toAdnlIdShort().toString()
+
     companion object : TlConstructor<PrivateKeyOverlay>(
         type = PrivateKeyOverlay::class,
         schema = "pk.overlay name:bytes = PrivateKey"
