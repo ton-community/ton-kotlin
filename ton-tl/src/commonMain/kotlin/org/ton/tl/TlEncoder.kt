@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.ton.crypto.sha256
 
 interface TlEncoder<T : Any> {
     fun encode(value: T): ByteArray = buildPacket {
@@ -14,27 +15,18 @@ interface TlEncoder<T : Any> {
         encodeBoxed(this, value)
     }.readBytes()
 
-    fun Output.writeByteLength(length: Int) {
-        if (length <= 253) {
-            writeByte(length.toByte())
-        } else {
-            writeByte(254.toByte())
-            writeByte((length and 0xFF).toByte())
-            writeByte(((length and 0xFF00) shr 8).toByte())
-            writeByte(((length and 0xFF0000) shr 16).toByte())
-        }
-    }
+    fun hash(value: T): ByteArray = sha256(encodeBoxed(value))
 }
 
-fun <R : Any> Output.writeFlagTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
+fun <R : Any> Output.writeOptionalTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
     if (value != null) {
-        writeFlagTl(flag, index) {
+        writeOptionalTl(flag, index) {
             encoder.encode(this, value)
         }
     }
 }
 
-fun Output.writeFlagTl(flag: Int, index: Int, block: Output.() -> Unit) {
+fun Output.writeOptionalTl(flag: Int, index: Int, block: Output.() -> Unit) {
     if (flag and (1 shl index) != 0) {
         block()
     }

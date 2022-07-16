@@ -9,28 +9,6 @@ interface TlDecoder<T : Any> {
 
     fun decodeBoxed(byteArray: ByteArray): T = decodeBoxed(ByteReadPacket(byteArray))
     fun decodeBoxed(input: Input): T
-
-    fun Input.readByteLength(): Int {
-        var length = readByte().toInt() and 0xFF
-        if (length >= 254) {
-            length = (readByte().toInt() and 0xFF) or
-                    ((readByte().toInt() and 0xFF) shl 8) or
-                    ((readByte().toInt() and 0xFF) shl 16)
-        }
-        return length
-    }
-
-    // Same as readByteLength(), but returns number of bytes read as second pair element
-    fun Input.readByteLengthEx(): Pair<Int, Int> {
-        var length = readByte().toInt() and 0xFF
-        if (length >= 254) {
-            length = (readByte().toInt() and 0xFF) or
-                    ((readByte().toInt() and 0xFF) shl 8) or
-                    ((readByte().toInt() and 0xFF) shl 16)
-            return Pair(length, 4)
-        }
-        return Pair(length, 1)
-    }
 }
 
 fun <R : Any> Input.readFlagTl(flag: Int, index: Int, decoder: TlDecoder<R>) =

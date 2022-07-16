@@ -53,8 +53,8 @@ private object LiteServerListBlockTransactionsTlConstructor : TlConstructor<Lite
         output.writeTl(TonNodeBlockIdExt, value.id)
         output.writeIntTl(value.mode)
         output.writeIntTl(value.count)
-        output.writeFlagTl(value.mode, 7, LiteServerTransactionId3, value.after)
-        output.writeFlagTl(value.mode, 6) { output.writeBoolTl(true) }
-        output.writeFlagTl(value.mode, 5) { output.writeBoolTl(true) }
+        output.writeOptionalTl(value.mode, 7, LiteServerTransactionId3, value.after)
+        output.writeOptionalTl(value.mode, 6) { output.writeBoolTl(true) }
+        output.writeOptionalTl(value.mode, 5) { output.writeBoolTl(true) }
     }
 }

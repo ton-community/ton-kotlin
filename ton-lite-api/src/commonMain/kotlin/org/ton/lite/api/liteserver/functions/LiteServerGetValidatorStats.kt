@@ -94,7 +94,7 @@ private object LiteServerGetValidatorStatsTlConstructor : TlConstructor<LiteServ
         output.writeIntTl(value.mode)
         output.writeTl(TonNodeBlockIdExt, value.id)
         output.writeIntTl(value.limit)
-        output.writeFlagTl(value.mode, 0, Int256TlConstructor, value.start_after)
-        output.writeFlagTl(value.mode, 2, IntTlConstructor, value.modified_after)
+        output.writeOptionalTl(value.mode, 0, Int256TlConstructor, value.start_after)
+        output.writeOptionalTl(value.mode, 2, IntTlConstructor, value.modified_after)
     }
 }

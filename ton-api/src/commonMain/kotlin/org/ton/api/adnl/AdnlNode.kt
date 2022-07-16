@@ -12,7 +12,7 @@ import org.ton.tl.writeTl
 data class AdnlNode(
     val id: PublicKey,
     @SerialName("addr_list")
-    val addrList: AdnlAddressList
+    val addr_list: AdnlAddressList
 ) {
     companion object : TlConstructor<AdnlNode>(
         type = AdnlNode::class,
@@ -20,7 +20,7 @@ data class AdnlNode(
     ) {
         override fun encode(output: Output, value: AdnlNode) {
             output.writeTl(PublicKey, value.id)
-            output.writeTl(AdnlAddressList, value.addrList)
+            output.writeTl(AdnlAddressList, value.addr_list)
         }
 
         override fun decode(input: Input): AdnlNode {

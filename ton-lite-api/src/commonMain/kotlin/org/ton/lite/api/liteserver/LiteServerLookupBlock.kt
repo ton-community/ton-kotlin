@@ -65,7 +65,7 @@ private object LiteServerLookupBlockTlConstructor : TlConstructor<LiteServerLook
     override fun encode(output: Output, value: LiteServerLookupBlock) {
         output.writeIntTl(value.mode)
         output.writeTl(TonNodeBlockId, value.id)
-        if (value.lt != null) output.writeFlagTl(value.mode, 1, LongTlConstructor, value.lt)
-        if (value.utime != null) output.writeFlagTl(value.utime, 2, IntTlConstructor, value.utime)
+        if (value.lt != null) output.writeOptionalTl(value.mode, 1, LongTlConstructor, value.lt)
+        if (value.utime != null) output.writeOptionalTl(value.utime, 2, IntTlConstructor, value.utime)
     }
 }

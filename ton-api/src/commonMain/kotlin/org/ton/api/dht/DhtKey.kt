@@ -2,6 +2,7 @@ package org.ton.api.dht
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import org.ton.api.adnl.AdnlIdShort
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
@@ -9,11 +10,13 @@ import org.ton.tl.constructors.*
 
 @Serializable
 data class DhtKey(
-        @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(Base64ByteArraySerializer::class)
         val id: ByteArray,
-        val name: String,
-        val idx: Int
+    val name: String,
+    val idx: Int = 0
 ) {
+    constructor(id: AdnlIdShort, name: String, idx: Int = 0) : this(id.id, name, idx)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

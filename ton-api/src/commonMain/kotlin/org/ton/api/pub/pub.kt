@@ -6,31 +6,37 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.Ed25519
-import org.ton.crypto.base64
-import org.ton.crypto.hex
+import org.ton.api.adnl.AdnlIdShort
+import org.ton.api.dht.DhtKeyDescription
+import org.ton.api.dht.DhtUpdateRule
+import org.ton.crypto.*
+import org.ton.crypto.aes.EncryptorAes
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 
 @JsonClassDiscriminator("@type")
-interface PublicKey {
+interface PublicKey : Encryptor {
+    fun toAdnlIdShort(): AdnlIdShort
+
     companion object : TlCombinator<PublicKey>(
-            PublicKeyUnencrypted,
-            PublicKeyEd25519,
-            PublicKeyAes,
-            PublicKeyOverlay
+        PublicKeyEd25519.tlConstructor(),
+        PublicKeyUnencrypted,
+        PublicKeyAes,
+        PublicKeyOverlay
     )
 }
 
 @SerialName("pub.unenc")
 @Serializable
 data class PublicKeyUnencrypted(
-        @Serializable(Base64ByteArraySerializer::class)
-        val data: ByteArray
-) : PublicKey {
+    @Serializable(Base64ByteArraySerializer::class)
+    val data: ByteArray
+) : PublicKey, Encryptor by EncryptorNone {
+
+    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyUnencrypted.hash(this))
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -53,8 +59,8 @@ data class PublicKeyUnencrypted(
     }
 
     companion object : TlConstructor<PublicKeyUnencrypted>(
-            type = PublicKeyUnencrypted::class,
-            schema = "pub.unenc data:bytes = PublicKey"
+        type = PublicKeyUnencrypted::class,
+        schema = "pub.unenc data:bytes = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyUnencrypted) {
             output.writeBytesTl(value.data)
@@ -67,57 +73,15 @@ data class PublicKeyUnencrypted(
     }
 }
 
-@SerialName("pub.ed25519")
-@Serializable
-data class PublicKeyEd25519(
-        @Serializable(Base64ByteArraySerializer::class)
-        val key: ByteArray
-) : PublicKey {
-    init {
-        require(key.size == 32) { "key size expected: 32 actual: ${key.size}" }
-    }
-
-    fun verify(signature: ByteArray, byteArray: ByteArray): Boolean =
-        Ed25519.verify(signature, key, byteArray)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PublicKeyEd25519
-
-        if (!key.contentEquals(other.key)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return key.contentHashCode()
-    }
-
-    override fun toString(): String = hex(key)
-
-    companion object : TlConstructor<PublicKeyEd25519>(
-            type = PublicKeyEd25519::class,
-            schema = "pub.ed25519 key:int256 = PublicKey"
-    ) {
-        override fun encode(output: Output, value: PublicKeyEd25519) {
-            output.writeFully(value.key)
-        }
-
-        override fun decode(input: Input): PublicKeyEd25519 {
-            val key = input.readBytes(32)
-            return PublicKeyEd25519(key)
-        }
-    }
-}
-
 @SerialName("pub.aes")
 @Serializable
 data class PublicKeyAes(
-        @Serializable(Base64ByteArraySerializer::class)
-        val key: ByteArray
-) : PublicKey {
+    @Serializable(Base64ByteArraySerializer::class)
+    val key: ByteArray
+) : PublicKey, Encryptor by EncryptorAes(key) {
+
+    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyAes.hash(this))
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -140,8 +104,8 @@ data class PublicKeyAes(
     }
 
     companion object : TlConstructor<PublicKeyAes>(
-            type = PublicKeyAes::class,
-            schema = "pub.aes key:int256 = PublicKey"
+        type = PublicKeyAes::class,
+        schema = "pub.aes key:int256 = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyAes) {
             output.writeFully(value.key)
@@ -157,19 +121,35 @@ data class PublicKeyAes(
 @SerialName("pub.overlay")
 @Serializable
 data class PublicKeyOverlay(
-        val name: String
-) : PublicKey {
+    val name: ByteArray
+) : PublicKey, Encryptor by EncryptorFail {
+    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
+        PublicKeyOverlay.hash(this)
+    )
+
     companion object : TlConstructor<PublicKeyOverlay>(
-            type = PublicKeyOverlay::class,
-            schema = "pub.overlay name:bytes = PublicKey"
+        type = PublicKeyOverlay::class,
+        schema = "pub.overlay name:bytes = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyOverlay) {
-            output.writeBytesTl(value.name.encodeToByteArray())
+            output.writeBytesTl(value.name)
         }
 
         override fun decode(input: Input): PublicKeyOverlay {
-            val name = input.readBytesTl().decodeToString()
+            val name = input.readBytesTl()
             return PublicKeyOverlay(name)
         }
+    }
+
+    override fun verify(message: ByteArray, signature: ByteArray?): Boolean {
+        if (signature == null || signature.isNotEmpty()) return false
+        val result = try {
+            DhtKeyDescription.decodeBoxed(message)
+        } catch (e: Exception) {
+            return false
+        }
+        if (result.update_rule != DhtUpdateRule.OVERLAY_NODES) return false
+        if (result.signature.isNotEmpty()) return false
+        return true
     }
 }

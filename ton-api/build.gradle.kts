@@ -2,11 +2,12 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(projects.tonBigint)
-                implementation(projects.tonTl)
-                implementation(projects.tonTlb)
-                implementation(projects.tonCrypto)
+                api(projects.tonBigint)
+                api(projects.tonTl)
+                api(projects.tonTlb)
+                api(projects.tonCrypto)
                 implementation(libs.serialization.json)
+                api(libs.datetime)
             }
         }
         commonTest {

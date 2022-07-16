@@ -1,0 +1,12 @@
+@file:Suppress("OPT_IN_USAGE")
+
+package org.ton.api.validator.config
+
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
+
+@Serializable
+@Polymorphic
+@JsonClassDiscriminator("@type")
+sealed interface ValidatorConfigLocal
