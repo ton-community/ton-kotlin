@@ -22,7 +22,7 @@ data class HashMapEdge<T>(
         return when (node) {
             is HashMapNodeLeaf -> sequenceOf(parentLabel to node.value)
             is HashMapNodeFork ->
-                // Note: left and right branches explicitly contain prefixes '0' and '1' respectively
+                // Note: left and right branches implicitly contain prefixes '0' and '1' respectively
                 node.left.nodes().map { (label, value) -> (parentLabel + BitString(false) + label) to value }.plus(
                     node.right.nodes().map { (label, value) -> (parentLabel + BitString(true) + label) to value }
                 )
