@@ -1,5 +1,6 @@
 package org.ton.smartcontract.wallet.v1
 
+import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.Coins
 import org.ton.block.Message
@@ -29,7 +30,7 @@ class WalletV1R3Test {
         logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
     )
 
-    private fun wallet() = WalletV1R3(liteClient(), privateKey)
+    private fun wallet() = TransferWalletV1R3(privateKey)
 
     @Test
     fun `test private key`() {
@@ -116,18 +117,19 @@ class WalletV1R3Test {
         assertContentEquals(expected, actual)
     }
 
-    private fun WalletV1R3.exampleTransferMessage(comment: String) = createTransferMessage(
-        dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm"),
-        bounce = true,
-        amount = Coins.of(1),
-        seqno = 1,
-        payload = createCommentPayload(comment)
-    )
+    private fun V1TransferBuilder.exampleTransferMessage(text: String) = this.apply {
+        dest = MsgAddressInt.parse("kQDzHsXMkamiJeqCLcrNDUuyBn78Jr7NUcx075WhEfqIPpwm")
+        bounce = true
+        amount = Coins.of(1)
+        seqno = 1
+        comment = text
+    }
 
     @Test
     fun `test transfer message with 'Hello TON' comment`() {
         val wallet = wallet()
-        val message = wallet.exampleTransferMessage("Hello TON")
+        val message =
+            runBlocking { wallet.beginTransfer(liteClient()).exampleTransferMessage("Hello TON").createMessage() }
         val actual = CellBuilder.createCell {
             storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
         }
@@ -142,7 +144,8 @@ class WalletV1R3Test {
     @Test
     fun `test transfer BOC with 'Hello TON' comment`() {
         val wallet = wallet()
-        val message = wallet.exampleTransferMessage("Hello TON")
+        val message =
+            runBlocking { wallet.beginTransfer(liteClient()).exampleTransferMessage("Hello TON").createMessage() }
         val actual =
             BagOfCells(CellBuilder.createCell {
                 storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
