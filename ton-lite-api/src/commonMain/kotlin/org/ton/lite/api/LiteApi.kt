@@ -35,8 +35,7 @@ interface LiteApi :
 
     override suspend fun query(liteServerQuery: LiteServerQuery): ByteArray {
         val liteServerQueryBytes = LiteServerQuery.encodeBoxed(liteServerQuery)
-        println("LiteServerQuery: ${liteServerQueryBytes.encodeHex()}")
-        println("  $liteServerQuery")
+        logger.debug { "LiteServerQuery: ${liteServerQueryBytes.encodeHex()}\n  $liteServerQuery" }
         return sendRawQuery(liteServerQueryBytes)
     }
 }
