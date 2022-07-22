@@ -39,5 +39,7 @@ actual infix fun BigInt.or(mod: BigInt): BigInt = or(mod)
 
 actual infix fun BigInt.xor(mod: BigInt): BigInt = xor(mod)
 
+actual infix fun BigInt.pow(pow: Int): BigInt = pow(pow)
+
 // TODO: check all cases
 actual infix fun BigInt.divRem(value: BigInt): Array<BigInt> = divideAndRemainder(value)

@@ -98,7 +98,7 @@ private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
             VmStackList.tlbCodec(n - 1)
         }
         private val vmStackValue by lazy {
-            VmStackValue.tlbCodec()
+            VmStackValue.tlbCombinator()
         }
 
         override fun storeTlb(

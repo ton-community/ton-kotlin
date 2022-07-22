@@ -42,6 +42,9 @@ interface CellSlice {
     fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
 
+    fun loadTinyInt(length: Int): Long = loadInt(length).toLong()
+    fun preloadTinyInt(length: Int): Long = preloadInt(length).toLong()
+
     fun loadUIntLeq(max: Int) = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
     fun preloadUIntLeq(max: Int) = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
 
@@ -137,6 +140,12 @@ private open class CellSliceImpl(
         val int = preloadInt(length)
         bitsPosition += length
         return int
+    }
+
+    override fun loadTinyInt(length: Int): Long {
+        val tinyInt = preloadTinyInt(length)
+        bitsPosition += length
+        return tinyInt
     }
 
     override fun preloadInt(length: Int): BigInt {
@@ -282,6 +291,22 @@ private class CellSliceByteBackedBitString(
                     BigInt(uint)
                 }
             }
+        }
+    }
+
+    override fun preloadTinyInt(length: Int): Long {
+        return when {
+            length == 0 -> 0
+            length <= 64 -> {
+                val uint = getLong(length).toLong()
+                val int = 1L shl (length - 1)
+                if (uint >= int) {
+                    uint - (int * 2)
+                } else {
+                    uint
+                }
+            }
+            else -> throw IllegalArgumentException("expected length in 0..64, actual: $length")
         }
     }
 }

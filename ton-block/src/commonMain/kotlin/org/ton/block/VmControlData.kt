@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
@@ -11,7 +14,7 @@ import org.ton.tlb.storeTlb
 
 @SerialName("vm_ctl_data")
 @Serializable
-data class VmControlData(
+class VmControlData(
     val nargs: Maybe<Int>,
     val stack: Maybe<VmStack>,
     val save: VmSaveList,
@@ -24,35 +27,27 @@ data class VmControlData(
         cp.toMaybe()
     )
 
-    companion object {
+    companion object : TlbCodec<VmControlData> by VmControlDataTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmControlData> = VmControlDataTlbConstructor()
+        fun tlbCodec(): TlbConstructor<VmControlData> = VmControlDataTlbConstructor
     }
 }
 
-private class VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
+private object VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     schema = "vm_ctl_data\$_ nargs:(Maybe uint13) stack:(Maybe VmStack) save:VmSaveList cp:(Maybe int16) = VmControlData;"
 ) {
-    private val maybeUint13Constructor by lazy {
-        Maybe.tlbCodec(UIntTlbConstructor.int(13))
-    }
-    private val maybeVmStackConstructor by lazy {
-        Maybe.tlbCodec(VmStack.tlbCodec())
-    }
-    private val vmSaveListCodec by lazy {
-        VmSaveList.tlbCodec()
-    }
-    private val maybeInt16Constructor by lazy {
-        Maybe.tlbCodec(IntTlbConstructor.int(16))
-    }
+    private val maybeUint13Constructor = Maybe.tlbCodec(UIntTlbConstructor.int(13))
+    private val maybeVmStackConstructor = Maybe.tlbCodec(VmStack.tlbCodec())
+    private val maybeInt16Constructor = Maybe.tlbCodec(IntTlbConstructor.int(16))
 
+    @Suppress("UNCHECKED_CAST")
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: VmControlData
     ) = cellBuilder {
         storeTlb(maybeUint13Constructor, value.nargs)
         storeTlb(maybeVmStackConstructor, value.stack)
-        storeTlb(vmSaveListCodec, value.save)
+        storeTlb(VmSaveList, value.save)
         storeTlb(maybeInt16Constructor, value.cp)
     }
 
@@ -61,7 +56,7 @@ private class VmControlDataTlbConstructor : TlbConstructor<VmControlData>(
     ): VmControlData = cellSlice {
         val nargs = loadTlb(maybeUint13Constructor)
         val stack = loadTlb(maybeVmStackConstructor)
-        val save = loadTlb(vmSaveListCodec)
+        val save = loadTlb(VmSaveList)
         val cp = loadTlb(maybeInt16Constructor)
         VmControlData(nargs, stack, save, cp)
     }

@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.block
 
 import kotlinx.serialization.SerialName
@@ -7,9 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VmGasLimits(
     val remaining: Long,
-    @SerialName("max_limit")
-    val maxLimit: Long,
-    @SerialName("cur_limit")
-    val curLimit: Long,
+    val max_limit: Long,
+    val cur_limit: Long,
     val credit: Long
 )

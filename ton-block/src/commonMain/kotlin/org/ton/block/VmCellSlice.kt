@@ -6,41 +6,29 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
 @SerialName("vm_stk_cell")
 @Serializable
 data class VmCellSlice(
-    val cell: Cell,
-    @SerialName("st_bits")
-    val stBits: Int,
-    @SerialName("end_bits")
-    val endBits: Int,
-    @SerialName("st_ref")
-    val stRef: Int,
-    @SerialName("end_ref")
-    val endRef: Int
-) {
+    override val cell: Cell,
+    override val st_bits: Int,
+    override val end_bits: Int,
+    override val st_ref: Int,
+    override val end_ref: Int
+) : VmStackSlice {
     constructor(cellSlice: CellSlice) : this(
         cell = Cell(cellSlice.bits, cellSlice.refs),
-        stBits = cellSlice.bitsPosition,
-        endBits = cellSlice.bits.size,
-        stRef = cellSlice.refsPosition,
-        endRef = cellSlice.refs.size
+        st_bits = cellSlice.bitsPosition,
+        end_bits = cellSlice.bits.size,
+        st_ref = cellSlice.refsPosition,
+        end_ref = cellSlice.refs.size
     )
 
-    fun toCellSlice(): CellSlice = cell.beginParse().run {
-        skipBits(stBits)
-        loadRefs(stRef)
-        CellSlice.of(
-            loadBits(endBits - stBits),
-            loadRefs(endRef - stRef)
-        )
-    }
-
-    companion object {
+    companion object : TlbCodec<VmCellSlice> by VmCellSliceTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmCellSlice> = VmCellSliceTlbConstructor
+        fun tlbConstructor(): TlbConstructor<VmCellSlice> = VmCellSliceTlbConstructor
     }
 }
 
@@ -53,10 +41,10 @@ private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         value: VmCellSlice
     ) = cellBuilder {
         storeRef(value.cell)
-        storeUInt(value.stBits, 10)
-        storeUInt(value.endBits, 10)
-        storeUIntLeq(value.stRef, 4)
-        storeUIntLeq(value.endRef, 4)
+        storeUInt(value.st_bits, 10)
+        storeUInt(value.end_bits, 10)
+        storeUIntLeq(value.st_ref, 4)
+        storeUIntLeq(value.end_ref, 4)
     }
 
     override fun loadTlb(

@@ -1,0 +1,42 @@
+package org.ton.block
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
+
+@Serializable
+@SerialName("vm_stk_tuple")
+class VmStackTuple(
+    val len: Int,
+    val data: VmTuple
+) : VmStackValue {
+    constructor(data: VmTuple) : this(data.depth(), data)
+
+    companion object {
+        fun tlbConstructor(): TlbConstructor<VmStackTuple> = VmStackValueTupleConstructor
+    }
+}
+
+private object VmStackValueTupleConstructor : TlbConstructor<VmStackTuple>(
+    schema = "vm_stk_tuple#07 len:(## 16) data:(VmTuple len) = VmStackValue;"
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder, value: VmStackTuple
+    ) = cellBuilder {
+        storeUInt(value.len, 16)
+        storeTlb(VmTuple.tlbCodec(value.len), value.data)
+    }
+
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): VmStackTuple = cellSlice {
+        val len = loadUInt(16).toInt()
+        val data = loadTlb(VmTuple.tlbCodec(len))
+        VmStackTuple(len, data)
+    }
+}

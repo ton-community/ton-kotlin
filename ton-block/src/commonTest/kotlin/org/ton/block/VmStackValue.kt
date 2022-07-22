@@ -8,7 +8,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 
 class VmStackValueTest {
-    val codec = VmStackValue.tlbCodec()
+    val codec = VmStackValue.tlbCombinator()
 
     @Test
     fun `test VmStackValue (de)serialization`() {

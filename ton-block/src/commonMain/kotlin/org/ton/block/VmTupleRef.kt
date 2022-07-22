@@ -18,6 +18,8 @@ inline fun VmTupleRef(ref: VmTuple): VmTupleRef = VmTupleRef.of(ref)
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface VmTupleRef {
+    fun depth(): Int
+
     companion object {
         @JvmStatic
         fun of(): VmTupleRef = VmTupleRefNil
@@ -35,19 +37,25 @@ sealed interface VmTupleRef {
 
 @SerialName("vm_tupref_nil")
 @Serializable
-object VmTupleRefNil : VmTupleRef
+object VmTupleRefNil : VmTupleRef {
+    override fun depth(): Int = 0
+}
 
 @SerialName("vm_tupref_single")
 @Serializable
 data class VmTupleRefSingle(
     val entry: VmStackValue
-) : VmTupleRef
+) : VmTupleRef {
+    override fun depth(): Int = 1
+}
 
 @SerialName("vm_tupref_any")
 @Serializable
 data class VmTupleRefAny(
     val ref: VmTuple
-) : VmTupleRef
+) : VmTupleRef {
+    override fun depth(): Int = ref.depth()
+}
 
 private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() {
     private val nilConstructor by lazy { VmTupleRefNilTlbConstructor() }
@@ -88,7 +96,7 @@ private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() 
     private class VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRefSingle>(
         schema = "vm_tupref_single\$_ entry:^VmStackValue = VmTupleRef 1;"
     ) {
-        private val vmStackValueCodec by lazy { VmStackValue.tlbCodec() }
+        private val vmStackValueCodec by lazy { VmStackValue.tlbCombinator() }
 
         override fun storeTlb(
             cellBuilder: CellBuilder, value: VmTupleRefSingle

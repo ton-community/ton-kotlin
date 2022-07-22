@@ -2,8 +2,11 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -13,21 +16,16 @@ import org.ton.tlb.storeTlb
 data class VmSaveList(
     val cregs: HashMapE<VmStackValue>
 ) {
-    companion object {
+    companion object : TlbCodec<VmSaveList> by VmSaveListTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmSaveList> = VmSaveListTlbConstructor()
+        fun tlbCodec(): TlbConstructor<VmSaveList> = VmSaveListTlbConstructor
     }
 }
 
-private class VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
+private object VmSaveListTlbConstructor : TlbConstructor<VmSaveList>(
     schema = "_ cregs:(HashmapE 4 VmStackValue) = VmSaveList;"
 ) {
-    private val vmStackValueCodec by lazy {
-        VmStackValue.tlbCodec()
-    }
-    private val hashmapCombinator by lazy {
-        HashMapE.tlbCodec(4, vmStackValueCodec)
-    }
+    private val hashmapCombinator = HashMapE.tlbCodec(4, VmStackValue)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

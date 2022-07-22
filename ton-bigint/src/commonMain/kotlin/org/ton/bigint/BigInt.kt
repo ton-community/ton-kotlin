@@ -34,6 +34,7 @@ expect infix fun BigInt.mod(mod: BigInt): BigInt
 expect infix fun BigInt.or(mod: BigInt): BigInt
 expect infix fun BigInt.xor(mod: BigInt): BigInt
 expect infix fun BigInt.divRem(value: BigInt): Array<BigInt>
+expect infix fun BigInt.pow(pow: Int): BigInt
 
 fun BigInt(number: Number): BigInt = number.toBigInt()
 
