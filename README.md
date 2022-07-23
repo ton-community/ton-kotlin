@@ -4,7 +4,7 @@
 [![JitPack][jitpack-svg]][jitpack]
 [![Based on TON][ton-svg]][ton]
 
-## Gradle
+## `build.gradle.kts`
 
 ```kotlin
 val version = "main-SNAPSHOT" // Get actual version on: https://jitpack.io/#andreypfau/ton-kotlin
