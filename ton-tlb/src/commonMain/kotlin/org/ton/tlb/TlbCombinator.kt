@@ -1,11 +1,16 @@
 package org.ton.tlb
 
+import kotlinx.atomicfu.atomic
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.UnknownTlbConstructorException
 
 abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
+    companion object {
+        var EXPERIMENTAL_BINARY_TREE_SEARCH by atomic(true)
+    }
+
     abstract val constructors: List<AbstractTlbConstructor<*>>
 
     private val sortedConstructors by lazy {
@@ -31,7 +36,17 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
 
     fun loadTlbConstructor(cellSlice: CellSlice): C {
         val id = cellSlice.preloadBits(cellSlice.bits.size - cellSlice.bitsPosition)
-        val constructor = constructorTree[id] ?: throw UnknownTlbConstructorException(id)
+        val constructor = if (EXPERIMENTAL_BINARY_TREE_SEARCH) {
+            constructorTree[id] ?: throw UnknownTlbConstructorException(id)
+        } else {
+            var currentId = BitString.empty()
+            sortedConstructors.firstOrNull { constructor ->
+                if (constructor.id.size > currentId.size) {
+                    currentId = cellSlice.preloadBits(constructor.id.size)
+                }
+                currentId == constructor.id
+            } ?: throw UnknownTlbConstructorException()
+        }
         cellSlice.skipBits(constructor.id.size)
         @Suppress("UNCHECKED_CAST")
         return constructor as C
