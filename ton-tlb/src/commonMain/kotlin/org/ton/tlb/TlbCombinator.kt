@@ -12,6 +12,15 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
         constructors.sortedBy { it.id.size }
     }
 
+    // TODO
+    private val constructorTree by lazy {
+        ConstructorTree().apply {
+            constructors.forEach { constructor ->
+                add(constructor)
+            }
+        }
+    }
+
     abstract fun getConstructor(value: T): AbstractTlbConstructor<*>
 
     fun storeTlbConstructor(cellBuilder: CellBuilder, value: T): C {
@@ -29,9 +38,54 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
             }
             currentId == constructor.id
         } ?: throw UnknownTlbConstructorException()
+//        val id = cellSlice.preloadBits(cellSlice.bits.size - cellSlice.bitsPosition)
+//        val constructor = constructorTree[id] ?: kotlin.run {
+//            constructorTree.get(id)
+//            constructors.forEach { println("${it.id}") }
+//            throw UnknownTlbConstructorException(id)
+//        }
         cellSlice.skipBits(constructor.id.size)
         @Suppress("UNCHECKED_CAST")
         return constructor as C
+    }
+
+    private class ConstructorTree(
+        var root: Node? = null
+    ) {
+        fun add(value: AbstractTlbConstructor<*>) {
+            root?.add(value) ?: run {
+                root = Node(value)
+            }
+        }
+
+        operator fun get(value: BitString): AbstractTlbConstructor<*>? = root?.get(value)
+
+        class Node(
+            val value: AbstractTlbConstructor<*>,
+            var left: Node? = null,
+            var right: Node? = null
+        ) {
+            fun add(value: AbstractTlbConstructor<*>) {
+                if (value.id < this.value.id) {
+                    left?.add(value) ?: run {
+                        left = Node(value)
+                    }
+                } else {
+                    right?.add(value) ?: run {
+                        right = Node(value)
+                    }
+                }
+            }
+
+            operator fun get(value: BitString): AbstractTlbConstructor<*>? {
+                val compare = value.compareTo(this.value.id)
+                return when {
+                    compare == 0 || compare > 1 -> this.value
+                    compare < 0 -> left?.get(value)
+                    else -> right?.get(value)
+                }
+            }
+        }
     }
 }
 

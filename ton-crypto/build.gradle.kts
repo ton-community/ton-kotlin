@@ -5,19 +5,19 @@ plugins {
 
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(libs.ktor.utils)
                 api(libs.curve25519)
                 compileOnly(libs.serialization.core)
             }
         }
-        jvmMain {
+        val jvmMain by getting {
             dependencies {
                 implementation(libs.bouncycastle)
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.benchmark.runtime)

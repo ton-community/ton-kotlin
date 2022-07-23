@@ -1,6 +1,6 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(projects.tonTl)
                 api(projects.tonTlb)
@@ -17,7 +17,7 @@ kotlin {
                 implementation(libs.coroutines.core)
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }

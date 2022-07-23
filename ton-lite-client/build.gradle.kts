@@ -1,6 +1,6 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(projects.tonAdnl)
                 api(projects.tonTlb)
@@ -13,7 +13,7 @@ kotlin {
                 implementation(libs.serialization.json)
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }

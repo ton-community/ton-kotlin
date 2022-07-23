@@ -1,6 +1,6 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(projects.tonBitstring)
                 api(projects.tonBigint)
@@ -8,7 +8,7 @@ kotlin {
                 implementation(libs.serialization.json)
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }

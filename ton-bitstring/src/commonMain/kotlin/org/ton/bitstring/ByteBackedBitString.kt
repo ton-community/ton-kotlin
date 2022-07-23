@@ -34,22 +34,6 @@ open class ByteBackedBitString protected constructor(
 
     override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes, size)
 
-    override fun compareTo(other: BitString): Int {
-        val limit = kotlin.math.min(size, other.size)
-        repeat(limit) {
-            val thisValue = this[it]
-            val otherValue = other[it]
-            if (thisValue != otherValue) {
-                return if (thisValue) {
-                    1
-                } else {
-                    -1
-                }
-            }
-        }
-        return size - other.size
-    }
-
     override fun contains(element: Boolean): Boolean = any { it == element }
     override fun containsAll(elements: Collection<Boolean>): Boolean = elements.all { contains(it) }
     override fun isEmpty(): Boolean = size == 0
