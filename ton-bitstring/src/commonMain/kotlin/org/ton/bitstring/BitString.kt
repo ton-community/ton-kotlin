@@ -39,6 +39,8 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
     override fun toString(): String
 
+    fun joinToStringBits(): String = joinToString("") { if (it) "1" else "0" }
+
     override fun compareTo(other: BitString): Int {
         val limit = min(size, other.size)
         repeat(limit) {

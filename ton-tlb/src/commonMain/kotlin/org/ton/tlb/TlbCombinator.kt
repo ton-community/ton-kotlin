@@ -12,7 +12,6 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
         constructors.sortedBy { it.id.size }
     }
 
-    // TODO
     private val constructorTree by lazy {
         ConstructorTree().apply {
             constructors.forEach { constructor ->
@@ -31,19 +30,8 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
     }
 
     fun loadTlbConstructor(cellSlice: CellSlice): C {
-        var currentId = BitString.empty()
-        val constructor = sortedConstructors.firstOrNull { constructor ->
-            if (constructor.id.size > currentId.size) {
-                currentId = cellSlice.preloadBits(constructor.id.size)
-            }
-            currentId == constructor.id
-        } ?: throw UnknownTlbConstructorException()
-//        val id = cellSlice.preloadBits(cellSlice.bits.size - cellSlice.bitsPosition)
-//        val constructor = constructorTree[id] ?: kotlin.run {
-//            constructorTree.get(id)
-//            constructors.forEach { println("${it.id}") }
-//            throw UnknownTlbConstructorException(id)
-//        }
+        val id = cellSlice.preloadBits(cellSlice.bits.size - cellSlice.bitsPosition)
+        val constructor = constructorTree[id] ?: throw UnknownTlbConstructorException(id)
         cellSlice.skipBits(constructor.id.size)
         @Suppress("UNCHECKED_CAST")
         return constructor as C
@@ -77,12 +65,15 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
                 }
             }
 
-            operator fun get(value: BitString): AbstractTlbConstructor<*>? {
-                val compare = value.compareTo(this.value.id)
+            operator fun get(key: BitString): AbstractTlbConstructor<*>? {
+                val compare = key.compareTo(this.value.id)
                 return when {
-                    compare == 0 || compare > 1 -> this.value
-                    compare < 0 -> left?.get(value)
-                    else -> right?.get(value)
+                    compare == -1 && left != null -> left?.get(key)
+                    compare == 1 -> right?.get(key) ?: value
+                    else -> {
+                        val slice = key.slice(0 until value.id.size)
+                        if (slice == this.value.id) value else null
+                    }
                 }
             }
         }
