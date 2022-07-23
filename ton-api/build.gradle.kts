@@ -1,6 +1,6 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(projects.tonBigint)
                 api(projects.tonTl)
@@ -10,7 +10,7 @@ kotlin {
                 api(libs.datetime)
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }

@@ -3,6 +3,7 @@
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
+import kotlin.math.min
 
 inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
     BitString.of(byteArray, size)
@@ -37,6 +38,24 @@ interface BitString : List<Boolean>, Comparable<BitString> {
     override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
 
     override fun toString(): String
+
+    fun joinToStringBits(): String = joinToString("") { if (it) "1" else "0" }
+
+    override fun compareTo(other: BitString): Int {
+        val limit = min(size, other.size)
+        repeat(limit) {
+            val thisValue = this[it]
+            val otherValue = other[it]
+            if (thisValue != otherValue) {
+                return if (thisValue) {
+                    1
+                } else {
+                    -1
+                }
+            }
+        }
+        return size - other.size
+    }
 
     companion object {
         const val MAX_LENGTH = 1023

@@ -14,6 +14,9 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
+inline fun VmStack(depth: Int, stack: VmStackList): VmStack = VmStackImpl(depth, stack)
+inline fun VmStack(stack: VmStackList): VmStack = VmStackImpl(stack)
+
 interface VmStack : Collection<VmStackValue> {
     val depth: Int
     val stack: VmStackList

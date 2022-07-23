@@ -1,7 +1,7 @@
 package org.ton.smartcontract.wallet
 
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.VmStackValue
+import org.ton.block.VmStackTinyInt
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.smartcontract.SmartContract
 
@@ -11,6 +11,6 @@ interface SeqnoWallet : SmartContract {
     suspend fun seqno(blockIdExt: TonNodeBlockIdExt): Int {
         val liteServerAccountId = LiteServerAccountId(address())
         val result = liteApi.runSmcMethod(4, blockIdExt, liteServerAccountId, "seqno")
-        return (result.first() as VmStackValue.TinyInt).value.toInt()
+        return (result.first() as VmStackTinyInt).value.toInt()
     }
 }

@@ -4,20 +4,18 @@
 [![JitPack][jitpack-svg]][jitpack]
 [![Based on TON][ton-svg]][ton]
 
-## Gradle
+## `build.gradle.kts`
 
 ```kotlin
-implementation("org.ton:ton-kotlin:0.0.2")
-```
+val version = "main-SNAPSHOT" // Get actual version on: https://jitpack.io/#andreypfau/ton-kotlin
 
-## Maven
+repositories {
+    maven(url = "https://jitpack.io")
+}
 
-```xml
-<dependency>
-    <groupId>org.ton</groupId>
-    <artifactId>ton-kotlin</artifactId>
-    <version>0.0.2</version>
-</dependency>
+dependencies {
+    implementation("com.github.andreypfau:ton-kotlin:$version")
+}
 ```
 
 <!-- Badges -->

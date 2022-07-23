@@ -1,11 +1,13 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 compileOnly(libs.serialization.core)
                 api(projects.tonCrypto)
             }
         }
-        commonTest
+        val commonTest by getting {
+
+        }
     }
 }

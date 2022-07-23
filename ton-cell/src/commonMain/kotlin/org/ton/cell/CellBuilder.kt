@@ -5,6 +5,9 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
 import org.ton.cell.exception.CellOverflowException
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 interface CellBuilder {
     var bits: MutableBitString
@@ -104,8 +107,13 @@ inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder
 fun CellBuilder(cell: Cell): CellBuilder =
     CellBuilder.of(cell)
 
-fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder =
-    CellBuilderImpl(maxLength).apply(builder)
+@OptIn(ExperimentalContracts::class)
+fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
+    return CellBuilderImpl(maxLength).apply(builder)
+}
 
 private class CellBuilderImpl(
     val maxLength: Int,

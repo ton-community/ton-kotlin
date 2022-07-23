@@ -1,6 +1,6 @@
 kotlin {
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 api(projects.tonCrypto)
                 implementation(libs.ktor.utils)
@@ -8,7 +8,7 @@ kotlin {
                 implementation(kotlin("reflect"))
             }
         }
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
