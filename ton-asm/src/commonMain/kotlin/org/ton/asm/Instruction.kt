@@ -7,6 +7,7 @@ import org.ton.asm.codepage.SETCP
 import org.ton.asm.codepage.SETCP0
 import org.ton.asm.codepage.SETCPX
 import org.ton.asm.comparsion.integer.*
+import org.ton.asm.configuration.*
 import org.ton.asm.constant.bitstring.PUSHCONT
 import org.ton.asm.constant.bitstring.PUSHREF
 import org.ton.asm.constant.bitstring.PUSHREFSLICE
@@ -81,6 +82,9 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_9-exception-generating-and-handling-primitives
         THROW, THROWIF, THROWIFNOT, THROW, THROWARG, THROWARGIF, THROWIFNOT, THROWARGIFNOT, THROWANY,
         THROWARGANY, THROWANYIF, THROWARGANYIF, THROWANYIFNOT, THROWARGANYIFNOT, TRY, TRYARGS,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_113-configuration-primitives
+        GETPARAM, NOW, BLOCKLT, LTIME, RANDSEED, BALANCE, MYADDR, CONFIGROOT, CONFIGDICT, CONFIGPARAM, CONFIGOPTPARAM,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_13-codepage-primitives
         SETCP, SETCP0, SETCPX
