@@ -1,9 +1,12 @@
 package org.ton.asm
 
-import org.ton.asm.stack.Instruction
+import org.ton.asm.constant.integer.PUSHINT
 import org.ton.asm.stack.basic.XCHG
 import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
 import org.ton.tlb.loadTlb
+import org.ton.tlb.parse
+import org.ton.tlb.storeTlb
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,15 +20,28 @@ class AsmDeserializationTest {
 
     @Test
     fun parse() {
-        val instructions = Instruction.loadList(Cell("105811F025313032212022").beginParse())
-        instructions.forEach {
-            println(it)
+        fun checkPushInt(pushInt: PUSHINT) {
+            val cell = CellBuilder.createCell {
+                storeTlb(PUSHINT, pushInt)
+            }
+            val actualPushInt = cell.parse(PUSHINT)
+            assertEquals(pushInt, actualPushInt)
         }
+
+        checkPushInt(PUSHINT(2))
+        checkPushInt(PUSHINT(85))
+        checkPushInt(PUSHINT(851))
+        checkPushInt(PUSHINT(8514))
+        checkPushInt(PUSHINT(85143))
+        checkPushInt(PUSHINT(78748))
+        checkPushInt(PUSHINT(78748191))
+        checkPushInt(PUSHINT(7874819132))
+        checkPushInt(PUSHINT(7874819132232))
+        checkPushInt(PUSHINT(7874819132232213222))
     }
 
     @Test
     fun walletv3() {
-        val instructions =
-            Instruction.loadList(Cell("FF0020DD2082014C97BA218201339CBAB19F71B0ED44D0D31FD31F31D70BFFE304E0A4F2608308D71820D31FD31FD31FF82313BBF263ED44D0D31FD31FD3FFD15132BAF2A15144BAF2A204F901541055F910F2A3F8009320D74A96D307D402FB00E8D101A4C8CB1FCB1FCBFFC9ED54").beginParse())
+        Instruction.loadList(Cell("FF0020DD2082014C97BA218201339CBAB19F71B0ED44D0D31FD31F31D70BFFE304E0A4F2608308D71820D31FD31FD31FF82313BBF263ED44D0D31FD31FD3FFD15132BAF2A15144BAF2A204F901541055F910F2A3F8009320D74A96D307D402FB00E8D101A4C8CB1FCB1FCBFFC9ED54").beginParse())
     }
 }

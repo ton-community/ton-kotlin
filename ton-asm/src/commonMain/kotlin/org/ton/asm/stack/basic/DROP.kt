@@ -1,6 +1,6 @@
 package org.ton.asm.stack.basic
 
-import org.ton.asm.stack.Instruction
+import org.ton.asm.Instruction
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
