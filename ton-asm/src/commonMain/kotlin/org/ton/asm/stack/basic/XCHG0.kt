@@ -1,15 +1,17 @@
 package org.ton.asm.stack.basic
 
+import org.ton.asm.stack.Instruction
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 data class XCHG0(
     val s: Int
-) {
-    companion object {
-        fun tlbConstructor(): TlbConstructor<XCHG0> = XCH0TlbConstructor
-    }
+) : Instruction {
+    override fun toString(): String = "$s XCHG0"
+
+    companion object : TlbConstructorProvider<XCHG0> by XCH0TlbConstructor
 }
 
 private object XCH0TlbConstructor : TlbConstructor<XCHG0>(
