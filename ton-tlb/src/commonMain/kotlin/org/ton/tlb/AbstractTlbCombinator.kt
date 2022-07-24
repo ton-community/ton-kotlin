@@ -37,7 +37,9 @@ abstract class AbstractTlbCombinator<T : Any, C : AbstractTlbConstructor<out T>>
     fun loadTlbConstructor(cellSlice: CellSlice): C {
         val constructor = if (EXPERIMENTAL_BINARY_TREE_SEARCH) {
             val id = cellSlice.preloadBits(cellSlice.bits.size - cellSlice.bitsPosition)
-            tlbConstructorTree[id] ?: throw UnknownTlbConstructorException(id)
+            println("search: $id")
+            tlbConstructorTree[id]?.also { println("found: ${it.id} - ${it.type}") }
+                ?: throw UnknownTlbConstructorException(id)
         } else {
             var currentId = BitString.empty()
             sortedConstructors.firstOrNull { constructor ->

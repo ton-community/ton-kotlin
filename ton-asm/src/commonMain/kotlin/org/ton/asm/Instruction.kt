@@ -5,6 +5,9 @@ import org.ton.asm.codepage.SETCP
 import org.ton.asm.codepage.SETCP0
 import org.ton.asm.codepage.SETCPX
 import org.ton.asm.comparsion.integer.*
+import org.ton.asm.constant.bitstring.PUSHCONT
+import org.ton.asm.constant.bitstring.PUSHREF
+import org.ton.asm.constant.bitstring.PUSHREFSLICE
 import org.ton.asm.constant.integer.*
 import org.ton.asm.flow.conditional.*
 import org.ton.asm.stack.basic.*
@@ -36,6 +39,10 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_41-integer-and-boolean-constants
         PUSHINT, ZERO, ONE, TWO, TEN, TRUE, PUSHPOW2, PUSHNAN, PUSHPOW2DEC, PUSHNEGPOW2,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_42-constant-slices-continuations-cells-and-references
+        // TODO: PUSHSLICE
+        PUSHREF, PUSHREFSLICE, PUSHCONT,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_53-shifts-logical-operations
         LSHIFTBY, RSHIFTBY, LSHIFT, RSHIFT, POW2, AND, OR, XOR, NOT, FITS, CHKBOOL, UFITS, CHKBIT, FITSX, UFITSX,

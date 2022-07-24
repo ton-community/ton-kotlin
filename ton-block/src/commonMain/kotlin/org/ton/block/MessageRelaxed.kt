@@ -2,7 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
@@ -35,13 +37,13 @@ data class MessageRelaxed<X>(
 
     companion object {
         @JvmStatic
-        fun <X> tlbCodec(
+        fun <X : Any> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<MessageRelaxed<X>> = MessageRelaxedTlbConstructor(x)
     }
 }
 
-private class MessageRelaxedTlbConstructor<X>(
+private class MessageRelaxedTlbConstructor<X : Any>(
     x: TlbCodec<X>
 ) : TlbConstructor<MessageRelaxed<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfoRelaxed " +

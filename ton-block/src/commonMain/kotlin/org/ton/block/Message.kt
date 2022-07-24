@@ -43,7 +43,7 @@ data class Message<X>(
         val Any = tlbCodec(AnyTlbConstructor)
 
         @JvmStatic
-        fun <X> tlbCodec(
+        fun <X : Any> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<Message<X>> = MessageTlbConstructor(x)
     }
@@ -60,9 +60,9 @@ data class Message<X>(
     }
 }
 
-operator fun <X> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)
+operator fun <X : Any> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)
 
-private class MessageTlbConstructor<X>(
+private class MessageTlbConstructor<X : Any>(
     x: TlbCodec<X>
 ) : TlbConstructor<Message<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfo " +
