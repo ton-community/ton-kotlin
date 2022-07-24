@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class POPSAVE(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c POPSAVE"
+    override fun toString(): String = "$c POPSAVE"
 
     companion object : TlbConstructorProvider<POPSAVE> by POPSAVETlbConstructor
 }

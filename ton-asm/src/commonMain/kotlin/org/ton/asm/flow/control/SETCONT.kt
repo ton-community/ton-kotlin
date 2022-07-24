@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class SETCONT(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c SETCONT"
+    override fun toString(): String = "$c SETCONT"
 
     companion object : TlbConstructorProvider<SETCONT> by SETCONTTlbConstructor
 }

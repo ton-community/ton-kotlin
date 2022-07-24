@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class POPCTR(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c POPCTR"
+    override fun toString(): String = "$c POPCTR"
 
     companion object : TlbConstructorProvider<POPCTR> by POPCTRTlbConstructor
 }

@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class SAVEALT(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c SAVEALT"
+    override fun toString(): String = "$c SAVEALT"
 
     companion object : TlbConstructorProvider<SAVEALT> by SAVEALTTlbConstructor
 }

@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class PUSHCTR(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c PUSHCTR"
+    override fun toString(): String = "$c PUSHCTR"
 
     companion object : TlbConstructorProvider<PUSHCTR> by PUSHCTRTlbConstructor
 }

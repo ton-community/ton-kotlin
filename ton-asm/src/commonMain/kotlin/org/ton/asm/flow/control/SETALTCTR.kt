@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class SETALTCTR(
     val c: Int
 ) : Instruction {
-    override fun toString(): String = "c$c SETALTCTR"
+    override fun toString(): String = "$c SETALTCTR"
 
     companion object : TlbConstructorProvider<SETALTCTR> by SETALTCTRTlbConstructor
 }
