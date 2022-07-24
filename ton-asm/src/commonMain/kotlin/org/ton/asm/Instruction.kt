@@ -1,5 +1,6 @@
 package org.ton.asm
 
+import org.ton.asm.arithmetic.basic.*
 import org.ton.asm.arithmetic.logical.*
 import org.ton.asm.cell.deserialization.*
 import org.ton.asm.codepage.SETCP
@@ -45,6 +46,9 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_42-constant-slices-continuations-cells-and-references
         // TODO: PUSHSLICE
         PUSHREF, PUSHREFSLICE, PUSHCONT,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_51-addition-subtraction-multiplication
+        ADD, SUB, SUBR, NEGATE, INC, DEC, ADDCONST, MULCONST, MUL,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_53-shifts-logical-operations
         LSHIFTBY, RSHIFTBY, LSHIFT, RSHIFT, POW2, AND, OR, XOR, NOT, FITS, CHKBOOL, UFITS, CHKBIT, FITSX, UFITSX,
