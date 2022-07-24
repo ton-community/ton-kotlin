@@ -11,6 +11,7 @@ import org.ton.asm.constant.bitstring.PUSHCONT
 import org.ton.asm.constant.bitstring.PUSHREF
 import org.ton.asm.constant.bitstring.PUSHREFSLICE
 import org.ton.asm.constant.integer.*
+import org.ton.asm.exception.*
 import org.ton.asm.flow.conditional.*
 import org.ton.asm.flow.control.*
 import org.ton.asm.stack.basic.*
@@ -77,12 +78,16 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
         SETCONTCTRX, COMPOS, COMPOSALT, COMPOSBOTH, ATEXIT, ATEXITALT, SETEXITALT, THENRET, THENRETALT, INVERT,
         BOOLEVAL, SAMEALT, SAMEALTSAVE,
 
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_9-exception-generating-and-handling-primitives
+        THROW, THROWIF, THROWIFNOT, THROW, THROWARG, THROWARGIF, THROWIFNOT, THROWARGIFNOT, THROWANY,
+        THROWARGANY, THROWANYIF, THROWARGANYIF, THROWANYIFNOT, THROWARGANYIFNOT, TRY, TRYARGS,
+
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_13-codepage-primitives
         SETCP, SETCP0, SETCPX
     )
 
     private fun createConstructorList(vararg providers: TlbProvider<out Instruction>): List<TlbConstructor<out Instruction>> {
-        val list = buildList {
+        val list = buildSet {
             providers.forEach { provider ->
                 when (provider) {
                     is TlbConstructorProvider<out Instruction> -> add(provider.tlbConstructor())
