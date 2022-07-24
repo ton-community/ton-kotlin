@@ -15,7 +15,8 @@ data class XCHG0(
 }
 
 private object XCH0TlbConstructor : TlbConstructor<XCHG0>(
-    schema = "asm_xch0#0 s:uint4 = XCHG0;"
+    schema = "asm_xch0#0 s:uint4 = XCHG0;",
+    type = XCHG0::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: XCHG0) {
         cellBuilder.storeUInt(value.s, 4)

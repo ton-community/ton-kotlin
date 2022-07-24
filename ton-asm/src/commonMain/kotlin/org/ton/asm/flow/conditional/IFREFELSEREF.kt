@@ -11,7 +11,8 @@ object IFREFELSEREF : Instruction, TlbConstructorProvider<IFREFELSEREF> by IFREF
 }
 
 private object IFREFELSEREFTlbConstructor : TlbConstructor<IFREFELSEREF>(
-    schema = "asm_ifrefelseref#e30f = IFREFELSEREF;"
+    schema = "asm_ifrefelseref#e30f = IFREFELSEREF;",
+    type = IFREFELSEREF::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFREFELSEREF) {
     }

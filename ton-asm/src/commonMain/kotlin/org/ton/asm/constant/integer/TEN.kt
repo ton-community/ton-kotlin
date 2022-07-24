@@ -11,7 +11,8 @@ object TEN : Instruction, TlbConstructorProvider<TEN> by TENTlbConstructor {
 }
 
 private object TENTlbConstructor : TlbConstructor<TEN>(
-    schema = "asm_ten#7a = TEN;"
+    schema = "asm_ten#7a = TEN;",
+    type = TEN::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: TEN) {
     }

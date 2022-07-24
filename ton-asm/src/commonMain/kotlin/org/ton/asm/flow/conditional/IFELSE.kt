@@ -11,7 +11,8 @@ object IFELSE : Instruction, TlbConstructorProvider<IFELSE> by IFELSETlbConstruc
 }
 
 private object IFELSETlbConstructor : TlbConstructor<IFELSE>(
-    schema = "asm_ifelse#e2 = IFELSE;"
+    schema = "asm_ifelse#e2 = IFELSE;",
+    type = IFELSE::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFELSE) {
     }

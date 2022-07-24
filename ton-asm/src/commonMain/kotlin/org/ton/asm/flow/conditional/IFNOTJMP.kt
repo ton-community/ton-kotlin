@@ -11,7 +11,8 @@ object IFNOTJMP : Instruction, TlbConstructorProvider<IFNOTJMP> by IFNOTJMPTlbCo
 }
 
 private object IFNOTJMPTlbConstructor : TlbConstructor<IFNOTJMP>(
-    schema = "asm_ifnotjmp#e1 = IFNOTJMP;"
+    schema = "asm_ifnotjmp#e1 = IFNOTJMP;",
+    type = IFNOTJMP::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFNOTJMP) {
     }

@@ -10,7 +10,8 @@ object CONDSEL : TlbConstructorProvider<CONDSEL> by CONDSELTlbConstructor {
 }
 
 private object CONDSELTlbConstructor : TlbConstructor<CONDSEL>(
-    schema = "asm_condsel#e304 = CONDSEL;"
+    schema = "asm_condsel#e304 = CONDSEL;",
+    type = CONDSEL::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: CONDSEL) {
     }

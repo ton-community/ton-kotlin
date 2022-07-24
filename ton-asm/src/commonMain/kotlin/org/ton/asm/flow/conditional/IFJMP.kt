@@ -11,7 +11,8 @@ object IFJMP : Instruction, TlbConstructorProvider<IFJMP> by IFJMPTlbConstructor
 }
 
 private object IFJMPTlbConstructor : TlbConstructor<IFJMP>(
-    schema = "asm_ifjmp#e0 = IFJMP;"
+    schema = "asm_ifjmp#e0 = IFJMP;",
+    type = IFJMP::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFJMP) {
     }

@@ -11,7 +11,8 @@ object SETCP0 : Instruction, TlbConstructorProvider<SETCP0> by SETCP0TlbConstruc
 }
 
 private object SETCP0TlbConstructor : TlbConstructor<SETCP0>(
-    schema = "asm_setcp0#ff00 = SETCP0;"
+    schema = "asm_setcp0#ff00 = SETCP0;",
+    type = SETCP0::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETCP0) {
     }

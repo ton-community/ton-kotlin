@@ -11,7 +11,8 @@ object ONE : Instruction, TlbConstructorProvider<ONE> by ONETlbConstructor {
 }
 
 private object ONETlbConstructor : TlbConstructor<ONE>(
-    schema = "asm_one#71 = ONE;"
+    schema = "asm_one#71 = ONE;",
+    type = ONE::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: ONE) {
     }

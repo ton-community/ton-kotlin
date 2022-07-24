@@ -3,6 +3,7 @@ package org.ton.asm
 import org.ton.asm.codepage.SETCP
 import org.ton.asm.codepage.SETCP0
 import org.ton.asm.codepage.SETCPX
+import org.ton.asm.comparsion.integer.*
 import org.ton.asm.constant.integer.*
 import org.ton.asm.flow.conditional.*
 import org.ton.asm.stack.basic.*
@@ -34,6 +35,10 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_41-integer-and-boolean-constants
         PUSHINT, ZERO, ONE, TWO, TEN, TRUE, PUSHPOW2, PUSHNAN, PUSHPOW2DEC, PUSHNEGPOW2,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_61-integer-comparison
+        SGN, LESS, EQUAL, LEQ, GREATER, NEQ, GEQ, CMP, EQINT, ISZERO, LESSINT, ISNEG, ISNPOS, ISNNEG, NEQINT,
+        ISNAN, CHKNAN,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_82-conditional-control-flow-primitives
         IFRET, IFNOTRET, IF, IFNOTRET, IFJMP, IFNOTJMP, IFELSE, IFREF, IFNOTREF, IFJMPREF, IFNOTJMPREF, CONDSELCHK,

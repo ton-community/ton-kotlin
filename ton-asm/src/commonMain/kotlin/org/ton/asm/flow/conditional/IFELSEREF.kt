@@ -11,7 +11,8 @@ object IFELSEREF : Instruction, TlbConstructorProvider<IFELSEREF> by IFELSEREFTL
 }
 
 private object IFELSEREFTLbConstructor : TlbConstructor<IFELSEREF>(
-    schema = "asm_ifelseref#e30e = IFELSEREF;"
+    schema = "asm_ifelseref#e30e = IFELSEREF;",
+    type = IFELSEREF::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFELSEREF) {
     }

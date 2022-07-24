@@ -11,7 +11,8 @@ object IFJMPREF : Instruction, TlbConstructorProvider<IFJMPREF> by IFJMPREFTlbCo
 }
 
 private object IFJMPREFTlbConstructor : TlbConstructor<IFJMPREF>(
-    schema = "asm_ifjmpref#e302 = IFJMPREF;"
+    schema = "asm_ifjmpref#e302 = IFJMPREF;",
+    type = IFJMPREF::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: IFJMPREF) {
     }

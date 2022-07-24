@@ -11,7 +11,8 @@ object ZERO : Instruction, TlbConstructorProvider<ZERO> by ZEROTlbConstructor {
 }
 
 private object ZEROTlbConstructor : TlbConstructor<ZERO>(
-    schema = "asm_zero#70 = ZERO;"
+    schema = "asm_zero#70 = ZERO;",
+    type = ZERO::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: ZERO) {
     }

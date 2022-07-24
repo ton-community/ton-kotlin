@@ -25,7 +25,8 @@ private object SETCPTlbCombinator : TlbCombinator<SETCP>() {
 }
 
 private object SETCPFFTlbConstructor : TlbConstructor<SETCP>(
-    schema = "asm_setcp_ff#ff cp:uint8 = SETCP;"
+    schema = "asm_setcp_ff#ff cp:uint8 = SETCP;",
+    type = SETCP::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETCP) {
         cellBuilder.storeUInt(value.cp, 8)
@@ -38,7 +39,8 @@ private object SETCPFFTlbConstructor : TlbConstructor<SETCP>(
 }
 
 private object SETCPFFFTlbConstructor : TlbConstructor<SETCP>(
-    schema = "asm_setcp_fff#fff cp:uint4 = SETCP;"
+    schema = "asm_setcp_fff#fff cp:uint4 = SETCP;",
+    type = SETCP::class
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETCP) {
         cellBuilder.storeUInt(value.cp + 16, 4)
