@@ -4,6 +4,7 @@ kotlin {
             dependencies {
                 api(projects.tonCell)
                 implementation(libs.atomicfu)
+                implementation(kotlin("reflect"))
             }
         }
     }

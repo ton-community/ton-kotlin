@@ -2,12 +2,19 @@ package org.ton.tlb
 
 import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.tlb.exception.ParseTlbException
+import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 abstract class AbstractTlbConstructor<T>(
     @Language("TL-B")
     val schema: String,
-    id: BitString? = null
+    id: BitString? = null,
+    val type: KType? = null
 ) {
     val id = id ?: calculateId(schema)
     override fun toString(): String = schema
@@ -36,11 +43,24 @@ abstract class AbstractTlbConstructor<T>(
     }
 }
 
-abstract class TlbConstructor<T>(
+abstract class TlbConstructor<T : Any>(
     @Language("TL-B")
     schema: String,
-    id: BitString? = null
-) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T> {
+    id: BitString? = null,
+    type: KType?
+) : AbstractTlbConstructor<T>(schema, id, type), TlbCodec<T>, TlbConstructorProvider<T> {
+    constructor(
+        @Language("TL-B")
+        schema: String,
+        id: BitString? = null,
+        type: KClass<T>? = null
+    ) : this(schema, id, type?.createType())
+
+    abstract override fun storeTlb(cellBuilder: CellBuilder, value: T)
+    abstract override fun loadTlb(cellSlice: CellSlice): T
+
+    override fun tlbConstructor(): TlbConstructor<T> = this
+
     fun asTlbCombinator(): TlbCombinator<T> = object : TlbCombinator<T>() {
         override val constructors: List<TlbConstructor<out T>> = listOf(this@TlbConstructor)
 

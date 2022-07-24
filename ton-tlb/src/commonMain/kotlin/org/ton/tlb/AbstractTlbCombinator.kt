@@ -6,7 +6,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.UnknownTlbConstructorException
 
-abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
+abstract class AbstractTlbCombinator<T : Any, C : AbstractTlbConstructor<out T>> {
     companion object {
         var EXPERIMENTAL_BINARY_TREE_SEARCH by atomic(true)
     }
@@ -51,4 +51,5 @@ abstract class AbstractTlbCombinator<T, C : AbstractTlbConstructor<out T>> {
         @Suppress("UNCHECKED_CAST")
         return constructor as C
     }
+
 }

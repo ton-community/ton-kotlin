@@ -8,7 +8,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
 fun Cell.Companion.tlbCodec(): TlbCodec<Cell> = CellTlbConstructor
-fun <T> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellReferencedTlbConstructor(type)
+fun <T : Any> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellReferencedTlbConstructor(type)
 
 private object CellTlbConstructor : TlbConstructor<Cell>(
     schema = "_ _:Cell = Cell;",
@@ -27,14 +27,14 @@ private object CellTlbConstructor : TlbConstructor<Cell>(
     }
 }
 
-private class CellReferencedTlbConstructor<T>(
-    val type: TlbCodec<T>
+private class CellReferencedTlbConstructor<T : Any>(
+    val codec: TlbCodec<T>
 ) : TlbConstructor<T>("", id = BitString.empty()) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: T
     ) = cellBuilder {
         storeRef {
-            storeTlb(type, value)
+            storeTlb(codec, value)
         }
     }
 
@@ -42,7 +42,7 @@ private class CellReferencedTlbConstructor<T>(
         cellSlice: CellSlice
     ): T = cellSlice {
         loadRef {
-            loadTlb(type)
+            loadTlb(codec)
         }
     }
 }
