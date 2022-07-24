@@ -1,5 +1,6 @@
 package org.ton.asm
 
+import org.ton.asm.arithmetic.logical.*
 import org.ton.asm.codepage.SETCP
 import org.ton.asm.codepage.SETCP0
 import org.ton.asm.codepage.SETCPX
@@ -35,6 +36,10 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_41-integer-and-boolean-constants
         PUSHINT, ZERO, ONE, TWO, TEN, TRUE, PUSHPOW2, PUSHNAN, PUSHPOW2DEC, PUSHNEGPOW2,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_53-shifts-logical-operations
+        LSHIFTBY, RSHIFTBY, LSHIFT, RSHIFT, POW2, AND, OR, XOR, NOT, FITS, CHKBOOL, UFITS, CHKBIT, FITSX, UFITSX,
+        BITSIZE, UBITSIZE, MIN, MAX, MINMAX, ABS,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_61-integer-comparison
         SGN, LESS, EQUAL, LEQ, GREATER, NEQ, GEQ, CMP, EQINT, ISZERO, LESSINT, ISNEG, ISNPOS, ISNNEG, NEQINT,
