@@ -10,6 +10,7 @@ import org.ton.asm.constant.bitstring.PUSHREF
 import org.ton.asm.constant.bitstring.PUSHREFSLICE
 import org.ton.asm.constant.integer.*
 import org.ton.asm.flow.conditional.*
+import org.ton.asm.flow.control.*
 import org.ton.asm.stack.basic.*
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCombinator
@@ -55,6 +56,11 @@ object InstructionTlbCombinator : TlbCombinator<Instruction>() {
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_82-conditional-control-flow-primitives
         IFRET, IFNOTRET, IF, IFNOTRET, IFJMP, IFNOTJMP, IFELSE, IFREF, IFNOTREF, IFJMPREF, IFNOTJMPREF, CONDSELCHK,
         IFRETALT, IFNOTRETALT, IFREFELSE, IFELSEREF, IFREFELSEREF, IFBITJMP, IFNBITJMP, IFBITJMPREF, IFNBITJMPREF,
+
+        // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_86-operations-with-continuation-savelists-and-control-registers
+        PUSHCTR, POPCTR, SETCONT, SETRETCTR, SETALTCTR, POPSAVE, SAVE, SAVEALT, SAVEBOTH, PUSHCTRX, PUSHCTRX, POPCTRX,
+        SETCONTCTRX, COMPOS, COMPOSALT, COMPOSBOTH, ATEXIT, ATEXITALT, SETEXITALT, THENRET, THENRETALT, INVERT,
+        BOOLEVAL, SAMEALT, SAMEALTSAVE,
 
         // https://ton.org/docs/#/smart-contracts/tvm-instructions/instructions?id=_13-codepage-primitives
         SETCP, SETCP0, SETCPX
