@@ -60,6 +60,22 @@ fun interface LiteServerRunSmcMethodFunction : LiteServerQueryFunction {
         methodName: String,
         params: Iterable<VmStackValue>
     ) = query(LiteServerRunSmcMethod(mode, id, account, methodName, params))
+
+    suspend fun runSmcMethod(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        method: Long,
+        vararg params: VmStackValue
+    ) = query(LiteServerRunSmcMethod(mode, id, account, method, *params))
+
+    suspend fun runSmcMethod(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        method: Long,
+        params: Iterable<VmStackValue>
+    ) = query(LiteServerRunSmcMethod(mode, id, account, method, params))
 }
 
 @Serializable
@@ -82,6 +98,12 @@ data class LiteServerRunSmcMethod(
     }))
 
     constructor(
+        mode: Int, id: TonNodeBlockIdExt, account: LiteServerAccountId, method: Long, params: VmStack
+    ) : this(mode, id, account, method, BagOfCells(CellBuilder.createCell {
+        storeTlb(VmStack, params)
+    }).toByteArray())
+
+    constructor(
         mode: Int,
         id: TonNodeBlockIdExt,
         account: LiteServerAccountId,
@@ -96,6 +118,22 @@ data class LiteServerRunSmcMethod(
         methodName: String,
         params: Iterable<VmStackValue>
     ) : this(mode, id, account, methodName, VmStack(VmStackList(params)))
+
+    constructor(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        method: Long,
+        vararg params: VmStackValue
+    ) : this(mode, id, account, method, VmStack(VmStackList(params.asIterable())))
+
+    constructor(
+        mode: Int,
+        id: TonNodeBlockIdExt,
+        account: LiteServerAccountId,
+        method: Long,
+        params: Iterable<VmStackValue>
+    ) : this(mode, id, account, method, VmStack(VmStackList(params)))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

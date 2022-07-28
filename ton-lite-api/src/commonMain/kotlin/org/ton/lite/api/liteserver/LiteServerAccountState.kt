@@ -1,40 +1,37 @@
-@file:UseSerializers(HexByteArraySerializer::class)
+@file:UseSerializers(Base64ByteArraySerializer::class)
 
 package org.ton.lite.api.liteserver
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.api.tonnode.Shard
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.Account
 import org.ton.boc.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
-import org.ton.tlb.loadTlb
 
 @Serializable
 data class LiteServerAccountState(
-        val id: TonNodeBlockIdExt,
-        @SerialName("shardblk")
-        val shardBlk: TonNodeBlockIdExt,
-        @SerialName("shard_proof")
-        @Serializable(Base64ByteArraySerializer::class)
-        val shardProof: ByteArray,
-        @Serializable(Base64ByteArraySerializer::class)
-        val proof: ByteArray,
-        @Serializable(Base64ByteArraySerializer::class)
-        val state: ByteArray
+    val id: TonNodeBlockIdExt,
+    val shard_blk: TonNodeBlockIdExt,
+    val shard_proof: ByteArray,
+    val proof: ByteArray,
+    val state: ByteArray
 ) {
-    fun stateToBagOfCells(): BagOfCells = BagOfCells(state)
-    fun stateToAccount(): Account = stateToBagOfCells().first().parse {
-        loadTlb(Account)
+    fun stateBagOfCells(): BagOfCells = BagOfCells(state)
+    fun shardProofBagOfCells(): BagOfCells = BagOfCells(shard_proof)
+
+    fun check(blockIdExt: TonNodeBlockIdExt, liteServerAccountId: LiteServerAccountId) {
+        check(id != blockIdExt && blockIdExt.seqno != 0.inv()) { "invalid block_id, expected: $blockIdExt, actual: $id" }
+        check(shard_blk.isValidFull()) { "invalid shard_blk: $shard_blk" }
+        Shard.check(id, shard_blk, shardProofBagOfCells().first())
+        // TODO: check shard
     }
 
     override fun equals(other: Any?): Boolean {
@@ -44,8 +41,8 @@ data class LiteServerAccountState(
         other as LiteServerAccountState
 
         if (id != other.id) return false
-        if (shardBlk != other.shardBlk) return false
-        if (!shardProof.contentEquals(other.shardProof)) return false
+        if (shard_blk != other.shard_blk) return false
+        if (!shard_proof.contentEquals(other.shard_proof)) return false
         if (!proof.contentEquals(other.proof)) return false
         if (!state.contentEquals(other.state)) return false
 
@@ -54,30 +51,30 @@ data class LiteServerAccountState(
 
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + shardBlk.hashCode()
-        result = 31 * result + shardProof.contentHashCode()
+        result = 31 * result + shard_blk.hashCode()
+        result = 31 * result + shard_proof.contentHashCode()
         result = 31 * result + proof.contentHashCode()
         result = 31 * result + state.hashCode()
         return result
     }
 
     override fun toString() = buildString {
-        append("LiteServerAccountState(id=")
+        append("(id:")
         append(id)
-        append(", shardblk=")
-        append(shardBlk)
-        append(", shardProof=")
-        append(base64(shardProof))
-        append(", proof=")
-        append(base64(proof))
-        append(", state=")
-        append(base64(state))
+        append(" shard_blk:")
+        append(shard_blk)
+        append(" shard_proof:")
+        append(hex(shard_proof).uppercase())
+        append(" proof:")
+        append(hex(proof).uppercase())
+        append(" state:")
+        append(hex(state).uppercase())
         append(")")
     }
 
     companion object : TlConstructor<LiteServerAccountState>(
-            type = LiteServerAccountState::class,
-            schema = "liteServer.accountState id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:bytes proof:bytes state:bytes = liteServer.AccountState"
+        type = LiteServerAccountState::class,
+        schema = "liteServer.accountState id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:bytes proof:bytes state:bytes = liteServer.AccountState"
     ) {
         override fun decode(input: Input): LiteServerAccountState {
             val id = input.readTl(TonNodeBlockIdExt)
@@ -90,8 +87,8 @@ data class LiteServerAccountState(
 
         override fun encode(output: Output, value: LiteServerAccountState) {
             output.writeTl(TonNodeBlockIdExt, value.id)
-            output.writeTl(TonNodeBlockIdExt, value.shardBlk)
-            output.writeBytesTl(value.shardProof)
+            output.writeTl(TonNodeBlockIdExt, value.shard_blk)
+            output.writeBytesTl(value.shard_proof)
             output.writeBytesTl(value.proof)
             output.writeBytesTl(value.state)
         }

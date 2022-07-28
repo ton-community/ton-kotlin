@@ -13,7 +13,7 @@ import org.ton.tlb.TlbConstructor
 @Serializable
 data class ExtBlkRef(
     val end_lt: Long,
-    val seq_no: Long,
+    val seq_no: Int,
     val root_hash: BitString,
     val file_hash: BitString
 ) {
@@ -44,7 +44,7 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
         cellSlice: CellSlice
     ): ExtBlkRef = cellSlice {
         val endLt = loadUInt(64).toLong()
-        val seqNo = loadUInt(32).toLong()
+        val seqNo = loadUInt(32).toInt()
         val rootHash = loadBits(256)
         val fileHash = loadBits(256)
         ExtBlkRef(endLt, seqNo, rootHash, fileHash)

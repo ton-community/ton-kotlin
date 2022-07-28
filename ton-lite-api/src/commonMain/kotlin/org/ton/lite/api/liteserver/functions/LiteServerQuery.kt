@@ -5,6 +5,7 @@ package org.ton.lite.api.liteserver.functions
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.api.exception.TonException
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.encodeHex
@@ -22,7 +23,7 @@ interface LiteServerQueryFunction {
         queryCodec: TlCodec<Q>,
         answerCodec: TlCodec<A>,
         seqno: Int = -1
-    ): A = try {
+    ): A {
         var queryBytes = queryCodec.encodeBoxed(query)
         if (seqno >= 0) {
             queryBytes = LiteServerWaitMasterchainSeqno.encodeBoxed(
@@ -36,13 +37,10 @@ interface LiteServerQueryFunction {
         val answerBytes = query(liteServerQuery)
         val errorByteInput = ByteReadPacket(answerBytes)
         if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
-            throw LiteServerError.decode(errorByteInput)
+            val liteServerError = LiteServerError.decode(errorByteInput)
+            throw TonException(liteServerError.code, liteServerError.message)
         }
-        answerCodec.decodeBoxed(answerBytes)
-    } catch (e: LiteServerError) {
-        throw e.copy(message = "${e.message} query: $query")
-    } catch (e: Exception) {
-        throw RuntimeException("Can't process query: $query", e)
+        return answerCodec.decodeBoxed(answerBytes)
     }
 }
 

@@ -1,11 +1,9 @@
 package org.ton.lite.api
 
-import org.ton.crypto.encodeHex
 import org.ton.lite.api.liteserver.LiteServerLookupBlockFunction
 import org.ton.lite.api.liteserver.functions.*
-import org.ton.logger.Logger
 
-interface LiteApi :
+fun interface LiteApi :
     LiteServerGetMasterchainInfoFunction,
     LiteServerGetMasterchainInfoExtFunction,
     LiteServerGetTimeFunction,
@@ -26,16 +24,14 @@ interface LiteApi :
     LiteServerGetConfigAllFunction,
     LiteServerGetConfigParamsFunction,
     LiteServerGetValidatorStatsFunction,
-
     LiteServerQueryFunction {
-
-    val logger: Logger
 
     suspend fun sendRawQuery(byteArray: ByteArray): ByteArray
 
     override suspend fun query(liteServerQuery: LiteServerQuery): ByteArray {
         val liteServerQueryBytes = LiteServerQuery.encodeBoxed(liteServerQuery)
-        logger.debug { "LiteServerQuery: ${liteServerQueryBytes.encodeHex()}\n  $liteServerQuery" }
         return sendRawQuery(liteServerQueryBytes)
     }
+
+    suspend operator fun <T> invoke(liteApi: suspend LiteApi.() -> T): T = liteApi(this)
 }

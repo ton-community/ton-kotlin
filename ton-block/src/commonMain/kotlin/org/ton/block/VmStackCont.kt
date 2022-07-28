@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -14,9 +15,9 @@ import org.ton.tlb.storeTlb
 data class VmStackCont(
     val cont: VmCont
 ) : VmStackValue {
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmStackCont> = VmStackValueContTlbConstructor
-    }
+    override fun toString(): String = "(vm_stk_cont cont:$cont)"
+
+    companion object : TlbConstructorProvider<VmStackCont> by VmStackValueContTlbConstructor
 }
 
 private object VmStackValueContTlbConstructor : TlbConstructor<VmStackCont>(

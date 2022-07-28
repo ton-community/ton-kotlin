@@ -8,6 +8,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.math.abs
 
 @SerialName("vm_stk_tinyint")
@@ -36,6 +37,7 @@ data class VmStackTinyInt(
                     VmStackTinyInt(r)
                 }
             }
+
             is VmStackInt -> VmStackInt(other.value + value)
             VmStackNan -> throw VmStackNanException()
         }
@@ -52,6 +54,7 @@ data class VmStackTinyInt(
                 VmStackInt(BigInt(value) - other.value)
             }
         }
+
         is VmStackInt -> VmStackInt(other.value + value)
         VmStackNan -> throw VmStackNanException()
     }
@@ -74,6 +77,7 @@ data class VmStackTinyInt(
                 }
                 VmStackTinyInt(r)
             }
+
             is VmStackInt -> VmStackInt(BigInt(value) * other.value)
             VmStackNan -> throw VmStackNanException()
         }
@@ -85,9 +89,9 @@ data class VmStackTinyInt(
         is VmStackNan -> throw VmStackNanException()
     }
 
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmStackTinyInt> = VmStackTinyIntTlbConstructor
-    }
+    override fun toString(): String = "(vm_stk_tinyint value:$value)"
+
+    companion object : TlbConstructorProvider<VmStackTinyInt> by VmStackTinyIntTlbConstructor
 }
 
 private object VmStackTinyIntTlbConstructor : TlbConstructor<VmStackTinyInt>(

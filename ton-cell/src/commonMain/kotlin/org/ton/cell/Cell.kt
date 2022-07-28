@@ -52,6 +52,7 @@ interface Cell {
 
     companion object {
         const val MAX_REFS = 4
+        const val MAX_LEVEL = 3
 
         @JvmStatic
         fun of(hex: String, vararg refs: Cell): Cell =

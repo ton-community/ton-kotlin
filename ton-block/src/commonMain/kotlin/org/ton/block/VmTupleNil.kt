@@ -5,13 +5,14 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_tuple_nil")
 @Serializable
-object VmTupleNil : VmTuple {
+object VmTupleNil : VmTuple, TlbConstructorProvider<VmTupleNil> by VmTupleNilTlbConstructor {
     override fun depth(): Int = 0
 
-    fun tlbConstructor(): TlbConstructor<VmTupleNil> = VmTupleNilTlbConstructor
+    override fun toString(): String = "vm_tuple_nil"
 }
 
 private object VmTupleNilTlbConstructor : TlbConstructor<VmTupleNil>(

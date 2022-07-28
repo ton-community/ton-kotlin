@@ -7,6 +7,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("vm_stk_builder")
@@ -17,9 +18,9 @@ class VmStackBuilder(
 
     fun toCellBuilder(): CellBuilder = CellBuilder(cell)
 
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmStackBuilder> = VmStackValueBuilderTlbConstructor
-    }
+    override fun toString(): String = "(vm_stk_builder cell:$cell)"
+
+    companion object : TlbConstructorProvider<VmStackBuilder> by VmStackValueBuilderTlbConstructor
 }
 
 private object VmStackValueBuilderTlbConstructor : TlbConstructor<VmStackBuilder>(

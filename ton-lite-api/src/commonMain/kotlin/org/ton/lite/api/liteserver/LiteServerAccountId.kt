@@ -5,6 +5,7 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.api.tonnode.Workchain
 import org.ton.block.AddrStd
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
@@ -17,10 +18,13 @@ import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class LiteServerAccountId(
-        val workchain: Int,
-        @Serializable(Base64ByteArraySerializer::class)
-        val id: ByteArray
+    val workchain: Int,
+    @Serializable(Base64ByteArraySerializer::class)
+    val id: ByteArray
 ) {
+    constructor() : this(Workchain.INVALID_WORKCHAIN, ByteArray(32))
+    constructor(string: String) : this(AddrStd(string))
+
     init {
         check(id.size == 32)
     }
@@ -51,13 +55,13 @@ data class LiteServerAccountId(
         append("LiteServerAccountId(workchain=")
         append(workchain)
         append(", id=")
-        append(id.encodeHex())
+        append(id.encodeHex().uppercase())
         append(")")
     }
 
     companion object : TlConstructor<LiteServerAccountId>(
-            type = LiteServerAccountId::class,
-            schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
+        type = LiteServerAccountId::class,
+        schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
     ) {
         override fun decode(input: Input): LiteServerAccountId {
             val workchain = input.readIntTl()

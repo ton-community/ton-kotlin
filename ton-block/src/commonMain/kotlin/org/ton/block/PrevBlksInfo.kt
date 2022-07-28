@@ -13,6 +13,8 @@ data class PrevBlksInfo(
     val prev1: ExtBlkRef,
     val prev2: ExtBlkRef
 ) : BlkPrevInfo {
+    override fun prevs(): List<ExtBlkRef> = listOf(prev1, prev2)
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<PrevBlksInfo> = PrevBlksInfoTlbConstructor

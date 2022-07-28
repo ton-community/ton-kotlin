@@ -1,9 +1,12 @@
+
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import org.ton.boc.BagOfCells
 import org.ton.boc.readBagOfCell
 import org.ton.boc.writeBagOfCells
 import org.ton.crypto.base64
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,5 +32,10 @@ class BagOfCellsTest {
         assertEquals(1, boc.roots.size)
 
         assertEquals("000001010000000000000045", hex(boc.roots.first().bits.toByteArray()))
+    }
+
+    @Test
+    fun `test`() {
+        println(Instant.ofEpochSecond(0).plus(4294967295, ChronoUnit.SECONDS))
     }
 }

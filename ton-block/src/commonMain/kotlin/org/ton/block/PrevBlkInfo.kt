@@ -2,7 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -12,6 +14,8 @@ import org.ton.tlb.storeTlb
 data class PrevBlkInfo(
     val prev: ExtBlkRef
 ) : BlkPrevInfo {
+    override fun prevs(): List<ExtBlkRef> = listOf(prev)
+
     companion object {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<PrevBlkInfo> = PrevBlkInfoTlbConstructor

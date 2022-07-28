@@ -84,12 +84,14 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parse(address: String): AddrStd {
-            return if (address.contains(':')) {
+        fun parse(address: String): AddrStd = try {
+            if (address.contains(':')) {
                 parseRaw(address)
             } else {
                 parseUserFriendly(address)
             }
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Can't parse address: $address", e)
         }
 
         @JvmStatic

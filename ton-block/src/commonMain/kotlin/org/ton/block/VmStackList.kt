@@ -24,6 +24,7 @@ sealed interface VmStackList : Iterable<VmStackValue> {
         val tos: VmStackValue
     ) : VmStackList {
         override fun iterator(): Iterator<VmStackValue> = ListIterator(this)
+        override fun toString(): String = "(vm_stk_cons rest:$rest tos:$tos)"
     }
 
     @SerialName("vm_stk_nil")
@@ -31,6 +32,7 @@ sealed interface VmStackList : Iterable<VmStackValue> {
     object Nil : VmStackList {
         private val iterator = ListIterator(this)
         override fun iterator(): Iterator<VmStackValue> = iterator
+        override fun toString(): String = "vm_stk_nil"
     }
 
     private class ListIterator(
@@ -65,16 +67,11 @@ sealed interface VmStackList : Iterable<VmStackValue> {
 }
 
 private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
-    private val vmStkConsConstructor by lazy {
-        VmStackListConsConstructor(n)
-    }
-    private val vmStkNilConstructor by lazy {
-        VmStackListNilConstructor()
-    }
+    private val vmStkConsConstructor = VmStackListConsConstructor(n)
+    private val vmStkNilConstructor = VmStackListNilConstructor
 
-    override val constructors: List<TlbConstructor<out VmStackList>> by lazy {
+    override val constructors: List<TlbConstructor<out VmStackList>> =
         listOf(vmStkConsConstructor, vmStkNilConstructor)
-    }
 
     override fun getConstructor(value: VmStackList): TlbConstructor<out VmStackList> = when (value) {
         is VmStackList.Cons -> vmStkConsConstructor
@@ -97,9 +94,6 @@ private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
         private val vmStackListCodec by lazy {
             VmStackList.tlbCodec(n - 1)
         }
-        private val vmStackValue by lazy {
-            VmStackValue.tlbCombinator()
-        }
 
         override fun storeTlb(
             cellBuilder: CellBuilder,
@@ -108,7 +102,7 @@ private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
             storeRef {
                 storeTlb(vmStackListCodec, value.rest)
             }
-            storeTlb(vmStackValue, value.tos)
+            storeTlb(VmStackValue, value.tos)
         }
 
         override fun loadTlb(
@@ -117,12 +111,12 @@ private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
             val rest = loadRef {
                 loadTlb(vmStackListCodec)
             }
-            val tos = loadTlb(vmStackValue)
+            val tos = loadTlb(VmStackValue)
             VmStackList.Cons(rest, tos)
         }
     }
 
-    private class VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
+    private object VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
         schema = "vm_stk_nil#_ = VmStackList 0;"
     ) {
         override fun storeTlb(

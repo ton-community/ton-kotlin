@@ -8,6 +8,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_stk_int")
 @Serializable
@@ -49,9 +50,9 @@ data class VmStackInt(
         VmStackNan -> throw VmStackNanException()
     }
 
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmStackInt> = VmStackIntTlbConstructor
-    }
+    override fun toString(): String = "(vm_stk_int value:$value)"
+
+    companion object : TlbConstructorProvider<VmStackInt> by VmStackIntTlbConstructor
 }
 
 private object VmStackIntTlbConstructor : TlbConstructor<VmStackInt>(

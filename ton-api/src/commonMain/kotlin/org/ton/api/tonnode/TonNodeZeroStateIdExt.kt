@@ -3,26 +3,29 @@
 package org.ton.api.tonnode
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.encodeHex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class TonNodeZeroStateIdExt(
-        val workchain: Int,
-        @SerialName("root_hash")
-        @Serializable(Base64ByteArraySerializer::class)
-        val rootHash: ByteArray,
-        @SerialName("file_hash")
-        @Serializable(Base64ByteArraySerializer::class)
-        val fileHash: ByteArray
+    val workchain: Int,
+    @Serializable(Base64ByteArraySerializer::class)
+    val root_hash: ByteArray,
+    @Serializable(Base64ByteArraySerializer::class)
+    val file_hash: ByteArray
 ) {
+    constructor() : this(Workchain.INVALID_WORKCHAIN, ByteArray(0), ByteArray(0))
+
+    fun isValid(): Boolean = workchain != Workchain.INVALID_WORKCHAIN
+
+    fun isMasterchain(): Boolean = workchain == Workchain.MASTERCHAIN_ID
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -30,32 +33,24 @@ data class TonNodeZeroStateIdExt(
         other as TonNodeZeroStateIdExt
 
         if (workchain != other.workchain) return false
-        if (!rootHash.contentEquals(other.rootHash)) return false
-        if (!fileHash.contentEquals(other.fileHash)) return false
+        if (!root_hash.contentEquals(other.root_hash)) return false
+        if (!file_hash.contentEquals(other.file_hash)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = workchain
-        result = 31 * result + rootHash.contentHashCode()
-        result = 31 * result + fileHash.contentHashCode()
+        result = 31 * result + root_hash.contentHashCode()
+        result = 31 * result + file_hash.contentHashCode()
         return result
     }
 
-    override fun toString() = buildString {
-        append("TonNodeZeroStateIdExt(workchain=")
-        append(workchain)
-        append(", rootHash=")
-        append(base64(rootHash))
-        append(", fileHash=")
-        append(base64(fileHash))
-        append(")")
-    }
+    override fun toString() = "($workchain:${root_hash.encodeHex().uppercase()}:${file_hash.encodeHex().uppercase()})"
 
     companion object : TlConstructor<TonNodeZeroStateIdExt>(
-            type = TonNodeZeroStateIdExt::class,
-            schema = "tonNode.zeroStateIdExt workchain:int root_hash:int256 file_hash:int256 = tonNode.ZeroStateIdExt"
+        type = TonNodeZeroStateIdExt::class,
+        schema = "tonNode.zeroStateIdExt workchain:int root_hash:int256 file_hash:int256 = tonNode.ZeroStateIdExt"
     ) {
         override fun decode(input: Input): TonNodeZeroStateIdExt {
             val workchain = input.readIntTl()
@@ -66,8 +61,8 @@ data class TonNodeZeroStateIdExt(
 
         override fun encode(output: Output, value: TonNodeZeroStateIdExt) {
             output.writeIntTl(value.workchain)
-            output.writeFully(value.rootHash)
-            output.writeFully(value.fileHash)
+            output.writeFully(value.root_hash)
+            output.writeFully(value.file_hash)
         }
     }
 }

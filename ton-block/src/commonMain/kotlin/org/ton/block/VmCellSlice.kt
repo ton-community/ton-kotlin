@@ -6,8 +6,8 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_stk_cell")
 @Serializable
@@ -26,14 +26,14 @@ data class VmCellSlice(
         end_ref = cellSlice.refs.size
     )
 
-    companion object : TlbCodec<VmCellSlice> by VmCellSliceTlbConstructor {
-        @JvmStatic
-        fun tlbConstructor(): TlbConstructor<VmCellSlice> = VmCellSliceTlbConstructor
-    }
+    override fun toString(): String =
+        "(vm_stk_slice cell:$cell st_bits:$st_bits end_bits:$end_bits st_ref:$st_ref end_ref:$end_ref)"
+
+    companion object : TlbConstructorProvider<VmCellSlice> by VmCellSliceTlbConstructor
 }
 
 private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
-    schema = "_ cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
+    schema = "vm_stk_slice#04 cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
             "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
 ) {
     override fun storeTlb(

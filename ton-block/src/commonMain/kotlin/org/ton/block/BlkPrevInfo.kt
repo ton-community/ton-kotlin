@@ -20,6 +20,8 @@ sealed interface BlkPrevInfo {
         fun tlbCodec(multiple: Number): TlbCombinator<BlkPrevInfo> =
             BlkPrevInfoTlbCombinator(multiple != 0)
     }
+
+    fun prevs(): List<ExtBlkRef>
 }
 
 private class BlkPrevInfoTlbCombinator(

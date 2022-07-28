@@ -20,14 +20,14 @@ class AdnlTcpClientImpl(
     host: String,
     port: Int,
     publicKey: PublicKey,
-    dispatcher: CoroutineContext,
+    dispatcher: CoroutineContext = Dispatchers.IO,
     logger: Logger = PrintLnLogger("TON ADNL")
 ) : AdnlTcpClient(host, port, publicKey, dispatcher, logger) {
     constructor(
         ipv4: Int,
         port: Int,
         publicKey: PublicKey,
-        dispatcher: CoroutineContext,
+        dispatcher: CoroutineContext = Dispatchers.IO,
         logger: Logger = PrintLnLogger("TON ADNL")
     ) : this(
         ipv4(ipv4),
@@ -58,6 +58,8 @@ class AdnlTcpClientImpl(
         }
         connection.socket.awaitClosed()
     }
+
+    override fun isConnected(): Boolean = !connection.socket.isClosed
 
     private suspend fun performHandshake() {
         val nonce = SecureRandom.nextBytes(160)

@@ -11,8 +11,8 @@ import org.ton.tl.constructors.writeStringTl
 @Serializable
 data class LiteServerError(
     val code: Int,
-    override val message: String
-) : RuntimeException("[$code] $message") {
+    val message: String
+) {
     override fun toString(): String = "[$code] $message"
 
     companion object : TlConstructor<LiteServerError>(

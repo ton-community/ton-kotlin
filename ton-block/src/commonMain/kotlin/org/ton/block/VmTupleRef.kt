@@ -39,6 +39,8 @@ sealed interface VmTupleRef {
 @Serializable
 object VmTupleRefNil : VmTupleRef {
     override fun depth(): Int = 0
+
+    override fun toString(): String = "vm_tupref_nil"
 }
 
 @SerialName("vm_tupref_single")
@@ -47,6 +49,8 @@ data class VmTupleRefSingle(
     val entry: VmStackValue
 ) : VmTupleRef {
     override fun depth(): Int = 1
+
+    override fun toString(): String = "(vm_tupref_single entry:$entry)"
 }
 
 @SerialName("vm_tupref_any")
@@ -55,16 +59,18 @@ data class VmTupleRefAny(
     val ref: VmTuple
 ) : VmTupleRef {
     override fun depth(): Int = ref.depth()
+
+    override fun toString(): String = "(vm_tupref_any ref:$ref)"
 }
 
 private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() {
-    private val nilConstructor by lazy { VmTupleRefNilTlbConstructor() }
-    private val singleConstructor by lazy { VmTupleRefSingleTlbConstructor() }
-    private val anyConstructor by lazy { VmTupleRefAnyTlbConstructor(n) }
+    private val nilConstructor = VmTupleRefNilTlbConstructor
+    private val singleConstructor = VmTupleRefSingleTlbConstructor
+    private val anyConstructor = VmTupleRefAnyTlbConstructor(n)
 
-    override val constructors: List<TlbConstructor<out VmTupleRef>> by lazy {
-        listOf(nilConstructor, singleConstructor, anyConstructor)
-    }
+    override val constructors: List<TlbConstructor<out VmTupleRef>> = listOf(
+        nilConstructor, singleConstructor, anyConstructor
+    )
 
     override fun getConstructor(value: VmTupleRef): TlbConstructor<out VmTupleRef> = when (value) {
         is VmTupleRefNil -> nilConstructor
@@ -80,7 +86,7 @@ private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() 
         }
     }
 
-    private class VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRefNil>(
+    private object VmTupleRefNilTlbConstructor : TlbConstructor<VmTupleRefNil>(
         schema = "vm_tupref_nil\$_ = VmTupleRef 0;"
     ) {
         override fun storeTlb(
@@ -93,16 +99,15 @@ private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() 
         }
     }
 
-    private class VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRefSingle>(
+    private object VmTupleRefSingleTlbConstructor : TlbConstructor<VmTupleRefSingle>(
         schema = "vm_tupref_single\$_ entry:^VmStackValue = VmTupleRef 1;"
     ) {
-        private val vmStackValueCodec by lazy { VmStackValue.tlbCombinator() }
 
         override fun storeTlb(
             cellBuilder: CellBuilder, value: VmTupleRefSingle
         ) = cellBuilder {
             storeRef {
-                storeTlb(vmStackValueCodec, value.entry)
+                storeTlb(VmStackValue, value.entry)
             }
         }
 
@@ -110,7 +115,7 @@ private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() 
             cellSlice: CellSlice
         ): VmTupleRefSingle = cellSlice {
             val entry = loadRef {
-                loadTlb(vmStackValueCodec)
+                loadTlb(VmStackValue)
             }
             VmTupleRefSingle(entry)
         }
@@ -121,7 +126,7 @@ private class VmTupleRefTlbCombinator(val n: Int) : TlbCombinator<VmTupleRef>() 
     ) : TlbConstructor<VmTupleRefAny>(
         schema = "vm_tupref_any\$_ {n:#} ref:^(VmTuple (n + 2)) = VmTupleRef (n + 2);"
     ) {
-        private val vmTupleCodec by lazy { VmTuple.tlbCodec(n - 2) }
+        private val vmTupleCodec = VmTuple.tlbCodec(n - 2)
 
         override fun storeTlb(
             cellBuilder: CellBuilder, value: VmTupleRefAny

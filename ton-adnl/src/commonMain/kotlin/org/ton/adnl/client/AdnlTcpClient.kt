@@ -3,6 +3,9 @@ package org.ton.adnl.client
 import io.ktor.util.collections.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.locks.reentrantLock
+import kotlinx.atomicfu.locks.withLock
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.ton.adnl.ipv4
@@ -31,19 +34,20 @@ abstract class AdnlTcpClient(
     val host: String,
     val port: Int,
     val publicKey: PublicKey,
-    protected val dispatcher: CoroutineContext,
+    protected val dispatcher: CoroutineContext = Dispatchers.IO,
     val logger: Logger = PrintLnLogger("TON ADNL")
 ) {
     constructor(
         ipv4: Int,
         port: Int,
         publicKey: PublicKey,
-        dispatcher: CoroutineContext
+        dispatcher: CoroutineContext = Dispatchers.IO
     ) : this(ipv4(ipv4), port, publicKey, dispatcher)
 
     protected val supervisorJob = SupervisorJob()
     private val outputFlow = MutableSharedFlow<ByteArray>()
     private val inputFlow = MutableSharedFlow<ByteArray>()
+    private val queryLock = reentrantLock()
     private val queryMap = ConcurrentMap<BitString, CompletableDeferred<AdnlMessageAnswer>>()
     private val pingMap = ConcurrentMap<AdnlPing, CompletableDeferred<AdnlPong>>()
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -54,6 +58,8 @@ abstract class AdnlTcpClient(
             disconnect()
         }
     }
+    private var receivedPacketCount by atomic(0L)
+    private var sentPacketCount by atomic(0L)
 
     protected lateinit var input: ByteReadChannel
     protected lateinit var output: ByteWriteChannel
@@ -62,12 +68,16 @@ abstract class AdnlTcpClient(
 
     abstract suspend fun disconnect()
 
-    suspend fun sendQuery(query: ByteArray): ByteArray = suspendCoroutine { continuation ->
-        val queryId = nextQueryId()
-        val adnlMessageQuery = AdnlMessageQuery(queryId.toByteArray(), query)
-        val deferred = CompletableDeferred<AdnlMessageAnswer>()
-        queryMap[queryId] = deferred
+    abstract fun isConnected(): Boolean
 
+    suspend fun sendQuery(query: ByteArray): ByteArray = suspendCoroutine { continuation ->
+        val (queryId, deferred) = queryLock.withLock {
+            val queryId = nextQueryId()
+            val deferred = CompletableDeferred<AdnlMessageAnswer>()
+            queryMap[queryId] = deferred
+            queryId to deferred
+        }
+        val adnlMessageQuery = AdnlMessageQuery(queryId.toByteArray(), query)
         val packet = AdnlMessageQuery.encodeBoxed(adnlMessageQuery)
         CoroutineScope(continuation.context).launch {
             outputFlow.emit(packet)
@@ -141,6 +151,7 @@ abstract class AdnlTcpClient(
         if (flush) {
             output.flush()
         }
+        sentPacketCount++
     }
 
     protected suspend fun receiveRaw(): ByteArray {
@@ -148,20 +159,30 @@ abstract class AdnlTcpClient(
 
         check(length >= 64) { "Too small packet: $length" }
 
-        val nonce = input.readPacket(32).readBytes()
-        val payload = input.readPacket(length - 64).readBytes()
-        val hash = input.readPacket(32).readBytes()
+        val nonce = ByteArray(32).also {
+            input.readFully(it)
+        }
+        val payload = ByteArray(length - 64).also {
+            input.readFully(it)
+        }
+        val hash = ByteArray(32).also {
+            input.readFully(it)
+        }
 
         val actualHash = sha256(nonce, payload)
 
         logger.debug { "RECEIVE: hash:${hash.encodeHex()} length:$length nonce:${hex(nonce)} payload:${hex(payload)}" }
 
         check(hash.contentEquals(actualHash)) {
-            "Invalid hash! expected: ${hex(hash)} actual: ${hex(actualHash)} length:$length nonce:${hex(nonce)} payload: ${
+            "[rcv=$receivedPacketCount snt=$sentPacketCount] Invalid hash! expected: ${hex(hash)} actual: ${
+                hex(
+                    actualHash
+                )
+            } length:$length nonce:${hex(nonce)} payload: ${
                 hex(payload)
             }"
         }
-
+        receivedPacketCount++
         return payload
     }
 

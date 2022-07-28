@@ -3,7 +3,7 @@ package org.ton.cell
 data class LevelMask(
     val mask: Int
 ) {
-    val level: Int get() = 32 - mask.countLeadingZeroBits()
+    val level: Int get() = Int.SIZE_BITS - mask.countLeadingZeroBits()
     val hashIndex: Int
         get() {
             var x = mask
@@ -14,4 +14,9 @@ data class LevelMask(
             return (x + (x shr 16)) and 0x3F
         }
     val hashesCount: Int get() = hashIndex + 1
+
+    fun withLevel(level: Int): LevelMask {
+        require(level shl 32 != 0)
+        return LevelMask(mask and ((1 shl level) - 1))
+    }
 }

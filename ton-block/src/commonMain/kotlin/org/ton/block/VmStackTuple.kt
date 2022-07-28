@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -17,9 +18,9 @@ class VmStackTuple(
 ) : VmStackValue {
     constructor(data: VmTuple) : this(data.depth(), data)
 
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmStackTuple> = VmStackValueTupleConstructor
-    }
+    override fun toString(): String = "(vm_stk_tuple len:$len data:$data)"
+
+    companion object : TlbConstructorProvider<VmStackTuple> by VmStackValueTupleConstructor
 }
 
 private object VmStackValueTupleConstructor : TlbConstructor<VmStackTuple>(

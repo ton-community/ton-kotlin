@@ -11,11 +11,13 @@ kotlin {
                 api(projects.tonLiteApi)
                 api(projects.tonLogger)
                 implementation(libs.serialization.json)
+                implementation(libs.atomicfu)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.coroutines.core)
             }
         }
     }

@@ -1,7 +1,6 @@
 package org.ton.lite.api.liteserver
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
@@ -20,15 +19,13 @@ data class LiteServerMasterchainInfoExt(
     val mode: Int,
     val version: Int,
     val capabilities: Long,
-    val last: TonNodeBlockIdExt,
-    @SerialName("last_utime")
-    val lastUTime: Int,
+    override val last: TonNodeBlockIdExt,
+    val last_utime: Int,
     val now: Int,
-    @SerialName("state_root_hash")
     @Serializable(Base64ByteArraySerializer::class)
-    val stateRootHash: ByteArray,
-    val init: TonNodeZeroStateIdExt
-) {
+    override val state_root_hash: ByteArray,
+    override val init: TonNodeZeroStateIdExt
+) : LiteServerMasterchainInfo {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -39,9 +36,9 @@ data class LiteServerMasterchainInfoExt(
         if (version != other.version) return false
         if (capabilities != other.capabilities) return false
         if (last != other.last) return false
-        if (lastUTime != other.lastUTime) return false
+        if (last_utime != other.last_utime) return false
         if (now != other.now) return false
-        if (!stateRootHash.contentEquals(other.stateRootHash)) return false
+        if (!state_root_hash.contentEquals(other.state_root_hash)) return false
         if (init != other.init) return false
 
         return true
@@ -52,9 +49,9 @@ data class LiteServerMasterchainInfoExt(
         result = 31 * result + version
         result = 31 * result + capabilities.hashCode()
         result = 31 * result + last.hashCode()
-        result = 31 * result + lastUTime
+        result = 31 * result + last_utime
         result = 31 * result + now
-        result = 31 * result + stateRootHash.contentHashCode()
+        result = 31 * result + state_root_hash.contentHashCode()
         result = 31 * result + init.hashCode()
         return result
     }
@@ -69,16 +66,15 @@ data class LiteServerMasterchainInfoExt(
         append(", last=")
         append(last)
         append(", lastUTime=")
-        append(lastUTime)
+        append(last_utime)
         append(", now=")
         append(now)
         append(", stateRootHash=")
-        append(base64(stateRootHash))
+        append(base64(state_root_hash))
         append(", init=")
         append(init)
         append(")")
     }
-
 
     companion object : TlConstructor<LiteServerMasterchainInfoExt>(
         type = LiteServerMasterchainInfoExt::class,
@@ -89,9 +85,9 @@ data class LiteServerMasterchainInfoExt(
             output.writeIntTl(value.version)
             output.writeLongLittleEndian(value.capabilities)
             output.writeTl(TonNodeBlockIdExt, value.last)
-            output.writeIntTl(value.lastUTime)
+            output.writeIntTl(value.last_utime)
             output.writeIntTl(value.now)
-            output.writeInt256Tl(value.stateRootHash)
+            output.writeInt256Tl(value.state_root_hash)
             output.writeTl(TonNodeZeroStateIdExt, value.init)
         }
 

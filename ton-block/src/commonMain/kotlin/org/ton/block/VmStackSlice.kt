@@ -18,7 +18,4 @@ sealed interface VmStackSlice : VmStackValue {
             loadRefs(end_ref - st_ref)
         )
     }
-
-    // TODO: Create cell slice reader without object creation overhead
-    fun asCellSlice(): CellSlice = toCellSlice()
 }

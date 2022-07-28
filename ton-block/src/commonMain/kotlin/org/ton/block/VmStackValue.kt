@@ -8,9 +8,9 @@ import org.ton.bigint.BigInt
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 inline fun VmStackValue(): VmStackValue = VmStackValue.of()
 inline fun VmStackValue(byte: Byte): VmStackTinyInt = VmStackValue.of(byte)
@@ -28,7 +28,7 @@ inline fun VmStackValue(tuple: VmTuple): VmStackTuple = VmStackValue.of(tuple)
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface VmStackValue {
-    companion object : TlbCodec<VmStackValue> by VmStackValueTlbCombinator {
+    companion object : TlbCombinatorProvider<VmStackValue> by VmStackValueTlbCombinator {
         @JvmStatic
         fun of(): VmStackNull = VmStackNull
 
@@ -64,15 +64,12 @@ sealed interface VmStackValue {
 
         @JvmStatic
         fun of(tuple: VmTuple): VmStackTuple = VmStackTuple(tuple)
-
-        @JvmStatic
-        fun tlbCombinator(): TlbCombinator<VmStackValue> = VmStackValueTlbCombinator
     }
 }
 
 private object VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
     private val nullConstructor = VmStackNull.tlbConstructor()
-    private val tinyIntConstructor = VmStackInt.tlbConstructor()
+    private val tinyIntConstructor = VmStackTinyInt.tlbConstructor()
     private val intConstructor = VmStackInt.tlbConstructor()
     private val nanConstructor = VmStackNan.tlbConstructor()
     private val cellConstructor = VmStackCell.tlbConstructor()

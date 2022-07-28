@@ -17,6 +17,8 @@ data class VmTupleTcons(
 ) : VmTuple {
     override fun depth(): Int = head.depth() + 1
 
+    override fun toString(): String = "(vm_tuple_tcons head:$head tail:$tail)"
+
     companion object {
         @JvmStatic
         fun tlbCodec(n: Int): TlbConstructor<VmTupleTcons> = VmTupleTconsTlbConstructor(n)

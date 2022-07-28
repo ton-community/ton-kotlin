@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.crypto
 
 import kotlin.experimental.or
@@ -24,3 +26,10 @@ private val rev8tab = hex(buildString {
 fun Byte.reverse() = rev8tab[this.toInt()]
 
 fun Short.reverse() = rev8tab[this.toInt() shr 8].toShort() or (rev8tab[this.toInt() and 0xff].toInt() shl 8).toShort()
+
+inline fun lowerBits64(x: ULong) = x and bitsNegative64(x)
+inline fun bitsNegative64(x: ULong) = x.inv() + 1u
+inline fun ULong.toBoolean() = this != 0uL
+inline fun Long.toBoolean() = this != 0L
+inline fun UInt.toBoolean() = this != 0u
+inline fun Int.toBoolean() = this != 0

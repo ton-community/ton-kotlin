@@ -2,6 +2,7 @@ package org.ton.lite.api.liteserver
 
 import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.crypto.hex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
@@ -31,12 +32,22 @@ data class LiteServerTransactionList(
         return result
     }
 
+    override fun toString(): String = buildString {
+        append("(")
+        append("ids:")
+        append(ids)
+        append(" transactions:")
+        append(hex(transactions).uppercase())
+        append(")")
+    }
+
     companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
 }
 
 private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServerTransactionList>(
     type = LiteServerTransactionList::class,
-    schema = "liteServer.transactionList ids:(vector tonNode.blockIdExt) transactions:bytes = liteServer.TransactionList"
+    schema = "liteServer.transactionList ids:(vector tonNode.blockIdExt) transactions:bytes = liteServer.TransactionList",
+    id = 1864812043
 ) {
     override fun decode(input: Input): LiteServerTransactionList {
         val ids = input.readVectorTl(TonNodeBlockIdExt)

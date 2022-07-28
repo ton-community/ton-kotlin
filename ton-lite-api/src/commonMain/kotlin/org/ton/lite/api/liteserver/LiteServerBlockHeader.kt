@@ -3,6 +3,7 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.boc.BagOfCells
 import org.ton.crypto.hex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -19,7 +20,7 @@ data class LiteServerBlockHeader(
     val mode: Int,
     val header_proof: ByteArray
 ) {
-
+    fun headerProofBagOfCell() = BagOfCells(header_proof)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -42,12 +43,12 @@ data class LiteServerBlockHeader(
     }
 
     override fun toString(): String = buildString {
-        append("LiteServerBlockHeader(id=")
+        append("(id: ")
         append(id)
-        append(", mode=")
+        append(" mode:")
         append(mode)
-        append(", header_proof=")
-        append(hex(header_proof))
+        append(" header_proof:")
+        append(hex(header_proof).uppercase())
         append(")")
     }
 

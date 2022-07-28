@@ -26,11 +26,12 @@ class DataCell private constructor(
         }
     }
 
-    private val hash by lazy {
-        sha256(representation())
+    private val cachedHash: ByteArray by lazy {
+        hash(this)
     }
+
     private val hashCode by lazy {
-        hash.contentHashCode()
+        hash().contentHashCode()
     }
 
     override val isExotic: Boolean = cellType.isExotic
@@ -51,7 +52,7 @@ class DataCell private constructor(
     }
 
     override fun loadCell(): Cell =
-        when(cellType) {
+        when (cellType) {
             ORDINARY -> this
             PRUNED_BRANCH -> error("Can't load pruned branch cell")
             LIBRARY_REFERENCE -> TODO()
@@ -63,7 +64,9 @@ class DataCell private constructor(
 
     override fun descriptors(): ByteArray = byteArrayOf(referencesDescriptor(), bitsDescriptor())
 
-    override fun hash(): ByteArray = hash
+    override fun hash(): ByteArray {
+        return cachedHash
+    }
 
     override fun toString(): String = buildString {
         Cell.toString(cell = this@DataCell, appendable = this, firstChild = true, lastChild = true)
@@ -124,6 +127,14 @@ class DataCell private constructor(
         ): DataCell {
             Cell.checkRefsCount(refs.size)
             return DataCell(bits, refs.toList(), ORDINARY)
+        }
+
+        fun hash(cell: DataCell): ByteArray {
+            if (cell.isPruned) {
+                val position = 1 + (cell.levelMask.level * 32)
+                return cell.bits.toByteArray().copyOfRange(position, position + 32)
+            }
+            return sha256(cell.representation())
         }
     }
 }

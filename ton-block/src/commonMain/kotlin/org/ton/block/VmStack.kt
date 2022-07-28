@@ -30,6 +30,8 @@ interface VmStack : Collection<VmStackValue> {
     override val size: Int get() = depth
     override fun isEmpty(): Boolean = depth <= 0
 
+    fun toMutableVmStack(): MutableVmStack
+
     operator fun get(index: Int): VmStackValue {
         forEachIndexed { currentIndex, vmStackValue ->
             if (currentIndex == index) {
@@ -52,7 +54,7 @@ interface MutableVmStack : VmStack {
     fun popBool() = popTinyInt() != 0L
     fun popInt() = (pop() as VmStackInt).value
     fun popCell() = (pop() as VmStackCell).cell
-    fun popSlice() = (pop() as VmStackSlice).asCellSlice()
+    fun popSlice() = (pop() as VmStackSlice).toCellSlice()
     fun popBuilder() = (pop() as VmStackBuilder).toCellBuilder()
     fun popCont() = (pop() as VmStackCont).cont
     fun popTuple() = (pop() as VmStackTuple).data
@@ -83,12 +85,18 @@ data class VmStackImpl(
     override val stack: VmStackList
 ) : VmStack {
     constructor(stack: VmStackList) : this(stack.count(), stack)
+
+    override fun toMutableVmStack(): MutableVmStack = MutableVmStackImpl(stack)
+
+    override fun toString(): String = "(vm_stack depth:$depth stack:$stack)"
 }
 
 inline fun MutableVmStack(): MutableVmStack = MutableVmStackImpl()
 
-class MutableVmStackImpl : MutableVmStack {
-    private val _stack = ArrayDeque<VmStackValue>()
+class MutableVmStackImpl(
+    iterable: Iterable<VmStackValue> = emptyList()
+) : MutableVmStack {
+    private val _stack = ArrayDeque<VmStackValue>().also { it.addAll(iterable) }
     override val depth: Int get() = _stack.size
 
     override val stack: VmStackList get() = VmStackList(_stack)
@@ -100,12 +108,16 @@ class MutableVmStackImpl : MutableVmStack {
         _stack.addLast(stackValue)
     }
 
+    override fun toMutableVmStack(): MutableVmStack = this
+
     override fun interchange(i: Int, j: Int) {
         val iStackValue = _stack[i]
         val jStackValue = _stack[j]
         _stack[i] = jStackValue
         _stack[j] = iStackValue
     }
+
+    override fun toString(): String = "(vm_stack depth:$depth stack:$stack)"
 }
 
 private object VmStackTlbConstructor : TlbConstructor<VmStack>(
