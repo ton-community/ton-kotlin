@@ -79,13 +79,82 @@ functionality is provided by a `BagOfCells` interface.
 ## ton-cell
 
 TON Blockchain and Virtual Machine represent all data as so-called cells, where each cell consists of up to 1023 bits
-and can contain up to 4 references to other cells, circular references are not allowed. In ton-kotlin, they are
-represented by the `Cell` interface.
+of data and can contain up to 4 references to other cells, circular references are not allowed. In ton-kotlin, they are
+implemented by the `Cell` interface.
 
-Once again, cells themselves are immutable - in order to manipulate with them, two extra interfaces are provided:
+```kotlin
+Cell(BitString("B_"))  // Create from a bitstring
+Cell("B_")             // Same as the above 
+Cell("A_", Cell("B_")) // Cell containing a reference to another cell
+```
 
-- `CellBuilder`, that contains helpful definitions to construct new cells
-- `CellSlice`, providing functionality to read cells
+`CellSlice` is used to read data from cells as bits, bytes, integers, other cells, and data structures with TL-B
+schema (see [ton-tlb](#ton-tlb)). Its interface is similar to FunC's
+[slice primitives](https://ton.org/docs/#/func/stdlib?id=slice-primitives).
+
+```kotlin
+val cs = Cell("2432B6363796102BB7B93632108000522AFFFFFFFFFFEB1E", Cell("B_"))
+    .beginParse() // Create cell slice instance
+
+cs.preloadBit()       // false - peek next bit without moving the cursor forward
+cs.skipBits(1)        // Skip one bit
+cs.loadBits(13 * 8)   // Load 13 bytes as a bitstring
+    .toByteArray()    // Convert to bytes
+    .decodeToString() // "Hello, World!" - decode to string
+cs.loadUInt(32)       // 42069 - Load 32-bit unsigned integer
+cs.loadInt(53)        // -1337 - Load 53-bit signed integer
+cs.loadBits(2)        // "9_" - Load 2 bits
+cs.loadRef()          // "x{B_}" - Load cell reference
+
+cs.endParse()         // Finish parsing. This ensures that the entire slice was consumed
+```
+
+It is strongly advised to call `endParse()` when done parsing, it will throw an exception in case some data left
+unprocessed, which is generally a sign of incorrect/incomplete parsing algorithm. Use `parse { }` when possible.
+
+```kotlin
+Cell("2432B6363796102BB7B93632108000522AFFFFFFFFFFEB1E", Cell("B_"))
+    .parse { // this: CellSlice
+        loadBit()
+        loadBits(13 * 8).toByteArray().decodeToString()
+        loadUInt(32)
+        loadInt(53)
+        loadBits(2)
+        loadRef()
+    } // Automatically calls endParse() at the end
+```
+
+`CellBuilder` is used to construct new cells by storing bits, bytes, integers, cell slices, other cells, and data
+structures with TL-B schema (see [ton-tlb](#ton-tlb)). Its interface is similar to
+FunC's [builder primitives](https://ton.org/docs/#/func/stdlib?id=builder-primitives).
+
+```kotlin
+CellBuilder.beginCell()                        // Create builder instance
+    .storeBit(false)                           // Store a single 0 bit
+    .storeBytes("Hello, World!".toByteArray()) // Store string's byte representation
+    .storeUInt(42069, 32)                      // Store 32-bit unsigned integer
+    .storeInt(-1337, 53)                       // Store 53-bit signed integer
+    .storeSlice(Cell("A_").beginParse())       // Store cell slice
+    .storeRef(Cell("B_"))                      // Store a reference to another cell
+    .endCell()                                 // Assemble a cell
+```
+
+Slick kotlin-style builder interface is also available, it is functionally the same but calls `beginCell()`
+and `endCell()` automatically. Note how `storeRef { }` creates a new builder to construct referenced cell. This makes it
+easy to build complex nested cells.
+
+```kotlin
+CellBuilder.createCell { // this: CellBuilder
+    storeBit(false)
+    storeBytes("Hello, World!".toByteArray())
+    storeUInt(42069, 32)
+    storeInt(-1337, 53)
+    storeSlice(Cell("A_").beginParse())
+    storeRef { // this: CellBuilder - a new instance of a builder is created to construct this nested cell
+        storeBits(true, false, true)
+    }
+}
+```
 
 ## ton-crypto
 
