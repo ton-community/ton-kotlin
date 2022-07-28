@@ -74,7 +74,12 @@ require(a == c) // Success
 
 In order to store and transfer cells in a portable way, TON defines a collection of cells as bag-of-cells (BoC),
 alongside an algorithm to serialize (write) and deserialize (read) it to/from a series of bytes. In ton-kotlin this
-functionality is provided by a `BagOfCells` interface.
+functionality is provided by the `BagOfCells` interface.
+
+```kotlin
+BagOfCells(hex("b5ee9c72010101010003000001b0")).roots.first() // "x{B_}" - Loaded from byte array
+BagOfCells(Cell("B_")).toByteArray()                          // b5ee9c72010101010003000001b0 - Serialized to byte array
+```
 
 ## ton-cell
 
