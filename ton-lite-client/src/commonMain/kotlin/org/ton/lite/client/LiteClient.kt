@@ -230,10 +230,20 @@ open class LiteClient(
         return blockHeader.id
     }
 
-    suspend fun getBlock(blockId: TonNodeBlockIdExt): Block {
+    suspend fun getBlock(blockId: TonNodeBlockIdExt, timeout: Duration) = withTimeoutOrNull(timeout) {
+        var result: Block? = null
+        while (isActive && result == null) {
+            result = getBlock(blockId)
+        }
+        result
+    }
+
+    suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
         init()
         val blockData = try {
             liteApi.getBlock(blockId)
+        } catch (e: TonNotReadyException) {
+            return null
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
