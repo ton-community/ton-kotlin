@@ -448,18 +448,16 @@ open class LiteClient(
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
+        val resultBytes = checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
         // TODO: check proofs
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
-        val stack = result.result?.let {
-            val boc = BagOfCells(it)
-            try {
-                boc.first().parse(VmStack)
-            } catch (e: Exception) {
-                throw RuntimeException("Can't parse result for $method@$address($params)", e)
-            }
-        } ?: throw IllegalStateException("exit code: $exitCode")
-        return stack
+        val boc = BagOfCells(resultBytes)
+        return try {
+            boc.first().parse(VmStack)
+        } catch (e: Exception) {
+            throw RuntimeException("Can't parse result for $method@$address($params)", e)
+        }
     }
 
     suspend fun resolveDns(domain: String, category: Int = 0) {
