@@ -39,6 +39,9 @@ data class Coins(
 
         @JvmStatic
         fun ofNano(coins: Long): Coins = Coins(VarUInteger(coins))
+
+        @JvmStatic
+        fun ofNano(coins: BigInt): Coins = Coins(VarUInteger(coins))
     }
 }
 

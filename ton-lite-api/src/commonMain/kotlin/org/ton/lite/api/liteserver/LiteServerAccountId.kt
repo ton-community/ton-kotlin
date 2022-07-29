@@ -6,6 +6,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain
+import org.ton.bitstring.BitString
 import org.ton.block.AddrStd
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
@@ -22,6 +23,7 @@ data class LiteServerAccountId(
     @Serializable(Base64ByteArraySerializer::class)
     val id: ByteArray
 ) {
+    constructor(workchain: Int, id: BitString) : this(workchain, id.toByteArray())
     constructor() : this(Workchain.INVALID_WORKCHAIN, ByteArray(32))
     constructor(string: String) : this(AddrStd(string))
 

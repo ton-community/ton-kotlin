@@ -337,7 +337,7 @@ open class LiteClient(
     ): AccountInfo? = getAccount(parseAccountId(address), mode)
 
     suspend fun getAccount(
-        address: LiteServerAccountId,
+        address: LiteServerAccountId?,
         mode: Int = 0
     ): AccountInfo? {
         init()
@@ -345,17 +345,18 @@ open class LiteClient(
     }
 
     suspend fun getAccount(
-        address: String,
+        address: String?,
         blockId: TonNodeBlockIdExt,
         mode: Int = 0
-    ): AccountInfo? = getAccount(parseAccountId(address), blockId, mode)
+    ): AccountInfo? = getAccount(address?.let { parseAccountId(address) }, blockId, mode)
 
     suspend fun getAccount(
-        address: LiteServerAccountId,
+        address: LiteServerAccountId?,
         blockId: TonNodeBlockIdExt,
         mode: Int = 0
     ): AccountInfo? {
         init()
+        if (address == null) return null
         logger.debug {
             "requesting account state for ${address.workchain}:${
                 address.id.encodeHex().uppercase()
@@ -376,8 +377,9 @@ open class LiteClient(
         address: LiteServerAccountId,
         methodName: String,
         vararg params: VmStackValue
-    ): Pair<Int, VmStack?> {
+    ): VmStack {
         init()
+        logger.debug { "run: $address - ${params.toList()}" }
         return runSmcMethod(
             address,
             lastMasterchainBlockId,
@@ -390,7 +392,7 @@ open class LiteClient(
         address: LiteServerAccountId,
         method: Long,
         vararg params: VmStackValue
-    ): Pair<Int, VmStack?> {
+    ): VmStack {
         init()
         return runSmcMethod(address, lastMasterchainBlockId, method, params.asIterable())
     }
@@ -399,7 +401,7 @@ open class LiteClient(
         address: LiteServerAccountId,
         methodName: String,
         params: Iterable<VmStackValue>
-    ): Pair<Int, VmStack?> {
+    ): VmStack {
         init()
         return runSmcMethod(address, lastMasterchainBlockId, LiteServerRunSmcMethod.methodId(methodName), params)
     }
@@ -408,7 +410,7 @@ open class LiteClient(
         address: LiteServerAccountId,
         method: Long,
         params: Iterable<VmStackValue>
-    ): Pair<Int, VmStack?> {
+    ): VmStack {
         init()
         return runSmcMethod(address, lastMasterchainBlockId, method, params)
     }
@@ -439,7 +441,7 @@ open class LiteClient(
         blockId: TonNodeBlockIdExt,
         method: Long,
         params: Iterable<VmStackValue>
-    ): Pair<Int, VmStack?> {
+    ): VmStack {
         init()
         val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
         check((!blockId.isValid()) || blockId == result.id) {
@@ -453,8 +455,22 @@ open class LiteClient(
             } catch (e: Exception) {
                 throw RuntimeException("Can't parse result for $method@$address($params)", e)
             }
+        } ?: throw IllegalStateException("exit code: $exitCode")
+        return stack
+    }
+
+    suspend fun resolveDns(domain: String, category: Int = 0) {
+        init()
+        return resolveDns(lastMasterchainBlockId, domain, category)
+    }
+
+    suspend fun resolveDns(blockId: TonNodeBlockIdExt, domain: String, category: Int = 0) {
+        require(domain.length <= 1023) { "domain name too long" }
+        domain.forEach { char ->
+            require(char.code < 0xfe && char > ' ') {
+                "invalid characters in a domain name"
+            }
         }
-        return exitCode to stack
     }
 
     private suspend fun parseLine() {

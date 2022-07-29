@@ -27,7 +27,7 @@ data class VmCellSlice(
     )
 
     override fun toString(): String =
-        "(vm_stk_slice cell:$cell st_bits:$st_bits end_bits:$end_bits st_ref:$st_ref end_ref:$end_ref)"
+        "(vm_stk_slice cell:${if (st_ref == 0 && end_ref == 0) cell.bits.toString() else cell.toString()} st_bits:$st_bits end_bits:$end_bits st_ref:$st_ref end_ref:$end_ref)"
 
     companion object : TlbConstructorProvider<VmCellSlice> by VmCellSliceTlbConstructor
 }

@@ -50,9 +50,9 @@ interface VmStack : Collection<VmStackValue> {
 interface MutableVmStack : VmStack {
     fun pop(): VmStackValue
     fun popNull() = pop() as VmStackNull
-    fun popTinyInt() = (pop() as VmStackNumber).toLong()
+    fun popTinyInt() = popNumber().toLong()
     fun popBool() = popTinyInt() != 0L
-    fun popInt() = (pop() as VmStackInt).value
+    fun popInt() = popNumber().toBigInt()
     fun popNumber() = (pop() as VmStackNumber)
     fun popCell() = (pop() as VmStackCell).cell
     fun popSlice() = (pop() as VmStackSlice).toCellSlice()

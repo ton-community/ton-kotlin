@@ -62,7 +62,7 @@ interface CellSlice {
         fun beginParse(cell: Cell): CellSlice = of(cell.bits, cell.refs)
 
         @JvmStatic
-        fun of(bits: BitString, refs: List<Cell>): CellSlice {
+        fun of(bits: BitString, refs: List<Cell> = emptyList()): CellSlice {
             return if (bits is ByteBackedBitString) {
                 CellSliceByteBackedBitString(bits, refs)
             } else {
