@@ -53,6 +53,7 @@ interface MutableVmStack : VmStack {
     fun popTinyInt() = (pop() as VmStackNumber).toLong()
     fun popBool() = popTinyInt() != 0L
     fun popInt() = (pop() as VmStackInt).value
+    fun popNumber() = (pop() as VmStackNumber)
     fun popCell() = (pop() as VmStackCell).cell
     fun popSlice() = (pop() as VmStackSlice).toCellSlice()
     fun popBuilder() = (pop() as VmStackBuilder).toCellBuilder()
