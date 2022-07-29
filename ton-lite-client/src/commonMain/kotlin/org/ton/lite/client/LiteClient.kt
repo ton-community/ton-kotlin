@@ -101,7 +101,7 @@ open class LiteClient(
     }
 
     private suspend fun init() {
-        if (isInit) return
+        if (isInit && adnl.isConnected()) return
         isInit = true
         try {
             adnl.connect()
@@ -371,6 +371,7 @@ open class LiteClient(
                 address.id.encodeHex().uppercase()
             } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
         }
+        if (accountState.state.isEmpty()) return null
         val stateBoc = accountState.stateBagOfCells()
         return stateBoc.first().parse(Account) as? AccountInfo
     }
@@ -381,7 +382,6 @@ open class LiteClient(
         vararg params: VmStackValue
     ): VmStack = coroutineScope {
         init()
-        logger.debug { "run: $address - ${params.toList()}" }
         runSmcMethod(
             address,
             lastMasterchainBlockId,
@@ -443,8 +443,9 @@ open class LiteClient(
         blockId: TonNodeBlockIdExt,
         method: Long,
         params: Iterable<VmStackValue>
-    ): VmStack = coroutineScope {
+    ): VmStack {
         init()
+        logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
@@ -454,7 +455,7 @@ open class LiteClient(
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
         val boc = BagOfCells(resultBytes)
-        try {
+        return try {
             boc.first().parse(VmStack)
         } catch (e: Exception) {
             throw RuntimeException("Can't parse result for $method@$address($params)", e)

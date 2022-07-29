@@ -25,6 +25,7 @@ import org.ton.logger.PrintLnLogger
 import org.ton.tl.TlCombinator
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
@@ -44,15 +45,15 @@ abstract class AdnlTcpClient(
         dispatcher: CoroutineContext = Dispatchers.IO
     ) : this(ipv4(ipv4), port, publicKey, dispatcher)
 
-    protected val supervisorJob = SupervisorJob()
+    protected lateinit var supervisorJob: CompletableJob
     private val outputFlow = MutableSharedFlow<ByteArray>()
     private val inputFlow = MutableSharedFlow<ByteArray>()
     private val queryLock = reentrantLock()
-    private val queryMap = ConcurrentMap<BitString, CompletableDeferred<AdnlMessageAnswer>>()
+    protected val queryMap = ConcurrentMap<BitString, CompletableDeferred<AdnlMessageAnswer>>()
     private val pingMap = ConcurrentMap<AdnlPing, CompletableDeferred<AdnlPong>>()
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         logger.fatal {
-            throwable.stackTraceToString()
+            throwable.toString()
         }
         runBlocking {
             disconnect()
@@ -80,9 +81,28 @@ abstract class AdnlTcpClient(
         val adnlMessageQuery = AdnlMessageQuery(queryId.toByteArray(), query)
         val packet = AdnlMessageQuery.encodeBoxed(adnlMessageQuery)
         CoroutineScope(continuation.context).launch {
-            outputFlow.emit(packet)
-            val answer = deferred.await().answer
-            continuation.resume(answer)
+            var retry = 1
+            while (true) {
+                try {
+                    outputFlow.emit(packet)
+                    val answer = withTimeoutOrNull(3000) {
+                        deferred.await().answer
+                    }
+                    if (answer != null) {
+                        continuation.resume(answer)
+                        break
+                    }
+                } catch (e: Exception) {
+                    if (!isConnected()) {
+                        connect()
+                    }
+                    logger.warn { "Retry... $retry" }
+                    if (retry++ == 3) {
+                        continuation.resumeWithException(e)
+                        break
+                    }
+                }
+            }
         }
     }
 
@@ -99,6 +119,7 @@ abstract class AdnlTcpClient(
     }
 
     protected fun launchIoJob() {
+        supervisorJob = SupervisorJob()
         CoroutineScope(dispatcher + supervisorJob + exceptionHandler + CoroutineName("ADNL I/O INPUT")).launch {
             outputFlow.collect { outputPacket ->
                 sendRaw(outputPacket)
@@ -120,6 +141,7 @@ abstract class AdnlTcpClient(
                         }
                         deferred.complete(adnlPacket)
                     }
+
                     is AdnlPong -> {
                         val value = AdnlPing(adnlPacket.value)
                         val deferred = requireNotNull(pingMap[value]) {
@@ -127,6 +149,7 @@ abstract class AdnlTcpClient(
                         }
                         deferred.complete(adnlPacket)
                     }
+
                     is AdnlPing -> {
                         val value = adnlPacket.value
                         val adnlPong = AdnlPong(value)

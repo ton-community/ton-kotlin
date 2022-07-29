@@ -57,6 +57,7 @@ class AdnlTcpClientImpl(
             connection.socket.close()
         }
         connection.socket.awaitClosed()
+        queryMap.clear()
     }
 
     override fun isConnected(): Boolean = !connection.socket.isClosed
