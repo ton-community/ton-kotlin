@@ -10,6 +10,7 @@ import kotlinx.datetime.Instant
 import org.ton.adnl.client.AdnlTcpClient
 import org.ton.adnl.client.AdnlTcpClientImpl
 import org.ton.api.exception.TonNotReadyException
+import org.ton.api.exception.TvmException
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.api.tonnode.*
 import org.ton.block.*
@@ -449,9 +450,11 @@ open class LiteClient(
         }
         // TODO: check proofs
         val exitCode = result.exitCode
+        if (exitCode != 0) throw TvmException(exitCode)
         val stack = result.result?.let {
+            val boc = BagOfCells(it)
             try {
-                BagOfCells(it).first().parse(VmStack)
+                boc.first().parse(VmStack)
             } catch (e: Exception) {
                 throw RuntimeException("Can't parse result for $method@$address($params)", e)
             }
