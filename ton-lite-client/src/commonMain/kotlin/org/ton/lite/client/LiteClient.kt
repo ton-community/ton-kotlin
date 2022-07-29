@@ -2,6 +2,7 @@ package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -378,10 +379,10 @@ open class LiteClient(
         address: LiteServerAccountId,
         methodName: String,
         vararg params: VmStackValue
-    ): VmStack {
+    ): VmStack = coroutineScope {
         init()
         logger.debug { "run: $address - ${params.toList()}" }
-        return runSmcMethod(
+        runSmcMethod(
             address,
             lastMasterchainBlockId,
             LiteServerRunSmcMethod.methodId(methodName),
@@ -393,27 +394,27 @@ open class LiteClient(
         address: LiteServerAccountId,
         method: Long,
         vararg params: VmStackValue
-    ): VmStack {
+    ): VmStack = coroutineScope {
         init()
-        return runSmcMethod(address, lastMasterchainBlockId, method, params.asIterable())
+        runSmcMethod(address, lastMasterchainBlockId, method, params.asIterable())
     }
 
     suspend fun runSmcMethod(
         address: LiteServerAccountId,
         methodName: String,
         params: Iterable<VmStackValue>
-    ): VmStack {
+    ): VmStack = coroutineScope {
         init()
-        return runSmcMethod(address, lastMasterchainBlockId, LiteServerRunSmcMethod.methodId(methodName), params)
+        runSmcMethod(address, lastMasterchainBlockId, LiteServerRunSmcMethod.methodId(methodName), params)
     }
 
     suspend fun runSmcMethod(
         address: LiteServerAccountId,
         method: Long,
         params: Iterable<VmStackValue>
-    ): VmStack {
+    ): VmStack = coroutineScope {
         init()
-        return runSmcMethod(address, lastMasterchainBlockId, method, params)
+        runSmcMethod(address, lastMasterchainBlockId, method, params)
     }
 
     suspend fun runSmcMethod(
@@ -442,7 +443,7 @@ open class LiteClient(
         blockId: TonNodeBlockIdExt,
         method: Long,
         params: Iterable<VmStackValue>
-    ): VmStack {
+    ): VmStack = coroutineScope {
         init()
         val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
         check((!blockId.isValid()) || blockId == result.id) {
@@ -453,7 +454,7 @@ open class LiteClient(
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
         val boc = BagOfCells(resultBytes)
-        return try {
+        try {
             boc.first().parse(VmStack)
         } catch (e: Exception) {
             throw RuntimeException("Can't parse result for $method@$address($params)", e)
