@@ -28,6 +28,8 @@ abstract class TlConstructor<T : Any>(
 
     fun <R : Any> Output.writeBoxedTl(codec: TlCodec<R>, value: R) = codec.encodeBoxed(this, value)
 
+    abstract override fun decode(input: Input): T
+
     override fun decodeBoxed(input: Input): T {
         val actualId = input.readIntTl()
         require(actualId == id) { "Invalid ID. expected: $id actual: $actualId" }

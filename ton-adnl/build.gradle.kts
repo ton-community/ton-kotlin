@@ -20,6 +20,18 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.coroutines.core)
+                implementation(libs.coroutines.test)
+                implementation(libs.coroutines.debug)
+                implementation(libs.ktor.client.cio)
+                implementation(libs.ktor.utils)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.coroutines.jvm)
+                implementation(libs.ktor.client.cio)
+                implementation(libs.ktor.utils)
             }
         }
     }

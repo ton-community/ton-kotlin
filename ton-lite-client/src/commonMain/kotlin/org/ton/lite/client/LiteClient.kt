@@ -1,18 +1,15 @@
 package org.ton.lite.client
 
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.ton.adnl.client.AdnlTcpClient
-import org.ton.adnl.client.AdnlTcpClientImpl
+import org.ton.adnl.ipv4
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
-import org.ton.api.pub.PublicKeyEd25519
 import org.ton.api.tonnode.*
 import org.ton.block.*
 import org.ton.boc.BagOfCells
@@ -27,6 +24,7 @@ import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tlb.parse
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -34,15 +32,14 @@ import kotlin.time.Duration.Companion.seconds
 fun LiteClient(block: LiteClientConfig.() -> Unit) = LiteClient(LiteClientConfig(block))
 
 open class LiteClient(
-    val adnl: AdnlTcpClient,
     val config: LiteClientConfig = LiteClientConfig(),
     private val logger: Logger = PrintLnLogger("TON LiteClient")
-) : Closeable {
-    constructor(config: LiteClientConfig, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
-        AdnlTcpClientImpl(config.ipv4, config.port, PublicKeyEd25519(config.publicKey)),
-        config,
-        logger
-    )
+) : Closeable, CoroutineScope {
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
+
+    private val socket = aSocket(SelectorManager())
+        .tcp()
+        .connect(ipv4(config.ipv4), config.port)
 
     val liteApi: LiteApi = LiteApi {
         adnl.sendQuery(it)

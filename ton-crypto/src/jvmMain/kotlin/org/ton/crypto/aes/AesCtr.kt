@@ -1,8 +1,8 @@
 package org.ton.crypto.aes
 
 import io.ktor.utils.io.core.*
+import org.ton.crypto.cipherLoop
 import javax.crypto.Cipher
-import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
@@ -10,24 +10,18 @@ actual class AesCtr actual constructor(
     key: ByteArray,
     iv: ByteArray,
 ) {
-    private val secretKey: SecretKey = SecretKeySpec(key, "AES")
-    private val iv = IvParameterSpec(iv)
-    private val encryptCipher = Cipher.getInstance("AES/CTR/NoPadding").also {
-        it.init(Cipher.ENCRYPT_MODE, secretKey, this.iv)
-    }
-    private val decryptCipher = Cipher.getInstance("AES/CTR/NoPadding").also {
-        it.init(Cipher.DECRYPT_MODE, secretKey, this.iv)
+    private val _cipher = Cipher.getInstance("AES/CTR/NoPadding").also {
+        it.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(iv))
     }
 
     actual fun encrypt(byteArray: ByteArray): ByteArray {
         if (byteArray.isEmpty()) return byteArray
-        return encryptCipher.update(byteArray)
+        return encrypt(ByteReadPacket(byteArray)).readBytes()
     }
 
-    actual suspend fun encrypt(packet: suspend BytePacketBuilder.() -> Unit): ByteReadPacket {
-        val builder = BytePacketBuilder()
-        packet(builder)
-        val encrypted = encrypt(builder.build().readBytes())
-        return ByteReadPacket(encrypted)
-    }
+    actual fun encrypt(byteReadPacket: ByteReadPacket): ByteReadPacket = byteReadPacket.cipherLoop(_cipher)
+
+    suspend fun encrypt(packet: suspend BytePacketBuilder.() -> Unit = {}): ByteReadPacket = encrypt(buildPacket {
+        packet()
+    })
 }
