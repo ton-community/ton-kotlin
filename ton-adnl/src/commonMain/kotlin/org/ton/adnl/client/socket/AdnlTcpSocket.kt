@@ -1,4 +1,4 @@
-package org.ton.adnl.client
+package org.ton.adnl.client.socket
 
 import io.ktor.network.sockets.*
 import io.ktor.network.util.*
@@ -13,17 +13,20 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.withContext
+import org.ton.adnl.client.AdnlClientHandshake
+import org.ton.adnl.client.AdnlConfig
+import org.ton.adnl.client.AdnlConfigBuilder
+import org.ton.adnl.client.AdnlPacket
 import kotlin.coroutines.CoroutineContext
-import kotlin.random.Random
 
 suspend fun Socket.adnl(
     coroutineContext: CoroutineContext,
-    block: AdnlTcpConfigBuilder.() -> Unit
-): Socket = adnl(coroutineContext, AdnlTcpConfigBuilder().apply(block).build())
+    block: AdnlConfigBuilder.() -> Unit
+): Socket = adnl(coroutineContext, AdnlConfigBuilder().apply(block).build())
 
 suspend fun Socket.adnl(
     context: CoroutineContext,
-    config: AdnlTcpConfig
+    config: AdnlConfig
 ): Socket {
     val reader = openReadChannel()
     val writer = openWriteChannel()
@@ -43,7 +46,7 @@ fun openAdnlSession(
     socket: Socket,
     input: ByteReadChannel,
     output: ByteWriteChannel,
-    config: AdnlTcpConfig,
+    config: AdnlConfig,
     context: CoroutineContext
 ): Socket {
     val handshake = try {
@@ -73,9 +76,9 @@ private class AdnlTcpSocket(
 
     private suspend fun dataInputLoop(pipe: ByteWriteChannel) {
         try {
-            input.consumeEach { adnlPacket ->
-                val packet = adnlPacket.data
-                pipe.writePacket(packet)
+            input.consumeEach { packet ->
+                val payload = packet.payload
+                pipe.writePacket(payload)
                 pipe.flush()
             }
         } catch (_: Throwable) {
@@ -91,9 +94,11 @@ private class AdnlTcpSocket(
                 val rc = pipe.readAvailable(buffer)
                 if (rc == -1) break
                 buffer.flip()
-                output.send(AdnlPacket(buildPacket {
-                    writeFully(buffer)
-                }, Random.nextBytes(32)))
+                output.send(
+                    AdnlPacket {
+                        writeFully(buffer)
+                    }
+                )
             }
         } finally {
             output.close()

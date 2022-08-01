@@ -25,6 +25,7 @@ kotlin {
                 implementation(libs.coroutines.debug)
                 implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.utils)
+                implementation(projects.tonCrypto)
             }
         }
         val jvmTest by getting {

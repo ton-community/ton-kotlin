@@ -2,24 +2,30 @@ package org.ton.adnl.client
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.debug.junit4.CoroutinesTimeout
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.junit.Rule
-import org.junit.Test
 import org.ton.adnl.ipv4
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.base64
+import org.ton.crypto.hex
+import kotlin.math.ceil
 import kotlin.random.Random
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 class ClientConnectionTest {
     @get:Rule
     val timeout = CoroutinesTimeout.seconds(15)
 
     @Test
-    fun adnlWithoutCloseTest() = runBlocking {
+    fun adnlSocketTest() = runBlocking {
         val selectorManager = ActorSelectorManager(Dispatchers.IO)
         val socket = aSocket(selectorManager)
             .tcp()
@@ -30,16 +36,64 @@ class ClientConnectionTest {
 
         val channel = socket.openWriteChannel()
 
-        buildPacket {
-            writeIntLittleEndian(-1265895046) // constructor prefix: crc32("adnl.message.query query_id:int256 query:bytes = adnl.Message")
-            writeFully(Random.nextBytes(32)) // query_id:int256
-        }
+        val queryId = buildPacket {
+            writeLong(Clock.System.now().epochSeconds)
+            writeFully(Random.nextBytes(24))
+        }.readBytes()
 
         channel.apply {
-            writePacket {
-
-            }
+            writePacket(testAdnlMessageQuery(queryId))
             flush()
         }
+        delay(1000)
+        val answer = socket.openReadChannel().readRemaining(48)
+        assertEquals(
+            0x1684ac0f,
+            answer.readInt()
+        ) // crc32("adnl.message.answer query_id:int256 answer:bytes = adnl.Message")
+        assertContentEquals(queryId, answer.readBytes(32)) // query_id:bytes
+        assertEquals(8, answer.readByte()) // answer:bytes length
+        assertEquals(0x0d0053e9, answer.readInt()) // crc32("liteServer.currentTime now:int = liteServer.CurrentTime")
+        val serverTime = Instant.fromEpochSeconds(answer.readIntLittleEndian().toLong())
+        println("server time: $serverTime")
+        assertContentEquals(ByteArray(3), answer.readBytes())
+    }
+
+    private fun testAdnlMessageQuery(queryId: ByteArray): ByteReadPacket {
+        val liteServerGetTime = buildPacket {
+            writeInt(0x345aad16) // crc32("liteServer.getTime = liteServer.CurrentTime")
+        }
+        assertContentEquals(
+            hex("345aad16"),
+            liteServerGetTime.copy().readBytes()
+        )
+
+        val liteServerQuery = buildPacket {
+            writeInt(0xdf068c79.toInt()) // crc32("liteServer.query data:bytes = Object")
+            writeByte(liteServerGetTime.remaining.toByte()) // data:bytes length
+            writePacket(liteServerGetTime) // data:bytes
+            repeat(4 - ceil(liteServerGetTime.remaining.toInt() + 1 / 4.0).toInt()) {
+                writeByte(0) // data:bytes padding
+            }
+        }
+        assertContentEquals(
+            hex("df068c7904345aad16000000"),
+            liteServerQuery.copy().readBytes()
+        )
+
+        val adnlMessageQuery = buildPacket {
+            writeInt(0x7af98bb4) // crc32("adnl.message.query query_id:int256 query:bytes = adnl.Message")
+            writeFully(queryId) // query_id:int256
+            writeByte(liteServerQuery.remaining.toByte()) // query:bytes length
+            writePacket(liteServerQuery)
+            repeat(4 - ceil(liteServerQuery.remaining.toInt() + 1 / 4.0).toInt()) {
+                writeByte(0) // query:bytes padding
+            }
+        }
+        assertContentEquals(
+            hex("7af98bb4") + queryId + hex("0cdf068c7904345aad16000000000000"),
+            adnlMessageQuery.copy().readBytes()
+        )
+        return adnlMessageQuery
     }
 }

@@ -25,8 +25,8 @@ class VmStackTest {
         val stack = VmStack(
             VmStackList.Cons(
                 VmStackList.Cons(
-                    VmStackList.Nil, VmStackValue.TinyInt(1313)
-                ), VmStackValue.Int(12)
+                    VmStackList.Nil, VmStackTinyInt(1313)
+                ), VmStackInt(12)
             )
         )
         val cell = CellBuilder.createCell {

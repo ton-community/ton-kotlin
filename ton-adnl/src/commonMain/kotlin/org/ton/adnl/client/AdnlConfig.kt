@@ -4,16 +4,16 @@ import org.ton.api.pub.PublicKey
 import org.ton.crypto.SecureRandom
 import kotlin.random.Random
 
-data class AdnlTcpConfig(
+data class AdnlConfig(
     val serverPublicKey: PublicKey,
     val random: Random = SecureRandom
 )
 
-data class AdnlTcpConfigBuilder(
+data class AdnlConfigBuilder(
     var random: Random? = null,
     var serverPublicKey: PublicKey? = null
 ) {
-    fun build(): AdnlTcpConfig = AdnlTcpConfig(
+    fun build(): AdnlConfig = AdnlConfig(
         requireNotNull(serverPublicKey),
         random ?: SecureRandom
     )

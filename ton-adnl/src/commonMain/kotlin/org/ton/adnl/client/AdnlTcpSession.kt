@@ -1,5 +1,3 @@
-@file:Suppress("OPT_IN_USAGE")
-
 package org.ton.adnl.client
 
 import io.ktor.util.cio.*

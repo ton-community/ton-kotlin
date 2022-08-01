@@ -7,7 +7,6 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.ton.adnl.ipv4
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.tonnode.*
@@ -37,9 +36,7 @@ open class LiteClient(
 ) : Closeable, CoroutineScope {
     override val coroutineContext: CoroutineContext = Dispatchers.IO
 
-    private val socket = aSocket(SelectorManager())
-        .tcp()
-        .connect(ipv4(config.ipv4), config.port)
+    private lateinit var socket: Socket
 
     val liteApi: LiteApi = LiteApi {
         adnl.sendQuery(it)
@@ -79,7 +76,9 @@ open class LiteClient(
 
     override fun close() = runBlocking {
         knownBlockIds.clear()
-        adnl.disconnect()
+        withContext(Dispatchers.IO) {
+            socket.close()
+        }
         isInit = false
     }
 

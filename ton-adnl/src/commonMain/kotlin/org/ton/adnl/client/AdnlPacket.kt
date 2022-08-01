@@ -5,29 +5,32 @@ import io.ktor.utils.io.core.*
 import org.ton.crypto.aes.AesCtr
 import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
+import kotlin.random.Random
 
 class AdnlPacket(
     val length: Int,
     val nonce: ByteArray,
-    val data: ByteReadPacket,
+    val payload: ByteReadPacket,
     val hash: ByteArray
 ) {
-    constructor(packet: ByteReadPacket, nonce: ByteArray) : this(
-        packet.remaining.toInt() + nonce.size + 32,
+    constructor(block: BytePacketBuilder.() -> Unit) : this(BytePacketBuilder().apply(block).build())
+
+    constructor(payload: ByteReadPacket, nonce: ByteArray = Random.nextBytes(32)) : this(
+        payload.remaining.toInt() + nonce.size + 32,
         nonce,
-        packet,
-        sha256(nonce, packet.copy().readBytes())
+        payload,
+        sha256(nonce, payload.copy().readBytes())
     )
 
     override fun toString(): String =
-        "AdnlPacket(length=$length, nonce=${nonce.encodeHex()}, data=$data, hash=${hash.encodeHex()})"
+        "AdnlPacket(length=$length, nonce=${nonce.encodeHex()}, payload=$payload, hash=${hash.encodeHex()})"
 }
 
 suspend fun ByteWriteChannel.writeAdnlPacket(aes: AesCtr, adnlPacket: AdnlPacket) {
     val encryptedPacket = aes.encrypt {
         writeIntLittleEndian(adnlPacket.length)
         writeFully(adnlPacket.nonce)
-        writePacket(adnlPacket.data)
+        writePacket(adnlPacket.payload)
         writeFully(adnlPacket.hash)
     }
     writePacket(encryptedPacket)

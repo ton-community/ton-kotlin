@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 class AdnlClientHandshake(
     rawInput: ByteReadChannel,
     rawOutput: ByteWriteChannel,
-    private val config: AdnlSocketConfig,
+    private val config: AdnlConfig,
     override val coroutineContext: CoroutineContext
 ) : CoroutineScope {
     private val authNonce = config.random.nextBytes(160)
@@ -26,12 +26,10 @@ class AdnlClientHandshake(
             loop@ while (true) {
                 if (performedHandshake) {
                     val packet = rawInput.readAdnlPacket(inputCipher)
-                    println("Read packet: $packet")
                     channel.send(packet)
                 } else {
                     val packet = rawInput.readAdnlPacket(inputCipher)
-                    check(packet.data.remaining == 0L)
-                    println("all done!")
+                    check(packet.payload.remaining == 0L)
                     performedHandshake = true
                 }
             }
@@ -49,16 +47,16 @@ class AdnlClientHandshake(
         try {
             channel.consumeEach { rawPacket ->
                 try {
-                    if (performedHandshake) {
-                        rawOutput.writeAdnlPacket(outputCipher, rawPacket)
-                    } else {
+                    if (!performedHandshake) {
                         val handshake = AdnlHandshakePacket(authNonce, config.serverPublicKey)
-                        rawOutput.writePacket(handshake.build())
-                        rawOutput.flush()
+                        val packet = handshake.build()
+                        rawOutput.writePacket(packet)
                         performedHandshake = true
-                        println("Performed handshake: $handshake")
                     }
+                    rawOutput.writeAdnlPacket(outputCipher, rawPacket)
+                    rawOutput.flush()
                 } catch (cause: Throwable) {
+                    cause.printStackTrace()
                     channel.close(cause)
                 }
             }
