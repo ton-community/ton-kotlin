@@ -1,5 +1,6 @@
 package org.ton.tl.constructors
 
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
@@ -9,6 +10,10 @@ object IntTlConstructor : TlConstructor<Int>(
     schema = "int ? = Int"
 ) {
     override fun decode(input: Input): Int {
+        return input.readIntLittleEndian()
+    }
+
+    override suspend fun decode(input: ByteReadChannel): Int {
         return input.readIntLittleEndian()
     }
 

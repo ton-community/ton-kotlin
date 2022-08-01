@@ -1,5 +1,6 @@
 package org.ton.tl.constructors
 
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
@@ -12,6 +13,12 @@ object Int256TlConstructor : TlConstructor<ByteArray>(
 
     override fun decode(input: Input): ByteArray {
         return input.readBytes(BYTE_SIZE)
+    }
+
+    override suspend fun decode(input: ByteReadChannel): ByteArray {
+        return ByteArray(BYTE_SIZE) {
+            input.readByte()
+        }
     }
 
     override fun encode(output: Output, value: ByteArray) {

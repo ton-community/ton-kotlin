@@ -1,10 +1,10 @@
 package org.ton.api.adnl.message
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.readInt256Tl
@@ -41,9 +41,9 @@ data class AdnlMessageAnswer(
 
     override fun toString() = buildString {
         append("AdnlMessageAnswer(queryId=")
-        append(base64(query_id))
+        append(hex(query_id))
         append(", answer=")
-        append(base64(answer))
+        append(hex(answer))
         append(")")
     }
 

@@ -1,14 +1,15 @@
 package org.ton.lite.client
 
-import io.ktor.network.selector.*
-import io.ktor.network.sockets.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.ton.adnl.client.engine.AdnlClientEngine
+import org.ton.adnl.client.engine.cio.CIOAdnlClientEngine
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
+import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.block.*
 import org.ton.boc.BagOfCells
@@ -28,23 +29,28 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-fun LiteClient(block: LiteClientConfig.() -> Unit) = LiteClient(LiteClientConfig(block))
+private const val BLOCK_ID_CACHE_SIZE = 100
 
 open class LiteClient(
-    val config: LiteClientConfig = LiteClientConfig(),
+    private val adnlClientEngine: AdnlClientEngine,
+    private val liteServer: LiteServerDesc,
     private val logger: Logger = PrintLnLogger("TON LiteClient")
 ) : Closeable, CoroutineScope {
-    override val coroutineContext: CoroutineContext = Dispatchers.IO
+    constructor(liteServer: LiteServerDesc, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
+        CIOAdnlClientEngine.create(),
+        liteServer,
+        logger
+    )
 
-    private lateinit var socket: Socket
+    override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
 
-    val liteApi: LiteApi = LiteApi {
-        adnl.sendQuery(it)
+    val liteApi: LiteApi = LiteApi { query ->
+        adnlClientEngine.query(liteServer, query)
     }
 
-    private var isInit: Boolean = false
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
     private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(TonNodeBlockIdExt())
+    private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
     private var zeroStateId: TonNodeZeroStateIdExt by atomic(TonNodeZeroStateIdExt())
     private var lastBlock: LiteServerBlockData? by atomic(null)
     var serverVersion: Int by atomic(0)
@@ -76,41 +82,9 @@ open class LiteClient(
 
     override fun close() = runBlocking {
         knownBlockIds.clear()
-        withContext(Dispatchers.IO) {
-            socket.close()
-        }
-        isInit = false
-    }
-
-    suspend fun start(input: Boolean = false) {
-        init()
-
-        if (input) {
-            while (true) {
-                try {
-                    parseLine()
-                } catch (e: Exception) {
-                    logger.fatal { e.toString() }
-                }
-            }
-        }
-    }
-
-    private suspend fun init() {
-        if (isInit && adnl.isConnected()) return
-        isInit = true
-        try {
-            adnl.connect()
-            getServerVersion()
-            getLastBlockId()
-        } catch (e: Exception) {
-            isInit = false
-            throw e
-        }
     }
 
     suspend fun getServerVersion(): LiteServerVersion {
-        init()
         val version = try {
             liteApi.getVersion()
         } catch (e: Exception) {
@@ -121,7 +95,6 @@ open class LiteClient(
     }
 
     suspend fun getLastBlockId(mode: Int = if (serverCapabilities and 2 != 0L) 0 else -1): TonNodeBlockIdExt {
-        init()
         val masterchainInfo = try {
             if (mode < 0) {
                 liteApi.getMasterchainInfo()
@@ -182,8 +155,10 @@ open class LiteClient(
         )
         if (!lastMasterchainBlockId.isValid()) {
             lastMasterchainBlockId = blockId
+            lastMasterchainBlockIdTime = Clock.System.now()
         } else if (lastMasterchainBlockId.seqno < masterchainInfo.last.seqno) {
             lastMasterchainBlockId = blockId
+            lastMasterchainBlockIdTime = Clock.System.now()
         }
         logger.debug {
             "latest masterchain block known to server is:\n$blockId${
@@ -199,12 +174,14 @@ open class LiteClient(
         var result: TonNodeBlockIdExt? = null
         while (isActive && result == null) {
             result = lookupBlock(blockId)
+            if (result == null) {
+                delay(1000)
+            }
         }
         result
     }
 
     suspend fun lookupBlock(blockId: TonNodeBlockId? = null): TonNodeBlockIdExt? {
-        init()
         if (blockId == null) {
             return getLastBlockId()
         }
@@ -232,12 +209,14 @@ open class LiteClient(
         var result: Block? = null
         while (isActive && result == null) {
             result = getBlock(blockId)
+            if (result == null) {
+                delay(1000)
+            }
         }
         result
     }
 
     suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
-        init()
         val blockData = try {
             liteApi.getBlock(blockId)
         } catch (e: TonNotReadyException) {
@@ -338,8 +317,7 @@ open class LiteClient(
         address: LiteServerAccountId?,
         mode: Int = 0
     ): AccountInfo? {
-        init()
-        return getAccount(address, lastMasterchainBlockId, mode)
+        return getAccount(address, getCachedLastMasterchainBlockId(), mode)
     }
 
     suspend fun getAccount(
@@ -353,7 +331,6 @@ open class LiteClient(
         blockId: TonNodeBlockIdExt,
         mode: Int = 0
     ): AccountInfo? {
-        init()
         if (address == null) return null
         logger.debug {
             "requesting account state for ${address.workchain}:${
@@ -377,10 +354,9 @@ open class LiteClient(
         methodName: String,
         vararg params: VmStackValue
     ): VmStack = coroutineScope {
-        init()
         runSmcMethod(
             address,
-            lastMasterchainBlockId,
+            getCachedLastMasterchainBlockId(),
             LiteServerRunSmcMethod.methodId(methodName),
             params.asIterable()
         )
@@ -391,8 +367,7 @@ open class LiteClient(
         method: Long,
         vararg params: VmStackValue
     ): VmStack = coroutineScope {
-        init()
-        runSmcMethod(address, lastMasterchainBlockId, method, params.asIterable())
+        runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params.asIterable())
     }
 
     suspend fun runSmcMethod(
@@ -400,8 +375,7 @@ open class LiteClient(
         methodName: String,
         params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
-        init()
-        runSmcMethod(address, lastMasterchainBlockId, LiteServerRunSmcMethod.methodId(methodName), params)
+        runSmcMethod(address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params)
     }
 
     suspend fun runSmcMethod(
@@ -409,8 +383,7 @@ open class LiteClient(
         method: Long,
         params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
-        init()
-        runSmcMethod(address, lastMasterchainBlockId, method, params)
+        runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params)
     }
 
     suspend fun runSmcMethod(
@@ -440,7 +413,6 @@ open class LiteClient(
         method: Long,
         params: Iterable<VmStackValue>
     ): VmStack {
-        init()
         logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
         check((!blockId.isValid()) || blockId == result.id) {
@@ -459,8 +431,7 @@ open class LiteClient(
     }
 
     suspend fun resolveDns(domain: String, category: Int = 0) {
-        init()
-        return resolveDns(lastMasterchainBlockId, domain, category)
+        return resolveDns(getCachedLastMasterchainBlockId(), domain, category)
     }
 
     suspend fun resolveDns(blockId: TonNodeBlockIdExt, domain: String, category: Int = 0) {
@@ -469,6 +440,16 @@ open class LiteClient(
             require(char.code < 0xfe && char > ' ') {
                 "invalid characters in a domain name"
             }
+        }
+    }
+
+    private suspend fun getCachedLastMasterchainBlockId(): TonNodeBlockIdExt {
+        val cachedLastMasterchainBlockId = lastMasterchainBlockId
+        if (!cachedLastMasterchainBlockId.isValid()) return getLastBlockId()
+        return if (lastMasterchainBlockIdTime < (Clock.System.now() - 1.seconds)) {
+            getLastBlockId()
+        } else {
+            cachedLastMasterchainBlockId
         }
     }
 
@@ -503,7 +484,7 @@ open class LiteClient(
 
     private fun registerBlockId(blockIdExt: TonNodeBlockIdExt) {
         if (knownBlockIds.contains(blockIdExt)) return
-        if (config.blockIdCacheSize > 0 && knownBlockIds.size == config.blockIdCacheSize) {
+        if (BLOCK_ID_CACHE_SIZE > 0 && knownBlockIds.size == BLOCK_ID_CACHE_SIZE) {
             knownBlockIds.removeFirst()
         }
         knownBlockIds.addLast(blockIdExt)

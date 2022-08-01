@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.Rule
+import org.ton.adnl.client.socket.adnl
 import org.ton.adnl.ipv4
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.base64
@@ -26,8 +27,7 @@ class ClientConnectionTest {
 
     @Test
     fun adnlSocketTest() = runBlocking {
-        val selectorManager = ActorSelectorManager(Dispatchers.IO)
-        val socket = aSocket(selectorManager)
+        val socket = aSocket(SelectorManager())
             .tcp()
             .connect(ipv4(908566172), 51565)
             .adnl(Dispatchers.Default) {
