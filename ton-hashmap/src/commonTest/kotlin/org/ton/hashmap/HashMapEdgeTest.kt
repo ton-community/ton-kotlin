@@ -1,13 +1,30 @@
 package org.ton.hashmap
 
 import org.ton.bitstring.BitString
+import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.cell.CellSlice
+import org.ton.crypto.base64
+import org.ton.tlb.constructor.UIntTlbConstructor
+import org.ton.tlb.parse
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class HashMapEdgeTest {
     @Test
-    fun `keys are correctly determined when iterating over nodes`() {
+    fun `(1) keys are correctly determined when iterating over nodes`() {
+        val hashMapEdge =
+            BagOfCells(base64("te6cckEBEwEAVwACASABAgIC2QMEAgm3///wYBESAgEgBQYCAWIODwIBIAcIAgHODQ0CAdQNDQIBIAkKAgEgCxACASAQDAABWAIBIA0NAAEgAgEgEBAAAdQAAUgAAfwAAdwXk+eF"))
+                .first().parse(HashMapEdge.tlbCodec(32, UIntTlbConstructor.int(1)))
+        val keys = hashMapEdge.nodes().map { CellSlice(it.first).loadInt(32).toInt() }.toList()
+        assertEquals(
+            listOf(0, 1, 9, 10, 12, 14, 15, 16, 17, 32, 34, 36, -1001, -1000),
+            keys
+        )
+    }
+
+    @Test
+    fun `(2) keys are correctly determined when iterating over nodes`() {
         val e = HashMapEdge(
             label = HashMapLabelShort(UnaryZero, BitString()),
             node = HashMapNodeFork(
