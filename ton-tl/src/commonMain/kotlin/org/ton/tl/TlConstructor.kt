@@ -51,7 +51,7 @@ abstract class TlConstructor<T : Any>(
 
     override suspend fun decodeBoxed(input: ByteReadChannel): T {
         val actualId = input.readIntLittleEndian()
-        require(actualId == id) { "Invalid ID. expected: $id actual: $actualId" }
+        require(actualId == id) { "Invalid ID. expected: $id actual: $actualId constructor: [$this]" }
         return decode(input)
     }
 

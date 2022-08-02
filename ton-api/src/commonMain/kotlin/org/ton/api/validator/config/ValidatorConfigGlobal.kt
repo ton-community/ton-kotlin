@@ -14,10 +14,10 @@ import org.ton.tl.writeTl
 @Serializable
 data class ValidatorConfigGlobal(
     @SerialName("zero_state")
-    val zeroState: TonNodeBlockIdExt,
+    val zeroState: TonNodeBlockIdExt = TonNodeBlockIdExt(),
     @SerialName("init_block")
-    val initBlock: TonNodeBlockIdExt,
-    val hardforks: List<TonNodeBlockIdExt>
+    val initBlock: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val hardforks: List<TonNodeBlockIdExt> = listOf()
 ) {
     companion object : TlConstructor<ValidatorConfigGlobal>(
         type = ValidatorConfigGlobal::class,

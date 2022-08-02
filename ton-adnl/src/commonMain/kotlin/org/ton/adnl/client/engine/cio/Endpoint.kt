@@ -52,7 +52,10 @@ internal class Endpoint(
         try {
             val connection = connect()
             val input = connection.input
-            val output = connection.output
+            val output = connection.output.handleHalfClosed(
+                callContext,
+                false
+            )
             callContext[Job]!!.invokeOnCompletion { cause ->
                 val originCause = cause?.unwrapCancellationException()
                 try {

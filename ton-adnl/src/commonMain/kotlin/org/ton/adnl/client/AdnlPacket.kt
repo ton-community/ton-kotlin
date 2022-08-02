@@ -22,26 +22,50 @@ class AdnlPacket(
         sha256(nonce, payload.copy().readBytes())
     )
 
+    fun verify() {
+        val payloadBytes = payload.copy().readBytes()
+        val actualLength = payload.remaining.toInt() + nonce.size + 32
+        check(length == actualLength) {
+            "length mismatch, expected: $length actual: $actualLength\n$this"
+        }
+        val actualHash = sha256(nonce, payloadBytes)
+        check(hash.contentEquals(actualHash)) {
+            "hash mismatch, expected: ${hash.encodeHex()} actual: ${actualHash.encodeHex()}\n$this"
+        }
+    }
+
+    fun isValid(): Boolean = try {
+        verify()
+        true
+    } catch (e: IllegalStateException) {
+        false
+    }
+
     override fun toString(): String =
-        "AdnlPacket(length=$length, nonce=${nonce.encodeHex()}, payload=$payload, hash=${hash.encodeHex()})"
+        "AdnlPacket(\n  length=$length\n  nonce=${nonce.encodeHex()}\n  payload=${
+            payload.copy().readBytes().encodeHex()
+        }\n  hash=${hash.encodeHex()}\n)"
 }
 
 suspend fun ByteWriteChannel.writeAdnlPacket(aes: AesCtr, adnlPacket: AdnlPacket) {
-    val encryptedPacket = aes.encrypt {
+    val encryptedPacket = aes.encrypt(buildPacket {
         writeIntLittleEndian(adnlPacket.length)
         writeFully(adnlPacket.nonce)
         writePacket(adnlPacket.payload)
         writeFully(adnlPacket.hash)
-    }
-    writePacket(encryptedPacket)
+    }.readBytes())
+    writeFully(encryptedPacket)
 }
 
 suspend fun ByteReadChannel.readAdnlPacket(aes: AesCtr): AdnlPacket {
-    val length = aes.encrypt {
-        writeIntLittleEndian(readIntLittleEndian())
-    }.readIntLittleEndian()
-    val nonce = aes.encrypt(readPacket(32)).readBytes()
-    val data = aes.encrypt(readPacket(length - 64))
-    val hash = aes.encrypt(readPacket(32)).readBytes()
-    return AdnlPacket(length, nonce, data, hash)
+    val length = ByteReadPacket(aes.encrypt(readRemaining(4).readBytes())).readIntLittleEndian()
+    if (length > (1 shl 24) || length < 32) {
+        throw IllegalStateException("Invalid packet size: $length")
+    }
+    val data = readRemaining(length.toLong()).readBytes()
+    val decryptedData = aes.encrypt(data)
+    val nonce = decryptedData.copyOfRange(0, 32)
+    val hash = decryptedData.copyOfRange(length - 32, length)
+    val payload = decryptedData.copyOfRange(32, length - 32)
+    return AdnlPacket(length, nonce, ByteReadPacket(payload), hash)
 }

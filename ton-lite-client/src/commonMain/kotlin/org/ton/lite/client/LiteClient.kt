@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
@@ -9,8 +11,10 @@ import org.ton.adnl.client.engine.AdnlClientEngine
 import org.ton.adnl.client.engine.cio.CIOAdnlClientEngine
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
+import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
+import org.ton.api.validator.config.ValidatorConfigGlobal
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.crypto.encodeHex
@@ -28,24 +32,43 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 private const val BLOCK_ID_CACHE_SIZE = 100
 
 open class LiteClient(
     private val adnlClientEngine: AdnlClientEngine,
-    private val liteServer: LiteServerDesc,
+    private val liteClientConfigGlobal: LiteClientConfigGlobal,
     private val logger: Logger = PrintLnLogger("TON LiteClient")
 ) : Closeable, CoroutineScope {
+    constructor(
+        liteClientConfigGlobal: LiteClientConfigGlobal
+    ) : this(
+        CIOAdnlClientEngine.create(), liteClientConfigGlobal
+    )
+
     constructor(liteServer: LiteServerDesc, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
-        CIOAdnlClientEngine.create(),
-        liteServer,
-        logger
+        CIOAdnlClientEngine.create(), LiteClientConfigGlobal(listOf(liteServer), ValidatorConfigGlobal()), logger
     )
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
-
+    private var goodServers: List<LiteServerDesc>? by atomic(null)
     val liteApi: LiteApi = LiteApi { query ->
-        adnlClientEngine.query(liteServer, query)
+        var retry = 0
+        var byteArray: ByteArray
+        while (true) {
+            try {
+                byteArray = adnlClientEngine.query(selectServer(), query)
+                break
+            } catch (e: Exception) {
+                retry++
+                if (retry > 5) {
+                    throw e
+                }
+            }
+        }
+        byteArray
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
@@ -84,6 +107,15 @@ open class LiteClient(
         knownBlockIds.clear()
     }
 
+    suspend fun getServerTime(): Instant {
+        val time = try {
+            liteApi.getTime()
+        } catch (e: Exception) {
+            throw RuntimeException("Can't get server time", e)
+        }
+        return Instant.fromEpochSeconds(time.now.toLong())
+    }
+
     suspend fun getServerVersion(): LiteServerVersion {
         val version = try {
             liteApi.getVersion()
@@ -117,19 +149,15 @@ open class LiteClient(
             createdAt = lastUtime
             if (masterchainInfo.last_utime > masterchainInfo.now) {
                 logger.warn {
-                    "server claims to have a masterchain block $blockId created at $lastUtime " +
-                            "(${lastUtime - serverNow} in future)"
+                    "server claims to have a masterchain block $blockId created at $lastUtime " + "(${lastUtime - serverNow} in future)"
                 }
             } else if (lastUtime < serverNow - 60.seconds) {
                 logger.warn {
-                    "server appears to be out of sync: its newest masterchain block is $blockId" +
-                            " created at $lastUtime (${serverNow - lastUtime} ago according to the server's clock)"
+                    "server appears to be out of sync: its newest masterchain block is $blockId" + " created at $lastUtime (${serverNow - lastUtime} ago according to the server's clock)"
                 }
             } else if (lastUtime < serverTimeGotAt - 60.seconds) {
                 logger.warn {
-                    "either the server is out of sync, or the local clock is set incorrectly: the newest masterchain " +
-                            "block known to server is $blockId created at $lastUtime " +
-                            "(${serverNow - serverTimeGotAt} ago according to the local clock)"
+                    "either the server is out of sync, or the local clock is set incorrectly: the newest masterchain " + "block known to server is $blockId created at $lastUtime " + "(${serverNow - serverTimeGotAt} ago according to the local clock)"
                 }
             }
         }
@@ -146,11 +174,7 @@ open class LiteClient(
         registerBlockId(blockId)
         registerBlockId(
             TonNodeBlockIdExt(
-                Workchain.MASTERCHAIN_ID,
-                Shard.ID_ALL,
-                0,
-                zeroStateId.root_hash,
-                zeroStateId.file_hash
+                Workchain.MASTERCHAIN_ID, Shard.ID_ALL, 0, zeroStateId.root_hash, zeroStateId.file_hash
             )
         )
         if (!lastMasterchainBlockId.isValid()) {
@@ -259,7 +283,9 @@ open class LiteClient(
                 shard.workchain_id,
                 if (block.info.after_split) Shard.shardParent(shard.shard_prefix.toULong())
                     .toLong() else shard.shard_prefix,
-                prev1.seq_no, prev1.root_hash, prev1.file_hash
+                prev1.seq_no,
+                prev1.root_hash,
+                prev1.file_hash
             )
             check(!block.info.after_split || prev1.seq_no != 0) {
                 "shardchains cannot be split immediately after initial state"
@@ -309,27 +335,21 @@ open class LiteClient(
     }
 
     suspend fun getAccount(
-        address: String,
-        mode: Int = 0
+        address: String, mode: Int = 0
     ): AccountInfo? = getAccount(parseAccountId(address), mode)
 
     suspend fun getAccount(
-        address: LiteServerAccountId?,
-        mode: Int = 0
+        address: LiteServerAccountId?, mode: Int = 0
     ): AccountInfo? {
         return getAccount(address, getCachedLastMasterchainBlockId(), mode)
     }
 
     suspend fun getAccount(
-        address: String?,
-        blockId: TonNodeBlockIdExt,
-        mode: Int = 0
+        address: String?, blockId: TonNodeBlockIdExt, mode: Int = 0
     ): AccountInfo? = getAccount(address?.let { parseAccountId(address) }, blockId, mode)
 
     suspend fun getAccount(
-        address: LiteServerAccountId?,
-        blockId: TonNodeBlockIdExt,
-        mode: Int = 0
+        address: LiteServerAccountId?, blockId: TonNodeBlockIdExt, mode: Int = 0
     ): AccountInfo? {
         if (address == null) return null
         logger.debug {
@@ -350,68 +370,45 @@ open class LiteClient(
     }
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        methodName: String,
-        vararg params: VmStackValue
+        address: LiteServerAccountId, methodName: String, vararg params: VmStackValue
     ): VmStack = coroutineScope {
         runSmcMethod(
-            address,
-            getCachedLastMasterchainBlockId(),
-            LiteServerRunSmcMethod.methodId(methodName),
-            params.asIterable()
+            address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params.asIterable()
         )
     }
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        method: Long,
-        vararg params: VmStackValue
+        address: LiteServerAccountId, method: Long, vararg params: VmStackValue
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params.asIterable())
     }
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        methodName: String,
-        params: Iterable<VmStackValue>
+        address: LiteServerAccountId, methodName: String, params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params)
     }
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        method: Long,
-        params: Iterable<VmStackValue>
+        address: LiteServerAccountId, method: Long, params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params)
     }
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        blockId: TonNodeBlockIdExt,
-        methodName: String,
-        vararg params: VmStackValue
+        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, vararg params: VmStackValue
     ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), *params)
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        blockId: TonNodeBlockIdExt,
-        methodName: String,
-        params: Iterable<VmStackValue>
+        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, params: Iterable<VmStackValue>
     ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), params)
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        blockId: TonNodeBlockIdExt,
-        method: Long,
-        vararg params: VmStackValue
+        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, vararg params: VmStackValue
     ) = runSmcMethod(address, blockId, method, params.asIterable())
 
     suspend fun runSmcMethod(
-        address: LiteServerAccountId,
-        blockId: TonNodeBlockIdExt,
-        method: Long,
-        params: Iterable<VmStackValue>
+        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, params: Iterable<VmStackValue>
     ): VmStack {
         logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
@@ -488,5 +485,30 @@ open class LiteClient(
             knownBlockIds.removeFirst()
         }
         knownBlockIds.addLast(blockIdExt)
+    }
+
+    private suspend fun selectServer(): LiteServerDesc = coroutineScope {
+        var goodServers = goodServers
+        if (goodServers == null) {
+            goodServers = liteClientConfigGlobal.liteservers
+                .map { server ->
+                    async {
+                        try {
+                            val liteApi = LiteApi { query -> adnlClientEngine.query(server, query) }
+                            server to measureTime {
+                                liteApi.getTime()
+                            }
+                        } catch (e: Throwable) {
+                            server to null
+                        }
+                    }
+                }
+                .awaitAll()
+                .sortedBy { it.second }.mapNotNull {
+                    if (it.second == null) null else it.first
+                }
+            this@LiteClient.goodServers = goodServers
+        }
+        return@coroutineScope goodServers.random()
     }
 }

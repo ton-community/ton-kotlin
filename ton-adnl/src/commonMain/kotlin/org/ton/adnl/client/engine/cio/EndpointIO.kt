@@ -1,11 +1,11 @@
 package org.ton.adnl.client.engine.cio
 
+import io.ktor.client.engine.cio.*
 import io.ktor.client.utils.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import io.ktor.utils.io.CancellationException
+import io.ktor.utils.io.errors.*
+import kotlinx.coroutines.*
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.crypto.encodeHex
@@ -50,9 +50,43 @@ internal suspend fun readAnswer(
     input: ByteReadChannel,
     callContext: CoroutineContext
 ): AdnlMessageAnswer = withContext(callContext) {
-    val answer = AdnlMessageAnswer.decodeBoxed(input)
+    val answer = try {
+        AdnlMessageAnswer.decodeBoxed(input)
+    } catch (e: Exception) {
+        throw IOException("Can't parse ADNL answer for query: $query", e)
+    }
     check(answer.query_id.contentEquals(query.query_id)) {
         "query_id mismatch, expected: ${query.query_id.encodeHex()} actual: ${answer.query_id.encodeHex()}"
     }
     return@withContext answer
 }
+
+/**
+ * Wrap channel so that [ByteWriteChannel.close] of the resulting channel doesn't lead to closing of the base channel.
+ */
+@OptIn(DelicateCoroutinesApi::class)
+internal fun ByteWriteChannel.withoutClosePropagation(
+    coroutineContext: CoroutineContext,
+    closeOnCoroutineCompletion: Boolean = true
+): ByteWriteChannel {
+    if (closeOnCoroutineCompletion) {
+        // Pure output represents a socket output channel that is closed when request fully processed or after
+        // request sent in case TCP half-close is allowed.
+        coroutineContext[Job]!!.invokeOnCompletion {
+            close()
+        }
+    }
+
+    return GlobalScope.reader(coroutineContext, autoFlush = true) {
+        channel.copyTo(this@withoutClosePropagation, Long.MAX_VALUE)
+        this@withoutClosePropagation.flush()
+    }.channel
+}
+
+/**
+ * Wrap channel using [withoutClosePropagation] if [propagateClose] is false otherwise return the same channel.
+ */
+internal fun ByteWriteChannel.handleHalfClosed(
+    coroutineContext: CoroutineContext,
+    propagateClose: Boolean
+): ByteWriteChannel = if (propagateClose) this else withoutClosePropagation(coroutineContext)

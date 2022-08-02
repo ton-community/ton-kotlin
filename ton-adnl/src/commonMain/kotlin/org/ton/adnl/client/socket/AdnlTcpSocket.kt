@@ -75,13 +75,23 @@ private class AdnlTcpSocket(
         }
 
     private suspend fun dataInputLoop(pipe: ByteWriteChannel) {
+        var validationException: Throwable? = null
         try {
             input.consumeEach { packet ->
                 val payload = packet.payload
+                try {
+                    packet.verify()
+                } catch (e: Throwable) {
+                    validationException = e
+                    throw e
+                }
                 pipe.writePacket(payload)
                 pipe.flush()
             }
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            if (validationException == e) {
+                throw e
+            }
         } finally {
             pipe.close()
         }
