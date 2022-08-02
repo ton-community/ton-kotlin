@@ -18,14 +18,20 @@ data class HashMapEdge<T>(
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
 
     fun nodes(): Sequence<Pair<BitString, T>> {
-        val parentLabel = label.s
         return when (node) {
-            is HashMapNodeLeaf -> sequenceOf(parentLabel to node.value)
-            is HashMapNodeFork ->
+            is HashMapNodeLeaf -> sequenceOf(BitString.empty() to node.value)
+            is HashMapNodeFork -> {
                 // Note: left and right branches implicitly contain prefixes '0' and '1' respectively
-                node.left.nodes().map { (label, value) -> (parentLabel + BitString(false) + label) to value }.plus(
-                    node.right.nodes().map { (label, value) -> (parentLabel + BitString(true) + label) to value }
-                )
+                val left = node.left.nodes().map { (label, value) ->
+                    (BitString(false) + label) to value
+                }
+                val right = node.right.nodes().map { (label, value) ->
+                    (BitString(true) + label) to value
+                }
+                left + right
+            }
+        }.map { (childLabel, value) ->
+            (label.s + childLabel) to value
         }
     }
 

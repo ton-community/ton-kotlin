@@ -10,6 +10,8 @@ data class HashMapLabelSame(
     val v: Boolean,
     val n: Int
 ) : HashMapLabel {
+    constructor(v: Int, n: Int) : this(v != 0, n)
+
     override val s: BitString get() = BitString(*BooleanArray(n) { v })
 
     override fun toString() = "(hml_same\nv:$v n:$n)"
