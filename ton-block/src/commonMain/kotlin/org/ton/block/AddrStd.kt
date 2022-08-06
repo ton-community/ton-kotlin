@@ -115,7 +115,9 @@ data class AddrStd(
             }
 
             require(raw.size == 36) { "invalid byte-array size expected: 36, actual: ${raw.size}" }
-            check((raw[0] == 0x11.toByte()) or (raw[0] == 0x51.toByte())) {
+            // not 0x80 = 0x7F; here we clean the test only flag to only check proper bounce flags
+            val cleanTestOnly = raw[0] and 0x7F.toByte()
+            check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
                 "unknown address tag"
             }
 
@@ -125,11 +127,7 @@ data class AddrStd(
             )
 
             val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
-            if (testOnly) {
-                // not 0x80 = 0x7F; here we clean the test only flag
-                raw[0] = raw[0] and 0x7F.toByte()
-            }
-            val bounceable = raw[0] == 0x11.toByte()
+            val bounceable = cleanTestOnly == 0x11.toByte()
             val expectedChecksum = raw[34].toUByte().toInt() * 256 + raw[35].toUByte().toInt()
             val actualChecksum = crc(addrStd, testOnly, bounceable)
             check(expectedChecksum == actualChecksum) {
