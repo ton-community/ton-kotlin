@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.ton.cell
 
 import org.ton.bigint.*
@@ -5,6 +7,8 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.cell.exception.CellUnderflowException
+
+inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()) = CellSlice.of(bits, refs)
 
 interface CellSlice {
     val bits: BitString
@@ -267,6 +271,7 @@ private class CellSliceByteBackedBitString(
                 val byte = getByte(0).toInt() and 0xFF
                 byte.toBigInt()
             }
+
             else -> {
                 val value = getLong(length)
                 if (value > Long.MAX_VALUE.toULong()) {
@@ -306,6 +311,7 @@ private class CellSliceByteBackedBitString(
                     uint
                 }
             }
+
             else -> throw IllegalArgumentException("expected length in 0..64, actual: $length")
         }
     }

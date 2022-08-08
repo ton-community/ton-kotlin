@@ -8,6 +8,10 @@ kotlin {
                 implementation(libs.serialization.json.jvm)
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(projects.tonBoc)
+            }
+        }
     }
 }
