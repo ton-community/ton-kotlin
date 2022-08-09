@@ -8,7 +8,8 @@ class EncryptorEd25519(
     private val publicKey: ByteArray
 ) : Encryptor {
     override fun encrypt(data: ByteArray): ByteArray {
-        val privateKey = Ed25519.privateKey()
+//        val privateKey = Ed25519.privateKey()
+        val privateKey = ByteArray(32)
         val decryptionKey = X25519.convertToEd25519(X25519.publicKey(privateKey))
         val secret = X25519.sharedKey(privateKey, Ed25519.convertToX25519(publicKey))
         val aes = EncryptorAes(secret)

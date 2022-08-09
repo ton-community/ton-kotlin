@@ -55,20 +55,7 @@ open class LiteClient(
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
     private var goodServers: List<LiteServerDesc>? by atomic(null)
     val liteApi: LiteApi = LiteApi { query ->
-        var retry = 0
-        var byteArray: ByteArray
-        while (true) {
-            try {
-                byteArray = adnlClientEngine.query(selectServer(), query)
-                break
-            } catch (e: Exception) {
-                retry++
-                if (retry > 5) {
-                    throw e
-                }
-            }
-        }
-        byteArray
+        adnlClientEngine.query(liteClientConfigGlobal.liteservers.first(), query)
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
@@ -499,11 +486,15 @@ open class LiteClient(
                                 liteApi.getTime()
                             }
                         } catch (e: Throwable) {
+                            e.printStackTrace()
                             server to null
                         }
                     }
+                }.let {
+                    runBlocking {
+                        it.awaitAll()
+                    }
                 }
-                .awaitAll()
                 .sortedBy { it.second }.mapNotNull {
                     if (it.second == null) null else it.first
                 }
