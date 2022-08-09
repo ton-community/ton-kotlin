@@ -18,7 +18,7 @@ class EncryptorAes(
         secret.copyInto(iv, destinationOffset = 4, startIndex = 20, endIndex = 32)
 
         val cipher = AesCtr(key, iv)
-        val encryptedData = cipher.encrypt(data)
+        val encryptedData = cipher.update(data)
 
         return digest + encryptedData
     }

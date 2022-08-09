@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.liteserver.LiteServerDesc
+import kotlin.random.Random
 
 interface AdnlClientEngine : CoroutineScope, Closeable {
     val dispatcher: CoroutineDispatcher
@@ -20,8 +21,7 @@ interface AdnlClientEngine : CoroutineScope, Closeable {
         liteServer: LiteServerDesc,
         query: ByteArray
     ): ByteArray =
-//        query(liteServer, AdnlMessageQuery(Random.nextBytes(32), query)).answer
-        query(liteServer, AdnlMessageQuery(ByteArray(32), query)).answer
+        query(liteServer, AdnlMessageQuery(Random.nextBytes(32), query)).answer
 
     suspend fun query(
         liteServer: LiteServerDesc,
