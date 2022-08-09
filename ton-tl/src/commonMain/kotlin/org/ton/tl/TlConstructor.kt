@@ -1,5 +1,6 @@
 package org.ton.tl
 
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.intellij.lang.annotations.Language
 import org.ton.crypto.crc32
@@ -13,9 +14,15 @@ abstract class TlConstructor<T : Any>(
     val type: KType,
     @Language("TL")
     val schema: String,
-    val id: Int = crc32(schema)
+    val id: Int = crc32(schema),
+    val fields: List<TlCodec<*>> = emptyList()
 ) : TlCodec<T> {
-    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema)) : this(type.createType(), schema, id)
+    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema), fields: List<TlCodec<*>> = listOf()) : this(
+        type.createType(),
+        schema,
+        id,
+        fields
+    )
 
     override fun encodeBoxed(value: T): ByteArray = buildPacket {
         encodeBoxed(this, value)
@@ -28,9 +35,23 @@ abstract class TlConstructor<T : Any>(
 
     fun <R : Any> Output.writeBoxedTl(codec: TlCodec<R>, value: R) = codec.encodeBoxed(this, value)
 
+    override fun decode(input: Input): T = decode(fields.map {
+        it.decode(input)
+    }.iterator())
+
+    override suspend fun decode(input: ByteReadChannel): T = decode(fields.map {
+        it.decode(input)
+    }.iterator())
+
     override fun decodeBoxed(input: Input): T {
         val actualId = input.readIntTl()
         require(actualId == id) { "Invalid ID. expected: $id actual: $actualId" }
+        return decode(input)
+    }
+
+    override suspend fun decodeBoxed(input: ByteReadChannel): T {
+        val actualId = input.readIntLittleEndian()
+        require(actualId == id) { "Invalid ID. expected: $id actual: $actualId constructor: [$this]" }
         return decode(input)
     }
 

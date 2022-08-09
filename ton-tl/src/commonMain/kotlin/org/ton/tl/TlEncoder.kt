@@ -9,8 +9,9 @@ interface TlEncoder<T : Any> {
     }.readBytes()
 
     fun encode(output: Output, value: T)
-    fun encodeBoxed(output: Output, value: T)
+    fun encodeFields(value: T): List<*> = TODO()
 
+    fun encodeBoxed(output: Output, value: T)
     fun encodeBoxed(value: T): ByteArray = buildPacket {
         encodeBoxed(this, value)
     }.readBytes()

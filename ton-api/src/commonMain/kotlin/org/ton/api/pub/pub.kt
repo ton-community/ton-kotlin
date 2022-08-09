@@ -16,8 +16,9 @@ import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 
+@Serializable
 @JsonClassDiscriminator("@type")
-interface PublicKey : Encryptor {
+sealed interface PublicKey : Encryptor {
     fun toAdnlIdShort(): AdnlIdShort
 
     companion object : TlCombinator<PublicKey>(

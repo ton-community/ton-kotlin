@@ -19,7 +19,7 @@ class DecryptorAes(
         secret.copyInto(iv, destinationOffset = 4, startIndex = 20, endIndex = 32)
 
         val cipher = AesCtr(key, iv)
-        val decryptedData = cipher.encrypt(data)
+        val decryptedData = cipher.update(data)
 
         val actualDigest = sha256(decryptedData)
         check(digest.contentEquals(actualDigest)) { "sha256 mismatch after decryption" }

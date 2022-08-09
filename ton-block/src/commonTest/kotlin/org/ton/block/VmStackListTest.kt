@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 class VmStackListTest {
     @Test
     fun `test VmStackList (de)serialization`() {
-        val vmStackList = VmStackList(VmStackValue.TinyInt(37218))
+        val vmStackList = VmStackList(VmStackTinyInt(37218))
         val depth = vmStackList.count()
 
         val cellBuilder = CellBuilder.beginCell()

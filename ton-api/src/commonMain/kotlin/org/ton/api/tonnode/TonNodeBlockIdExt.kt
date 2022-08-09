@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain.INVALID_WORKCHAIN
 import org.ton.bitstring.BitString
+import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.ByteArray
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.encodeHex
@@ -22,7 +23,9 @@ data class TonNodeBlockIdExt(
     override val workchain: Int = INVALID_WORKCHAIN,
     override val shard: Long = 0,
     override val seqno: Int = 0,
+    @Serializable(Base64ByteArraySerializer::class)
     val root_hash: ByteArray = byteArrayOf(),
+    @Serializable(Base64ByteArraySerializer::class)
     val file_hash: ByteArray = byteArrayOf()
 ) : TonNodeBlockId {
     constructor(

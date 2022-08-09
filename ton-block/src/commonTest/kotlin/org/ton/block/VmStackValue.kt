@@ -13,29 +13,29 @@ class VmStackValueTest {
     @Test
     fun `test VmStackValue (de)serialization`() {
 
-        testSerialization(codec, VmStackValue.Null)
+        testSerialization(codec, VmStackNull)
 
-        testSerialization(codec, VmStackValue.TinyInt(17239))
-        testSerialization(codec, VmStackValue.TinyInt(-17))
-        testSerialization(codec, VmStackValue.TinyInt(1000000239))
-        testSerialization(codec, VmStackValue.TinyInt(1000000239L * 1000000239))
+        testSerialization(codec, VmStackTinyInt(17239))
+        testSerialization(codec, VmStackTinyInt(-17))
+        testSerialization(codec, VmStackTinyInt(1000000239))
+        testSerialization(codec, VmStackTinyInt(1000000239L * 1000000239))
         repeat(10) {
-            testSerialization(codec, VmStackValue.TinyInt(Random.nextLong()))
+            testSerialization(codec, VmStackTinyInt(Random.nextLong()))
         }
 
-        testSerialization(codec, VmStackValue.Int(17239))
-        testSerialization(codec, VmStackValue.Int(-17))
-        testSerialization(codec, VmStackValue.Int(1000000239))
-        testSerialization(codec, VmStackValue.Int(1000000239L * 1000000239))
-        testSerialization(codec, VmStackValue.Int(BigInt("-1000000000000000000000000239")))
+        testSerialization(codec, VmStackInt(17239))
+        testSerialization(codec, VmStackInt(-17))
+        testSerialization(codec, VmStackInt(1000000239))
+        testSerialization(codec, VmStackInt(1000000239L * 1000000239))
+        testSerialization(codec, VmStackInt(BigInt("-1000000000000000000000000239")))
 
         repeat(10) {
-            testSerialization(codec, VmStackValue.Int(Random.nextLong()))
-            testSerialization(codec, VmStackValue.Int(BigInt(Random.nextBytes(256 / 8))))
+            testSerialization(codec, VmStackInt(Random.nextLong()))
+            testSerialization(codec, VmStackInt(BigInt(Random.nextBytes(256 / 8))))
         }
 
         testSerialization(
-            codec, VmStackValue.Cell(
+            codec, VmStackCell(
                 CellBuilder.createCell {
                     storeBits(BitString("989A386C05EFF862FFFFE23_"))
                     storeRef {
