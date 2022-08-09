@@ -55,7 +55,7 @@ open class LiteClient(
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
     private var goodServers: List<LiteServerDesc>? by atomic(null)
     val liteApi: LiteApi = LiteApi { query ->
-        adnlClientEngine.query(liteClientConfigGlobal.liteservers.first(), query)
+        adnlClientEngine.query(selectServer(), query)
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
@@ -414,19 +414,6 @@ open class LiteClient(
         }
     }
 
-    suspend fun resolveDns(domain: String, category: Int = 0) {
-        return resolveDns(getCachedLastMasterchainBlockId(), domain, category)
-    }
-
-    suspend fun resolveDns(blockId: TonNodeBlockIdExt, domain: String, category: Int = 0) {
-        require(domain.length <= 1023) { "domain name too long" }
-        domain.forEach { char ->
-            require(char.code < 0xfe && char > ' ') {
-                "invalid characters in a domain name"
-            }
-        }
-    }
-
     private suspend fun getCachedLastMasterchainBlockId(): TonNodeBlockIdExt {
         val cachedLastMasterchainBlockId = lastMasterchainBlockId
         if (!cachedLastMasterchainBlockId.isValid()) return getLastBlockId()
@@ -434,19 +421,6 @@ open class LiteClient(
             getLastBlockId()
         } else {
             cachedLastMasterchainBlockId
-        }
-    }
-
-    private suspend fun parseLine() {
-        val words = readln().split(" ")
-        when (words[0].lowercase()) {
-            "getaccount" -> {
-                val accountId = parseAccountId(words[1])
-                val blockId = words.getOrNull(2)?.let { parseBlockIdExt(it) } ?: lastMasterchainBlockId
-                getAccount(accountId, blockId)
-            }
-
-            "last" -> getLastBlockId()
         }
     }
 
@@ -486,20 +460,16 @@ open class LiteClient(
                                 liteApi.getTime()
                             }
                         } catch (e: Throwable) {
-                            e.printStackTrace()
                             server to null
                         }
                     }
-                }.let {
-                    runBlocking {
-                        it.awaitAll()
-                    }
                 }
+                .awaitAll()
                 .sortedBy { it.second }.mapNotNull {
                     if (it.second == null) null else it.first
                 }
             this@LiteClient.goodServers = goodServers
         }
-        return@coroutineScope goodServers.random()
+        return@coroutineScope goodServers.randomOrNull() ?: liteClientConfigGlobal.liteservers.random()
     }
 }
