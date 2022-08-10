@@ -13,7 +13,6 @@ inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()) = CellSlic
 interface CellSlice {
     val bits: BitString
     val refs: List<Cell>
-    val depth: Int
     var bitsPosition: Int
     var refsPosition: Int
 
@@ -87,11 +86,6 @@ private open class CellSliceImpl(
     override var bitsPosition: Int = 0,
     override var refsPosition: Int = 0
 ) : CellSlice {
-
-    override val depth: Int by lazy {
-        refs.maxOfOrNull { it.maxDepth } ?: 0
-    }
-
     override fun endParse() =
         check(bitsPosition == bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
 

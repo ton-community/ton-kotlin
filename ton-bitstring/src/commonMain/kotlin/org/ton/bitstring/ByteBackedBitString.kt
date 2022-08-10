@@ -28,7 +28,12 @@ open class ByteBackedBitString protected constructor(
         return result
     }
 
-    override fun toByteArray(): ByteArray = bytes.copyOf()
+    override fun toByteArray(augment: Boolean): ByteArray =
+        if (augment && size % 8 != 0) {
+            BitString.appendAugmentTag(bytes, size)
+        } else {
+            bytes.copyOf()
+        }
 
     override fun toBooleanArray(): BooleanArray = (this as List<Boolean>).toBooleanArray()
 
