@@ -21,9 +21,7 @@ internal data class BagOfCellsImpl(
 
     override fun toString(): String = buildString {
         roots.forEachIndexed { index, cell ->
-            val firstChild = index == 0
-            val lastChild = index == roots.lastIndex
-            Cell.toString(cell, this, "", firstChild, lastChild)
+            Cell.toString(cell, this)
         }
     }
 }

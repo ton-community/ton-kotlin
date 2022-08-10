@@ -4,34 +4,54 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.cell.exception.CellOverflowException
+import kotlin.math.ceil
+import kotlin.math.floor
 
-fun Cell(hex: String, vararg refs: Cell): Cell =
-    Cell.of(hex, *refs)
+fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
+    Cell.of(BitString(hex), refs = refs.toList(), isExotic)
 
-fun Cell(bits: BitString = BitString.empty(), refs: Iterable<Cell> = emptyList(), type: CellType = CellType.ORDINARY) =
-    Cell.of(bits, refs, type)
+fun Cell(hex: String, refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false): Cell =
+    Cell.of(BitString(hex), refs, isExotic)
 
-fun Cell(bits: BitString, vararg refs: Cell): Cell =
-    Cell.of(bits, *refs)
+fun Cell(bits: BitString = BitString.empty(), refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false) =
+    Cell.of(bits, refs, isExotic)
+
+fun Cell(bits: BitString, vararg refs: Cell, isExotic: Boolean = false): Cell =
+    Cell.of(bits, refs = refs, isExotic)
 
 @JsonClassDiscriminator("@type")
 interface Cell {
     val bits: BitString
     val refs: List<Cell>
-    val cellType: CellType
+    val type: CellType
 
-    val isExotic: Boolean
-    val isMerkle: Boolean
-    val isPruned: Boolean
-    val maxDepth: Int
-    val levelMask: LevelMask
+    val isExotic: Boolean get() = type.isExotic
+    val isMerkle: Boolean get() = type.isMerkle
+    val isPruned: Boolean get() = type.isPruned
+    val levelMask: Int
 
     fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    fun treeWalk(): Sequence<Cell>
-    fun loadCell(): Cell
-    fun beginParse(): CellSlice
+    fun hash(level: Int = 0): ByteArray
+    fun depth(level: Int = 0): Int
+
+    fun treeWalk(): Sequence<Cell> = sequence {
+        yieldAll(refs)
+        refs.forEach { reference ->
+            yieldAll(reference.treeWalk())
+        }
+    }
+
+    fun loadCell(): Cell =
+        when (type) {
+            CellType.ORDINARY -> this
+            CellType.PRUNED_BRANCH -> error("Can't load pruned branch cell")
+            CellType.LIBRARY_REFERENCE -> TODO()
+            CellType.MERKLE_PROOF -> refs[0]
+            CellType.MERKLE_UPDATE -> refs[1]
+        }
+
+    fun beginParse(): CellSlice = CellSlice.beginParse(this)
 
     fun <T> parse(block: CellSlice.() -> T): T {
         val slice = beginParse()
@@ -40,53 +60,44 @@ interface Cell {
         return result
     }
 
-    /**
-     * Computes the representation hash of a cell and returns it as a 256-bit byte array.
-     * Useful for signing and checking signatures of arbitrary entities represented by a tree of cells.
-     */
-    fun hash(): ByteArray
-
-    fun descriptors(): ByteArray
+    fun getBitsDescriptor(): Byte = Companion.getBitsDescriptor(bits)
+    fun getRefsDescriptor(): Byte = Companion.getRefsDescriptor(refs.size, isExotic, levelMask)
 
     override fun toString(): String
 
     companion object {
-        const val MAX_REFS = 4
-        const val MAX_LEVEL = 3
-
         @JvmStatic
-        fun of(hex: String, vararg refs: Cell): Cell =
-            DataCell.of(BitString(hex), *refs)
+        fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
+            CellImpl.of(BitString(hex), refs.toList(), isExotic)
 
         @JvmStatic
         fun of(
             bits: BitString = BitString(),
             refs: Iterable<Cell> = emptyList(),
-            type: CellType = CellType.ORDINARY
-        ): Cell = DataCell.of(bits, refs, type)
+            isExotic: Boolean = false
+        ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
         fun of(
             bits: BitString,
-            vararg refs: Cell
-        ): Cell = DataCell.of(bits, *refs)
+            vararg refs: Cell,
+            isExotic: Boolean = false
+        ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
-        fun checkRefsCount(count: Int, range: IntRange =  0..MAX_REFS) = require(count in range) {
-            throw CellOverflowException("Refs overflow. expected: $range, actual: $count")
+        fun toString(cell: Cell) = buildString {
+            toString(cell, this)
         }
 
         @JvmStatic
         fun toString(
             cell: Cell,
             appendable: Appendable,
-            indent: String = "",
-            lastChild: Boolean = true,
-            firstChild: Boolean = true
+            indent: String = ""
         ) {
             appendable.append(indent)
             if (cell.isExotic) {
-                appendable.append(cell.cellType.toString())
+                appendable.append(cell.type.toString())
                 appendable.append(' ')
             }
             appendable.append("x{")
@@ -94,11 +105,18 @@ interface Cell {
             appendable.append("}")
             cell.refs.forEachIndexed { index, reference ->
                 appendable.append('\n')
-                val firstRef = index == 0
-                val lastRef = index == cell.refs.lastIndex
-                toString(reference, appendable, "$indent    ", firstRef, lastRef)
+                toString(reference, appendable, "$indent    ")
             }
         }
+
+        @JvmStatic
+        fun getRefsDescriptor(refs: Int, isExotic: Boolean, levelMask: Int): Byte {
+            return (refs + ((if (isExotic) 1 else 0) * 8) + (levelMask * 32)).toByte()
+        }
+
+        @JvmStatic
+        fun getBitsDescriptor(bits: BitString): Byte =
+            (ceil(bits.size / 8.0).toInt() + floor(bits.size / 8.0).toInt()).toByte()
     }
 }
 

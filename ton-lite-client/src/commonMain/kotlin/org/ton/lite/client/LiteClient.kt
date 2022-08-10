@@ -33,7 +33,6 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 private const val BLOCK_ID_CACHE_SIZE = 100
 
@@ -53,9 +52,8 @@ open class LiteClient(
     )
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
-    private var goodServers: List<LiteServerDesc>? by atomic(null)
     val liteApi: LiteApi = LiteApi { query ->
-        adnlClientEngine.query(selectServer(), query)
+        adnlClientEngine.query(liteClientConfigGlobal.liteservers.random(), query)
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
@@ -248,13 +246,12 @@ open class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
-        // TODO: Fix root hash calculation (Pruned branch cells?)
-//        val actualRootHash = root.hash()
-//        check(blockId.root_hash.contentEquals(actualRootHash)) {
-//            "block root hash mismatch, expected: ${
-//                blockId.root_hash.encodeHex().uppercase()
-//            } , actual: ${actualRootHash.encodeHex().uppercase()}"
-//        }
+        val actualRootHash = root.hash()
+        check(blockId.root_hash.contentEquals(actualRootHash)) {
+            "block root hash mismatch, expected: ${
+                blockId.root_hash.encodeHex().uppercase()
+            } , actual: ${actualRootHash.encodeHex().uppercase()}"
+        }
         val block = try {
             root.parse(Block)
         } catch (e: Exception) {
@@ -446,30 +443,5 @@ open class LiteClient(
             knownBlockIds.removeFirst()
         }
         knownBlockIds.addLast(blockIdExt)
-    }
-
-    private suspend fun selectServer(): LiteServerDesc = coroutineScope {
-        var goodServers = goodServers
-        if (goodServers == null) {
-            goodServers = liteClientConfigGlobal.liteservers
-                .map { server ->
-                    async {
-                        try {
-                            val liteApi = LiteApi { query -> adnlClientEngine.query(server, query) }
-                            server to measureTime {
-                                liteApi.getTime()
-                            }
-                        } catch (e: Throwable) {
-                            server to null
-                        }
-                    }
-                }
-                .awaitAll()
-                .sortedBy { it.second }.mapNotNull {
-                    if (it.second == null) null else it.first
-                }
-            this@LiteClient.goodServers = goodServers
-        }
-        return@coroutineScope goodServers.randomOrNull() ?: liteClientConfigGlobal.liteservers.random()
     }
 }

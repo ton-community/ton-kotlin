@@ -31,7 +31,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
     fun plus(bytes: ByteArray, bits: Int): BitString
 
     fun slice(indices: IntRange): BitString
-    fun toByteArray(): ByteArray
+    fun toByteArray(augment: Boolean = false): ByteArray
     fun toBooleanArray(): BooleanArray
     fun toMutableBitString(): MutableBitString
 

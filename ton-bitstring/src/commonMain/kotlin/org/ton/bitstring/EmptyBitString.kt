@@ -22,7 +22,11 @@ internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
         throw IndexOutOfBoundsException(indices.toString())
     }
 
-    override fun toByteArray(): ByteArray = byteArrayOf()
+    override fun toByteArray(augment: Boolean): ByteArray = if (augment) {
+        byteArrayOf(0x80.toByte())
+    } else {
+        byteArrayOf()
+    }
 
     override fun toBooleanArray(): BooleanArray = booleanArrayOf()
 

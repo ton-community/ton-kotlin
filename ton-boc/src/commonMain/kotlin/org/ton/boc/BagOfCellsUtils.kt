@@ -1,14 +1,13 @@
 package org.ton.boc
 
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
-import org.ton.cell.CellType
 import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
-import kotlin.math.ceil
-import kotlin.math.floor
 
+@OptIn(DelicateCoroutinesApi::class)
 fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
@@ -78,7 +77,7 @@ fun Input.readBagOfCell(): BagOfCells {
 
     val cellBits = Array(cellCount) { BitString() }
     val cellRefs = Array(cellCount) { intArrayOf() }
-    val cellTypes = Array(cellCount) { CellType.ORDINARY }
+    val cellExotics = BooleanArray(cellCount) { false }
 
     repeat(cellCount) { cellIndex ->
         val d1 = readByte().toInt() and 0xFF
@@ -122,15 +121,16 @@ fun Input.readBagOfCell(): BagOfCells {
                 check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
                 refIndex
             }
-            cellTypes[cellIndex] = if (!isExotic) CellType.ORDINARY else CellType[cellData[0].toInt()]
+            cellExotics[cellIndex] = isExotic
         }
     }
 
     // Resolving references & constructing cells from leaves to roots
     val cells = Array<Cell?>(cellCount) { null }
-    repeat(cellCount) { cellIndex ->
-        createCell(cellIndex, cells, cellBits, cellRefs, cellTypes)
+    List(cellCount) { cellIndex ->
+        createCell(cellIndex, cells, cellBits, cellRefs, cellExotics)
     }
+
     // TODO: Crc32c check (calculate size of resulting bytearray)
     if (hashCrc32) {
         readIntLittleEndian()
@@ -143,7 +143,13 @@ fun Input.readBagOfCell(): BagOfCells {
     return BagOfCells(roots)
 }
 
-private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, refs: Array<IntArray>, types: Array<CellType>): Cell {
+private fun createCell(
+    index: Int,
+    cells: Array<Cell?>,
+    bits: Array<BitString>,
+    refs: Array<IntArray>,
+    exotics: BooleanArray
+): Cell {
     var cell = cells[index]
     if (cell != null) {
         return cell
@@ -151,9 +157,9 @@ private fun createCell(index: Int, cells: Array<Cell?>, bits: Array<BitString>, 
     val cellBits = bits[index]
     val cellRefIndexes = refs[index]
     val cellRefs = cellRefIndexes.map { refIndex ->
-        createCell(refIndex, cells, bits, refs, types)
+        createCell(refIndex, cells, bits, refs, exotics)
     }
-    cell = Cell(cellBits, cellRefs, types[index])
+    cell = Cell(cellBits, cellRefs, exotics[index])
     cells[index] = cell
     return cell
 }
@@ -192,13 +198,11 @@ private fun serializeBagOfCells(
 
     val serializedCells = cells.mapIndexed { index: Int, cell: Cell ->
         buildPacket {
-            val d1 = cell.refs.size + (if (cell.isExotic) 1 else 0) * 8 + cell.levelMask.level * 32
-            writeByte(d1.toByte())
-            val d2 = ceil(cell.bits.size / 8.0).toInt() + floor(cell.bits.size / 8.0).toInt()
-            writeByte(d2.toByte())
-            val cellData = if (cell.bits.size % 8 != 0) {
-                BitString.appendAugmentTag(cell.bits.toByteArray(), cell.bits.size)
-            } else cell.bits.toByteArray()
+            val d1 = cell.getRefsDescriptor()
+            writeByte(d1)
+            val d2 = cell.getBitsDescriptor()
+            writeByte(d2)
+            val cellData = cell.bits.toByteArray(augment = true)
             writeFully(cellData)
             cell.refs.forEach { reference ->
                 val refIndex = cells.indexOf(reference)
@@ -272,6 +276,7 @@ private fun Output.writeInt(value: Int, bytes: Int) {
             writeByte((value shr Short.SIZE_BITS).toByte())
             writeShort(value.toShort())
         }
+
         else -> writeInt(value)
     }
 }

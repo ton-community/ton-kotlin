@@ -16,12 +16,6 @@ interface CellBuilder {
     val bitsPosition: Int
 
     /**
-     * @return the depth of builder. If no cell references are stored in builder, then returns `0`;
-     * otherwise the returned value is one plus the maximum of depths of cells referred to from builder.
-     */
-    val depth: Int get() = refs.maxOfOrNull { it.maxDepth } ?: 0
-
-    /**
      * Converts a builder into an ordinary cell.
      */
     fun endCell(): Cell
