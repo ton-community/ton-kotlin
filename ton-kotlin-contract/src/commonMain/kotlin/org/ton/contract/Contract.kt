@@ -10,7 +10,7 @@ import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.storeTlb
 
-interface SmartContract {
+interface Contract {
     val liteApi: LiteApi
     val workchainId: Int
     val name: String

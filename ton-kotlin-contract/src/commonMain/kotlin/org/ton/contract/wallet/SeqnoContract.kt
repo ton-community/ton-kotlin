@@ -2,10 +2,10 @@ package org.ton.contract.wallet
 
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.VmStackTinyInt
+import org.ton.contract.Contract
 import org.ton.lite.api.liteserver.LiteServerAccountId
-import org.ton.smartcontract.SmartContract
 
-interface SeqnoWallet : SmartContract {
+interface SeqnoContract : Contract {
     suspend fun seqno(): Int = seqno(liteApi.getMasterchainInfo().last)
 
     suspend fun seqno(blockIdExt: TonNodeBlockIdExt): Int {

@@ -5,17 +5,17 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
+import org.ton.contract.wallet.SeqnoContract
+import org.ton.contract.wallet.WalletContract
 import org.ton.lite.api.LiteApi
-import org.ton.smartcontract.wallet.SeqnoWallet
-import org.ton.smartcontract.wallet.WalletContract
 
-abstract class AbstractWalletV3(
+abstract class AbstractContractV3(
     liteApi: LiteApi,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     val subwalletId: Int = DEFAULT_WALLET_ID + workchainId,
     private val timeout: Long = 60
-) : WalletContract(liteApi, privateKey, workchainId), SeqnoWallet {
+) : WalletContract(liteApi, privateKey, workchainId), SeqnoContract {
 
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno

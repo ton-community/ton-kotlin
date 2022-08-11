@@ -2,59 +2,58 @@ package org.ton.contract
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.*
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbCombinatorProvider
+import org.ton.tlb.storeTlb
 
 sealed interface ContentData {
-    data class Snake(val data: org.ton.contract.SnakeData) : org.ton.contract.ContentData
+    data class Snake(val data: SnakeData) : ContentData
 
-    data class Chunks(val data: org.ton.contract.ChunkedData) : org.ton.contract.ContentData
+    data class Chunks(val data: ChunkedData) : ContentData
 
-    companion object :
-        TlbCodec<org.ton.contract.ContentData> by _root_ide_package_.org.ton.contract.ContentDataCombinator {
-        @JvmStatic
-        fun tlbCombinator(): TlbCombinator<org.ton.contract.ContentData> =
-            _root_ide_package_.org.ton.contract.ContentDataCombinator
-    }
+    companion object : TlbCombinatorProvider<ContentData> by ContentDataCombinator
 }
 
-private object ContentDataCombinator : TlbCombinator<org.ton.contract.ContentData>() {
-    override val constructors: List<TlbConstructor<out org.ton.contract.ContentData>> =
+private object ContentDataCombinator : TlbCombinator<ContentData>() {
+    override val constructors: List<TlbConstructor<out ContentData>> =
         listOf(
-            _root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataSnakeConstructor,
-            _root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataChunksConstructor
+            ContentDataSnakeConstructor,
+            ContentDataChunksConstructor
         )
 
-    override fun getConstructor(value: org.ton.contract.ContentData): TlbConstructor<out org.ton.contract.ContentData> =
+    override fun getConstructor(value: ContentData): TlbConstructor<out ContentData> =
         when (value) {
-            is org.ton.contract.ContentData.Snake -> _root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataSnakeConstructor
-            is _root_ide_package_.org.ton.contract.ContentData.Chunks -> _root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataChunksConstructor
+            is ContentData.Snake -> ContentDataSnakeConstructor
+            is ContentData.Chunks -> ContentDataChunksConstructor
         }
 
-    private object ContentDataSnakeConstructor : TlbConstructor<_root_ide_package_.org.ton.contract.ContentData.Snake>(
+    private object ContentDataSnakeConstructor : TlbConstructor<ContentData.Snake>(
         schema = "snake#00 data:(SnakeData ~n) = ContentData;"
     ) {
-        private val snakeDataCodec = _root_ide_package_.org.ton.contract.SnakeData.Companion.tlbCodec()
+        private val snakeDataCodec = SnakeData.tlbCodec()
 
-        override fun storeTlb(cellBuilder: CellBuilder, value: _root_ide_package_.org.ton.contract.ContentData.Snake) {
+        override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Snake) {
             cellBuilder.storeTlb(
-                _root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataSnakeConstructor.snakeDataCodec,
+                snakeDataCodec,
                 value.data
             )
         }
 
-        override fun loadTlb(cellSlice: CellSlice): _root_ide_package_.org.ton.contract.ContentData.Snake =
-            _root_ide_package_.org.ton.contract.ContentData.Snake(cellSlice.loadTlb(_root_ide_package_.org.ton.contract.ContentDataCombinator.ContentDataSnakeConstructor.snakeDataCodec))
+        override fun loadTlb(cellSlice: CellSlice): ContentData.Snake =
+            ContentData.Snake(cellSlice.loadTlb(snakeDataCodec))
     }
 
     private object ContentDataChunksConstructor :
-        TlbConstructor<_root_ide_package_.org.ton.contract.ContentData.Chunks>(
+        TlbConstructor<ContentData.Chunks>(
             schema = "chunks#01 data:ChunkedData = ContentData;"
         ) {
-        override fun storeTlb(cellBuilder: CellBuilder, value: _root_ide_package_.org.ton.contract.ContentData.Chunks) {
-            cellBuilder.storeTlb(_root_ide_package_.org.ton.contract.ChunkedData, value.data)
+        override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Chunks) {
+            cellBuilder.storeTlb(ChunkedData, value.data)
         }
 
-        override fun loadTlb(cellSlice: CellSlice): _root_ide_package_.org.ton.contract.ContentData.Chunks =
-            _root_ide_package_.org.ton.contract.ContentData.Chunks(cellSlice.loadTlb(_root_ide_package_.org.ton.contract.ChunkedData))
+        override fun loadTlb(cellSlice: CellSlice): ContentData.Chunks =
+            ContentData.Chunks(cellSlice.loadTlb(ChunkedData))
     }
 }

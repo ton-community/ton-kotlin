@@ -6,11 +6,8 @@ import org.ton.block.StateInit
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
-import org.ton.crypto.base64
+import org.ton.contract.wallet.liteClient
 import org.ton.crypto.hex
-import org.ton.lite.client.LiteClient
-import org.ton.logger.Logger
-import org.ton.logger.PrintLnLogger
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 import kotlin.test.Test
@@ -20,14 +17,7 @@ import kotlin.test.assertEquals
 class WalletV3R2Test {
     private val privateKey = PrivateKeyEd25519(ByteArray(32))
 
-    private fun liteClient() = LiteClient(
-        ipv4 = 1426768764,
-        port = 13724,
-        publicKey = base64("R1KsqYlNks2Zows+I9s4ywhilbSevs9dH1x2KF9MeSU="),
-        logger = PrintLnLogger("TON SimpleWalletR3", Logger.Level.DEBUG)
-    )
-
-    private fun wallet() = WalletV3R2(liteClient(), privateKey)
+    private fun wallet() = ContractV3R2(liteClient().liteApi, privateKey)
 
     @Test
     fun `test private key`() {

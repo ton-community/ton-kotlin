@@ -3,20 +3,20 @@ package org.ton.contract.wallet.v4
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.contract.wallet.GetPublicKeyContract
 import org.ton.crypto.hex
 import org.ton.lite.api.LiteApi
-import org.ton.smartcontract.wallet.GetPublicKeyWallet
 
 /**
  * Wallet v4 revision 1
  */
-class WalletV4R2(
+class ContractV4R2(
     liteApi: LiteApi,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     subwalletId: Int = DEFAULT_WALLET_ID + workchainId,
     timeout: Long = 60
-) : AbstractWalletV4(liteApi, privateKey, workchainId, subwalletId, timeout), GetPublicKeyWallet {
+) : AbstractContractV4(liteApi, privateKey, workchainId, subwalletId, timeout), GetPublicKeyContract {
     override val name: String = "v4r2"
     override val code: Cell = CODE
 

@@ -29,7 +29,7 @@ open class ByteBackedBitString protected constructor(
     }
 
     override fun toByteArray(augment: Boolean): ByteArray =
-        if (augment) {
+        if (augment && (size % 8 != 0 || size == 0)) {
             BitString.appendAugmentTag(bytes, size)
         } else {
             bytes.copyOf()

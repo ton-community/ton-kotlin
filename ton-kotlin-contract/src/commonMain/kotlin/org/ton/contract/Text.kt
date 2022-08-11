@@ -3,14 +3,12 @@ package org.ton.contract
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 data class Text(
     val data: SnakeData
 ) {
-    companion object : TlbCodec<Text> by TextCombinator {
-        @JvmStatic
-        fun tlbCombinator(): TlbCombinator<Text> = TextCombinator
-    }
+    companion object : TlbCombinatorProvider<Text> by TextCombinator
 }
 
 private object TextCombinator : TlbCombinator<Text>() {

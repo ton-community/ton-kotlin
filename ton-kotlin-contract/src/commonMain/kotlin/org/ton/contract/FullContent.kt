@@ -6,6 +6,8 @@ import org.ton.cell.CellSlice
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.providers.TlbCombinatorProvider
+import org.ton.tlb.providers.TlbConstructorProvider
 
 sealed interface FullContent {
     data class OnChain(
@@ -16,10 +18,7 @@ sealed interface FullContent {
         val uri: Text
     ) : FullContent
 
-    companion object : TlbCodec<FullContent> by FullContentCombinator {
-        @JvmStatic
-        fun tlbCombinator(): TlbCombinator<FullContent> = FullContentCombinator
-    }
+    companion object : TlbCombinatorProvider<FullContent> by FullContentCombinator
 }
 
 private object FullContentCombinator : TlbCombinator<FullContent>() {

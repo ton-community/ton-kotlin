@@ -51,6 +51,8 @@ internal class CellImpl(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Cell) return false
+        if (bits.size != other.bits.size) return false
+        if (refs.size != other.refs.size) return false
         if (!hash().contentEquals(other.hash())) return false
         return true
     }

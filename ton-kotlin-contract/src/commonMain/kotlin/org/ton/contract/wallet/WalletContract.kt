@@ -6,10 +6,10 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.exception.CellOverflowException
 import org.ton.cell.storeRef
+import org.ton.contract.Contract
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.logger.Logger
-import org.ton.smartcontract.SmartContract
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 
@@ -17,7 +17,7 @@ abstract class WalletContract(
     override val liteApi: LiteApi,
     val privateKey: PrivateKeyEd25519,
     override val workchainId: Int = 0
-) : SmartContract {
+) : Contract {
     val logger: Logger by lazy {
         Logger.println(name, Logger.Level.DEBUG)
     }

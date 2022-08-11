@@ -11,12 +11,12 @@ import org.ton.lite.api.LiteApi
  *
  * [Fift-ASM source-code](https://github.com/ton-blockchain/ton/blob/fd7a8de9708c9ece8d802890519735b55bc99a8e/crypto/smartcont/new-wallet-v2.fif)
  */
-class WalletV2R1(
+class ContractV2R1(
     liteApi: LiteApi,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     timeout: Long = 60
-) : AbstractWalletV2(liteApi, privateKey, workchainId, timeout) {
+) : AbstractContractV2(liteApi, privateKey, workchainId, timeout) {
     override val name: String = "v2R1"
     override val code: Cell = CODE
 

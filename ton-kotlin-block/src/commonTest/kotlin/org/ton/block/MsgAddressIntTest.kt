@@ -191,11 +191,4 @@ class MsgAddressIntTest {
             addr3.toString(urlSafe = true, testOnly = true, bounceable = true)
         )
     }
-
-    @Test
-    fun a() {
-        val address = "EQCxhaSrUuwwsMMUnMu8jaipSrkhXwzXaWQfhhO1s2REdQAB"
-        val addrStd = AddrStd.parse(address)
-        assertEquals(address, addrStd.toString(true))
-    }
 }
