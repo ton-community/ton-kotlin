@@ -2,6 +2,7 @@
 
 package org.ton.lite.client
 
+import io.ktor.client.network.sockets.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
@@ -17,6 +18,7 @@ import org.ton.api.tonnode.*
 import org.ton.api.validator.config.ValidatorConfigGlobal
 import org.ton.block.*
 import org.ton.boc.BagOfCells
+import org.ton.cell.CellType
 import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
 import org.ton.lite.api.LiteApi
@@ -53,13 +55,29 @@ open class LiteClient(
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
     val liteApi: LiteApi = LiteApi { query ->
-        adnlClientEngine.query(liteClientConfigGlobal.liteservers.random(), query)
+        var reconnectAttempts = 0
+        var result: ByteArray
+        while (true) {
+            try {
+                result = adnlClientEngine.query(liteClientConfigGlobal.liteservers.random(), query)
+                break
+            } catch (e: ConnectTimeoutException) {
+                if (reconnectAttempts++ > 3) {
+                    throw e
+                }
+            }
+        }
+        result
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
     private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(TonNodeBlockIdExt())
     private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
-    private var zeroStateId: TonNodeZeroStateIdExt by atomic(TonNodeZeroStateIdExt())
+    private var zeroStateId: TonNodeZeroStateIdExt by atomic(
+        TonNodeZeroStateIdExt(
+            liteClientConfigGlobal.validator.zeroState
+        )
+    )
     private var lastBlock: LiteServerBlockData? by atomic(null)
     var serverVersion: Int by atomic(0)
         private set
@@ -190,17 +208,20 @@ open class LiteClient(
         result
     }
 
-    suspend fun lookupBlock(blockId: TonNodeBlockId? = null): TonNodeBlockIdExt? {
-        if (blockId == null) {
-            return getLastBlockId()
+    suspend fun lookupBlock(
+        blockId: TonNodeBlockId,
+        lt: Long? = null,
+        time: Instant? = null
+    ): TonNodeBlockIdExt? {
+        if (blockId is TonNodeBlockIdExt) {
+            return blockId
         }
-        if (blockId is TonNodeBlockIdExt) return blockId
         val knownBlockId = knownBlockIds.find { it == blockId }
         if (knownBlockId != null) {
             return knownBlockId
         }
         val blockHeader = try {
-            liteApi.lookupBlock(blockId)
+            liteApi.lookupBlock(blockId, lt, time?.epochSeconds?.toInt())
         } catch (e: TonNotReadyException) {
             return null
         } catch (e: Exception) {
@@ -209,6 +230,20 @@ open class LiteClient(
         val actualBlockId = blockHeader.id
         check((!blockId.isValid()) || blockId == actualBlockId) {
             "block id mismatch, expected: $blockId actual: $actualBlockId"
+        }
+        val blockProofCell = try {
+            BagOfCells(blockHeader.header_proof).first()
+        } catch (e: Exception) {
+            throw IllegalStateException("Can't parse block proof", e)
+        }
+        val actualRootHash = blockProofCell.refs.firstOrNull()?.hash(level = 0)
+        check(
+            blockProofCell.type == CellType.MERKLE_PROOF &&
+                    blockHeader.id.root_hash.contentEquals(actualRootHash)
+        ) {
+            "Root hash mismatch:" +
+                    "\n expected: ${blockHeader.id.root_hash.encodeHex()}" +
+                    "\n   actual: ${actualRootHash?.encodeHex()}"
         }
         registerBlockId(blockHeader.id)
         return blockHeader.id

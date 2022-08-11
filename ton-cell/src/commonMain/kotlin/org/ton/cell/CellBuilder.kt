@@ -82,6 +82,46 @@ interface CellBuilder {
         @JvmStatic
         fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
             CellBuilderImpl(maxLength).apply(builder).endCell()
+
+        @JvmStatic
+        fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
+            createCell {
+                val levelMask = cell.levelMask.apply(virtualizationLevel)
+                val level = levelMask.level
+                check(newLevel >= level + 1)
+
+                storeUInt(CellType.PRUNED_BRANCH.value, 8)
+                storeUInt((levelMask or LevelMask.level(newLevel)).mask, 8)
+                repeat(level + 1) {
+                    if (levelMask.isSignificant(it)) {
+                        storeBytes(cell.hash(it))
+                    }
+                }
+                repeat(level + 1) {
+                    if (levelMask.isSignificant(it)) {
+                        storeUInt(cell.depth(it), 16)
+                    }
+                }
+            }
+
+        @JvmStatic
+        fun createMerkleProof(cellProof: Cell): Cell = createCell {
+            storeUInt(CellType.MERKLE_PROOF.value, 8)
+            storeBytes(cellProof.hash(level = 0))
+            storeUInt(cellProof.depth(level = 0), Cell.DEPTH_BITS)
+            storeRef(cellProof)
+        }
+
+        @JvmStatic
+        fun createMerkleUpdate(fromProof: Cell, toProof: Cell) = createCell {
+            storeUInt(CellType.MERKLE_UPDATE.value, 8)
+            storeBytes(fromProof.hash(level = 0))
+            storeBytes(toProof.hash(level = 0))
+            storeUInt(fromProof.depth(level = 0), Cell.DEPTH_BITS)
+            storeUInt(toProof.depth(level = 0), Cell.DEPTH_BITS)
+            storeRef(fromProof)
+            storeRef(toProof)
+        }
     }
 
     fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder

@@ -1,6 +1,8 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell.Companion.DEPTH_BYTES
+import org.ton.cell.Cell.Companion.HASH_BYTES
 import org.ton.cell.Cell.Companion.getBitsDescriptor
 import org.ton.cell.Cell.Companion.getRefsDescriptor
 import org.ton.crypto.encodeHex
@@ -11,16 +13,16 @@ internal class CellImpl(
     override val bits: BitString = BitString(0),
     override val refs: List<Cell> = emptyList(),
     override val type: CellType = CellType.ORDINARY,
-    override val levelMask: Int,
+    override val levelMask: LevelMask,
     private val hashes: Array<ByteArray> = emptyArray(),
     private val depths: Array<Int> = emptyArray(),
 ) : Cell {
     private val hashCode = hash().contentHashCode()
 
     override fun hash(level: Int): ByteArray {
-        var hashIndex = getHashesCountFromMask(applyLevelMask(levelMask, level)) - 1
+        var hashIndex = levelMask.apply(level).hashIndex
         if (type == CellType.PRUNED_BRANCH) {
-            val thisHashIndex = getHashesCountFromMask(levelMask and 7) - 1
+            val thisHashIndex = levelMask.hashIndex
             if (hashIndex != thisHashIndex) {
                 val offset = (2 + hashIndex * HASH_BYTES)
                 return bits.toByteArray().copyOfRange(offset, offset + HASH_BYTES)
@@ -31,9 +33,9 @@ internal class CellImpl(
     }
 
     override fun depth(level: Int): Int {
-        var hashIndex = getHashesCountFromMask(applyLevelMask(levelMask, level)) - 1
+        var hashIndex = levelMask.apply(level).hashIndex
         if (type == CellType.PRUNED_BRANCH) {
-            val thisHashIndex = getHashesCountFromMask(levelMask and 7) - 1
+            val thisHashIndex = levelMask.hashIndex
             if (hashIndex != thisHashIndex) {
                 val bytes = bits.toByteArray()
                 val offset = 2 + thisHashIndex * HASH_BYTES + hashIndex * DEPTH_BYTES
@@ -56,9 +58,6 @@ internal class CellImpl(
     override fun hashCode(): Int = hashCode
 
     companion object {
-        private const val HASH_BYTES = 32
-        private const val DEPTH_BYTES = 2
-
         @JvmStatic
         fun of(
             bits: BitString,
@@ -70,7 +69,7 @@ internal class CellImpl(
                 require(dataBytes.size > 1) { "Not enough data for exotic cell" }
                 CellType[dataBytes[0].toInt()]
             } else CellType.ORDINARY
-            var levelMask = 0
+            var levelMask = LevelMask()
             when (type) {
                 CellType.ORDINARY -> {
                     refs.forEach { ref ->
@@ -85,13 +84,13 @@ internal class CellImpl(
                     require(dataBytes.size > 2) {
                         "Not enough data for a pruned branch cell"
                     }
-                    levelMask = dataBytes[1].toInt()
-                    val level = getLevelFromMask(levelMask and 7)
+                    levelMask = LevelMask(dataBytes[1].toInt())
+                    val level = levelMask.level
                     require(level in 0..3) {
                         "Pruned branch cell has an invalid level"
                     }
-                    val newLevelMask = applyLevelMask(levelMask, level - 1)
-                    val hashes = getHashesCountFromMask(newLevelMask)
+                    val newLevelMask = levelMask.apply(level - 1)
+                    val hashes = newLevelMask.hashCount
                     require(dataBytes.size == (2 + hashes * (HASH_BYTES + DEPTH_BYTES))) {
                         "Not enough data for pruned branch cell"
                     }
@@ -170,22 +169,22 @@ internal class CellImpl(
                     levelMask = (refs[0].levelMask or refs[1].levelMask) shr 1
                 }
             }
-            val totalHashCount = getHashesCountFromMask(levelMask and 7)
+            val totalHashCount = levelMask.hashCount
             val hashCount = if (type == CellType.PRUNED_BRANCH) 1 else totalHashCount
             val hashIndexOffset = totalHashCount - hashCount
 
             val hashes = Array(hashCount) { byteArrayOf() }
             val depths = Array(hashCount) { 0 }
 
-            val level = getLevelFromMask(levelMask and 7)
+            val level = levelMask.level
             var hashIndex = 0
             repeat(level + 1) { levelIndex ->
-                if (!isLevelSignificant(levelMask, levelIndex)) return@repeat
+                if (!levelMask.isSignificant(levelIndex)) return@repeat
                 if (hashIndex < hashIndexOffset) {
                     hashIndex++
                     return@repeat
                 }
-                val newLevelMask = applyLevelMask(levelMask, levelIndex)
+                val newLevelMask = levelMask.apply(levelIndex)
                 val d1 = getRefsDescriptor(refs.size, isExotic, newLevelMask)
                 val d2 = getBitsDescriptor(bits)
                 var representation = byteArrayOf(d1, d2)
@@ -255,6 +254,9 @@ internal class CellImpl(
             }
             return n + 1
         }
+
+        private fun depthToByteArray(depth: Int): ByteArray =
+            byteArrayOf((depth shr 8).toByte(), depth.toByte())
 
         private fun applyLevelMask(levelMask: Int, level: Int): Int =
             levelMask and ((1 shl level) - 1)

@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
+import kotlin.time.ExperimentalTime
 
 @OptIn(DelicateCoroutinesApi::class)
 fun Input.readBagOfCell(): BagOfCells {
@@ -143,6 +144,7 @@ fun Input.readBagOfCell(): BagOfCells {
     return BagOfCells(roots)
 }
 
+@OptIn(ExperimentalTime::class)
 private fun createCell(
     index: Int,
     cells: Array<Cell?>,

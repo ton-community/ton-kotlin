@@ -15,15 +15,15 @@ interface LiteServerLookupBlockFunction : LiteServerQueryFunction {
         query(query, LiteServerLookupBlock, LiteServerBlockHeader)
 
     suspend fun lookupBlock(
-        mode: Int,
         id: TonNodeBlockId,
         lt: Long? = null,
         utime: Int? = null
-    ) = query(LiteServerLookupBlock(mode, id, lt, utime))
-
-    suspend fun lookupBlock(
-        id: TonNodeBlockId,
-    ) = query(LiteServerLookupBlock(id))
+    ): LiteServerBlockHeader {
+        val query = if (utime != null) LiteServerLookupBlock(id, utime)
+        else if (lt != null) LiteServerLookupBlock(id, lt)
+        else LiteServerLookupBlock(id)
+        return query(query)
+    }
 
     suspend fun lookupBlockByUtime(
         id: TonNodeBlockId,

@@ -21,6 +21,11 @@ data class TonNodeZeroStateIdExt(
     val file_hash: ByteArray
 ) {
     constructor() : this(Workchain.INVALID_WORKCHAIN, ByteArray(0), ByteArray(0))
+    constructor(tonNodeBlockIdExt: TonNodeBlockIdExt) : this(
+        tonNodeBlockIdExt.workchain,
+        tonNodeBlockIdExt.root_hash,
+        tonNodeBlockIdExt.file_hash
+    )
 
     fun isValid(): Boolean = workchain != Workchain.INVALID_WORKCHAIN
 
