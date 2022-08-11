@@ -31,14 +31,14 @@
             - [basic checks](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/Crc16Test.kt)
             - check usage in `liteServer.runSmcMethod` function in Lite-API for method names
             - check usage in user-friendly (base64) address parsing
-  - hex
-      - check `UPPER CASE` and `lower case`
-      - check invalid characters
-      - [basic checks with expected values](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/HexTest.kt)
-      - incomplete hex (`AA_`) aka Fift-hex should be implemented as a separate function that reuses basic
-        hex-function
-  - ed25519 keypair
-      - [check expected keypair generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L42)
+    - hex
+        - check `UPPER CASE` and `lower case`
+        - check invalid characters
+        - [basic checks with expected values](https://github.com/andreypfau/ton-kotlin/blob/main/ton-crypto/src/commonTest/kotlin/org/ton/crypto/HexTest.kt)
+        - incomplete hex (`AA_`) aka Fift-hex should be implemented as a separate function that reuses basic
+          hex-function
+    - ed25519 keypair
+        - [check expected keypair generation](https://github.com/andreypfau/ton-kotlin/blob/6e2f83fc80f19466c84289c40e6de396b7320752/ton-smartcontract/src/jvmTest/kotlin/org/ton/smartcontract/wallet/v1/WalletV1R3Test.kt#L42)
 - BitString
     - [BitString creation](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L11)
     - [BitString concatenation without shifting](https://github.com/andreypfau/ton-kotlin/blob/363504ec96e821d4178dc09a2234377fd02808e9/ton-bitstring/src/commonTest/kotlin/org/ton/bitstring/BitStringTest.kt#L44)
