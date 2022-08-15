@@ -8,6 +8,7 @@ import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -15,16 +16,13 @@ import org.ton.tlb.storeTlb
 data class BlockCreateStatsRegular(
     val counters: HashMapE<CreatorStats>
 ) : BlockCreateStats {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlockCreateStatsRegular> = BlockCreateStatsRegularTlbConstructor
-    }
+    companion object : TlbConstructorProvider<BlockCreateStatsRegular> by BlockCreateStatsRegularTlbConstructor
 }
 
 private object BlockCreateStatsRegularTlbConstructor : TlbConstructor<BlockCreateStatsRegular>(
     schema = "block_create_stats#17 counters:(HashmapE 256 CreatorStats) = BlockCreateStats;"
 ) {
-    val hashmapE by lazy { HashMapE.tlbCodec(256, CreatorStats.tlbCodec()) }
+    val hashmapE = HashMapE.tlbCodec(256, CreatorStats)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

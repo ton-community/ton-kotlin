@@ -39,7 +39,13 @@ open class UIntTlbConstructor(
         fun long(length: Int = Long.SIZE_BITS) =
             number(encode = { storeUInt(it, length) }, decode = { loadUInt(length).toLong() })
 
-        fun <T : Number> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
+        fun uint32() =
+            number(encode = { storeUInt32(it) }, decode = { loadUInt32() })
+
+        fun uint64() =
+            number(encode = { storeUInt64(it) }, decode = { loadUInt64() })
+
+        fun <T : Any> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
             object : TlbConstructor<T>("") {
                 override fun storeTlb(
                     cellBuilder: CellBuilder,
@@ -56,3 +62,6 @@ open class UIntTlbConstructor(
             }
     }
 }
+
+fun UInt.Companion.tlbConstructor() = UIntTlbConstructor.uint32()
+fun ULong.Companion.tlbConstructor() = UIntTlbConstructor.uint64()

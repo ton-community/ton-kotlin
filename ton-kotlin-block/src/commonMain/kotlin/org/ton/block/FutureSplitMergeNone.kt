@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("fsm_none")
-object FutureSplitMergeNone : FutureSplitMerge {
-    @JvmStatic
-    fun tlbCodec(): TlbConstructor<FutureSplitMergeNone> = FutureSplitMergeNoneTlbConstructor
-}
+object FutureSplitMergeNone : FutureSplitMerge,
+    TlbConstructorProvider<FutureSplitMergeNone> by FutureSplitMergeNoneTlbConstructor
 
 private object FutureSplitMergeNoneTlbConstructor : TlbConstructor<FutureSplitMergeNone>(
     schema = "fsm_none\$0 = FutureSplitMerge;"

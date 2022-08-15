@@ -294,19 +294,18 @@ open class LiteClient(
         }
         val shard = block.info.shard
         val prevs: List<TonNodeBlockIdExt>
-        val prevSeqno: Int
+        val prevSeqno: UInt
         if (!block.info.after_merge) {
             val prev1 = block.info.prev_ref.prevs().first()
             prevSeqno = prev1.seq_no
             val prevBlockIdExt = TonNodeBlockIdExt(
                 shard.workchain_id,
-                if (block.info.after_split) Shard.shardParent(shard.shard_prefix.toULong())
-                    .toLong() else shard.shard_prefix,
-                prev1.seq_no,
+                (if (block.info.after_split) Shard.shardParent(shard.shard_prefix) else shard.shard_prefix).toLong(),
+                prev1.seq_no.toInt(),
                 prev1.root_hash,
                 prev1.file_hash
             )
-            check(!block.info.after_split || prev1.seq_no != 0) {
+            check(!block.info.after_split || prev1.seq_no != 0u) {
                 "shardchains cannot be split immediately after initial state"
             }
             prevs = listOf(prevBlockIdExt)
@@ -319,25 +318,25 @@ open class LiteClient(
             prevs = listOf(
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toULong(), true).toLong(),
-                    prev1.seq_no,
+                    Shard.shardChild(shard.shard_prefix, true).toLong(),
+                    prev1.seq_no.toInt(),
                     prev1.root_hash,
                     prev1.file_hash
                 ),
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toULong(), false).toLong(),
-                    prev2.seq_no,
+                    Shard.shardChild(shard.shard_prefix, false).toLong(),
+                    prev2.seq_no.toInt(),
                     prev2.root_hash,
                     prev2.file_hash
                 ),
             )
-            check(prev1.seq_no != 0 && prev2.seq_no != 0) {
+            check(prev1.seq_no != 0u && prev2.seq_no != 0u) {
                 "shardchains cannot be merged immediately after initial state"
             }
         }
-        check(block.info.seq_no == prevSeqno + 1) {
-            "block $blockId has invalid seqno, expected: ${prevSeqno + 1} , actual: ${block.info.seq_no}"
+        check(block.info.seq_no == prevSeqno + 1u) {
+            "block $blockId has invalid seqno, expected: ${prevSeqno + 1u} , actual: ${block.info.seq_no}"
         }
         prevs.forEachIndexed { index, id ->
             logger.debug { "previous block #$index : $id" }
@@ -346,7 +345,13 @@ open class LiteClient(
             prevs.first()
         } else {
             val mcRef = checkNotNull(block.info.master_ref?.master) { "missing master block reference" }
-            TonNodeBlockIdExt(Workchain.MASTERCHAIN_ID, Shard.ID_ALL, mcRef.seq_no, mcRef.root_hash, mcRef.file_hash)
+            TonNodeBlockIdExt(
+                Workchain.MASTERCHAIN_ID,
+                Shard.ID_ALL,
+                mcRef.seq_no.toInt(),
+                mcRef.root_hash,
+                mcRef.file_hash
+            )
         }
         logger.debug { "reference masterchain block: $mcBlockId" }
         registerBlockId(mcBlockId)

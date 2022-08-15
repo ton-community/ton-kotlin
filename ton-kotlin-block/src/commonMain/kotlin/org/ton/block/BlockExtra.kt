@@ -37,16 +37,14 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
             "  created_by:bits256\n" +
             "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
 ) {
-    val inMsgDescr by lazy { AugDictionary.tlbCodec(256, InMsg.tlbCodec(), ImportFees.tlbCodec()) }
-    val outMsgDescr by lazy { AugDictionary.tlbCodec(256, OutMsg.tlbCodec(), CurrencyCollection.tlbCodec()) }
-    val shardAccountBlock by lazy {
-        AugDictionary.tlbCodec(
-            256,
-            AccountBlock,
-            CurrencyCollection.tlbCodec()
-        )
-    }
-    val maybeMcBlockExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McBlockExtra)) }
+    val inMsgDescr = AugDictionary.tlbCodec(256, InMsg, ImportFees)
+    val outMsgDescr = AugDictionary.tlbCodec(256, OutMsg, CurrencyCollection)
+    val shardAccountBlock = AugDictionary.tlbCodec(
+        256,
+        AccountBlock,
+        CurrencyCollection
+    )
+    val maybeMcBlockExtra = Maybe.tlbCodec(Cell.tlbCodec(McBlockExtra))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

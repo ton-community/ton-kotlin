@@ -50,18 +50,18 @@ private class MessageRelaxedTlbConstructor<X : Any>(
             "init:(Maybe (Either StateInit ^StateInit)) " +
             "body:(Either X ^X) = MessageRelaxed X;"
 ) {
-    private val commonMsgInfoCodec by lazy { CommonMsgInfoRelaxed.tlbCodec() }
-    private val stateInitCodec by lazy { StateInit.tlbCodec() }
-    private val referencedStateInitCodec by lazy { Cell.tlbCodec(stateInitCodec) }
-    private val eitherStateInitCodec by lazy { Either.tlbCodec(stateInitCodec, referencedStateInitCodec) }
-    private val maybeEitherCodec by lazy { Maybe.tlbCodec(eitherStateInitCodec) }
-    private val referencedXCodec by lazy { Cell.tlbCodec(x) }
-    private val eitherXCodec by lazy { Either.tlbCodec(x, referencedXCodec) }
+    companion object {
+        private val referencedStateInitCodec = Cell.tlbCodec(StateInit)
+        private val eitherStateInitCodec = Either.tlbCodec(StateInit, referencedStateInitCodec)
+        private val maybeEitherCodec = Maybe.tlbCodec(eitherStateInitCodec)
+    }
+
+    private val eitherXCodec = Either.tlbCodec(x, Cell.tlbCodec(x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: MessageRelaxed<X>
     ) = cellBuilder {
-        storeTlb(commonMsgInfoCodec, value.info)
+        storeTlb(CommonMsgInfoRelaxed, value.info)
         storeTlb(maybeEitherCodec, value.init)
         storeTlb(eitherXCodec, value.body)
     }
@@ -69,7 +69,7 @@ private class MessageRelaxedTlbConstructor<X : Any>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): MessageRelaxed<X> = cellSlice {
-        val info = loadTlb(commonMsgInfoCodec)
+        val info = loadTlb(CommonMsgInfoRelaxed)
         val init = loadTlb(maybeEitherCodec)
         val body = loadTlb(eitherXCodec)
         MessageRelaxed(info, init, body)

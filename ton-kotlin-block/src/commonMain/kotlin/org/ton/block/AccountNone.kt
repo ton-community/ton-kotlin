@@ -5,13 +5,11 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("account_none")
-object AccountNone : Account {
-    @JvmStatic
-    fun tlbCodec(): TlbConstructor<AccountNone> = AccountNoneTlbConstructor
-
+object AccountNone : Account, TlbConstructorProvider<AccountNone> by AccountNoneTlbConstructor {
     override fun toString(): String = "account_none"
 }
 

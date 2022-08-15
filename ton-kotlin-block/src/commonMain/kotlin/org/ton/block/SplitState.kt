@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -13,26 +14,21 @@ data class SplitState(
     val left: ShardStateUnsplit,
     val right: ShardStateUnsplit
 ) : ShardState {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<SplitState> = SplitStateTlbConstructor
-    }
+    companion object : TlbConstructorProvider<SplitState> by SplitStateTlbConstructor
 }
 
 private object SplitStateTlbConstructor : TlbConstructor<SplitState>(
     schema = "split_state#5f327da5 left:^ShardStateUnsplit right:^ShardStateUnsplit = ShardState;"
 ) {
-    val shardStateUnsplit by lazy { ShardStateUnsplit.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: SplitState
     ) = cellBuilder {
         storeRef {
-            storeTlb(shardStateUnsplit, value.left)
+            storeTlb(ShardStateUnsplit, value.left)
         }
         storeRef {
-            storeTlb(shardStateUnsplit, value.right)
+            storeTlb(ShardStateUnsplit, value.right)
         }
     }
 
@@ -40,10 +36,10 @@ private object SplitStateTlbConstructor : TlbConstructor<SplitState>(
         cellSlice: CellSlice
     ): SplitState = cellSlice {
         val left = loadRef {
-            loadTlb(shardStateUnsplit)
+            loadTlb(ShardStateUnsplit)
         }
         val right = loadRef {
-            loadTlb(shardStateUnsplit)
+            loadTlb(ShardStateUnsplit)
         }
         SplitState(left, right)
     }

@@ -9,6 +9,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -21,10 +22,7 @@ data class TransTickTock(
     val aborted: Boolean,
     val destroyed: Boolean
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransTickTock> = TransTickTockTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransTickTock> by TransTickTockTlbConstructor
 }
 
 private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
@@ -32,17 +30,15 @@ private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
             "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
             "  aborted:Bool destroyed:Bool = TransactionDescr;"
 ) {
-    val trStoragePhase by lazy { TrStoragePhase.tlbCodec() }
-    val trComputePhase by lazy { TrComputePhase.tlbCodec() }
-    val maybeTrActionPhase by lazy { Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase.tlbCodec())) }
+    val maybeTrActionPhase = Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TransTickTock
     ) = cellBuilder {
         storeBit(value.is_tock)
-        storeTlb(trStoragePhase, value.storage_ph)
-        storeTlb(trComputePhase, value.compute_ph)
+        storeTlb(TrStoragePhase, value.storage_ph)
+        storeTlb(TrComputePhase, value.compute_ph)
         storeTlb(maybeTrActionPhase, value.action)
         storeBit(value.aborted)
         storeBit(value.destroyed)
@@ -52,8 +48,8 @@ private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
         cellSlice: CellSlice
     ): TransTickTock = cellSlice {
         val isTock = loadBit()
-        val storagePh = loadTlb(trStoragePhase)
-        val computePh = loadTlb(trComputePhase)
+        val storagePh = loadTlb(TrStoragePhase)
+        val computePh = loadTlb(TrComputePhase)
         val action = loadTlb(maybeTrActionPhase)
         val aborted = loadBit()
         val destroyed = loadBit()

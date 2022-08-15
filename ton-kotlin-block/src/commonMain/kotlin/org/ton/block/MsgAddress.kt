@@ -1,16 +1,13 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 sealed interface MsgAddress {
-    companion object : TlbCodec<MsgAddress> by MsgAddressTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<MsgAddress> = MsgAddressTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<MsgAddress> by MsgAddressTlbCombinator
 }
 
 private object MsgAddressTlbCombinator : TlbCombinator<MsgAddress>() {

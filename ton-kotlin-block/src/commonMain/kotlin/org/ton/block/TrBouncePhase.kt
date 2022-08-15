@@ -6,20 +6,18 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface TrBouncePhase {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<TrBouncePhase> = TrBouncePhaseTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<TrBouncePhase> by TrBouncePhaseTlbCombinator
 }
 
 private object TrBouncePhaseTlbCombinator : TlbCombinator<TrBouncePhase>() {
-    val negFunds by lazy { TrPhaseBounceNegFunds.tlbCodec() }
-    val noFunds by lazy { TrPhaseBounceNoFunds.tlbCodec() }
-    val ok by lazy { TrPhaseBounceOk.tlbCodec() }
+    val negFunds = TrPhaseBounceNegFunds.tlbConstructor()
+    val noFunds = TrPhaseBounceNoFunds.tlbConstructor()
+    val ok = TrPhaseBounceOk.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out TrBouncePhase>> by lazy {
         listOf(negFunds, noFunds, ok)

@@ -7,6 +7,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("ed25519_pubkey")
@@ -17,10 +18,7 @@ data class SigPubKey(
         require(pubkey.size == 256) { "required: pubkey.size == 256, actual: ${pubkey.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<SigPubKey> = SigPubKeyTlbConstructor
-    }
+    companion object : TlbConstructorProvider<SigPubKey> by SigPubKeyTlbConstructor
 }
 
 private object SigPubKeyTlbConstructor : TlbConstructor<SigPubKey>(

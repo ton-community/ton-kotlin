@@ -5,7 +5,6 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.hashmap.EmptyHashMapE
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -25,7 +24,7 @@ data class StateInit(
     constructor(
         code: Cell? = null,
         data: Cell? = null,
-        library: HashMapE<SimpleLib> = EmptyHashMapE(),
+        library: HashMapE<SimpleLib> = HashMapE.of(),
         splitDepth: Int? = null,
         special: TickTock? = null
     ) : this(

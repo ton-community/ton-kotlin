@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -14,10 +15,7 @@ data class MsgImportImm(
     val transaction: Transaction,
     val fwd_fee: Coins
 ) : InMsg {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<MsgImportImm> = MsgImportImmTlbConstructor
-    }
+    companion object : TlbConstructorProvider<MsgImportImm> by MsgImportImmTlbConstructor
 }
 
 private object MsgImportImmTlbConstructor : TlbConstructor<MsgImportImm>(

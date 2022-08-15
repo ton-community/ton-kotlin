@@ -6,6 +6,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -13,10 +14,7 @@ data class KeyExtBlkRef(
     val key: Boolean,
     val blk_ref: ExtBlkRef
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<KeyExtBlkRef> = KeyExtBlkRefTlbConstructor
-    }
+    companion object : TlbConstructorProvider<KeyExtBlkRef> by KeyExtBlkRefTlbConstructor
 }
 
 private object KeyExtBlkRefTlbConstructor : TlbConstructor<KeyExtBlkRef>(

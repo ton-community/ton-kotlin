@@ -4,17 +4,15 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 data class EnqueuedMsg(
-    val enqueued_lt: Long,
+    val enqueued_lt: ULong,
     val out_msg: MsgEnvelope
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<EnqueuedMsg> = EnqueuedMsgTlbConstructor
-    }
+    companion object : TlbConstructorProvider<EnqueuedMsg> by EnqueuedMsgTlbConstructor
 }
 
 private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
@@ -24,7 +22,7 @@ private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
         cellBuilder: CellBuilder,
         value: EnqueuedMsg
     ) = cellBuilder {
-        storeUInt(value.enqueued_lt, 64)
+        storeUInt64(value.enqueued_lt)
         storeRef {
             storeTlb(MsgEnvelope, value.out_msg)
         }
@@ -33,7 +31,7 @@ private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): EnqueuedMsg = cellSlice {
-        val enqueuedLt = loadUInt(64).toLong()
+        val enqueuedLt = loadUInt64()
         val outMsg = loadRef {
             loadTlb(MsgEnvelope)
         }

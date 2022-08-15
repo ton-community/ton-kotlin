@@ -13,7 +13,7 @@ import org.ton.tlb.storeTlb
 @SerialName("block_info")
 @Serializable
 data class BlockInfo(
-    val version: Long,
+    val version: UInt,
     val not_master: Boolean,
     val after_merge: Boolean,
     val before_split: Boolean,
@@ -23,27 +23,27 @@ data class BlockInfo(
     val key_block: Boolean,
     val vert_seqno_incr: Boolean,
     val flags: BitString,
-    val seq_no: Int,
-    val vert_seq_no: Int,
+    val seq_no: UInt,
+    val vert_seq_no: UInt,
     val shard: ShardIdent,
-    val gen_utime: Long,
-    val start_lt: Long,
-    val end_lt: Long,
-    val gen_validator_list_hash_short: Long,
-    val gen_catchain_seqno: Long,
-    val min_ref_mc_seqno: Long,
-    val prev_key_block_seqno: Long,
+    val gen_utime: UInt,
+    val start_lt: ULong,
+    val end_lt: ULong,
+    val gen_validator_list_hash_short: UInt,
+    val gen_catchain_seqno: UInt,
+    val min_ref_mc_seqno: UInt,
+    val prev_key_block_seqno: UInt,
     val gen_software: GlobalVersion?,
     val master_ref: BlkMasterInfo?,
     val prev_ref: BlkPrevInfo,
     val prev_vert_ref: BlkPrevInfo?
 ) {
-    val prev_seq_no: Int get() = seq_no - 1
+    val prev_seq_no: UInt get() = seq_no - 1u
 
     init {
         require(flags.size == 8) { "expected: flags.size == 8, actual: ${flags.size}" }
         require(flags.subList(1, flags.lastIndex).all { !it }) { "expected: flags <= 1, actual: $flags" }
-        require(vert_seq_no >= 0) { "expected: vert_seq_no >= vert_seqno_incr, actual: $vert_seq_no" }
+        require(vert_seq_no >= 0u) { "expected: vert_seq_no >= vert_seqno_incr, actual: $vert_seq_no" }
     }
 
     companion object : TlbCodec<BlockInfo> by BlockInfoTlbConstructor.asTlbCombinator()
@@ -75,7 +75,7 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         cellBuilder: CellBuilder,
         value: BlockInfo
     ) = cellBuilder {
-        storeUInt(value.version, 32)
+        storeUInt32(value.version)
         storeBit(value.not_master)
         storeBit(value.after_merge)
         storeBit(value.before_split)
@@ -85,16 +85,16 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         storeBit(value.key_block)
         storeBit(value.vert_seqno_incr)
         storeBits(value.flags.asReversed())
-        storeUInt(value.seq_no, 32)
-        storeUInt(value.vert_seq_no, 32)
+        storeUInt32(value.seq_no)
+        storeUInt32(value.vert_seq_no)
         storeTlb(ShardIdent, value.shard)
-        storeUInt(value.gen_utime, 32)
-        storeUInt(value.start_lt, 64)
-        storeUInt(value.end_lt, 64)
-        storeUInt(value.gen_validator_list_hash_short, 32)
-        storeUInt(value.gen_catchain_seqno, 32)
-        storeUInt(value.min_ref_mc_seqno, 32)
-        storeUInt(value.prev_key_block_seqno, 32)
+        storeUInt32(value.gen_utime)
+        storeUInt64(value.start_lt)
+        storeUInt64(value.end_lt)
+        storeUInt32(value.gen_validator_list_hash_short)
+        storeUInt32(value.gen_catchain_seqno)
+        storeUInt32(value.min_ref_mc_seqno)
+        storeUInt32(value.prev_key_block_seqno)
         if (value.flags[0] && value.gen_software != null) {
             storeTlb(GlobalVersion, value.gen_software)
         }
@@ -116,7 +116,7 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): BlockInfo = cellSlice {
-        val version = loadUInt(32).toLong()
+        val version = loadUInt32()
         val notMaster = loadBit()
         val afterMerge = loadBit()
         val beforeSplit = loadBit()
@@ -126,16 +126,16 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val keyBlock = loadBit()
         val verSeqnoIncr = loadBit()
         val flags = loadBits(8).asReversed().toBitString()
-        val seqNo = loadUInt(32).toInt()
-        val vertSeqNo = loadUInt(32).toInt()
+        val seqNo = loadUInt32()
+        val vertSeqNo = loadUInt32()
         val shard = loadTlb(ShardIdent)
-        val genUtime = loadUInt(32).toLong()
-        val startLt = loadUInt(64).toLong()
-        val endLt = loadUInt(64).toLong()
-        val genValidatorListHashShort = loadUInt(32).toLong()
-        val genCatchainSeqno = loadUInt(32).toLong()
-        val minRefMcSeqno = loadUInt(32).toLong()
-        val prevKeyBlockSeqno = loadUInt(32).toLong()
+        val genUtime = loadUInt32()
+        val startLt = loadUInt64()
+        val endLt = loadUInt64()
+        val genValidatorListHashShort = loadUInt32()
+        val genCatchainSeqno = loadUInt32()
+        val minRefMcSeqno = loadUInt32()
+        val prevKeyBlockSeqno = loadUInt32()
         val genSoftware = if (flags[0]) {
             loadTlb(GlobalVersion)
         } else null

@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("tr_phase_bounce_negfunds")
-object TrPhaseBounceNegFunds : TrBouncePhase {
-    @JvmStatic
-    fun tlbCodec(): TlbConstructor<TrPhaseBounceNegFunds> = TrPhaseBounceNegFundsTlbConstructor
+object TrPhaseBounceNegFunds : TrBouncePhase,
+    TlbConstructorProvider<TrPhaseBounceNegFunds> by TrPhaseBounceNegFundsTlbConstructor {
 }
 
 private object TrPhaseBounceNegFundsTlbConstructor : TlbConstructor<TrPhaseBounceNegFunds>(

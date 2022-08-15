@@ -8,33 +8,31 @@ import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("shard_state")
 data class ShardStateUnsplit(
-    val global_id: Long,
+    val global_id: UInt,
     val shard_id: ShardIdent,
-    val seq_no: Long,
-    val vert_seq_no: Int,
-    val gen_utime: Long,
-    val gen_lt: Long,
-    val min_ref_mc_seqno: Long,
+    val seq_no: UInt,
+    val vert_seq_no: UInt,
+    val gen_utime: UInt,
+    val gen_lt: ULong,
+    val min_ref_mc_seqno: UInt,
     val out_msg_queue_info: OutMsgQueueInfo,
     val before_split: Boolean,
     val accounts: AugDictionary<ShardAccount, DepthBalanceInfo>,
-    val overload_history: Long,
-    val underload_history: Long,
+    val overload_history: ULong,
+    val underload_history: ULong,
     val total_balance: CurrencyCollection,
     val total_validator_fees: CurrencyCollection,
     val libraries: HashMapE<LibDescr>,
     val master_ref: Maybe<BlkMasterInfo>,
     val custom: Maybe<McStateExtra>
 ) : ShardState {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ShardStateUnsplit> = ShardStateUnsplitTlbConstructor
-    }
+    companion object : TlbConstructorProvider<ShardStateUnsplit> by ShardStateUnsplitTlbConstructor
 }
 
 private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnsplit>(
@@ -54,34 +52,32 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
             "custom:(Maybe ^McStateExtra) " +
             "= ShardStateUnsplit;"
 ) {
-    val outMsgQueueInfo by lazy { OutMsgQueueInfo.tlbCodec() }
-    val shardAccounts by lazy { AugDictionary.tlbCodec(256, ShardAccount.tlbCodec(), DepthBalanceInfo.tlbCodec()) }
-    val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
-    val libraries by lazy { HashMapE.tlbCodec(256, LibDescr.tlbCodec()) }
-    val maybeBlkMasterInfo by lazy { Maybe.tlbCodec(BlkMasterInfo) }
-    val maybeMcStateExtra by lazy { Maybe.tlbCodec(Cell.tlbCodec(McStateExtra)) }
+    val shardAccounts = AugDictionary.tlbCodec(256, ShardAccount, DepthBalanceInfo)
+    val libraries = HashMapE.tlbCodec(256, LibDescr)
+    val maybeBlkMasterInfo = Maybe.tlbCodec(BlkMasterInfo)
+    val maybeMcStateExtra = Maybe.tlbCodec(Cell.tlbCodec(McStateExtra))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: ShardStateUnsplit
     ) = cellBuilder {
-        storeUInt(value.global_id, 32)
+        storeUInt32(value.global_id)
         storeTlb(ShardIdent, value.shard_id)
-        storeUInt(value.seq_no, 32)
-        storeUInt(value.vert_seq_no, 32)
-        storeUInt(value.min_ref_mc_seqno, 32)
+        storeUInt32(value.seq_no)
+        storeUInt32(value.vert_seq_no)
+        storeUInt32(value.min_ref_mc_seqno)
         storeRef {
-            storeTlb(outMsgQueueInfo, value.out_msg_queue_info)
+            storeTlb(OutMsgQueueInfo, value.out_msg_queue_info)
         }
         storeBits(value.before_split)
         storeRef {
             storeTlb(shardAccounts, value.accounts)
         }
         storeRef {
-            storeUInt(value.overload_history, 64)
-            storeUInt(value.underload_history, 64)
-            storeTlb(currencyCollection, value.total_balance)
-            storeTlb(currencyCollection, value.total_validator_fees)
+            storeUInt64(value.overload_history)
+            storeUInt64(value.underload_history)
+            storeTlb(CurrencyCollection, value.total_balance)
+            storeTlb(CurrencyCollection, value.total_validator_fees)
             storeTlb(libraries, value.libraries)
             storeTlb(maybeBlkMasterInfo, value.master_ref)
         }
@@ -91,15 +87,15 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
     override fun loadTlb(
         cellSlice: CellSlice
     ): ShardStateUnsplit = cellSlice {
-        val globalId = loadUInt(32).toLong()
+        val globalId = loadUInt32()
         val shardId = loadTlb(ShardIdent)
-        val seqNo = loadUInt(32).toLong()
-        val verSeqNo = loadUInt(32).toInt()
-        val genUtime = loadUInt(32).toLong()
-        val genLt = loadUInt(64).toLong()
-        val minRefMcSeqno = loadUInt(32).toLong()
+        val seqNo = loadUInt32()
+        val verSeqNo = loadUInt32()
+        val genUtime = loadUInt32()
+        val genLt = loadUInt64()
+        val minRefMcSeqno = loadUInt32()
         val outMsgQueueInfo = loadRef {
-            loadTlb(outMsgQueueInfo)
+            loadTlb(OutMsgQueueInfo)
         }
         val beforeSplit = loadBit()
         val accounts = loadRef {
@@ -107,10 +103,10 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
         }
         val custom = loadTlb(maybeMcStateExtra)
         loadRef {
-            val overloadHistory = loadUInt(64).toLong()
-            val underloadHistory = loadUInt(64).toLong()
-            val totalBalance = loadTlb(currencyCollection)
-            val totalValidatorFees = loadTlb(currencyCollection)
+            val overloadHistory = loadUInt64()
+            val underloadHistory = loadUInt64()
+            val totalBalance = loadTlb(CurrencyCollection)
+            val totalValidatorFees = loadTlb(CurrencyCollection)
             val libraries = loadTlb(libraries)
             val masterRef = loadTlb(maybeBlkMasterInfo)
             ShardStateUnsplit(

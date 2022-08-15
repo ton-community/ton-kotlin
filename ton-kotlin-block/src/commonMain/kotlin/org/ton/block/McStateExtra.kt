@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -24,7 +24,7 @@ data class McStateExtra(
     val block_create_stats: BlockCreateStats?,
     val global_balance: CurrencyCollection
 ) {
-    companion object : TlbCodec<McStateExtra> by McStateExtraTlbConstructor.asTlbCombinator()
+    companion object : TlbCombinatorProvider<McStateExtra> by McStateExtraTlbConstructor.asTlbCombinator()
 }
 
 private object McStateExtraTlbConstructor : TlbConstructor<McStateExtra>(
@@ -40,47 +40,43 @@ private object McStateExtraTlbConstructor : TlbConstructor<McStateExtra>(
             "  global_balance:CurrencyCollection" +
             "= McStateExtra;"
 ) {
-    val shardHashes by lazy { HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr.tlbCodec()))) }
-    val configParams by lazy { ConfigParams.tlbCodec() }
-    val validatorInfo by lazy { ValidatorInfo.tlbCodec() }
-    val oldMcBlocksInfo by lazy { AugDictionary.tlbCodec(32, KeyExtBlkRef.tlbCodec(), KeyMaxLt.tlbCodec()) }
-    val maybeExtBlkRef by lazy { Maybe.tlbCodec(ExtBlkRef) }
-    val blockCreateStats by lazy { BlockCreateStats.tlbCodec() }
-    val currencyCollection by lazy { CurrencyCollection.tlbCodec() }
+    val shardHashes = HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr)))
+    val oldMcBlocksInfo = AugDictionary.tlbCodec(32, KeyExtBlkRef, KeyMaxLt)
+    val maybeExtBlkRef = Maybe.tlbCodec(ExtBlkRef)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: McStateExtra
     ) = cellBuilder {
         storeTlb(shardHashes, value.shard_hashes)
-        storeTlb(configParams, value.config)
+        storeTlb(ConfigParams, value.config)
         storeRef {
             storeUInt(value.flags, 16)
-            storeTlb(validatorInfo, value.validator_info)
+            storeTlb(ValidatorInfo, value.validator_info)
             storeTlb(oldMcBlocksInfo, value.prev_blocks)
             storeBit(value.after_key_block)
             storeTlb(maybeExtBlkRef, value.last_key_block)
             if (value.block_create_stats != null) {
-                storeTlb(blockCreateStats, value.block_create_stats)
+                storeTlb(BlockCreateStats, value.block_create_stats)
             }
         }
-        storeTlb(currencyCollection, value.global_balance)
+        storeTlb(CurrencyCollection, value.global_balance)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): McStateExtra = cellSlice {
         val shardHashes = loadTlb(shardHashes)
-        val config = loadTlb(configParams)
-        val globalBalance = loadTlb(currencyCollection)
+        val config = loadTlb(ConfigParams)
+        val globalBalance = loadTlb(CurrencyCollection)
         loadRef {
             val flags = loadUInt(16).toInt()
-            val validatorInfo = loadTlb(validatorInfo)
+            val validatorInfo = loadTlb(ValidatorInfo)
             val prevBlocks = loadTlb(oldMcBlocksInfo)
             val afterKeyBlock = loadBit()
             val lastKeyBlock = loadTlb(maybeExtBlkRef)
             val blockCreateStats = if (flags and 65536 == 65536) {
-                loadTlb(blockCreateStats)
+                loadTlb(BlockCreateStats)
             } else null
             McStateExtra(
                 shardHashes,

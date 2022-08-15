@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -15,28 +16,23 @@ data class CreatorStats(
     val mc_blocks: Counters,
     val shard_blocks: Counters
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<CreatorStats> = CreatorStatsTlbConstructor
-    }
+    companion object : TlbConstructorProvider<CreatorStats> by CreatorStatsTlbConstructor
 }
 
 private object CreatorStatsTlbConstructor : TlbConstructor<CreatorStats>(
     schema = "creator_info#4 mc_blocks:Counters shard_blocks:Counters = CreatorStats;\n"
 ) {
-    val counters by lazy { Counters.tlbCodec() }
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: CreatorStats
     ) = cellBuilder {
-        storeTlb(counters, value.mc_blocks)
-        storeTlb(counters, value.shard_blocks)
+        storeTlb(Counters, value.mc_blocks)
+        storeTlb(Counters, value.shard_blocks)
     }
 
     override fun loadTlb(cellSlice: CellSlice): CreatorStats = cellSlice {
-        val mcBlocks = loadTlb(counters)
-        val shardBlocks = loadTlb(counters)
+        val mcBlocks = loadTlb(Counters)
+        val shardBlocks = loadTlb(Counters)
         CreatorStats(mcBlocks, shardBlocks)
     }
 }

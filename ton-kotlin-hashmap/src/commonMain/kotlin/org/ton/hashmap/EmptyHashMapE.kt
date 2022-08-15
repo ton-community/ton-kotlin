@@ -6,8 +6,8 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("hme_empty")
-class EmptyHashMapE<T> : HashMapE<T> {
-    override fun nodes(): Sequence<Pair<BitString, T>> = emptySequence()
+object EmptyHashMapE : HashMapE<Nothing> {
+    override fun nodes(): Sequence<Pair<BitString, Nothing>> = emptySequence()
 
     override fun toString(): String = "hme_empty"
 }

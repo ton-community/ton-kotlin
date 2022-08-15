@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.hashmap.AugDictionaryEdge
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -33,7 +33,7 @@ data class AccountBlock(
         append(")")
     }
 
-    companion object : TlbCodec<AccountBlock> by AccountBlockTlbConstructor.asTlbCombinator()
+    companion object : TlbCombinatorProvider<AccountBlock> by AccountBlockTlbConstructor.asTlbCombinator()
 }
 
 private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
@@ -42,13 +42,11 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
             "state_update:^(HASH_UPDATE Account) " +
             "= AccountBlock;"
 ) {
-    val augDictionaryEdge by lazy {
-        AugDictionaryEdge.tlbCodec(
-            64,
-            Cell.tlbCodec(Transaction),
-            CurrencyCollection.tlbCodec()
-        )
-    }
+    val augDictionaryEdge = AugDictionaryEdge.tlbCodec(
+        64,
+        Cell.tlbCodec(Transaction),
+        CurrencyCollection
+    )
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

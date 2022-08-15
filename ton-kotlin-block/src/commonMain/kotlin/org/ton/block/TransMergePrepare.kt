@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -16,10 +17,7 @@ data class TransMergePrepare(
     val storage_ph: TrStoragePhase,
     val aborted: Boolean
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransMergePrepare> = TransMergePrepareTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransMergePrepare> by TransMergePrepareTlbConstructor
 }
 
 private object TransMergePrepareTlbConstructor : TlbConstructor<TransMergePrepare>(

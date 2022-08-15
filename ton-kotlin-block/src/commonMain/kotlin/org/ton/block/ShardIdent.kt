@@ -13,7 +13,7 @@ import org.ton.tlb.TlbConstructor
 data class ShardIdent(
     val shard_pfx_bits: Int,
     val workchain_id: Int,
-    val shard_prefix: Long
+    val shard_prefix: ULong
 ) {
     init {
         require(shard_pfx_bits <= 60) { "expected: shard_pfx_bits <= 60, actual: $shard_pfx_bits" }
@@ -32,7 +32,7 @@ private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
     ) = cellBuilder {
         storeUIntLeq(value.shard_pfx_bits, 60)
         storeInt(value.workchain_id, 32)
-        storeUInt(value.shard_prefix, 64)
+        storeUInt64(value.shard_prefix)
     }
 
     override fun loadTlb(
@@ -40,7 +40,7 @@ private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
     ): ShardIdent = cellSlice {
         val shardPfxBits = loadUIntLeq(60).toInt()
         val workchainId = loadInt(32).toInt()
-        val shardPrefix = loadUInt(64).toLong()
+        val shardPrefix = loadUInt64()
         ShardIdent(shardPfxBits, workchainId, shardPrefix)
     }
 }

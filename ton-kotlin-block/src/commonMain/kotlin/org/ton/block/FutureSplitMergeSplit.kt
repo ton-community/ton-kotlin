@@ -6,17 +6,15 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("fsm_split")
 data class FutureSplitMergeSplit(
-    val split_utime: Long,
-    val interval: Long
+    val split_utime: UInt,
+    val interval: UInt
 ) : FutureSplitMerge {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<FutureSplitMergeSplit> = FutureSplitMergeSplitTlbConstructor
-    }
+    companion object : TlbConstructorProvider<FutureSplitMergeSplit> by FutureSplitMergeSplitTlbConstructor
 }
 
 private object FutureSplitMergeSplitTlbConstructor : TlbConstructor<FutureSplitMergeSplit>(
@@ -26,15 +24,15 @@ private object FutureSplitMergeSplitTlbConstructor : TlbConstructor<FutureSplitM
         cellBuilder: CellBuilder,
         value: FutureSplitMergeSplit
     ) = cellBuilder {
-        storeUInt(value.split_utime, 32)
-        storeUInt(value.interval, 32)
+        storeUInt32(value.split_utime)
+        storeUInt32(value.interval)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): FutureSplitMergeSplit = cellSlice {
-        val splitUtime = loadUInt(32).toLong()
-        val interval = loadUInt(32).toLong()
+        val splitUtime = loadUInt32()
+        val interval = loadUInt32()
         FutureSplitMergeSplit(splitUtime, interval)
     }
 }

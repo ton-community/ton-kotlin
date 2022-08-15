@@ -4,22 +4,19 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface Account {
-    companion object : TlbCodec<Account> by AccountTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<Account> = AccountTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<Account> by AccountTlbCombinator
 }
 
 private object AccountTlbCombinator : TlbCombinator<Account>() {
-    val none = AccountNone.tlbCodec()
-    val info = AccountInfo.tlbCodec()
+    val none = AccountNone.tlbConstructor()
+    val info = AccountInfo.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out Account>> =
         listOf(none, info)

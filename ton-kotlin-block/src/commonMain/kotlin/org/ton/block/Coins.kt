@@ -9,6 +9,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("nanocoins")
@@ -24,7 +25,7 @@ data class Coins(
         append(decimal.toString().padStart(9, '0'))
     }
 
-    companion object : TlbCodec<Coins> by CoinsTlbConstructor {
+    companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
         private val NANOCOINS = 1_000_000_000
 
         @JvmStatic

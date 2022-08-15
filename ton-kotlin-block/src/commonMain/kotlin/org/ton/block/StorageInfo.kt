@@ -5,19 +5,19 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("storage_info")
 @Serializable
 data class StorageInfo(
     val used: StorageUsed,
-    val last_paid: Int,
+    val last_paid: UInt,
     val due_payment: Maybe<Coins>
 ) {
-    constructor(used: StorageUsed, lastPaid: Int, duePayment: Coins? = null) : this(
+    constructor(used: StorageUsed, lastPaid: UInt, duePayment: Coins? = null) : this(
         used,
         lastPaid,
         duePayment.toMaybe()
@@ -25,10 +25,7 @@ data class StorageInfo(
 
     override fun toString(): String = "storage_info(used:$used last_paid:$last_paid due_payment:$due_payment)"
 
-    companion object : TlbCodec<StorageInfo> by StorageInfoTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<StorageInfo> = StorageInfoTlbConstructor
-    }
+    companion object : TlbConstructorProvider<StorageInfo> by StorageInfoTlbConstructor
 }
 
 private object StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
@@ -40,7 +37,7 @@ private object StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
         cellBuilder: CellBuilder, value: StorageInfo
     ) = cellBuilder {
         storeTlb(StorageUsed, value.used)
-        storeUInt(value.last_paid, 32)
+        storeUInt32(value.last_paid)
         storeTlb(maybeCoins, value.due_payment)
     }
 
@@ -48,7 +45,7 @@ private object StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
         cellSlice: CellSlice
     ): StorageInfo = cellSlice {
         val used = loadTlb(StorageUsed)
-        val lastPaid = loadUInt(32).toInt()
+        val lastPaid = loadUInt32()
         val duePayment = loadTlb(maybeCoins)
         StorageInfo(used, lastPaid, duePayment)
     }

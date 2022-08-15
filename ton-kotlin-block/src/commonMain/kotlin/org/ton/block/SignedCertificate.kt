@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -15,32 +16,27 @@ data class SignedCertificate(
     val certificate: Certificate,
     val certificate_signature: CryptoSignature
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<SignedCertificate> = SignedCertificatedTlbConstructor
-    }
+    companion object : TlbConstructorProvider<SignedCertificate> by SignedCertificatedTlbConstructor
 }
 
 private object SignedCertificatedTlbConstructor : TlbConstructor<SignedCertificate>(
     schema = "signed_certificate\$_ certificate:Certificate certificate_signature:CryptoSignature\n" +
             "  = SignedCertificate;"
 ) {
-    val certificate by lazy { Certificate.tlbCodec() }
-    val cryptoSignature by lazy { CryptoSignature.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: SignedCertificate
     ) = cellBuilder {
-        storeTlb(certificate, value.certificate)
-        storeTlb(cryptoSignature, value.certificate_signature)
+        storeTlb(Certificate, value.certificate)
+        storeTlb(CryptoSignature, value.certificate_signature)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): SignedCertificate = cellSlice {
-        val certificate = loadTlb(certificate)
-        val certificateSignature = loadTlb(cryptoSignature)
+        val certificate = loadTlb(Certificate)
+        val certificateSignature = loadTlb(CryptoSignature)
         SignedCertificate(certificate, certificateSignature)
     }
 }

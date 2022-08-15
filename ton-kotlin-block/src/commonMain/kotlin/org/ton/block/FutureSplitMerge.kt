@@ -6,20 +6,18 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @JsonClassDiscriminator("@type")
 sealed interface FutureSplitMerge {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<FutureSplitMerge> = FutureSplitMergeTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<FutureSplitMerge> by FutureSplitMergeTlbCombinator
 }
 
 private object FutureSplitMergeTlbCombinator : TlbCombinator<FutureSplitMerge>() {
-    val none = FutureSplitMergeNone.tlbCodec()
-    val split = FutureSplitMergeSplit.tlbCodec()
-    val merge = FutureSplitMergeMerge.tlbCodec()
+    val none = FutureSplitMergeNone.tlbConstructor()
+    val split = FutureSplitMergeSplit.tlbConstructor()
+    val merge = FutureSplitMergeMerge.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out FutureSplitMerge>> = listOf(
         none, split, merge

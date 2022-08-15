@@ -19,10 +19,10 @@ import org.ton.tlb.storeTlb
 @Serializable
 data class Transaction(
     val account_addr: BitString,
-    val lt: Long,
+    val lt: ULong,
     val prev_trans_hash: BitString,
-    val prev_trans_lt: Long,
-    val now: Long,
+    val prev_trans_lt: ULong,
+    val now: UInt,
     val outmsg_cnt: Int,
     val orig_status: AccountStatus,
     val end_status: AccountStatus,
@@ -95,10 +95,10 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         value: Transaction
     ) = cellBuilder {
         storeBits(value.account_addr)
-        storeUInt(value.lt, 64)
+        storeUInt64(value.lt)
         storeBits(value.prev_trans_hash)
-        storeUInt(value.prev_trans_lt, 64)
-        storeUInt(value.now, 32)
+        storeUInt64(value.prev_trans_lt)
+        storeUInt32(value.now)
         storeUInt(value.outmsg_cnt, 15)
         storeTlb(AccountStatus, value.orig_status)
         storeTlb(AccountStatus, value.end_status)
@@ -119,10 +119,10 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
         cellSlice: CellSlice
     ): Transaction = cellSlice {
         val accountAddr = loadBits(256)
-        val lt = loadUInt(64).toLong()
+        val lt = loadUInt64()
         val prevTransHash = loadBits(256)
-        val prevTransLt = loadUInt(64).toLong()
-        val now = loadUInt(32).toLong()
+        val prevTransLt = loadUInt64()
+        val now = loadUInt32()
         val outmsgCnt = loadUInt(15).toInt()
         val origStatus = loadTlb(AccountStatus)
         val endStatus = loadTlb(AccountStatus)

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -19,10 +20,7 @@ data class TransMergeInstall(
     val aborted: Boolean,
     val destroyed: Boolean
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransMergeInstall> = TransMergeInstallTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransMergeInstall> by TransMergeInstallTlbConstructor
 }
 
 private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstall>(
@@ -34,10 +32,9 @@ private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstal
             "  aborted:Bool destroyed:Bool\n" +
             "  = TransactionDescr;"
 ) {
-    val maybeTrStoragePhase by lazy { Maybe.tlbCodec(TrStoragePhase.tlbCodec()) }
-    val maybeTrCreditPhase by lazy { Maybe.tlbCodec(TrCreditPhase.tlbCodec()) }
-    val trComputePhase by lazy { TrComputePhase.tlbCodec() }
-    val maybeTrActionPhase by lazy { Maybe.tlbCodec(TrActionPhase.tlbCodec()) }
+    val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
+    val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase)
+    val maybeTrActionPhase = Maybe.tlbCodec(TrActionPhase)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -47,7 +44,7 @@ private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstal
         storeRef { storeTlb(Transaction, value.prepare_transaction) }
         storeTlb(maybeTrStoragePhase, value.storage_ph)
         storeTlb(maybeTrCreditPhase, value.credit_ph)
-        storeTlb(trComputePhase, value.compute_ph)
+        storeTlb(TrComputePhase, value.compute_ph)
         storeTlb(maybeTrActionPhase, value.action)
         storeBit(value.aborted)
         storeBit(value.destroyed)
@@ -60,7 +57,7 @@ private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstal
         val prepareTransaction = loadRef { loadTlb(Transaction) }
         val storagePh = loadTlb(maybeTrStoragePhase)
         val creditPh = loadTlb(maybeTrCreditPhase)
-        val computePh = loadTlb(trComputePhase)
+        val computePh = loadTlb(TrComputePhase)
         val action = loadTlb(maybeTrActionPhase)
         val aborted = loadBit()
         val destroyed = loadBit()

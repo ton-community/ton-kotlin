@@ -6,6 +6,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("interm_addr_regular")
@@ -16,10 +17,7 @@ data class IntermediateAddressRegular(
         require(use_dest_bits <= 96) { "expected: use_dest_bits <= 96, actual: $use_dest_bits" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<IntermediateAddressRegular> = IntermediateAddressRegularTlbConstructor
-    }
+    companion object : TlbConstructorProvider<IntermediateAddressRegular> by IntermediateAddressRegularTlbConstructor
 }
 
 private object IntermediateAddressRegularTlbConstructor : TlbConstructor<IntermediateAddressRegular>(

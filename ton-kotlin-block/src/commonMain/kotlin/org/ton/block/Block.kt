@@ -29,7 +29,7 @@ data class Block(
                 "state_update:^(MERKLE_UPDATE ShardState) " +
                 "extra:^BlockExtra = Block;"
     ) {
-        private val merkleUpdate = MerkleUpdate.tlbCodec(ShardState.tlbCodec())
+        private val merkleUpdate = MerkleUpdate.tlbCodec(ShardState)
 
         override fun storeTlb(
             cellBuilder: CellBuilder,

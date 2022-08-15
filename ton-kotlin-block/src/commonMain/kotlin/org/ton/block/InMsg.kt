@@ -4,27 +4,24 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface InMsg {
-    companion object : TlbCodec<InMsg> by InMsgTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<InMsg> = InMsgTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<InMsg> by InMsgTlbCombinator
 }
 
 private object InMsgTlbCombinator : TlbCombinator<InMsg>() {
-    val ext = MsgImportExt.tlbCodec()
-    val ihr = MsgImportIhr.tlbCodec()
-    val imm = MsgImportImm.tlbCodec()
-    val fin = MsgImportFin.tlbCodec()
-    val tr = MsgImportTr.tlbCodec()
-    val discardFin = MsgDiscardFin.tlbCodec()
-    val discardTr = MsgDiscardTr.tlbCodec()
+    val ext = MsgImportExt.tlbConstructor()
+    val ihr = MsgImportIhr.tlbConstructor()
+    val imm = MsgImportImm.tlbConstructor()
+    val fin = MsgImportFin.tlbConstructor()
+    val tr = MsgImportTr.tlbConstructor()
+    val discardFin = MsgDiscardFin.tlbConstructor()
+    val discardTr = MsgDiscardTr.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out InMsg>> =
         listOf(

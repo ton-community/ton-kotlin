@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -14,28 +15,24 @@ import org.ton.tlb.storeTlb
 data class TransStorage(
     val storage_ph: TrStoragePhase
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransStorage> = TransStorageTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransStorage> by TransStorageTlbConstructor
 }
 
 private object TransStorageTlbConstructor : TlbConstructor<TransStorage>(
     schema = "trans_storage\$0001 storage_ph:TrStoragePhase = TransactionDescr;"
 ) {
-    val trStoragePhase by lazy { TrStoragePhase.tlbCodec() }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TransStorage
     ) = cellBuilder {
-        storeTlb(trStoragePhase, value.storage_ph)
+        storeTlb(TrStoragePhase, value.storage_ph)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): TransStorage = cellSlice {
-        val storagePh = loadTlb(trStoragePhase)
+        val storagePh = loadTlb(TrStoragePhase)
         TransStorage(storagePh)
     }
 }

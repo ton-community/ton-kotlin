@@ -6,23 +6,20 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @JsonClassDiscriminator("@type")
 sealed interface BlockCreateStats {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<BlockCreateStats> = BlockCreateStatsTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<BlockCreateStats> by BlockCreateStatsTlbCombinator
 }
 
 private object BlockCreateStatsTlbCombinator : TlbCombinator<BlockCreateStats>() {
-    val regular by lazy { BlockCreateStatsRegular.tlbCodec() }
-    val ext by lazy { BlockCreateStatsExt.tlbCodec() }
+    val regular = BlockCreateStatsRegular.tlbConstructor()
+    val ext = BlockCreateStatsExt.tlbConstructor()
 
-    override val constructors: List<TlbConstructor<out BlockCreateStats>> by lazy {
+    override val constructors: List<TlbConstructor<out BlockCreateStats>> =
         listOf(regular, ext)
-    }
 
     override fun getConstructor(
         value: BlockCreateStats

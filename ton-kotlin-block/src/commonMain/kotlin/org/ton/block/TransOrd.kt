@@ -9,6 +9,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("trans_ord")
@@ -23,10 +24,7 @@ data class TransOrd(
     val bounce: Maybe<TrBouncePhase>,
     val destroyed: Boolean
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransOrd> = TransOrdTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransOrd> by TransOrdTlbConstructor
 
     override fun toString(): String = buildString {
         append("(trans_ord\n")
@@ -52,9 +50,9 @@ private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
             "= TransactionDescr;"
 ) {
     val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
-    val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase.tlbCodec())
+    val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase)
     val maybeTrActionPhase = Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase))
-    val maybeTrBouncePhase = Maybe.tlbCodec(TrBouncePhase.tlbCodec())
+    val maybeTrBouncePhase = Maybe.tlbCodec(TrBouncePhase)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

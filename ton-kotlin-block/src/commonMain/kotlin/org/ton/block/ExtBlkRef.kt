@@ -12,8 +12,8 @@ import org.ton.tlb.TlbConstructor
 @SerialName("ext_blk_ref")
 @Serializable
 data class ExtBlkRef(
-    val end_lt: Long,
-    val seq_no: Int,
+    val end_lt: ULong,
+    val seq_no: UInt,
     val root_hash: BitString,
     val file_hash: BitString
 ) {
@@ -34,8 +34,8 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
         cellBuilder: CellBuilder,
         value: ExtBlkRef
     ) = cellBuilder {
-        storeUInt(value.end_lt, 64)
-        storeUInt(value.seq_no, 32)
+        storeUInt64(value.end_lt)
+        storeUInt32(value.seq_no)
         storeBits(value.root_hash)
         storeBits(value.file_hash)
     }
@@ -43,8 +43,8 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ExtBlkRef = cellSlice {
-        val endLt = loadUInt(64).toLong()
-        val seqNo = loadUInt(32).toInt()
+        val endLt = loadUInt64()
+        val seqNo = loadUInt32()
         val rootHash = loadBits(256)
         val fileHash = loadBits(256)
         ExtBlkRef(endLt, seqNo, rootHash, fileHash)

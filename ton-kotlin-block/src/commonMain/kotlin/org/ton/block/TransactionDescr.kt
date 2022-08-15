@@ -4,27 +4,24 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface TransactionDescr {
-    companion object : TlbCodec<TransactionDescr> by TransactionDescrTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<TransactionDescr> = TransactionDescrTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<TransactionDescr> by TransactionDescrTlbCombinator
 }
 
 private object TransactionDescrTlbCombinator : TlbCombinator<TransactionDescr>() {
-    val ord = TransOrd.tlbCodec()
-    val storage = TransStorage.tlbCodec()
-    val tickTock = TransTickTock.tlbCodec()
-    val mergeInstall = TransMergeInstall.tlbCodec()
-    val mergePrepare = TransMergePrepare.tlbCodec()
-    val splitInstall = TransSplitInstall.tlbCodec()
-    val splitPrepare = TransSplitPrepare.tlbCodec()
+    val ord = TransOrd.tlbConstructor()
+    val storage = TransStorage.tlbConstructor()
+    val tickTock = TransTickTock.tlbConstructor()
+    val mergeInstall = TransMergeInstall.tlbConstructor()
+    val mergePrepare = TransMergePrepare.tlbConstructor()
+    val splitInstall = TransSplitInstall.tlbConstructor()
+    val splitPrepare = TransSplitPrepare.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out TransactionDescr>> =
         listOf(ord, storage, tickTock, mergeInstall, mergePrepare, splitInstall, splitPrepare)

@@ -3,17 +3,15 @@ package org.ton.block
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 data class MsgDiscardFin(
     val in_msg: MsgEnvelope,
-    val transaction_id: Long,
+    val transaction_id: ULong,
     val fwd_fee: Coins
 ) : InMsg {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<MsgDiscardFin> = MsgDiscardFinTlbConstructor
-    }
+    companion object : TlbConstructorProvider<MsgDiscardFin> by MsgDiscardFinTlbConstructor
 }
 
 private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
@@ -26,7 +24,7 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
         storeRef {
             storeTlb(MsgEnvelope, value.in_msg)
         }
-        storeUInt(value.transaction_id, 64)
+        storeUInt64(value.transaction_id)
         storeTlb(Coins, value.fwd_fee)
     }
 
@@ -36,7 +34,7 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
         val inMsg = loadRef {
             loadTlb(MsgEnvelope)
         }
-        val transactionId = loadUInt(64).toLong()
+        val transactionId = loadUInt64()
         val fwdFee = loadTlb(Coins)
         MsgDiscardFin(inMsg, transactionId, fwdFee)
     }

@@ -6,19 +6,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @JsonClassDiscriminator("@type")
 sealed interface CryptoSignature {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<CryptoSignature> = CryptoSignatureTlbCombinator
-    }
+    companion object : TlbCombinatorProvider<CryptoSignature> by CryptoSignatureTlbCombinator
 }
 
 private object CryptoSignatureTlbCombinator : TlbCombinator<CryptoSignature>() {
-    val regular by lazy { CryptoSignatureSimple.tlbCodec() }
-    val chained by lazy { ChainedSignature.tlbCodec() }
+    val regular = CryptoSignatureSimple.tlbConstructor()
+    val chained = ChainedSignature.tlbConstructor()
 
     override val constructors: List<TlbConstructor<out CryptoSignature>> by lazy {
         listOf(regular, chained)

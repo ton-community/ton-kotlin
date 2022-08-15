@@ -7,25 +7,23 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.AugDictionary
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.UIntTlbConstructor
+import org.ton.tlb.constructor.tlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("block_create_stats_ext")
 data class BlockCreateStatsExt(
-    val counters: AugDictionary<CreatorStats, Long>
+    val counters: AugDictionary<CreatorStats, UInt>
 ) : BlockCreateStats {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<BlockCreateStatsExt> = BlockCreateStateExtTlbConstructor
-    }
+    companion object : TlbConstructorProvider<BlockCreateStatsExt> by BlockCreateStateExtTlbConstructor
 }
 
 private object BlockCreateStateExtTlbConstructor : TlbConstructor<BlockCreateStatsExt>(
-    schema = "block_create_stats_ext#34 counters:(HashmapAugE 256 CreatorStats uint32) = BlockCreateStats;\n"
+    schema = "block_create_stats_ext#34 counters:(HashmapAugE 256 CreatorStats uint32) = BlockCreateStats;"
 ) {
-    val counters = AugDictionary.tlbCodec(256, CreatorStats.tlbCodec(), UIntTlbConstructor.long(32))
+    val counters = AugDictionary.tlbCodec(256, CreatorStats, UInt.tlbConstructor())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

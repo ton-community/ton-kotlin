@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -16,10 +17,7 @@ data class AccountInfo(
     val storage_stat: StorageInfo,
     val storage: AccountStorage
 ) : Account {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<AccountInfo> = AccountInfoTlbConstructor
-    }
+    companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
 
     override fun toString(): String = "(account\naddr:$addr storage_stat:$storage_stat storage:$storage)"
 }

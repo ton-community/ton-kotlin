@@ -21,8 +21,9 @@ sealed interface HashMapE<T> : Iterable<Pair<BitString, T>> {
     fun toMap(): Map<BitString, T> = nodes().toMap()
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <T> of(): HashMapE<T> = EmptyHashMapE()
+        fun <T> of(): HashMapE<T> = EmptyHashMapE as HashMapE<T>
 
         @JvmStatic
         fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapE<X>> =
@@ -37,7 +38,7 @@ private class HashMapETlbCombinator<X>(
     private val rootConstructor = RootHashMapETlbConstructor(n, x)
 
     @Suppress("UNCHECKED_CAST")
-    private val emptyConstructor = EmptyHashMapETlbConstructor as TlbConstructor<EmptyHashMapE<X>>
+    private val emptyConstructor = EmptyHashMapETlbConstructor as TlbConstructor<HashMapE<X>>
 
     override val constructors =
         listOf(rootConstructor, emptyConstructor)
@@ -48,17 +49,17 @@ private class HashMapETlbCombinator<X>(
         else -> throw UnknownTlbConstructorException()
     }
 
-    private object EmptyHashMapETlbConstructor : TlbConstructor<EmptyHashMapE<Any>>(
+    private object EmptyHashMapETlbConstructor : TlbConstructor<EmptyHashMapE>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;"
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: EmptyHashMapE<Any>
+            value: EmptyHashMapE
         ) = Unit
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): EmptyHashMapE<Any> = EmptyHashMapE()
+        ): EmptyHashMapE = EmptyHashMapE
     }
 
     private class RootHashMapETlbConstructor<X>(

@@ -6,19 +6,17 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("counters")
 data class Counters(
-    val last_updated: Long,
-    val total: Long,
-    val cnt2048: Long,
-    val cnt65536: Long
+    val last_updated: UInt,
+    val total: ULong,
+    val cnt2048: ULong,
+    val cnt65536: ULong
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<Counters> = CounterTlbConstructor
-    }
+    companion object : TlbConstructorProvider<Counters> by CounterTlbConstructor
 }
 
 private object CounterTlbConstructor : TlbConstructor<Counters>(
@@ -28,19 +26,19 @@ private object CounterTlbConstructor : TlbConstructor<Counters>(
         cellBuilder: CellBuilder,
         value: Counters
     ) = cellBuilder {
-        storeUInt(value.last_updated, 32)
-        storeUInt(value.total, 64)
-        storeUInt(value.cnt2048, 64)
-        storeUInt(value.cnt65536, 64)
+        storeUInt32(value.last_updated)
+        storeUInt64(value.total)
+        storeUInt64(value.cnt2048)
+        storeUInt64(value.cnt65536)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): Counters = cellSlice {
-        val lastUpdated = loadUInt(32).toLong()
-        val total = loadUInt(64).toLong()
-        val cnt2048 = loadUInt(64).toLong()
-        val cnt65535 = loadUInt(64).toLong()
+        val lastUpdated = loadUInt32()
+        val total = loadUInt64()
+        val cnt2048 = loadUInt64()
+        val cnt65535 = loadUInt64()
         Counters(lastUpdated, total, cnt2048, cnt65535)
     }
 }

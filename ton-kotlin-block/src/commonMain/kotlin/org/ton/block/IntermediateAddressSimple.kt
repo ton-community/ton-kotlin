@@ -6,17 +6,15 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("interm_addr_simple")
 data class IntermediateAddressSimple(
     val workchain_id: Int,
-    val addr_pfx: Long
+    val addr_pfx: ULong
 ) : IntermediateAddress {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<IntermediateAddressSimple> = IntermediateAddressSimpleTlbConstructor
-    }
+    companion object : TlbConstructorProvider<IntermediateAddressSimple> by IntermediateAddressSimpleTlbConstructor
 }
 
 private object IntermediateAddressSimpleTlbConstructor : TlbConstructor<IntermediateAddressSimple>(
@@ -26,14 +24,14 @@ private object IntermediateAddressSimpleTlbConstructor : TlbConstructor<Intermed
         cellBuilder: CellBuilder, value: IntermediateAddressSimple
     ) = cellBuilder {
         storeInt(value.workchain_id, 8)
-        storeUInt(value.addr_pfx, 64)
+        storeUInt64(value.addr_pfx)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): IntermediateAddressSimple = cellSlice {
         val workchainId = loadInt(8).toInt()
-        val addrPfx = loadUInt(64).toLong()
+        val addrPfx = loadUInt64()
         IntermediateAddressSimple(workchainId, addrPfx)
     }
 }

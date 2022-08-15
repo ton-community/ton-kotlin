@@ -8,6 +8,7 @@ import org.ton.cell.invoke
 import org.ton.cell.storeRef
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -17,10 +18,7 @@ data class TransSplitInstall(
     val prepare_transaction: Transaction,
     val installed: Boolean
 ) : TransactionDescr {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TransSplitInstall> = TransSplitInstallTlbConstructor
-    }
+    companion object : TlbConstructorProvider<TransSplitInstall> by TransSplitInstallTlbConstructor
 }
 
 private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstall>(

@@ -10,6 +10,7 @@ import org.ton.hashmap.HashMapEdge
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -18,10 +19,7 @@ data class LibDescr(
     val lib: Cell,
     val publishers: HashMapEdge<Unit>
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<LibDescr> = LibDescrTlbConstructor
-    }
+    companion object : TlbConstructorProvider<LibDescr> by LibDescrTlbConstructor
 }
 
 private object LibDescrTlbConstructor : TlbConstructor<LibDescr>(

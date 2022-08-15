@@ -95,7 +95,7 @@ abstract class WalletContract(
             storeRef {
                 val messageRelaxed = MessageRelaxed(
                     info = CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
-                        ihrDisabled = true,
+                        ihr_disabled = true,
                         bounce = bounce,
                         bounced = false,
                         src = AddrNone,

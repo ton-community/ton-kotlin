@@ -6,16 +6,14 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("ihr_pending")
 data class IhrPendingSince(
-    val import_lt: Long
+    val import_lt: ULong
 ) {
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<IhrPendingSince> = IhrPendingSinceTlbConstructor
-    }
+    companion object : TlbConstructorProvider<IhrPendingSince> by IhrPendingSinceTlbConstructor
 }
 
 private object IhrPendingSinceTlbConstructor : TlbConstructor<IhrPendingSince>(
@@ -25,13 +23,13 @@ private object IhrPendingSinceTlbConstructor : TlbConstructor<IhrPendingSince>(
         cellBuilder: CellBuilder,
         value: IhrPendingSince
     ) = cellBuilder {
-        storeUInt(value.import_lt, 64)
+        storeUInt64(value.import_lt)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): IhrPendingSince = cellSlice {
-        val importLt = loadUInt(64).toLong()
+        val importLt = loadUInt64()
         IhrPendingSince(importLt)
     }
 }

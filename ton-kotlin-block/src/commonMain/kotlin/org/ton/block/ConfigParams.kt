@@ -7,6 +7,7 @@ import org.ton.hashmap.HashMapEdge
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -18,16 +19,13 @@ data class ConfigParams(
         require(config_addr.size == 256) { "required: config_addr.size == 256, actual: ${config_addr.size}" }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ConfigParams> = ConfigParamsTlbConstructor
-    }
+    companion object : TlbConstructorProvider<ConfigParams> by ConfigParamsTlbConstructor
 }
 
 private object ConfigParamsTlbConstructor : TlbConstructor<ConfigParams>(
     schema = "_ config_addr:bits256 config:^(Hashmap 32 ^Cell) = ConfigParams;"
 ) {
-    val hashmap by lazy { HashMapEdge.tlbCodec(32, Cell.tlbCodec()) }
+    val hashmap = HashMapEdge.tlbCodec(32, Cell.tlbCodec())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
