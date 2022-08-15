@@ -51,8 +51,6 @@ internal class CellImpl(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Cell) return false
-        if (bits.size != other.bits.size) return false
-        if (refs.size != other.refs.size) return false
         if (!hash().contentEquals(other.hash())) return false
         return true
     }
@@ -232,35 +230,5 @@ internal class CellImpl(
                 levelMask, hashes, depths
             )
         }
-
-        private fun isLevelSignificant(levelMask: Int, level: Int) =
-            level == 0 || ((levelMask shr (level - 1)) % 2 != 0)
-
-        private fun getLevelFromMask(mask: Int): Int {
-            var m = mask
-            repeat(4) { i ->
-                if (m == 0) {
-                    return i
-                }
-                m = m shr 1
-            }
-            return 3
-        }
-
-        private fun getHashesCountFromMask(mask: Int): Int {
-            var n = 0
-            var m = mask
-            repeat(3) {
-                n += (m and 1)
-                m = m shr 1
-            }
-            return n + 1
-        }
-
-        private fun depthToByteArray(depth: Int): ByteArray =
-            byteArrayOf((depth shr 8).toByte(), depth.toByte())
-
-        private fun applyLevelMask(levelMask: Int, level: Int): Int =
-            levelMask and ((1 shl level) - 1)
     }
 }

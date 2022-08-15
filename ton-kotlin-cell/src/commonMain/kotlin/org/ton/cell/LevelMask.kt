@@ -1,6 +1,7 @@
 package org.ton.cell
 
-data class LevelMask(
+@JvmInline
+value class LevelMask(
     val mask: Int = 0
 ) {
     val level: Int get() = Int.SIZE_BITS - mask.countLeadingZeroBits()
@@ -24,15 +25,6 @@ data class LevelMask(
 
     infix fun shr(bitCount: Int): LevelMask =
         LevelMask(mask shr bitCount)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LevelMask) return false
-        if (mask != other.mask) return false
-        return true
-    }
-
-    override fun hashCode(): Int = mask
 
     companion object {
         private val ZERO = LevelMask(0)
