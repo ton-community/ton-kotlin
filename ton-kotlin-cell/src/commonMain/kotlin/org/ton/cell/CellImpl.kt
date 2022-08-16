@@ -7,7 +7,6 @@ import org.ton.cell.Cell.Companion.getBitsDescriptor
 import org.ton.cell.Cell.Companion.getRefsDescriptor
 import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
-import kotlin.experimental.and
 import kotlin.math.max
 
 internal class CellImpl(
@@ -191,7 +190,7 @@ internal class CellImpl(
                 var representation = byteArrayOf(d1, d2)
                 representation += if (hashIndex == hashIndexOffset) {
                     check(levelIndex == 0 || type == CellType.PRUNED_BRANCH)
-                    bits.toByteArray(augment = (d1 and 1) != 0.toByte())
+                    bits.toByteArray(augment = true)
                 } else {
                     hashes[hashIndex - hashIndexOffset - 1]
                 }
