@@ -1,14 +1,14 @@
 package org.ton.boc
 
 import io.ktor.utils.io.core.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
+import kotlin.experimental.and
 import kotlin.time.ExperimentalTime
 
-@OptIn(DelicateCoroutinesApi::class)
+@OptIn(ExperimentalUnsignedTypes::class)
 fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
@@ -81,49 +81,44 @@ fun Input.readBagOfCell(): BagOfCells {
     val cellExotics = BooleanArray(cellCount) { false }
 
     repeat(cellCount) { cellIndex ->
-        val d1 = readByte().toInt() and 0xFF
-        val level = d1 shr 5
+        val d1 = readUByte().toInt()
+        val d2 = readUByte().toInt()
+
         val hasHashes = (d1 and 0b0001_0000) != 0
         val isExotic = (d1 and 0b0000_1000) != 0
         val refsCount = d1 and 0b0000_0111
-        val isAbsent = refsCount == 0b0000_0111 && hasHashes
-
-        // For absent cells (i.e., external references), only d1 is present, always equal to 23 + 32l.
-        if (isAbsent) {
-            TODO()
-        } else {
-            require(refsCount in 0..4) {
-                "refsCount expected: 0..4 actual: $refsCount"
+        val levelMask = LevelMask(d1 shr 5)
+        if (refsCount > 4) {
+            if (refsCount != 0b111 || !hasHashes) {
+                throw IllegalArgumentException("Invalid first bytes")
             }
-
-            val d2 = readByte().toInt() and 0xFF
-            val fullFilledBytes = d2 and 1 == 0
-            val dataSize = (d2 shr 1) + if (fullFilledBytes) 0 else 1
-
-            if (hasHashes) {
-                val hashCount = LevelMask(level).level + 1
-                val hashes = Array(hashCount) {
-                    readBytes(32)
-                }
-                val depth = IntArray(hashCount) {
-                    readShort().toInt()
-                }
-            }
-
-            var cellData = readBytes(dataSize)
-            if (fullFilledBytes) {
-                cellData = BitString.appendAugmentTag(cellData, dataSize * 8)
-            }
-            val cellSize = BitString.findAugmentTag(cellData)
-            cellBits[cellIndex] = BitString(cellData, cellSize)
-            cellRefs[cellIndex] = IntArray(refsCount) { k ->
-                val refIndex = readInt(refSize)
-                check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
-                check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
-                refIndex
-            }
-            cellExotics[cellIndex] = isExotic
+            TODO("absent cells")
         }
+
+        val hashesOffset = 2
+        val hashesCount = levelMask.hashCount
+        val depthOffset = hashesOffset + if (hasHashes) hashesCount * Cell.HASH_BYTES else 0
+        val dataOffset = depthOffset + if (hasHashes) hashesCount * Cell.DEPTH_BYTES else 0
+        val dataLen = (d2 shr 1) + (d2 and 1)
+        val dataWithBits = (d2 and 1) != 0
+        val refsOffset = dataOffset + dataLen
+        val endOffset = refsOffset + refsCount * refSize
+
+        if (hasHashes) {
+            discardExact(hashesCount * Cell.HASH_BYTES)
+            discardExact(hashesCount * Cell.DEPTH_BYTES)
+        }
+
+        val cellData = readBytes(dataLen)
+        val cellSize = if (dataWithBits) BitString.findAugmentTag(cellData) else dataLen * 8
+        cellBits[cellIndex] = BitString(cellData, cellSize)
+        cellRefs[cellIndex] = IntArray(refsCount) { k ->
+            val refIndex = readInt(refSize)
+            check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
+            check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
+            refIndex
+        }
+        cellExotics[cellIndex] = isExotic
     }
 
     // Resolving references & constructing cells from leaves to roots
@@ -204,7 +199,9 @@ private fun serializeBagOfCells(
             writeByte(d1)
             val d2 = cell.getBitsDescriptor()
             writeByte(d2)
-            val cellData = cell.bits.toByteArray(augment = true)
+            val cellData = cell.bits.toByteArray(
+                augment = (d2 and 1) != 0.toByte()
+            )
             writeFully(cellData)
             cell.refs.forEach { reference ->
                 val refIndex = cells.indexOf(reference)

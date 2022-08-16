@@ -152,6 +152,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
 
         @JvmStatic
         fun findAugmentTag(byteArray: ByteArray): Int {
+            if (byteArray.isEmpty()) return 0
             var length = byteArray.size * 8
             var index = byteArray.lastIndex
             while (true) {

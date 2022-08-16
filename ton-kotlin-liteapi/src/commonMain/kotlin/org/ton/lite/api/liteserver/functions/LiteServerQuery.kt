@@ -38,7 +38,11 @@ interface LiteServerQueryFunction {
         val errorByteInput = ByteReadPacket(answerBytes)
         if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
             val liteServerError = LiteServerError.decode(errorByteInput)
-            throw TonException(liteServerError.code, liteServerError.message)
+            throw TonException(
+                liteServerError.code, "Exception occurred while processing query:\n" +
+                        "${query}\n" +
+                        "$liteServerError"
+            )
         }
         return answerCodec.decodeBoxed(answerBytes)
     }

@@ -4,8 +4,6 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import kotlin.math.ceil
-import kotlin.math.floor
 
 fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
     Cell.of(BitString(hex), refs = refs.toList(), isExotic)
@@ -132,8 +130,13 @@ interface Cell {
         }
 
         @JvmStatic
-        fun getBitsDescriptor(bits: BitString): Byte =
-            (ceil(bits.size / 8.0).toInt() + floor(bits.size / 8.0).toInt()).toByte()
+        fun getBitsDescriptor(bits: BitString): Byte {
+            val result = (bits.size / 8) * 2
+            if ((bits.size and 7) != 0) {
+                return (result + 1).toByte()
+            }
+            return result.toByte()
+        }
     }
 }
 

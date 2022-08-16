@@ -53,13 +53,7 @@ data class LiteServerAccountId(
         return result
     }
 
-    override fun toString(): String = buildString {
-        append("LiteServerAccountId(workchain=")
-        append(workchain)
-        append(", id=")
-        append(id.encodeHex().uppercase())
-        append(")")
-    }
+    override fun toString(): String = "$workchain:${id.encodeHex().uppercase()}"
 
     companion object : TlConstructor<LiteServerAccountId>(
         type = LiteServerAccountId::class,

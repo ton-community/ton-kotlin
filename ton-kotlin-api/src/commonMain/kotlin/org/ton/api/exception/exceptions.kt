@@ -10,10 +10,12 @@ inline fun TonException(code: Int, message: String, cause: Throwable? = null) = 
     TonNotReadyException.CODE -> TonNotReadyException(message, cause)
     TonTimeoutException.CODE -> TonTimeoutException(message, cause)
     TonCancelledException.CODE -> TonCancelledException(message, cause)
-    else -> throw IllegalArgumentException("Unknown error code: $code")
+    else -> object : TonException(message, cause) {
+        override val code: Int = code
+    }
 }
 
-sealed class TonException constructor(
+abstract class TonException constructor(
     override val message: String,
     override val cause: Throwable? = null
 ) : RuntimeException(message, cause) {

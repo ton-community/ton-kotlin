@@ -10,6 +10,7 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.crc16
+import org.ton.crypto.encodeHex
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerRunMethodResult
 import org.ton.tl.TlCodec
@@ -135,6 +136,7 @@ data class LiteServerRunSmcMethod(
         params: Iterable<VmStackValue>
     ) : this(mode, id, account, method, VmStack(VmStackList(params)))
 
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -157,6 +159,21 @@ data class LiteServerRunSmcMethod(
         result = 31 * result + method_id.hashCode()
         result = 31 * result + params.contentHashCode()
         return result
+    }
+
+    override fun toString(): String = buildString {
+        append("LiteServerRunSmcMethod(")
+        append("\n  mode:      ")
+        append(mode)
+        append("\n  id:        ")
+        append(id)
+        append("\n  account:   ")
+        append(account)
+        append("\n  method_id: ")
+        append(method_id)
+        append("\n  params:    ")
+        append(params.encodeHex().uppercase())
+        append("\n)")
     }
 
     companion object : TlCodec<LiteServerRunSmcMethod> by LiteServerRunSmcMethodTlConstructor {
