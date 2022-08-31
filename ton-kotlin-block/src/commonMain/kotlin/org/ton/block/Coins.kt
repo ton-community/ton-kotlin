@@ -2,7 +2,8 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.*
+import org.ton.bigint.BigInt
+import org.ton.bigint.times
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -11,32 +12,38 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
+import kotlin.math.pow
 
 @SerialName("nanocoins")
 @Serializable
 data class Coins(
     val amount: VarUInteger = VarUInteger(0)
 ) {
-    override fun toString(): String = buildString {
-        val full = amount.value / NANOCOINS
-        val decimal = amount.value - full
-        append(full)
-        append(".")
-        append(decimal.toString().padStart(9, '0'))
-    }
+    override fun toString() = toString(decimals = DECIMALS)
+
+    fun toString(decimals: Int): String =
+        amount.value.toString().let {
+            it.dropLast(decimals).ifEmpty { "0" } + "." + it.takeLast(decimals).padStart(decimals, '0')
+        }
 
     companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
-        private val NANOCOINS = 1_000_000_000
+        private val DECIMALS = 9
 
         @JvmStatic
         fun tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor
 
         @JvmStatic
-        fun of(coins: Long): Coins = Coins(VarUInteger(BigInt(coins) * NANOCOINS))
+        fun of(coins: Long, decimals: Int = DECIMALS): Coins =
+            Coins(VarUInteger(BigInt(coins) * BigInt(10).pow(decimals)))
 
         @JvmStatic
-        fun of(coins: Double): Coins =
-            Coins(VarUInteger(BigInt(coins.toLong() * NANOCOINS) + BigInt((coins - coins.toLong()) * NANOCOINS)))
+        fun of(coins: Double, decimals: Int = DECIMALS): Coins =
+            Coins(
+                VarUInteger(
+                    BigInt(coins.toLong() * 10.0.pow(decimals)) +
+                            BigInt((coins - coins.toLong()) * 10.0.pow(decimals))
+                )
+            )
 
         @JvmStatic
         fun ofNano(coins: Long): Coins = Coins(VarUInteger(coins))
