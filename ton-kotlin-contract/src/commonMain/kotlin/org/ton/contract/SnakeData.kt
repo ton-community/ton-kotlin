@@ -32,7 +32,7 @@ sealed interface SnakeData {
         }
 
         override fun loadTlb(cellSlice: CellSlice): SnakeData {
-            return if (cellSlice.refs.lastIndex >= cellSlice.refsPosition) {
+            return if (cellSlice.refs.lastIndex > cellSlice.refsPosition) {
                 snakeDataCons.loadTlb(cellSlice) // More references available, this is a cons
             } else {
                 snakeDataTail.loadTlb(cellSlice) // No more refs, this has to be a tail
