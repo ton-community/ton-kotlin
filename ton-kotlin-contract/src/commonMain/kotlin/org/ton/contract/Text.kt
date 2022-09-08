@@ -2,8 +2,11 @@ package org.ton.contract
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.*
+import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbCombinatorProvider
+import org.ton.tlb.storeTlb
 
 data class Text(
     val data: SnakeData
@@ -19,12 +22,10 @@ private object TextCombinator : TlbCombinator<Text>() {
     private object TextConstructor : TlbConstructor<Text>(
         schema = "text#_ {n:#} data:(SnakeData ~n) = Text;"
     ) {
-        private val snakeDataCodec by lazy { SnakeData.tlbCodec() }
-
         override fun storeTlb(cellBuilder: CellBuilder, value: Text) {
-            cellBuilder.storeTlb(snakeDataCodec, value.data)
+            cellBuilder.storeTlb(SnakeData, value.data)
         }
 
-        override fun loadTlb(cellSlice: CellSlice): Text = Text(cellSlice.loadTlb(snakeDataCodec))
+        override fun loadTlb(cellSlice: CellSlice): Text = Text(cellSlice.loadTlb(SnakeData))
     }
 }
