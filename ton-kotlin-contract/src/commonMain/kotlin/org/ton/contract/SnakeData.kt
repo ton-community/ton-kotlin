@@ -98,7 +98,7 @@ data class SnakeDataCons(
         override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, SnakeDataCons> {
             val b = cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitsPosition)
             val (n, next) = cellSlice.loadRef {
-                cellSlice.loadNegatedTlb(snakeData)
+                loadNegatedTlb(snakeData)
             }
             return n + 1 to SnakeDataCons(b, next)
         }
