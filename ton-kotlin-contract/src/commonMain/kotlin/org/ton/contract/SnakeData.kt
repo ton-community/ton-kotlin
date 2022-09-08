@@ -57,7 +57,7 @@ data class SnakeDataCons(
     companion object : TlbConstructorProvider<SnakeDataCons> by SnakeDataConsTlbConstructor
 
     private object SnakeDataConsTlbConstructor : TlbConstructor<SnakeDataCons>(
-        schema = "cons#_ {bn:#} {n:#} b:(bits bn) next:^(SnakeData ~n) = SnakeData ~(n + 1);"
+        schema = "cons#_ {bn:#} {n:#} b:(bits bn) next:^(SnakeData ~n) = SnakeData (n + 1);"
     ) {
         override fun storeTlb(cellBuilder: CellBuilder, value: SnakeDataCons) {
             cellBuilder.storeBits(value.bits)
