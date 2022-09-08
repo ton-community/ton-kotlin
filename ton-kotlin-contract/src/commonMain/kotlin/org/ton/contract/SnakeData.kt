@@ -39,7 +39,7 @@ data class SnakeDataTail(
     companion object : TlbConstructorProvider<SnakeDataTail> by SnakeDataTailTlbConstructor
 
     private object SnakeDataTailTlbConstructor : TlbConstructor<SnakeDataTail>(
-        schema = "tail#_ {bn:#} b:(bits bn) = SnakeData ~0;"
+        schema = "tail#_ {bn:#} b:(bits bn) = SnakeData 0;"
     ) {
         override fun storeTlb(cellBuilder: CellBuilder, value: SnakeDataTail) {
             cellBuilder.storeBits(value.bits)
