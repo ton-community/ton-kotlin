@@ -1,5 +1,6 @@
 package org.ton.asm.stackcomplex
 
+import org.ton.asm.AsmInstruction
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
@@ -10,7 +11,7 @@ data class XCHG3(
     val i: UByte,
     val j: UByte,
     val k: UByte
-) {
+) : AsmInstruction {
     override fun toString(): String = "s$i s$j s$k XCHG3"
 
     companion object : TlbConstructorProvider<XCHG3> by XCHG3TlbConstructor

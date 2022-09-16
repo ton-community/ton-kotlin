@@ -3,12 +3,20 @@ true$_ = True;
 // EMPTY False;
 bool_false$0 = Bool;
 bool_true$1 = Bool;
-bool_false$0 = BoolFalse;
-bool_true$1 = BoolTrue;
+//
+// bool_false$0 = BoolFalse;
+// bool_true$1 = BoolTrue;
+
+
 nothing$0 {X:Type} = Maybe X;
 just$1 {X:Type} value:X = Maybe X;
+
+
+foo value:(Maybe int32) = Foo;
+
 left$0 {X:Type} {Y:Type} value:X = Either X Y;
 right$1 {X:Type} {Y:Type} value:Y = Either X Y;
+
 pair$_ {X:Type} {Y:Type} first:X second:Y = Both X Y;
 
 bit$_ (## 1) = Bit;
@@ -161,6 +169,7 @@ interm_addr_simple$10 workchain_id:int8 addr_pfx:uint64
   = IntermediateAddress;
 interm_addr_ext$11 workchain_id:int32 addr_pfx:uint64
   = IntermediateAddress;
+
 msg_envelope#4 cur_addr:IntermediateAddress
   next_addr:IntermediateAddress fwd_fee_remaining:Coins
   msg:^(Message Any) = MsgEnvelope;
@@ -400,10 +409,10 @@ shard_state#9023afe2 global_id:int32
   gen_utime:uint32
    gen_lt:uint64
   min_ref_mc_seqno:uint32
-  out_msg_queue_info:^OutMsgQueueInfo
+  out_msg_queue_info:^OutMsgQueueInfo // ref0
   before_split:(## 1)
-  accounts:^ShardAccounts
-  ^[
+  accounts:^ShardAccounts // ref1
+  ^[ // ref2
   overload_history:uint64
   underload_history:uint64
   total_balance:CurrencyCollection
@@ -411,7 +420,7 @@ shard_state#9023afe2 global_id:int32
   libraries:(HashmapE 256 LibDescr)
   master_ref:(Maybe BlkMasterInfo)
   ]
-  custom:(Maybe ^McStateExtra)
+  custom:(Maybe ^McStateExtra) // ref3
   = ShardStateUnsplit;
 
 _ ShardStateUnsplit = ShardState;
