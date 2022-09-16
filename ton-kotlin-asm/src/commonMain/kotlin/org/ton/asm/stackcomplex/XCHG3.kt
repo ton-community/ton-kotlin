@@ -11,6 +11,8 @@ data class XCHG3(
     val j: UByte,
     val k: UByte
 ) {
+    override fun toString(): String = "s$i s$j s$k XCHG3"
+
     companion object : TlbConstructorProvider<XCHG3> by XCHG3TlbConstructor
 }
 
