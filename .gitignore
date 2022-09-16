@@ -28,3 +28,6 @@ local.properties
 
 # Ignore Gradle build output directory
 build
+
+# Intellij IDEA
+.idea
