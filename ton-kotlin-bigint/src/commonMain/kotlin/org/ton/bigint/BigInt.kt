@@ -21,6 +21,10 @@ expect class BigInt : Number, Comparable<BigInt> {
 }
 
 expect fun Number.toBigInt(): BigInt
+fun BigInt.toUByte(): UByte = toLong().toUByte()
+fun BigInt.toUShort(): UShort = toLong().toUShort()
+fun BigInt.toUInt(): UInt = toLong().toUInt()
+fun BigInt.toULong(): ULong = toLong().toULong()
 
 expect operator fun BigInt.plus(number: Number): BigInt
 expect operator fun BigInt.minus(number: Number): BigInt
