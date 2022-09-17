@@ -7,7 +7,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 object PUSHROOT : AsmInstruction, TlbConstructorProvider<PUSHROOT> by PUSHROOTTlbConstructor {
-    override fun toString(): String = "PUSHROOT"
+    override fun toString(): String = "c4 PUSHROOT"
 }
 
 private object PUSHROOTTlbConstructor : TlbConstructor<PUSHROOT>(
