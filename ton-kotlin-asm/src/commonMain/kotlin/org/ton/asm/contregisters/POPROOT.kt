@@ -7,7 +7,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 object POPROOT : AsmInstruction, TlbConstructorProvider<POPROOT> by POPROOTTlbConstructor {
-    override fun toString(): String = "POPROOT"
+    override fun toString(): String = "c4 POPCTR"
 }
 
 private object POPROOTTlbConstructor : TlbConstructor<POPROOT>(
