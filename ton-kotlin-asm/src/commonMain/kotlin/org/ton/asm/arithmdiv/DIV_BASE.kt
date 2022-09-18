@@ -55,6 +55,7 @@ private object DIV_BASETlbConstructor : TlbConstructor<DIV_BASE>(
         override fun storeTlb(cellBuilder: CellBuilder, value: Triple<UByte, UByte, UByte>) {
             cellBuilder.storeUInt(value.first, 2)
             cellBuilder.storeUInt(value.second, 2)
+            cellBuilder.storeUInt(value.third, 8)
         }
 
         override fun loadTlb(cellSlice: CellSlice): Triple<UByte, UByte, UByte> {
