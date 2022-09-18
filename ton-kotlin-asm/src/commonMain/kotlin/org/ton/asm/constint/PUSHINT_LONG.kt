@@ -1,5 +1,6 @@
 package org.ton.asm.constint
 
+import org.ton.asm.AsmInstruction
 import org.ton.bigint.BigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -10,7 +11,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class PUSHINT_LONG(
     val l: UByte,
     val xxx: BigInt
-) {
+) : AsmInstruction {
     override fun toString(): String = "$xxx PUSHINT"
 
     companion object : TlbConstructorProvider<PUSHINT_LONG> by PUSHINT_LONGTlbConstructor
