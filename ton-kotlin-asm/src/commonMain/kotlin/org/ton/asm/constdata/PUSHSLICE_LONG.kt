@@ -28,7 +28,7 @@ data class PUSHSLICE_LONG(
     init {
         require(r <= 4u) { "expected r <= 4, actual: $r" }
         require(c.size == r.toInt()) { "expected c.size: $r, actual: ${c.size}" }
-        require(ssss.size == 8 * xx.toInt() + 6) { "expected ssss.size: 8 * $xx + 6, actual: ${ssss.size}" }
+        require(ssss.size == 8 * xx.toInt() + 6) { "expected ssss.size: ${8u * xx + 6u}, actual: ${ssss.size}" }
     }
 
     fun toCellSlice(): CellSlice = CellSlice(ssss, c)
