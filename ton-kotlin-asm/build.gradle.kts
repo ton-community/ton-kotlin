@@ -5,6 +5,7 @@ kotlin {
                 api(projects.tonKotlinBitstring)
                 api(projects.tonKotlinBigint)
                 api(projects.tonKotlinTlb)
+                api(projects.tonKotlinBlock)
                 implementation(libs.serialization.json)
             }
         }

@@ -89,6 +89,12 @@ sealed interface Either<X, Y> {
         }
 
         @JvmStatic
+        fun <X, Y> left(left: X): Either<X, Y> = Left(left)
+
+        @JvmStatic
+        fun <X, Y> right(right: Y): Either<X, Y> = Right(right)
+
+        @JvmStatic
         fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
             EitherTlbCombinator(x, y)
     }
