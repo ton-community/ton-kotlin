@@ -89,6 +89,8 @@ data class VmStackTinyInt(
         is VmStackNan -> throw VmStackNanException()
     }
 
+    override fun unaryMinus(): VmStackTinyInt = VmStackTinyInt(-value)
+
     override fun toString(): String = "(vm_stk_tinyint value:$value)"
 
     companion object : TlbConstructorProvider<VmStackTinyInt> by VmStackTinyIntTlbConstructor

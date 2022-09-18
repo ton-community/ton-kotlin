@@ -50,6 +50,8 @@ data class VmStackInt(
         VmStackNan -> throw VmStackNanException()
     }
 
+    override fun unaryMinus(): VmStackInt = VmStackInt(value.unaryMinus())
+
     override fun toString(): String = "(vm_stk_int value:$value)"
 
     companion object : TlbConstructorProvider<VmStackInt> by VmStackIntTlbConstructor

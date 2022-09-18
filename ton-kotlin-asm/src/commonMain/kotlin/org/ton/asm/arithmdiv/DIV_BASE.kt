@@ -1,5 +1,6 @@
 package org.ton.asm.arithmdiv
 
+import org.ton.asm.AsmInstruction
 import org.ton.block.Either
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -13,7 +14,7 @@ data class DIV_BASE(
     val m: Boolean,
     val s: UByte,
     val cdft: Either<Pair<UByte, UByte>, Triple<UByte, UByte, UByte>>
-) {
+) : AsmInstruction {
     constructor(
         m: Boolean,
         s: UByte,

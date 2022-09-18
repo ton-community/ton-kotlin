@@ -16,6 +16,7 @@ object VmStackNan : VmStackValue, VmStackNumber, TlbConstructorProvider<VmStackN
     override fun minus(other: VmStackNumber): VmStackNumber = throw VmStackNanException()
     override fun times(other: VmStackNumber): VmStackNumber = throw VmStackNanException()
     override fun div(other: VmStackNumber): VmStackNumber = throw VmStackNanException()
+    override fun unaryMinus(): VmStackNumber = throw VmStackNanException()
 
     class VmStackNanException : RuntimeException("NaN exception")
 

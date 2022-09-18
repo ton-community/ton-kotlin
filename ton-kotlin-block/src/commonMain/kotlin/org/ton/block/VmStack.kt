@@ -16,6 +16,7 @@ import org.ton.tlb.storeTlb
 
 inline fun VmStack(depth: Int, stack: VmStackList): VmStack = VmStackImpl(depth, stack)
 inline fun VmStack(stack: VmStackList): VmStack = VmStackImpl(stack)
+inline fun VmStack(): VmStack = VmStackImpl(VmStackList.of())
 
 interface VmStack : Collection<VmStackValue> {
     val depth: Int
@@ -63,8 +64,13 @@ interface MutableVmStack : VmStack {
     fun push(stackValue: VmStackValue)
     fun pushNull() = push(VmStackNull)
     fun pushTinyInt(tinyInt: Boolean) = push(VmStackValue(tinyInt))
+    fun pushTinyInt(tinyInt: UByte) = push(VmStackValue(tinyInt))
     fun pushTinyInt(tinyInt: Int) = push(VmStackValue(tinyInt))
+    fun pushTinyInt(tinyInt: UInt) = push(VmStackValue(tinyInt))
+    fun pushTinyInt(tinyInt: Short) = push(VmStackValue(tinyInt))
+    fun pushTinyInt(tinyInt: UShort) = push(VmStackValue(tinyInt))
     fun pushTinyInt(tinyInt: Long) = push(VmStackValue(tinyInt))
+    fun pushTinyInt(tinyInt: ULong) = push(VmStackValue(tinyInt))
     fun pushBool(boolean: Boolean) = push(VmStackValue(boolean))
     fun pushInt(int: BigInt) = push(VmStackValue(int))
     fun pushNan() = push(VmStackNan)
@@ -74,7 +80,9 @@ interface MutableVmStack : VmStack {
     fun pushCont(vmCont: VmCont) = push(VmStackValue(vmCont))
     fun pushTuple(vmTuple: VmTuple) = push(VmStackValue(vmTuple))
 
+    fun interchange(i: UByte, j: UByte) = interchange(i.toInt(), j.toInt())
     fun interchange(i: Int, j: Int)
+    fun interchange(i: UByte) = interchange(i.toInt())
     fun interchange(i: Int) = interchange(0, i)
     fun swap() = interchange(0, 1)
 }
