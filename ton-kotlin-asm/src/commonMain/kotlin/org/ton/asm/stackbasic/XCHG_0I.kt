@@ -1,5 +1,6 @@
 package org.ton.asm.stackbasic
 
+import org.ton.asm.AsmInstruction
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
@@ -8,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 data class XCHG_0I(
     val i: UByte
-) {
+) : AsmInstruction {
     init {
         require(i >= 1u) { "expected i >= 1, actual: $i" }
     }

@@ -1,5 +1,6 @@
 package org.ton.asm.constdata
 
+import org.ton.asm.AsmInstruction
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
@@ -13,7 +14,7 @@ data class PUSHSLICE_LONG(
     val xx: UByte,
     val c: List<Cell>,
     val ssss: BitString
-) {
+) : AsmInstruction {
     constructor(
         c: List<Cell>,
         ssss: BitString
