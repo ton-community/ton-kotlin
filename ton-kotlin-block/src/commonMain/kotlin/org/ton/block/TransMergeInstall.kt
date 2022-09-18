@@ -25,12 +25,12 @@ data class TransMergeInstall(
 
 private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstall>(
     schema = "trans_merge_install\$0111 split_info:SplitMergeInfo\n" +
-            "  prepare_transaction:^Transaction\n" +
-            "  storage_ph:(Maybe TrStoragePhase)\n" +
-            "  credit_ph:(Maybe TrCreditPhase)\n" +
-            "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
-            "  aborted:Bool destroyed:Bool\n" +
-            "  = TransactionDescr;"
+        "  prepare_transaction:^Transaction\n" +
+        "  storage_ph:(Maybe TrStoragePhase)\n" +
+        "  credit_ph:(Maybe TrCreditPhase)\n" +
+        "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
+        "  aborted:Bool destroyed:Bool\n" +
+        "  = TransactionDescr;"
 ) {
     val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
     val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase)

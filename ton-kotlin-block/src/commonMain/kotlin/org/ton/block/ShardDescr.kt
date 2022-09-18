@@ -45,29 +45,29 @@ data class ShardDescr(
 private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>() {
     val a = ShardDescrTlbConstructor(
         "shard_descr_new#a seq_no:uint32 reg_mc_seqno:uint32 " +
-                "  start_lt:uint64 end_lt:uint64 " +
-                "  root_hash:bits256 file_hash:bits256 " +
-                "  before_split:Bool before_merge:Bool " +
-                "  want_split:Bool want_merge:Bool " +
-                "  nx_cc_updated:Bool flags:(## 3) { flags = 0 } " +
-                "  next_catchain_seqno:uint32 next_validator_shard:uint64 " +
-                "  min_ref_mc_seqno:uint32 gen_utime:uint32 " +
-                "  split_merge_at:FutureSplitMerge " +
-                "  ^[ fees_collected:CurrencyCollection " +
-                "     funds_created:CurrencyCollection ] = ShardDescr;"
+            "  start_lt:uint64 end_lt:uint64 " +
+            "  root_hash:bits256 file_hash:bits256 " +
+            "  before_split:Bool before_merge:Bool " +
+            "  want_split:Bool want_merge:Bool " +
+            "  nx_cc_updated:Bool flags:(## 3) { flags = 0 } " +
+            "  next_catchain_seqno:uint32 next_validator_shard:uint64 " +
+            "  min_ref_mc_seqno:uint32 gen_utime:uint32 " +
+            "  split_merge_at:FutureSplitMerge " +
+            "  ^[ fees_collected:CurrencyCollection " +
+            "     funds_created:CurrencyCollection ] = ShardDescr;"
     )
     val b = ShardDescrTlbConstructor(
         "shard_descr#b seq_no:uint32 reg_mc_seqno:uint32 " +
-                "  start_lt:uint64 end_lt:uint64 " +
-                "  root_hash:bits256 file_hash:bits256 " +
-                "  before_split:Bool before_merge:Bool " +
-                "  want_split:Bool want_merge:Bool " +
-                "  nx_cc_updated:Bool flags:(## 3) { flags = 0 } " +
-                "  next_catchain_seqno:uint32 next_validator_shard:uint64 " +
-                "  min_ref_mc_seqno:uint32 gen_utime:uint32 " +
-                "  split_merge_at:FutureSplitMerge " +
-                "  fees_collected:CurrencyCollection " +
-                "  funds_created:CurrencyCollection = ShardDescr;"
+            "  start_lt:uint64 end_lt:uint64 " +
+            "  root_hash:bits256 file_hash:bits256 " +
+            "  before_split:Bool before_merge:Bool " +
+            "  want_split:Bool want_merge:Bool " +
+            "  nx_cc_updated:Bool flags:(## 3) { flags = 0 } " +
+            "  next_catchain_seqno:uint32 next_validator_shard:uint64 " +
+            "  min_ref_mc_seqno:uint32 gen_utime:uint32 " +
+            "  split_merge_at:FutureSplitMerge " +
+            "  fees_collected:CurrencyCollection " +
+            "  funds_created:CurrencyCollection = ShardDescr;"
     )
 
     override val constructors: List<TlbConstructor<out ShardDescr>> = listOf(

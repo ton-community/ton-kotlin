@@ -72,9 +72,9 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
 
     private object IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.IntMsgInfoRelaxed>(
         schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool" +
-                " src:MsgAddress dest:MsgAddressInt" +
-                " value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins" +
-                " created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;"
+            " src:MsgAddress dest:MsgAddressInt" +
+            " value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins" +
+            " created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;"
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.IntMsgInfoRelaxed
@@ -112,7 +112,7 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
 
     private object ExtOutMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed>(
         schema = "ext_out_msg_info\$11 src:MsgAddress dest:MsgAddressExt" +
-                " created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;"
+            " created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;"
     ) {
 
         override fun storeTlb(

@@ -38,9 +38,9 @@ data class AccountBlock(
 
 private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
     schema = "acc_trans#5 account_addr:bits256 " +
-            "transactions:(AugDictionaryEdge 64 ^Transaction CurrencyCollection) " +
-            "state_update:^(HASH_UPDATE Account) " +
-            "= AccountBlock;"
+        "transactions:(AugDictionaryEdge 64 ^Transaction CurrencyCollection) " +
+        "state_update:^(HASH_UPDATE Account) " +
+        "= AccountBlock;"
 ) {
     val augDictionaryEdge = AugDictionaryEdge.tlbCodec(
         64,

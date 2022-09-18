@@ -22,8 +22,8 @@ data class TransMergePrepare(
 
 private object TransMergePrepareTlbConstructor : TlbConstructor<TransMergePrepare>(
     schema = "trans_merge_prepare\$0110 split_info:SplitMergeInfo\n" +
-            "  storage_ph:TrStoragePhase aborted:Bool\n" +
-            "  = TransactionDescr;"
+        "  storage_ph:TrStoragePhase aborted:Bool\n" +
+        "  = TransactionDescr;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

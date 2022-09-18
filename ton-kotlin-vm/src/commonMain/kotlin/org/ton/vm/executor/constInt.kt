@@ -17,14 +17,14 @@ private fun executePushInt8(vmState: VmState, instruction: PUSHINT_4) = vmState 
     vmState.stack.pushTinyInt(instruction.i)
 }
 
-private fun executePushInt16(vmState: VmState, instruction: PUSHINT_16) = vmState{
+private fun executePushInt16(vmState: VmState, instruction: PUSHINT_16) = vmState {
     vmState.stack.pushTinyInt(instruction.xxxx)
 }
 
-private fun executePushIntLong(vmState: VmState, instruction: PUSHINT_LONG) = vmState{
+private fun executePushIntLong(vmState: VmState, instruction: PUSHINT_LONG) = vmState {
     vmState.stack.pushInt(instruction.xxx)
 }
 
-private fun executePushNan(vmState: VmState, instruction: PUSHNAN) = vmState{
+private fun executePushNan(vmState: VmState, instruction: PUSHNAN) = vmState {
     vmState.stack.pushNan()
 }

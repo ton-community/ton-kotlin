@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class MODPOW2(
     val tt: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${tt+1u} MODPOW2#"
+    override fun toString(): String = "${tt + 1u} MODPOW2#"
 
     companion object : TlbConstructorProvider<MODPOW2> by MODPOW2TlbConstructor
 }

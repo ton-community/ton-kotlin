@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class LDU_ALT(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} LDU_l"
+    override fun toString(): String = "${cc + 1u} LDU_l"
 
     companion object : TlbConstructorProvider<LDU_ALT> by LDU_ALTTlbConstructor
 }

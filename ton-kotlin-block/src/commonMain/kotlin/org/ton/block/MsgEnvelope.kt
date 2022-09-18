@@ -21,8 +21,8 @@ data class MsgEnvelope(
 
 private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
     schema = "msg_envelope#4 cur_addr:IntermediateAddress " +
-            "next_addr:IntermediateAddress fwd_fee_remaining:Coins " +
-            "msg:^(Message Any) = MsgEnvelope;"
+        "next_addr:IntermediateAddress fwd_fee_remaining:Coins " +
+        "msg:^(Message Any) = MsgEnvelope;"
 ) {
 
     override fun storeTlb(

@@ -34,7 +34,7 @@ data class VmCellSlice(
 
 private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
     schema = "vm_stk_slice#04 cell:^Cell st_bits:(## 10) end_bits:(## 10) { st_bits <= end_bits } " +
-            "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
+        "st_ref:(#<= 4) end_ref:(#<= 4) { st_ref <= end_ref } = VmCellSlice;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,
@@ -58,4 +58,3 @@ private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         VmCellSlice(cell, stBits, endBits, stRef, endRef)
     }
 }
-

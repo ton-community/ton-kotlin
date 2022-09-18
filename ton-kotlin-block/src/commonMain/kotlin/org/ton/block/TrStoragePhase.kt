@@ -35,9 +35,9 @@ data class TrStoragePhase(
 
 private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
     schema = "tr_phase_storage\$_ storage_fees_collected:Coins " +
-            "storage_fees_due:(Maybe Coins) " +
-            "status_change:AccStatusChange " +
-            "= TrStoragePhase;"
+        "storage_fees_due:(Maybe Coins) " +
+        "status_change:AccStatusChange " +
+        "= TrStoragePhase;"
 ) {
     val maybeCoins = Maybe.tlbCodec(Coins)
 

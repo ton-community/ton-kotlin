@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class RSHIFTR(
     val tt: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${tt+1u} RSHIFTR#"
+    override fun toString(): String = "${tt + 1u} RSHIFTR#"
 
     companion object : TlbConstructorProvider<RSHIFTR> by RSHIFTRTlbConstructor
 }

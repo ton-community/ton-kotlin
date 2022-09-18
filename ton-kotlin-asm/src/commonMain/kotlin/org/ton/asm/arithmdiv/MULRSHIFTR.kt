@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class MULRSHIFTR(
     val tt: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${tt+1u} MULRSHIFTR#"
+    override fun toString(): String = "${tt + 1u} MULRSHIFTR#"
 
     companion object : TlbConstructorProvider<MULRSHIFTR> by MULRSHIFTRTlbConstructor
 }

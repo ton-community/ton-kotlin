@@ -1,7 +1,7 @@
 package org.ton.asm.contdict
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.*
+import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor

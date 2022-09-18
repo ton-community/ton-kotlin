@@ -18,17 +18,17 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
             resultAlignedLength = resultLength + 1
         } else if (resultLength == 254) {
             resultLength = input.readUByte().toInt() +
-                    (input.readUByte().toInt() shl 8) +
-                    (input.readUByte().toInt() shl 16)
+                (input.readUByte().toInt() shl 8) +
+                (input.readUByte().toInt() shl 16)
             resultAlignedLength = resultLength + 4
         } else {
             val resultLengthLong = input.readUByte().toLong() +
-                    (input.readUByte().toLong() shl 8) +
-                    (input.readUByte().toLong() shl 16) +
-                    (input.readUByte().toLong() shl 24) +
-                    (input.readUByte().toLong() shl 32) +
-                    (input.readUByte().toLong() shl 40) +
-                    (input.readUByte().toLong() shl 48)
+                (input.readUByte().toLong() shl 8) +
+                (input.readUByte().toLong() shl 16) +
+                (input.readUByte().toLong() shl 24) +
+                (input.readUByte().toLong() shl 32) +
+                (input.readUByte().toLong() shl 40) +
+                (input.readUByte().toLong() shl 48)
             if (resultLengthLong > Int.MAX_VALUE) {
                 throw IllegalStateException("Too big byte array: $resultLengthLong")
             }
@@ -52,17 +52,17 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
             resultAlignedLength = resultLength + 1
         } else if (resultLength == 254) {
             resultLength = input.readUByte().toInt() +
-                    (input.readUByte().toInt() shl 8) +
-                    (input.readUByte().toInt() shl 16)
+                (input.readUByte().toInt() shl 8) +
+                (input.readUByte().toInt() shl 16)
             resultAlignedLength = resultLength + 4
         } else {
             val resultLengthLong = input.readUByte().toLong() +
-                    (input.readUByte().toLong() shl 8) +
-                    (input.readUByte().toLong() shl 16) +
-                    (input.readUByte().toLong() shl 24) +
-                    (input.readUByte().toLong() shl 32) +
-                    (input.readUByte().toLong() shl 40) +
-                    (input.readUByte().toLong() shl 48)
+                (input.readUByte().toLong() shl 8) +
+                (input.readUByte().toLong() shl 16) +
+                (input.readUByte().toLong() shl 24) +
+                (input.readUByte().toLong() shl 32) +
+                (input.readUByte().toLong() shl 40) +
+                (input.readUByte().toLong() shl 48)
             if (resultLengthLong > Int.MAX_VALUE) {
                 throw IllegalStateException("Too big byte array: $resultLengthLong")
             }

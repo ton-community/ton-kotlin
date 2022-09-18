@@ -71,7 +71,7 @@ data class AddrStd(
         ): String {
             return if (userFriendly) {
                 val raw = byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()) +
-                        address.address.toByteArray() + crc(address, testOnly, bounceable).toShort().toBigInt()
+                    address.address.toByteArray() + crc(address, testOnly, bounceable).toShort().toBigInt()
                     .toByteArray()
                 if (urlSafe) {
                     base64url(raw)
@@ -146,7 +146,7 @@ data class AddrStd(
         // Get the tag byte based on set flags
         private fun tag(testOnly: Boolean, bounceable: Boolean): Byte =
             (if (testOnly) 0x80.toByte() else 0.toByte()) or
-                    (if (bounceable) 0x11.toByte() else 0x51.toByte())
+                (if (bounceable) 0x11.toByte() else 0x51.toByte())
     }
 }
 

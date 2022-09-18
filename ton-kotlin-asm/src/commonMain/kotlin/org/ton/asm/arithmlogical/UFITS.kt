@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class UFITS(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} UFITS"
+    override fun toString(): String = "${cc + 1u} UFITS"
 
     companion object : TlbConstructorProvider<UFITS> by UFITSTlbConstructor
 }

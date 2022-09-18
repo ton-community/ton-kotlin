@@ -25,10 +25,10 @@ data class TransSplitPrepare(
 
 private object TransSplitPrepareTlbConstructor : TlbConstructor<TransSplitPrepare>(
     schema = "trans_split_prepare\$0100 split_info:SplitMergeInfo\n" +
-            "  storage_ph:(Maybe TrStoragePhase)\n" +
-            "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
-            "  aborted:Bool destroyed:Bool\n" +
-            "  = TransactionDescr;"
+        "  storage_ph:(Maybe TrStoragePhase)\n" +
+        "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
+        "  aborted:Bool destroyed:Bool\n" +
+        "  = TransactionDescr;"
 ) {
     val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
     val maybeTrActionPhase = Maybe.tlbCodec(TrActionPhase)

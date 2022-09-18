@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class ROLL(
     val i: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${i+1u} ROLL"
+    override fun toString(): String = "${i + 1u} ROLL"
 
     companion object : TlbConstructorProvider<ROLL> by ROLLTlbConstructor
 }

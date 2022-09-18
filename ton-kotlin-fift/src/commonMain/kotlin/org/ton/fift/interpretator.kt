@@ -154,21 +154,21 @@ class FiftInterpretator(
         get() = when {
             isNotEmpty() && get(0).code < 0x80 -> get(0).code
             length >= 2
-                    && (get(0).code and 0xe0) == 0xc0
-                    && (get(1).code and 0xc0) == 0x80 ->
+                && (get(0).code and 0xe0) == 0xc0
+                && (get(1).code and 0xc0) == 0x80 ->
                 ((get(0).code and 0x1f) shl 6) or (get(1).code and 0x3f)
 
             length >= 3
-                    && (get(0).code and 0xf0) == 0xe0
-                    && (get(1).code and 0xc0) == 0x80
-                    && (get(2).code and 0xc0) == 0x80 ->
+                && (get(0).code and 0xf0) == 0xe0
+                && (get(1).code and 0xc0) == 0x80
+                && (get(2).code and 0xc0) == 0x80 ->
                 ((get(0).code and 0x0f) shl 12) or ((get(1).code and 0x3f) shl 6) or (get(2).code and 0x3f)
 
             length >= 4
-                    && (get(0).code and 0xf8) == 0xf0
-                    && (get(1).code and 0xc0) == 0x80
-                    && (get(2).code and 0xc0) == 0x80
-                    && (get(3).code and 0xc0) == 0x80 ->
+                && (get(0).code and 0xf8) == 0xf0
+                && (get(1).code and 0xc0) == 0x80
+                && (get(2).code and 0xc0) == 0x80
+                && (get(3).code and 0xc0) == 0x80 ->
                 ((get(0).code and 7) shl 18) or ((get(1).code and 0x3f) shl 12) or ((get(2).code and 0x3f) shl 6) or (get(
                     3
                 ).code and 0x3f)

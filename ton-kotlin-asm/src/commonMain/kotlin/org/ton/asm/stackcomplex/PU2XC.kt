@@ -12,7 +12,7 @@ data class PU2XC(
     val j: UByte,
     val k: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "s$i s${j-1u} s${k-2u} PU2XC"
+    override fun toString(): String = "s$i s${j - 1u} s${k - 2u} PU2XC"
 
     companion object : TlbConstructorProvider<PU2XC> by PU2XCTlbConstructor
 }

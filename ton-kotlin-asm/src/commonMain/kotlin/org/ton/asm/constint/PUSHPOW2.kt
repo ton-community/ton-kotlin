@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class PUSHPOW2(
     val xx: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${xx+1u} PUSHPOW2"
+    override fun toString(): String = "${xx + 1u} PUSHPOW2"
 
     companion object : TlbConstructorProvider<PUSHPOW2> by PUSHPOW2TlbConstructor
 }

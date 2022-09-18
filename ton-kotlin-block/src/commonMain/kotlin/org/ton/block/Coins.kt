@@ -41,7 +41,7 @@ data class Coins(
             Coins(
                 VarUInteger(
                     BigInt(coins.toLong() * 10.0.pow(decimals)) +
-                            BigInt((coins - coins.toLong()) * 10.0.pow(decimals))
+                        BigInt((coins - coins.toLong()) * 10.0.pow(decimals))
                 )
             )
 

@@ -11,7 +11,7 @@ data class BLKSWAP(
     val i: UByte,
     val j: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${i+1u} ${j+1u} BLKSWAP"
+    override fun toString(): String = "${i + 1u} ${j + 1u} BLKSWAP"
 
     companion object : TlbConstructorProvider<BLKSWAP> by BLKSWAPTlbConstructor
 }

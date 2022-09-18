@@ -6,7 +6,8 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-object DICTISETGETOPTREF : AsmInstruction, TlbConstructorProvider<DICTISETGETOPTREF> by DICTISETGETOPTREFTlbConstructor {
+object DICTISETGETOPTREF : AsmInstruction,
+    TlbConstructorProvider<DICTISETGETOPTREF> by DICTISETGETOPTREFTlbConstructor {
     override fun toString(): String = "DICTISETGETOPTREF"
 }
 

@@ -115,7 +115,7 @@ internal class CellImpl(
                         "Hash mismatch in merkle proof cell, merkle hash: ${merkleHash.encodeHex()} , child hash: ${childHash.encodeHex()}"
                     }
                     val merkleDepth = (dataBytes[1 + HASH_BYTES].toInt() shl 8) or
-                            dataBytes[2 + HASH_BYTES].toInt()
+                        dataBytes[2 + HASH_BYTES].toInt()
                     val childDepth = refs[0].depth(level = 0)
                     check(merkleDepth == childDepth) {
                         "Depth mismatch in merkle proof cell, merkle depth: $merkleDepth , child depth: $childDepth"
@@ -134,37 +134,37 @@ internal class CellImpl(
                     val childHash0 = refs[0].hash(level = 0)
                     check(merkleHash0.contentEquals(childHash0)) {
                         "First hash mismatch in merkle update cell:\n" +
-                                "merkle hash: ${merkleHash0.encodeHex()}\n" +
-                                " child hash: ${childHash0.encodeHex()}\n" +
-                                "       data: ${dataBytes.encodeHex()}"
+                            "merkle hash: ${merkleHash0.encodeHex()}\n" +
+                            " child hash: ${childHash0.encodeHex()}\n" +
+                            "       data: ${dataBytes.encodeHex()}"
                     }
                     val merkleHash1 = dataBytes.copyOfRange(1 + HASH_BYTES, 1 + HASH_BYTES * 2)
                     val childHash1 = refs[1].hash(level = 0)
                     check(merkleHash1.contentEquals(childHash1)) {
                         "Second hash mismatch in merkle update cell:\n" +
-                                "merkle hash: ${merkleHash1.encodeHex()}\n" +
-                                " child hash: ${childHash1.encodeHex()}\n" +
-                                "       data: ${dataBytes.encodeHex()}"
+                            "merkle hash: ${merkleHash1.encodeHex()}\n" +
+                            " child hash: ${childHash1.encodeHex()}\n" +
+                            "       data: ${dataBytes.encodeHex()}"
                     }
                     val depthOffset0 = 1 + 2 * HASH_BYTES
                     val merkleDepth0 = (dataBytes[depthOffset0].toInt() shl 8) or
-                            dataBytes[depthOffset0 + 1].toInt()
+                        dataBytes[depthOffset0 + 1].toInt()
                     val childDepth0 = refs[0].depth(level = 0)
                     check(merkleDepth0 == childDepth0) {
                         "First depth mismatch in merkle update cell:\n" +
-                                "merkle depth: $merkleDepth0\n" +
-                                " child depth: $childDepth0\n" +
-                                "       data: ${dataBytes.encodeHex()}"
+                            "merkle depth: $merkleDepth0\n" +
+                            " child depth: $childDepth0\n" +
+                            "       data: ${dataBytes.encodeHex()}"
                     }
                     val depthOffset1 = 1 + 2 * HASH_BYTES + DEPTH_BYTES
                     val merkleDepth1 = (dataBytes[depthOffset1].toInt() shl 8) or
-                            (dataBytes[depthOffset1 + 1].toInt())
+                        (dataBytes[depthOffset1 + 1].toInt())
                     val childDepth1 = refs[1].depth(level = 0)
                     check(merkleDepth1 == childDepth1) {
                         "Second depth mismatch in merkle update cell:\n" +
-                                "merkle depth: $merkleDepth1\n" +
-                                " child depth: $childDepth1\n" +
-                                "       data: ${dataBytes.encodeHex()}"
+                            "merkle depth: $merkleDepth1\n" +
+                            " child depth: $childDepth1\n" +
+                            "       data: ${dataBytes.encodeHex()}"
                     }
                     levelMask = (refs[0].levelMask or refs[1].levelMask) shr 1
                 }

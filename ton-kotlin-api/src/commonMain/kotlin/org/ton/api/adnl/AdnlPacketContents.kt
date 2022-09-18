@@ -56,17 +56,17 @@ data class AdnlPacketContents(
     ) : this(
         rand1 = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15),
         (if (from != null) FLAG_FROM else 0) or
-                (if (from_short != null) FLAG_FROM_SHORT else 0) or
-                (if (message != null) FLAG_MESSAGE else 0) or
-                (if (messages != null) FLAG_MESSAGES else 0) or
-                (if (address != null) FLAG_ADDRESS else 0) or
-                (if (priority_address != null) FLAG_PRIORITY_ADDRESS else 0) or
-                (if (seqno != null) FLAG_SEQNO else 0) or
-                (if (confirm_seqno != null) FLAG_CONFIRM_SEQNO else 0) or
-                (if (recv_addr_list_version != null) FLAG_RECV_ADDR_VERSION else 0) or
-                (if (recv_priority_addr_list_version != null) FLAG_RECV_PRIORITY_ADDR_VERSION else 0) or
-                (if (reinit_date != null) FLAG_REINIT_DATE else 0) or
-                (if (signature != null) FLAG_SIGNATURE else 0),
+            (if (from_short != null) FLAG_FROM_SHORT else 0) or
+            (if (message != null) FLAG_MESSAGE else 0) or
+            (if (messages != null) FLAG_MESSAGES else 0) or
+            (if (address != null) FLAG_ADDRESS else 0) or
+            (if (priority_address != null) FLAG_PRIORITY_ADDRESS else 0) or
+            (if (seqno != null) FLAG_SEQNO else 0) or
+            (if (confirm_seqno != null) FLAG_CONFIRM_SEQNO else 0) or
+            (if (recv_addr_list_version != null) FLAG_RECV_ADDR_VERSION else 0) or
+            (if (recv_priority_addr_list_version != null) FLAG_RECV_PRIORITY_ADDR_VERSION else 0) or
+            (if (reinit_date != null) FLAG_REINIT_DATE else 0) or
+            (if (signature != null) FLAG_SIGNATURE else 0),
         from,
         from_short,
         message,
@@ -182,23 +182,23 @@ data class AdnlPacketContents(
 private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContents>(
     type = AdnlPacketContents::class,
     schema = "adnl.packetContents" +
-            " rand1:bytes" +
-            " flags:#" +
-            " from:flags.0?PublicKey" +
-            " from_short:flags.1?adnl.id.short" +
-            " message:flags.2?adnl.Message" +
-            " messages:flags.3?(vector adnl.Message)" +
-            " address:flags.4?adnl.addressList" +
-            " priority_address:flags.5?adnl.addressList" +
-            " seqno:flags.6?long" +
-            " confirm_seqno:flags.7?long" +
-            " recv_addr_list_version:flags.8?int" +
-            " recv_priority_addr_list_version:flags.9?int" +
-            " reinit_date:flags.10?int" +
-            " dst_reinit_date:flags.10?int" +
-            " signature:flags.11?bytes" +
-            " rand2:bytes" +
-            " = adnl.PacketContents",
+        " rand1:bytes" +
+        " flags:#" +
+        " from:flags.0?PublicKey" +
+        " from_short:flags.1?adnl.id.short" +
+        " message:flags.2?adnl.Message" +
+        " messages:flags.3?(vector adnl.Message)" +
+        " address:flags.4?adnl.addressList" +
+        " priority_address:flags.5?adnl.addressList" +
+        " seqno:flags.6?long" +
+        " confirm_seqno:flags.7?long" +
+        " recv_addr_list_version:flags.8?int" +
+        " recv_priority_addr_list_version:flags.9?int" +
+        " reinit_date:flags.10?int" +
+        " dst_reinit_date:flags.10?int" +
+        " signature:flags.11?bytes" +
+        " rand2:bytes" +
+        " = adnl.PacketContents",
     id = -784151159
 ) {
     val vectorAdnlMessage = VectorTlConstructor(AdnlMessage)

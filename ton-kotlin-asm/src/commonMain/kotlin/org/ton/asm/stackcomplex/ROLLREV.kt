@@ -1,17 +1,17 @@
 package org.ton.asm.stackcomplex
 
 import org.ton.asm.AsmInstruction
+import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
-import org.ton.bigint.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class ROLLREV(
     val i: UByte,
     val zero: UByte = 0u
 ) : AsmInstruction {
-    override fun toString(): String = "${i+1u} ROLLREV"
+    override fun toString(): String = "${i + 1u} ROLLREV"
 
     companion object : TlbConstructorProvider<ROLLREV> by ROLLREVTlbConstructor
 }

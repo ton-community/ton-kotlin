@@ -27,14 +27,14 @@ data class McBlockExtra(
 
 private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(
     schema = "masterchain_block_extra#cca5 " +
-            "key_block:(## 1) " +
-            "shard_hashes:ShardHashes " +
-            "shard_fees:ShardFees " +
-            "^[ prev_blk_signatures:(HashmapE 16 CryptoSignaturePair) " +
-            "   recover_create_msg:(Maybe ^InMsg) " +
-            "   mint_msg:(Maybe ^InMsg) ] " +
-            "config:key_block?ConfigParams " +
-            "= McBlockExtra;"
+        "key_block:(## 1) " +
+        "shard_hashes:ShardHashes " +
+        "shard_fees:ShardFees " +
+        "^[ prev_blk_signatures:(HashmapE 16 CryptoSignaturePair) " +
+        "   recover_create_msg:(Maybe ^InMsg) " +
+        "   mint_msg:(Maybe ^InMsg) ] " +
+        "config:key_block?ConfigParams " +
+        "= McBlockExtra;"
 ) {
     val shardHashes = HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr)))
     val shardFees = AugDictionary.tlbCodec(96, ShardFeeCreated, ShardFeeCreated)

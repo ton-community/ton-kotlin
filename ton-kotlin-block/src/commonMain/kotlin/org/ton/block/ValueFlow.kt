@@ -24,16 +24,16 @@ data class ValueFlow(
 
 private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
     schema = "value_flow#b8e48dfb ^[ from_prev_blk:CurrencyCollection " +
-            "to_next_blk:CurrencyCollection " +
-            "imported:CurrencyCollection " +
-            "exported:CurrencyCollection ] " +
-            "fees_collected:CurrencyCollection " +
-            "^[ " +
-            "fees_imported:CurrencyCollection " +
-            "recovered:CurrencyCollection " +
-            "created:CurrencyCollection " +
-            "minted:CurrencyCollection " +
-            "] = ValueFlow;"
+        "to_next_blk:CurrencyCollection " +
+        "imported:CurrencyCollection " +
+        "exported:CurrencyCollection ] " +
+        "fees_collected:CurrencyCollection " +
+        "^[ " +
+        "fees_imported:CurrencyCollection " +
+        "recovered:CurrencyCollection " +
+        "created:CurrencyCollection " +
+        "minted:CurrencyCollection " +
+        "] = ValueFlow;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: ValueFlow

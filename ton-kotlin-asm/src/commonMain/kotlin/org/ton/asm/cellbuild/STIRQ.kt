@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class STIRQ(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} STIRQ"
+    override fun toString(): String = "${cc + 1u} STIRQ"
 
     companion object : TlbConstructorProvider<STIRQ> by STIRQTlbConstructor
 }

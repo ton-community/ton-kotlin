@@ -36,7 +36,7 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
     val y: TlbCodec<Y>
 ) : TlbConstructor<AugDictionaryNodeFork<X, Y>>(
     schema = "ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(AugDictionaryEdge n X Y) " +
-            "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;",
+        "right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;",
     id = BitString.empty()
 ) {
     val edge = AugDictionaryEdge.tlbCodec(n - 1, x, y)

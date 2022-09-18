@@ -239,11 +239,11 @@ open class LiteClient(
         val actualRootHash = blockProofCell.refs.firstOrNull()?.hash(level = 0)
         check(
             blockProofCell.type == CellType.MERKLE_PROOF &&
-                    blockHeader.id.root_hash.contentEquals(actualRootHash)
+                blockHeader.id.root_hash.contentEquals(actualRootHash)
         ) {
             "Root hash mismatch:" +
-                    "\n expected: ${blockHeader.id.root_hash.encodeHex()}" +
-                    "\n   actual: ${actualRootHash?.encodeHex()}"
+                "\n expected: ${blockHeader.id.root_hash.encodeHex()}" +
+                "\n   actual: ${actualRootHash?.encodeHex()}"
         }
         registerBlockId(blockHeader.id)
         return blockHeader.id

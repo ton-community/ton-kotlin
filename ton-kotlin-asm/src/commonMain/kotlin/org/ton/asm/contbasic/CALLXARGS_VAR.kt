@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class CALLXARGS_VAR(
     val p: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${p-1u} CALLXARGS"
+    override fun toString(): String = "${p - 1u} CALLXARGS"
 
     companion object : TlbConstructorProvider<CALLXARGS_VAR> by CALLXARGS_VARTlbConstructor
 }

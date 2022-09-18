@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class LSHIFTDIV(
     val tt: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${tt+1u} LSHIFT#DIV"
+    override fun toString(): String = "${tt + 1u} LSHIFT#DIV"
 
     companion object : TlbConstructorProvider<LSHIFTDIV> by LSHIFTDIVTlbConstructor
 }

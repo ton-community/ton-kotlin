@@ -27,8 +27,8 @@ data class ExtBlkRef(
 
 private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
     schema = "ext_blk_ref\$_ end_lt:uint64 " +
-            "seq_no:uint32 root_hash:bits256 file_hash:bits256 " +
-            "= ExtBlkRef;"
+        "seq_no:uint32 root_hash:bits256 file_hash:bits256 " +
+        "= ExtBlkRef;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

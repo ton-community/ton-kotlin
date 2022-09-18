@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class LDSLICEQ(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} LDSLICEQ"
+    override fun toString(): String = "${cc + 1u} LDSLICEQ"
 
     companion object : TlbConstructorProvider<LDSLICEQ> by LDSLICEQTlbConstructor
 }

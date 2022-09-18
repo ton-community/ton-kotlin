@@ -26,8 +26,8 @@ data class MsgExportDeqShort(
 
 private object MsgExportDeqShortTlbConstructor : TlbConstructor<MsgExportDeqShort>(
     schema = "msg_export_deq_short\$1101 msg_env_hash:bits256 " +
-            "next_workchain:int32 next_addr_pfx:uint64 " +
-            "import_block_lt:uint64 = OutMsg;"
+        "next_workchain:int32 next_addr_pfx:uint64 " +
+        "import_block_lt:uint64 = OutMsg;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

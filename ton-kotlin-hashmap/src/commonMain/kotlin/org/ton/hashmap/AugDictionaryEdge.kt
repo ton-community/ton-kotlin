@@ -39,8 +39,8 @@ private class AugDictionaryEdgeTlbConstructor<X, Y>(
     val y: TlbCodec<Y>,
 ) : TlbConstructor<AugDictionaryEdge<X, Y>>(
     schema = "ahm_edge#_ {n:#} {X:Type} {Y:Type} {l:#} {m:#} " +
-            "label:(DictionaryLabel ~l n) {n = (~m) + l} " +
-            "node:(AugDictionaryNode m X Y) = AugDictionaryEdge n X Y;",
+        "label:(DictionaryLabel ~l n) {n = (~m) + l} " +
+        "node:(AugDictionaryNode m X Y) = AugDictionaryEdge n X Y;",
     id = BitString.empty()
 ) {
     val hashMapLabel = HashMapLabel.tlbCodec(n)

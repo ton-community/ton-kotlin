@@ -21,7 +21,7 @@ data class SignedCertificate(
 
 private object SignedCertificatedTlbConstructor : TlbConstructor<SignedCertificate>(
     schema = "signed_certificate\$_ certificate:Certificate certificate_signature:CryptoSignature\n" +
-            "  = SignedCertificate;"
+        "  = SignedCertificate;"
 ) {
 
     override fun storeTlb(

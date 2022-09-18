@@ -29,16 +29,16 @@ data class McStateExtra(
 
 private object McStateExtraTlbConstructor : TlbConstructor<McStateExtra>(
     schema = "masterchain_state_extra#cc26" +
-            "  shard_hashes:ShardHashes" +
-            "  config:ConfigParams" +
-            "  ^[ flags:(## 16) { flags <= 1 }" +
-            "     validator_info:ValidatorInfo" +
-            "     prev_blocks:OldMcBlocksInfo" +
-            "     after_key_block:Bool" +
-            "     last_key_block:(Maybe ExtBlkRef)" +
-            "     block_create_stats:(flags . 0)?BlockCreateStats ]" +
-            "  global_balance:CurrencyCollection" +
-            "= McStateExtra;"
+        "  shard_hashes:ShardHashes" +
+        "  config:ConfigParams" +
+        "  ^[ flags:(## 16) { flags <= 1 }" +
+        "     validator_info:ValidatorInfo" +
+        "     prev_blocks:OldMcBlocksInfo" +
+        "     after_key_block:Bool" +
+        "     last_key_block:(Maybe ExtBlkRef)" +
+        "     block_create_stats:(flags . 0)?BlockCreateStats ]" +
+        "  global_balance:CurrencyCollection" +
+        "= McStateExtra;"
 ) {
     val shardHashes = HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr)))
     val oldMcBlocksInfo = AugDictionary.tlbCodec(32, KeyExtBlkRef, KeyMaxLt)

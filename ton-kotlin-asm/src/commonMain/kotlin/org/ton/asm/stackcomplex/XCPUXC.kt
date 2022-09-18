@@ -12,7 +12,7 @@ data class XCPUXC(
     val j: UByte,
     val k: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "s$i s$j s${k-1u} XCPUXC"
+    override fun toString(): String = "s$i s$j s${k - 1u} XCPUXC"
 
     companion object : TlbConstructorProvider<XCPUXC> by XCPUXCTlbConstructor
 }

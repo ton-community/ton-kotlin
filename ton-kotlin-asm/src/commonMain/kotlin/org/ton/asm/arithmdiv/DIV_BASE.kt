@@ -1,14 +1,14 @@
 package org.ton.asm.arithmdiv
 
 import org.ton.asm.AsmInstruction
+import org.ton.bigint.toUByte
 import org.ton.block.Either
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.storeTlb
-import org.ton.bigint.*
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
+import org.ton.tlb.storeTlb
 
 data class DIV_BASE(
     val m: Boolean,

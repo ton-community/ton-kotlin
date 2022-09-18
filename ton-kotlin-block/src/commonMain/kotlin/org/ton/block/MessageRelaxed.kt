@@ -47,8 +47,8 @@ private class MessageRelaxedTlbConstructor<X : Any>(
     x: TlbCodec<X>
 ) : TlbConstructor<MessageRelaxed<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfoRelaxed " +
-            "init:(Maybe (Either StateInit ^StateInit)) " +
-            "body:(Either X ^X) = MessageRelaxed X;"
+        "init:(Maybe (Either StateInit ^StateInit)) " +
+        "body:(Either X ^X) = MessageRelaxed X;"
 ) {
     companion object {
         private val referencedStateInitCodec = Cell.tlbCodec(StateInit)

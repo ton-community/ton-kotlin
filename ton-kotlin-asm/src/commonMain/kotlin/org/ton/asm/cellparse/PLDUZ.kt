@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class PLDUZ(
     val c: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${32u*(c+1u)} PLDUZ"
+    override fun toString(): String = "${32u * (c + 1u)} PLDUZ"
 
     companion object : TlbConstructorProvider<PLDUZ> by PLDUZTlbConstructor
 }

@@ -27,8 +27,8 @@ data class SplitMergeInfo(
 
 private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
     schema = "split_merge_info\$_ cur_shard_pfx_len:(## 6)\n" +
-            "  acc_split_depth:(## 6) this_addr:bits256 sibling_addr:bits256\n" +
-            "  = SplitMergeInfo;"
+        "  acc_split_depth:(## 6) this_addr:bits256 sibling_addr:bits256\n" +
+        "  = SplitMergeInfo;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

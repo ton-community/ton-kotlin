@@ -66,8 +66,8 @@ private class MessageTlbConstructor<X : Any>(
     x: TlbCodec<X>
 ) : TlbConstructor<Message<X>>(
     schema = "message\$_ {X:Type} info:CommonMsgInfo " +
-            "init:(Maybe (Either StateInit ^StateInit)) " +
-            "body:(Either X ^X) = Message X;",
+        "init:(Maybe (Either StateInit ^StateInit)) " +
+        "body:(Either X ^X) = Message X;",
     id = BitString.empty()
 ) {
     private val Body = Either(x, Cell.tlbCodec(x))
@@ -93,4 +93,3 @@ private class MessageTlbConstructor<X : Any>(
         private val Init = Maybe(Either(StateInit, Cell.tlbCodec(StateInit)))
     }
 }
-

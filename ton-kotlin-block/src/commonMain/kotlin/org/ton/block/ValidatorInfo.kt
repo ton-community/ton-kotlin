@@ -20,10 +20,10 @@ data class ValidatorInfo(
 
 private object ValidatorInfoTlbConstructor : TlbConstructor<ValidatorInfo>(
     schema = "validator_info\$_ " +
-            "  validator_list_hash_short:uint32 " +
-            "  catchain_seqno:uint32 " +
-            "  nx_cc_updated:Bool " +
-            "= ValidatorInfo;"
+        "  validator_list_hash_short:uint32 " +
+        "  catchain_seqno:uint32 " +
+        "  nx_cc_updated:Bool " +
+        "= ValidatorInfo;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class BCHKBITS(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} BCHKBITS#"
+    override fun toString(): String = "${cc + 1u} BCHKBITS#"
 
     companion object : TlbConstructorProvider<BCHKBITS> by BCHKBITSTlbConstructor
 }

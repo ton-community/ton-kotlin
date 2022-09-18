@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class FITS(
     val cc: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${cc+1u} FITS"
+    override fun toString(): String = "${cc + 1u} FITS"
 
     companion object : TlbConstructorProvider<FITS> by FITSTlbConstructor
 }

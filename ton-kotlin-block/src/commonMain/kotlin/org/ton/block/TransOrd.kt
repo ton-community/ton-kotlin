@@ -42,12 +42,12 @@ data class TransOrd(
 
 private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
     schema = "trans_ord\$0000 credit_first:Bool " +
-            "storage_ph:(Maybe TrStoragePhase) " +
-            "credit_ph:(Maybe TrCreditPhase) " +
-            "compute_ph:TrComputePhase action:(Maybe ^TrActionPhase) " +
-            "aborted:Bool bounce:(Maybe TrBouncePhase) " +
-            "destroyed:Bool " +
-            "= TransactionDescr;"
+        "storage_ph:(Maybe TrStoragePhase) " +
+        "credit_ph:(Maybe TrCreditPhase) " +
+        "compute_ph:TrComputePhase action:(Maybe ^TrActionPhase) " +
+        "aborted:Bool bounce:(Maybe TrBouncePhase) " +
+        "destroyed:Bool " +
+        "= TransactionDescr;"
 ) {
     val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
     val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase)

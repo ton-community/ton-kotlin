@@ -12,7 +12,7 @@ data class PUXCPU(
     val j: UByte,
     val k: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "s$i s${j-1u} s${k-1u} PUXCPU"
+    override fun toString(): String = "s$i s${j - 1u} s${k - 1u} PUXCPU"
 
     companion object : TlbConstructorProvider<PUXCPU> by PUXCPUTlbConstructor
 }

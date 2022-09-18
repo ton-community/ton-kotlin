@@ -79,12 +79,12 @@ data class TrActionPhase(
 
 private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
     schema = "tr_phase_action\$_ success:Bool valid:Bool no_funds:Bool " +
-            "status_change:AccStatusChange " +
-            "total_fwd_fees:(Maybe Coins) total_action_fees:(Maybe Coins) " +
-            "result_code:int32 result_arg:(Maybe int32) tot_actions:uint16 " +
-            "spec_actions:uint16 skipped_actions:uint16 msgs_created:uint16 " +
-            "action_list_hash:bits256 tot_msg_size:StorageUsedShort " +
-            "= TrActionPhase;"
+        "status_change:AccStatusChange " +
+        "total_fwd_fees:(Maybe Coins) total_action_fees:(Maybe Coins) " +
+        "result_code:int32 result_arg:(Maybe int32) tot_actions:uint16 " +
+        "spec_actions:uint16 skipped_actions:uint16 msgs_created:uint16 " +
+        "action_list_hash:bits256 tot_msg_size:StorageUsedShort " +
+        "= TrActionPhase;"
 ) {
     val maybeCoins = Maybe.tlbCodec(Coins)
     val maybeInt32 = Maybe.tlbCodec(IntTlbConstructor.int(32))

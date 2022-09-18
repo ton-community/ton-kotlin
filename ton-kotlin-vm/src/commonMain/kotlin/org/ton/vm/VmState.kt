@@ -11,5 +11,5 @@ data class VmState(
     var currentCodepage: Short = 0,
     var gas: VmGas = VmGas()
 ) {
-    operator fun invoke(block: VmState.()->Unit) = apply(block)
+    operator fun invoke(block: VmState.() -> Unit) = apply(block)
 }

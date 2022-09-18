@@ -11,7 +11,7 @@ data class REVERSE(
     val i: UByte,
     val j: UByte
 ) : AsmInstruction {
-    override fun toString(): String = "${i+2u} $j REVERSE"
+    override fun toString(): String = "${i + 2u} $j REVERSE"
 
     companion object : TlbConstructorProvider<REVERSE> by REVERSETlbConstructor
 }

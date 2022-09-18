@@ -79,12 +79,12 @@ data class Transaction(
 
 private object TransactionTlbConstructor : TlbConstructor<Transaction>(
     schema = "transaction\$0111 account_addr:bits256 lt:uint64 " +
-            "prev_trans_hash:bits256 prev_trans_lt:uint64 now:uint32 " +
-            "outmsg_cnt:uint15 " +
-            "orig_status:AccountStatus end_status:AccountStatus " +
-            "^[ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) ] " +
-            "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
-            "description:^TransactionDescr = Transaction;"
+        "prev_trans_hash:bits256 prev_trans_lt:uint64 now:uint32 " +
+        "outmsg_cnt:uint15 " +
+        "orig_status:AccountStatus end_status:AccountStatus " +
+        "^[ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) ] " +
+        "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
+        "description:^TransactionDescr = Transaction;"
 ) {
     val RefMessageAny = Cell.tlbCodec(Message.Any)
     val maybeMessageAny = Maybe(RefMessageAny)

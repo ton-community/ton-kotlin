@@ -24,7 +24,7 @@ data class ShardIdent(
 
 private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
     schema = "shard_ident\$00 shard_pfx_bits:(#<= 60) " +
-            "workchain_id:int32 shard_prefix:uint64 = ShardIdent;"
+        "workchain_id:int32 shard_prefix:uint64 = ShardIdent;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

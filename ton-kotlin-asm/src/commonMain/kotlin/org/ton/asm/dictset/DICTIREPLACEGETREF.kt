@@ -6,7 +6,8 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-object DICTIREPLACEGETREF : AsmInstruction, TlbConstructorProvider<DICTIREPLACEGETREF> by DICTIREPLACEGETREFTlbConstructor {
+object DICTIREPLACEGETREF : AsmInstruction,
+    TlbConstructorProvider<DICTIREPLACEGETREF> by DICTIREPLACEGETREFTlbConstructor {
     override fun toString(): String = "DICTIREPLACEGETREF"
 }
 

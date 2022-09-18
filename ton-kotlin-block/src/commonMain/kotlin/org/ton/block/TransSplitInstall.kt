@@ -23,8 +23,8 @@ data class TransSplitInstall(
 
 private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstall>(
     schema = "trans_split_install\$0101 split_info:SplitMergeInfo\n" +
-            "  prepare_transaction:^Transaction\n" +
-            "  installed:Bool = TransactionDescr;"
+        "  prepare_transaction:^Transaction\n" +
+        "  installed:Bool = TransactionDescr;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,

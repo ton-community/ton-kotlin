@@ -31,11 +31,11 @@ data class BlockExtra(
 
 private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
     schema = "block_extra#4a33f6fd in_msg_descr:^InMsgDescr\n" +
-            "  out_msg_descr:^OutMsgDescr\n" +
-            "  account_blocks:^ShardAccountBlocks\n" +
-            "  rand_seed:bits256\n" +
-            "  created_by:bits256\n" +
-            "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
+        "  out_msg_descr:^OutMsgDescr\n" +
+        "  account_blocks:^ShardAccountBlocks\n" +
+        "  rand_seed:bits256\n" +
+        "  created_by:bits256\n" +
+        "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
 ) {
     val inMsgDescr = AugDictionary.tlbCodec(256, InMsg, ImportFees)
     val outMsgDescr = AugDictionary.tlbCodec(256, OutMsg, CurrencyCollection)

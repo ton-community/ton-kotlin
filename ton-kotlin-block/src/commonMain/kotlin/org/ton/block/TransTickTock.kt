@@ -27,8 +27,8 @@ data class TransTickTock(
 
 private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
     schema = "trans_tick_tock\$001 is_tock:Bool storage_ph:TrStoragePhase\n" +
-            "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
-            "  aborted:Bool destroyed:Bool = TransactionDescr;"
+        "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
+        "  aborted:Bool destroyed:Bool = TransactionDescr;"
 ) {
     val maybeTrActionPhase = Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase))
 
