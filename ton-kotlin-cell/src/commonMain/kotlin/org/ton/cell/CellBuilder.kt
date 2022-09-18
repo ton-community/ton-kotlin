@@ -54,9 +54,13 @@ interface CellBuilder {
 
     fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
     fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: UByte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value.toShort()), BigInt(max))
     fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: UShort, max: Short): CellBuilder = storeUIntLeq(BigInt(value.toInt()), BigInt(max))
     fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: UInt, max: Int): CellBuilder = storeUIntLeq(BigInt(value.toLong()), BigInt(max))
     fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    fun storeUIntLeq(value: ULong, max: Long): CellBuilder = storeUIntLeq(BigInt(value.toString()), BigInt(max))
 
     fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
     fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
