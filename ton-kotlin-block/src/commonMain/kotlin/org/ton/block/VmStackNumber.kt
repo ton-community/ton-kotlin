@@ -12,4 +12,7 @@ sealed interface VmStackNumber : VmStackValue {
     operator fun minus(other: VmStackNumber): VmStackNumber
     operator fun times(other: VmStackNumber): VmStackNumber
     operator fun div(other: VmStackNumber): VmStackNumber
+    operator fun unaryMinus(): VmStackNumber
+    operator fun inc(): VmStackNumber = this + VmStackValue(1)
+    operator fun dec(): VmStackNumber = this - VmStackValue(1)
 }

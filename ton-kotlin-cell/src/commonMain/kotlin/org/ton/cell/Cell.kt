@@ -100,6 +100,9 @@ interface Cell {
         ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
+        fun empty(): Cell = of()
+
+        @JvmStatic
         fun toString(cell: Cell) = buildString {
             toString(cell, this)
         }
