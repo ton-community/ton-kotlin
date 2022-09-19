@@ -1,14 +1,14 @@
 package org.ton.asm.appglobal
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.*
+import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class SETGLOB(
-    val k1: UByte,
+    val k: UByte,
 ) : AsmInstruction {
     init {
         require(k >= 1u) { "expected k >= 1, actual: $k" }

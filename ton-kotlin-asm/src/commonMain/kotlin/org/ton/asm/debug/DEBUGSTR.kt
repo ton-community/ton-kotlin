@@ -9,7 +9,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class DEBUGSTR(
-    val n1: UByte,
+    val n: UByte,
     val ssss: BitString
 ) : AsmInstruction {
     constructor(

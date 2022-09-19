@@ -7,7 +7,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class DICTPUSHCONST (
-    val d1: Cell,
+    val d: Cell,
     val n: UShort
 ) : AsmInstruction {
 
