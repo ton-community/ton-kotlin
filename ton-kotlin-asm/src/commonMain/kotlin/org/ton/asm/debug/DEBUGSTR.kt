@@ -25,7 +25,7 @@ data class DEBUGSTR(
 
     fun toCellSlice(): CellSlice = CellSlice(ssss)
 
-    override fun toString(): String = "${ssss.toByteArray().decodeToString()} DEBUGSTR"
+    override fun toString(): String = ssss.toByteArray().decodeToString()
 
     companion object : TlbConstructorProvider<DEBUGSTR> by DEBUGSTRTlbConstructor
 }
