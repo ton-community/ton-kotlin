@@ -8,7 +8,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class SETCP(
-    val nn: UByte,
+    val nn1: UByte,
 ) : AsmInstruction {
 
     override fun toString(): String = "$nn SETCP"

@@ -1,14 +1,14 @@
 package org.ton.asm.debug
 
 import org.ton.asm.AsmInstruction
+import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
-import org.ton.bigint.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class DEBUG(
-    val nn: UByte,
+    val nn1: UByte,
 ) : AsmInstruction {
 
     override fun toString(): String = "$nn DEBUG"
