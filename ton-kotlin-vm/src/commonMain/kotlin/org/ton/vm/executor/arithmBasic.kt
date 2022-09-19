@@ -8,6 +8,7 @@ import org.ton.block.VmStackNumber
 import org.ton.block.VmStackValue
 import org.ton.vm.VmState
 
+
 internal fun VmExecutor.registerArithmBasic() {
     register(::executeAdd)
     register(::executeSub)
