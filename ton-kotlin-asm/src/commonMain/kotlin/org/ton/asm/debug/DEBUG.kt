@@ -20,7 +20,7 @@ private object DEBUGTlbConstructor : TlbConstructor<DEBUG>(
     schema = "asm_debug#fe nn:(#<= 239) = DEBUG;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: DEBUG) {
-        cellBuilder.storeUIntLeq(value.nn ,239.toByte())
+        cellBuilder.storeUIntLeq(value.nn, 239.toByte())
     }
 
     override fun loadTlb(cellSlice: CellSlice): DEBUG {

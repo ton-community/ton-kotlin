@@ -40,7 +40,7 @@ private object DEBUGSTRTlbConstructor : TlbConstructor<DEBUGSTR>(
 
     override fun loadTlb(cellSlice: CellSlice): DEBUGSTR {
         val n = cellSlice.loadUInt(4).toUByte()
-        val ssss = cellSlice.loadBits(n.toInt()* 8 + 8)
+        val ssss = cellSlice.loadBits(n.toInt() * 8 + 8)
         return DEBUGSTR(n, ssss)
     }
 }
