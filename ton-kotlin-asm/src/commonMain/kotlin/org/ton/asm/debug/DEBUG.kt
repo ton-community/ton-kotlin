@@ -24,7 +24,7 @@ private object DEBUGTlbConstructor : TlbConstructor<DEBUG>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): DEBUG {
-        val nn = cellSlice.loadUInt(239).toUByte()
+        val nn = cellSlice.loadUIntLeq(239).toUByte()
         return DEBUG(nn)
     }
 }
