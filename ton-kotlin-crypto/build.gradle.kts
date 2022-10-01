@@ -9,6 +9,7 @@ kotlin {
             dependencies {
                 api(libs.ktor.utils)
                 api(libs.curve25519)
+                api(libs.kotlinio.base64)
                 compileOnly(libs.serialization.core)
             }
         }

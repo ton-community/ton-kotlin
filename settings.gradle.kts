@@ -7,8 +7,8 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("multiplatform") version "1.7.0"
-        kotlin("plugin.serialization") version "1.7.0"
+        kotlin("multiplatform") version "1.7.20"
+        kotlin("plugin.serialization") version "1.7.20"
         id("org.jetbrains.kotlinx.benchmark") version "0.4.4"
     }
 }

@@ -8,6 +8,7 @@ ktor = "2.0.2"
 bouncycastle = "1.70"
 curve25519 = "f008dbc2c0"
 mockk = "1.12.4"
+kotlinio = "db57f3e429"
 
 [libraries]
 coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
@@ -28,3 +29,4 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bouncycastle" }
 curve25519 = { module = "com.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotlinio-base64 = { module = "com.github.andreypfau.kotlinio:kotlinio-base64", version.ref = "kotlinio" }

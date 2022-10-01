@@ -33,7 +33,7 @@ allprojects {
         jvm {
             withJava()
             compilations.all {
-                kotlinOptions.jvmTarget = "11"
+                kotlinOptions.jvmTarget = "1.8"
             }
             testRuns["test"].executionTask.configure {
                 useJUnitPlatform()
