@@ -12,6 +12,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
+import java.math.BigInteger
 import kotlin.math.pow
 
 @SerialName("nanocoins")
@@ -25,6 +26,14 @@ data class Coins(
         amount.value.toString().let {
             it.dropLast(decimals).ifEmpty { "0" } + "." + it.takeLast(decimals).padStart(decimals, '0')
         }
+
+    operator fun plus(other: Coins): Coins = Coins(amount + other.amount)
+    operator fun minus(other: Coins): Coins = Coins(amount - other.amount)
+    operator fun times(other: Coins): Coins = Coins(amount * other.amount)
+    operator fun div(other: Coins): Coins = Coins(amount / other.amount)
+    operator fun rem(other: Coins): Coins = Coins(amount % other.amount)
+    operator fun inc(): Coins = Coins(amount + VarUInteger(1, BigInteger.ONE))
+    operator fun dec(): Coins = Coins(amount - VarUInteger(1, BigInteger.ONE))
 
     companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
         private val DECIMALS = 9
