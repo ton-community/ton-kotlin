@@ -20,7 +20,7 @@ sealed interface HashMapLabel {
     companion object {
         @JvmStatic
         fun of(key: BitString, max: Int = key.size): HashMapLabel {
-            val len = 16 - max.toShort().countLeadingZeroBits()
+            val len = Int.SIZE_BITS - max.countLeadingZeroBits()
             val longLength = 2 + len + key.size
             val shortLength = 1 + 2 * key.size + 1
             val sameLength = 2 + 1 + len
