@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.utils.addToStdlib.applyIf
-import java.io.ByteArrayOutputStream
 import java.util.*
 
 plugins {
@@ -18,21 +16,9 @@ if (localPropsFile.exists()) {
     p.forEach { name, value -> ext.set(name.toString(), value) }
 }
 
-val gitVersion = ByteArrayOutputStream().use {
-    exec {
-        commandLine("git", "rev-parse", "--short", "head")
-        standardOutput = it
-    }
-    it.toString().trim()
-}
-
 allprojects {
     group = "org.ton"
-    version = version.applyIf(version == "unspecified") {
-        System.getenv("GITHUB_REF").takeIf {
-            !it.isNullOrEmpty()
-        }?.substring(11) ?: gitVersion
-    }
+    version = System.getenv("GITHUB_REF")
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
