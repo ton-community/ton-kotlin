@@ -2,9 +2,7 @@ package org.ton.adnl.node
 
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyAes
-import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyAes
-import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.Decryptor
 import org.ton.crypto.Encryptor
 
@@ -30,17 +28,6 @@ class AdnlChannel(
     }
 
     companion object {
-        @JvmStatic
-        fun of(
-            localKey: PrivateKeyEd25519,
-            remoteKey: PublicKeyEd25519,
-            localId: AdnlIdShort,
-            remoteId: AdnlIdShort
-        ): AdnlChannel {
-            val sharedSecret = localKey.sharedSecret(remoteKey)
-            return of(sharedSecret, localId, remoteId)
-        }
-
         @JvmStatic
         fun of(
             secret: ByteArray,

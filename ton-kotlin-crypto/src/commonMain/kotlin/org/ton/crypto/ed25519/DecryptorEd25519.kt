@@ -1,20 +1,23 @@
 package org.ton.crypto.ed25519
 
+import io.github.andreypfau.curve25519.ed25519.Ed25519
+import io.github.andreypfau.curve25519.ed25519.Ed25519PublicKey
 import org.ton.crypto.Decryptor
-import org.ton.crypto.X25519
 import org.ton.crypto.aes.DecryptorAes
 
 class DecryptorEd25519(
-    private val privateKey: ByteArray
+    privateKey: ByteArray
 ) : Decryptor {
+    private val privateKey = Ed25519.keyFromSeed(privateKey)
+
     override fun decrypt(data: ByteArray): ByteArray {
-        require(data.size >= Ed25519.KEY_SIZE) { "data is too short: ${data.size}" }
-        val publicKey = data.copyOfRange(0, 32)
-        val secret = X25519.sharedKey(privateKey, Ed25519.convertToX25519(publicKey))
-        val aes = DecryptorAes(secret)
+        require(data.size >= Ed25519.SEED_SIZE_BYTES) { "data is too short: ${data.size}" }
+        val publicKey = Ed25519PublicKey(data)
+        val sharedKey = privateKey.sharedKey(publicKey)
+        val aes = DecryptorAes(sharedKey)
         return aes.decrypt(data.copyOfRange(32, data.size))
     }
 
     override fun sign(message: ByteArray): ByteArray =
-        Ed25519.sign(privateKey, message)
+        privateKey.sign(message)
 }
