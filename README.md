@@ -21,7 +21,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 [maven-central-svg]: https://img.shields.io/maven-central/v/org.ton/ton-kotlin
 
-[maven-central]: https://mvnrepository.com/artifact/org.ton/ton-kotlin/0.1.0/pom
+[maven-central]: https://search.maven.org/artifact/io.github.andreypfau/org.ton/ton-kotlin/0.1.0/pom
 
 [jitpack-svg]: https://jitpack.io/v/andreypfau/ton-kotlin.svg
 
