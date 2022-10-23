@@ -1,0 +1,35 @@
+name: Release project
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+      - name: Cache konan
+        uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan
+      - name: Run build with Gradle Wrapper
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+      - name: Publish
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publish
+#      - name: Release
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: closeAndReleaseStagingRepository

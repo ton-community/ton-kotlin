@@ -10,10 +10,8 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.Decryptor
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.X25519
 import org.ton.crypto.ed25519.DecryptorEd25519
 import org.ton.crypto.ed25519.Ed25519
-import org.ton.crypto.ed25519.KEY_SIZE
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import kotlin.random.Random
@@ -24,11 +22,7 @@ inline fun PrivateKeyEd25519(random: Random = SecureRandom) = PrivateKeyEd25519.
 interface PrivateKeyEd25519 : PrivateKey {
     val key: ByteArray
 
-    override fun publicKey() =
-        PublicKeyEd25519(Ed25519.publicKey(key))
-
-    fun sharedSecret(publicKey: PublicKeyEd25519) =
-        X25519.sharedKey(publicKey.key, Ed25519.convertToX25519(publicKey.key))
+    override fun publicKey(): PublicKeyEd25519
 
     companion object : TlCodec<PrivateKeyEd25519> by PrivateKeyEd25519TlConstructor {
         const val KEY_SIZE = 32
@@ -43,8 +37,8 @@ interface PrivateKeyEd25519 : PrivateKey {
         @JvmStatic
         fun of(byteArray: ByteArray): PrivateKeyEd25519 =
             when (byteArray.size) {
-                Ed25519.KEY_SIZE -> PrivateKeyEd25519Impl(byteArray.copyOf())
-                Ed25519.KEY_SIZE + Int.SIZE_BYTES -> decodeBoxed(byteArray)
+                Ed25519.KEY_SIZE_BYTES -> PrivateKeyEd25519Impl(byteArray.copyOf())
+                Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> decodeBoxed(byteArray)
                 else -> throw IllegalArgumentException("Invalid key size: ${byteArray.size}")
             }
     }
@@ -61,7 +55,7 @@ private class PrivateKeyEd25519Impl(
         require(_key.size == PrivateKeyEd25519.KEY_SIZE) { "key size expected: 32 actual: ${_key.size}" }
     }
 
-    private val _publicKey: PublicKeyEd25519 by lazy { super.publicKey() }
+    private val _publicKey: PublicKeyEd25519 by lazy { PublicKeyEd25519(Ed25519.publicKey(_key)) }
 
     override val key: ByteArray get() = _key.copyOf()
 

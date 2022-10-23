@@ -11,3 +11,5 @@ object EmptyHashMapE : HashMapE<Nothing> {
 
     override fun toString(): String = "hme_empty"
 }
+
+fun <T> EmptyHashMapE(): HashMapE<T> = EmptyHashMapE as HashMapE<T>

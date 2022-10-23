@@ -11,7 +11,6 @@ import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.Encryptor
 import org.ton.crypto.ed25519.Ed25519
 import org.ton.crypto.ed25519.EncryptorEd25519
-import org.ton.crypto.ed25519.KEY_SIZE
 import org.ton.crypto.hex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -43,13 +42,14 @@ data class PublicKeyEd25519(
         fun tlConstructor(): TlConstructor<PublicKeyEd25519> = PublicKeyEd25519TlConstructor
 
         @JvmStatic
-        fun of(privateKey: PrivateKeyEd25519): PublicKeyEd25519 = of(Ed25519.publicKey(privateKey.key))
+        fun of(privateKey: PrivateKeyEd25519): PublicKeyEd25519 =
+            of(Ed25519.publicKey(privateKey.key))
 
         @JvmStatic
         fun of(byteArray: ByteArray) =
             when (byteArray.size) {
-                Ed25519.KEY_SIZE -> PublicKeyEd25519(byteArray.copyOf())
-                Ed25519.KEY_SIZE + Int.SIZE_BYTES -> decodeBoxed(byteArray)
+                Ed25519.KEY_SIZE_BYTES -> PublicKeyEd25519(byteArray.copyOf())
+                Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> decodeBoxed(byteArray)
                 else -> throw IllegalArgumentException("Invalid key size: ${byteArray.size}")
             }
     }
