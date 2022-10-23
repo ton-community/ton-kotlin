@@ -18,19 +18,20 @@ if (localPropsFile.exists()) {
     p.forEach { name, value -> ext.set(name.toString(), value) }
 }
 
+val gitVersion = ByteArrayOutputStream().use {
+    exec {
+        commandLine("git", "rev-parse", "--short", "head")
+        standardOutput = it
+    }
+    it.toString().trim()
+}
+
 allprojects {
     group = "org.ton"
     version = version.applyIf(version == "unspecified") {
-//        System.getenv("GITHUB_REF").takeIf {
-//            !it.isNullOrEmpty()
-//        }?.substring(11) ?:
-        ByteArrayOutputStream().use {
-            exec {
-                commandLine("git", "rev-parse", "--short", "head")
-                standardOutput = it
-            }
-            it.toString().trim()
-        }
+        System.getenv("GITHUB_REF").takeIf {
+            !it.isNullOrEmpty()
+        }?.substring(11) ?: gitVersion
     }
 
     apply(plugin = "kotlin-multiplatform")
