@@ -2,10 +2,12 @@ name: Release project
 
 on:
   push:
+    tags:
+      - 'v*'
     branches:
       - main
 jobs:
-  build:
+  Build and release:
     runs-on: ubuntu-latest
     env:
       SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
@@ -21,7 +23,7 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Run build with Gradle Wrapper
+      - name: Build
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
