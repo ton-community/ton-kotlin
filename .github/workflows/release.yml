@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  Build and release:
+  build:
     runs-on: ubuntu-latest
     env:
       SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
