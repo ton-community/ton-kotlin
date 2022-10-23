@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.utils.addToStdlib.applyIf
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("org.jetbrains.kotlinx.benchmark")
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
 }
@@ -17,7 +20,18 @@ if (localPropsFile.exists()) {
 
 allprojects {
     group = "org.ton"
-    version = "0.0.3"
+    version = version.applyIf(version == "unspecified") {
+//        System.getenv("GITHUB_REF").takeIf {
+//            !it.isNullOrEmpty()
+//        }?.substring(11) ?:
+        ByteArrayOutputStream().use {
+            exec {
+                commandLine("git", "rev-parse", "--short", "head")
+                standardOutput = it
+            }
+            it.toString().trim()
+        }
+    }
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -76,23 +90,11 @@ allprojects {
     }
 
     publishing {
-        repositories {
-            maven {
-                val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                url = if (version.toString().contains("SNAPSHOT")) snapshotsUrl else releasesUrl
-                credentials {
-                    username = project.properties["ossrhUsername"].toString()
-                    password = project.properties["ossrhPassword"].toString()
-                }
-            }
-        }
-
         publications.withType<MavenPublication> {
             artifact(javadocJar.get())
             pom {
                 name.set("ton-kotlin")
-                description.set("Pure Kotlin implementation of The Open Network")
+                description.set("Kotlin/Multiplatform SDK for The Open Network")
                 url.set("https://github.com/andreypfau/ton-kotlin")
                 licenses {
                     license {
@@ -114,16 +116,34 @@ allprojects {
                 }
             }
         }
+//        repositories {
+//            maven {
+//                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/andreypfau/ton-kotlin")
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
+//        }
     }
 
-    val signingKeyId = project.properties["signing.keyId"]?.toString()
-    val signingSecretKey = project.properties["signing.secretKey"]?.toString()
-    val signingPassword = project.properties["signing.password"]?.toString()
+    signing {
+        val secretKey = project.findProperty("signing.secretKey") as? String ?: System.getenv("SIGNING_SECRET_KEY")
+        val password = project.findProperty("signing.password") as? String ?: System.getenv("SIGNING_PASSWORD")
+        isRequired = secretKey != null && password != null
+        useInMemoryPgpKeys(secretKey, password)
+        sign(publishing.publications)
+    }
+}
 
-    if (signingKeyId != null && signingSecretKey != null && signingPassword != null) {
-        signing {
-            sign(publishing.publications)
-            useInMemoryPgpKeys(signingKeyId, signingSecretKey, signingPassword)
+nexusPublishing {
+    repositories {
+        sonatype {
+            username.set(project.findProperty("ossrhUsername") as? String ?: System.getenv("OSSRH_USERNAME"))
+            password.set(project.findProperty("ossrhPassword") as? String ?: System.getenv("OSSRH_PASSWORD"))
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
 }
