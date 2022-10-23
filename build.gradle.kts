@@ -16,9 +16,17 @@ if (localPropsFile.exists()) {
     p.forEach { name, value -> ext.set(name.toString(), value) }
 }
 
+val isCI = System.getenv("CI") == "true"
+val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
+if (isCI) {
+    checkNotNull(githubVersion) { "GITHUB_REF is not set" }
+    check(githubVersion.isNotEmpty()) { "GITHUB_REF is empty" }
+    check(githubVersion.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?"))) { "'$githubVersion' is not a valid version" }
+}
+
 allprojects {
     group = "org.ton"
-    version = System.getenv("GITHUB_REF")
+    version = if (isCI && githubVersion != null) githubVersion else "1.0-SNAPSHOT"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
