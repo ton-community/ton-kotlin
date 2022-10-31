@@ -9,7 +9,8 @@ class PeerState private constructor(
     val priorityHistory: PacketsHistory,
     reinitDate: Instant
 ) {
-    var reinitDate by atomic(reinitDate)
+    private val _reinitDate = atomic(reinitDate)
+    var reinitDate by _reinitDate
 
     companion object {
         fun receiver(reinitDate: Instant = Clock.System.now()) =

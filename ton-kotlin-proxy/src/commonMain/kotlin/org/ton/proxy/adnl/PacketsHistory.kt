@@ -6,7 +6,8 @@ class PacketsHistory private constructor(
     val deliveredSet: ArrayDeque<Long>?,
     seqno: Long,
 ) {
-    var seqno by atomic(seqno)
+    private val _seqno = atomic(seqno)
+    var seqno by _seqno
 
     fun reset() {
         deliveredSet?.clear()
