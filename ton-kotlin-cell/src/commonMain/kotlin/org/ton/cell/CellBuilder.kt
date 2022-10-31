@@ -45,6 +45,8 @@ interface CellBuilder {
     fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(BigInt(value), length)
     fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(BigInt(value), length)
 
+    fun storeUInt8(value: UByte) = storeInt(value.toByte(), 8)
+    fun storeUInt16(value: UShort) = storeInt(value.toShort(), 16)
     fun storeUInt32(value: UInt) = storeInt(value.toInt(), 32)
     fun storeUInt64(value: ULong) = storeInt(value.toLong(), 64)
 

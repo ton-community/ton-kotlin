@@ -23,7 +23,7 @@ data class Block(
             TlbConstructor
     }
 
-    object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
+    private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
         schema = "block#11ef55aa global_id:int32 " +
                 "info:^BlockInfo value_flow:^ValueFlow " +
                 "state_update:^(MERKLE_UPDATE ShardState) " +

@@ -45,6 +45,8 @@ interface CellSlice {
     fun loadUInt(length: Int): BigInt
     fun preloadUInt(length: Int): BigInt
 
+    fun loadUInt8(): UByte = loadTinyInt(8).toUByte()
+    fun loadUInt16(): UShort = loadTinyInt(16).toUShort()
     fun loadUInt32(): UInt = loadTinyInt(32).toUInt()
     fun loadUInt64(): ULong = loadTinyInt(64).toULong()
 

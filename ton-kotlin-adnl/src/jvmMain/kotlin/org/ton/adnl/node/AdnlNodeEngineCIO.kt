@@ -15,48 +15,6 @@ import org.ton.adnl.packet.AdnlPacket
 import org.ton.api.adnl.AdnlPacketContents
 import kotlin.coroutines.CoroutineContext
 
-class AdnlNodeEngineCIO(
-    val config: Config = Config()
-) : AdnlNodeEngineBase("adnl-cio") {
-
-    @OptIn(InternalAPI::class)
-    override val dispatcher by lazy {
-        Dispatchers.clientDispatcher(config.threadsCount, "adnl-cio-dispatcher")
-    }
-
-    val selectorManager by lazy {
-        SelectorManager(dispatcher)
-    }
-    private lateinit var socket: AdnlSocket
-
-    override fun start() {
-        val rawSocket = aSocket(selectorManager).udp().bind(InetSocketAddress(config.host, config.port))
-        start(rawSocket)
-    }
-
-    fun start(datagramChannel: DatagramReadWriteChannel) {
-        socket = AdnlSocket(
-            datagramChannel,
-            datagramChannel,
-            coroutineContext
-        )
-    }
-
-    override suspend fun sendPacket(packet: AdnlPacket) {
-        TODO("Not yet implemented")
-    }
-
-
-    override suspend fun receivePacket(): AdnlPacketContents =
-        TODO()
-
-    data class Config(
-        val host: String = "0.0.0.0",
-        val port: Int = 2222,
-        val threadsCount: Int = 4
-    )
-}
-
 @Suppress("OPT_IN_USAGE")
 private class AdnlSocket(
     rawInput: DatagramReadChannel,

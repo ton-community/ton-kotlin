@@ -9,13 +9,6 @@ plugins {
     signing
 }
 
-val localPropsFile = project.rootProject.file("local.properties")
-if (localPropsFile.exists()) {
-    val p = Properties()
-    localPropsFile.inputStream().use { p.load(it) }
-    p.forEach { name, value -> ext.set(name.toString(), value) }
-}
-
 val isCI = System.getenv("CI") == "true"
 val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
 if (isCI) {
@@ -40,8 +33,8 @@ allprojects {
 
     kotlin {
         jvm {
-            withJava()
             compilations.all {
+                kotlinOptions.useK2 = true
                 kotlinOptions.jvmTarget = "1.8"
             }
             testRuns["test"].executionTask.configure {

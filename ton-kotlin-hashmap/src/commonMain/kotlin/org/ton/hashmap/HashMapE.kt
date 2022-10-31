@@ -35,7 +35,7 @@ private class HashMapETlbCombinator<X>(
     n: Int,
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapE<X>>() {
-    private val rootConstructor = RootHashMapETlbConstructor(n, x)
+    private val rootConstructor = RootHashMapE.tlbConstructor(n, x)
 
     @Suppress("UNCHECKED_CAST")
     private val emptyConstructor = EmptyHashMapETlbConstructor as TlbConstructor<HashMapE<X>>
@@ -61,37 +61,4 @@ private class HashMapETlbCombinator<X>(
             cellSlice: CellSlice
         ): EmptyHashMapE = EmptyHashMapE
     }
-
-    private class RootHashMapETlbConstructor<X>(
-        n: Int,
-        x: TlbCodec<X>
-    ) : TlbConstructor<RootHashMapE<X>>(
-        schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;",
-        id = ID
-    ) {
-        private val hashmapConstructor = HashMapEdge.tlbCodec(n, x)
-
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: RootHashMapE<X>
-        ) {
-            cellBuilder.storeRef {
-                storeTlb(hashmapConstructor, value.root)
-            }
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): RootHashMapE<X> {
-            val root = cellSlice.loadRef {
-                loadTlb(hashmapConstructor)
-            }
-            return RootHashMapE(root)
-        }
-
-        companion object {
-            val ID = BitString(true)
-        }
-    }
 }
-

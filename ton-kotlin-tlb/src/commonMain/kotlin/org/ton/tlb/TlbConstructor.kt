@@ -68,6 +68,17 @@ abstract class TlbConstructor<T : Any>(
     }
 }
 
+class ObjectTlbConstructor<T : Any>(
+    @Language("TL-B")
+    schema: String,
+    val instance: T,
+    id: BitString? = null,
+) : TlbConstructor<T>(schema, id) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+    }
+    override fun loadTlb(cellSlice: CellSlice): T = instance
+}
+
 abstract class TlbNegatedConstructor<T>(
     @Language("TL-B")
     schema: String,

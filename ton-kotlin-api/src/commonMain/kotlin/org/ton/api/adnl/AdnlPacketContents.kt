@@ -100,10 +100,6 @@ data class AdnlPacketContents(
 
     fun messages(): List<AdnlMessage> = message?.let { listOf(it) } ?: messages ?: emptyList()
 
-    fun toByteArray(): ByteArray = buildPacket {
-        writeBoxedTl(AdnlPacketContents, this@AdnlPacketContents)
-    }.readBytes()
-
     override fun signed(privateKey: PrivateKey) =
         copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))
 

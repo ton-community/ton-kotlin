@@ -10,7 +10,8 @@ fun <R : Enum<R>> Output.writeTl(enum: EnumTlCombinator<R>, value: R) = enum.enc
 
 interface TlCodec<T : Any> : TlDecoder<T>, TlEncoder<T>
 
-interface TlObject<T : Any> {
+interface TlObject<T : TlObject<T>> {
     fun tlCodec(): TlCodec<T>
-}
 
+    fun toByteArray() = tlCodec().encodeBoxed(this as T)
+}
