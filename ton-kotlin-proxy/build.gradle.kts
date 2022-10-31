@@ -6,11 +6,10 @@ kotlin {
                 api(projects.tonKotlinTl)
                 api(projects.tonKotlinBlock)
                 api(projects.tonKotlinLiteclient)
-                implementation(libs.serialization.json)
-                implementation(libs.coroutines.core)
-                implementation(libs.ktor.server.cio)
-                implementation(libs.atomicfu)
-                implementation("io.github.reactivecircus.cache4k:cache4k:0.8.0")
+                api(libs.serialization.json)
+                api(libs.coroutines.core)
+                api(libs.ktor.server.cio)
+                api("io.github.reactivecircus.cache4k:cache4k:0.8.0")
             }
         }
     }

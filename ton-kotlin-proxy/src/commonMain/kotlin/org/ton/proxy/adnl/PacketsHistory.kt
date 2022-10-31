@@ -1,13 +1,17 @@
 package org.ton.proxy.adnl
 
-import kotlinx.atomicfu.atomic
+import java.util.concurrent.atomic.AtomicLong
 
 class PacketsHistory private constructor(
     val deliveredSet: ArrayDeque<Long>?,
     seqno: Long,
 ) {
-    private val _seqno = atomic(seqno)
-    var seqno by _seqno
+    private val _seqno = AtomicLong(seqno)
+    var seqno
+        get() = _seqno.get()
+        set(value) {
+            _seqno.set(value)
+        }
 
     fun reset() {
         deliveredSet?.clear()

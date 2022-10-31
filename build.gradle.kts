@@ -3,7 +3,7 @@ import java.util.*
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.atomicfu") version "1.7.20"
+//    id("org.jetbrains.kotlin.plugin.atomicfu") version "1.7.20"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
@@ -25,7 +25,7 @@ allprojects {
     apply(plugin = "kotlinx-serialization")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-    apply(plugin = "kotlinx-atomicfu")
+//    apply(plugin = "kotlinx-atomicfu")
 
     repositories {
         mavenCentral()
@@ -41,12 +41,6 @@ allprojects {
                 useJUnitPlatform()
             }
         }
-//        linuxX64()
-//        macosX64()
-//        js {
-//            useCommonJs()
-//            browser()
-//        }
         sourceSets {
             val commonMain by getting {
                 dependencies {
