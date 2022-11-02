@@ -6,6 +6,7 @@ import org.ton.crypto.Encryptor
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.aes.EncryptorAes
 import org.ton.crypto.ed25519.Ed25519.convertToEd25519
+import org.ton.crypto.encodeHex
 
 class EncryptorEd25519(
     publicKey: ByteArray

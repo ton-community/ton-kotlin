@@ -1,10 +1,12 @@
 package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.readIntTl
@@ -19,6 +21,14 @@ data class AdnlMessageCreateChannel(
     val key: ByteArray,
     val date: Int
 ) : AdnlMessage {
+    constructor(
+        key: ByteArray,
+        date: Instant
+    ) : this(key, date.epochSeconds.toUInt().toInt())
+
+
+    fun instant() = Instant.fromEpochSeconds(date.toUInt().toLong())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

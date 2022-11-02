@@ -3,23 +3,25 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
-import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeInt256Tl
 import org.ton.tl.constructors.writeIntTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
 
+@Polymorphic
+@Serializable
 @JsonClassDiscriminator("@type")
-sealed interface AdnlAddress {
+sealed interface AdnlAddress : TlObject<AdnlAddress> {
+    override fun tlCodec(): TlCodec<out AdnlAddress> = Companion
+
     companion object : TlCombinator<AdnlAddress>(
         AdnlAddressUdp,
         AdnlAddressUdp6,
@@ -50,6 +52,7 @@ data class AdnlAddressUdp(
     }
 }
 
+@JsonClassDiscriminator("@type")
 @SerialName("adnl.address.udp6")
 @Serializable
 data class AdnlAddressUdp6(
@@ -100,6 +103,7 @@ data class AdnlAddressUdp6(
     }
 }
 
+@JsonClassDiscriminator("@type")
 @SerialName("adnl.address.tunnel")
 @Serializable
 data class AdnlAddressTunnel(

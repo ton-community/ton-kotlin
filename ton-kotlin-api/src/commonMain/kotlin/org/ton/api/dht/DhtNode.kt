@@ -78,8 +78,8 @@ private object DhtNodeTlConstructor : TlConstructor<DhtNode>(
     schema = "dht.node id:PublicKey addr_list:adnl.addressList version:int signature:bytes = dht.Node"
 ) {
     override fun encode(output: Output, value: DhtNode) {
-        output.writeTl(PublicKey, value.id)
-        output.writeTl(AdnlAddressList, value.addr_list)
+        output.writeTl( value.id)
+        output.writeTl( value.addr_list)
         output.writeIntTl(value.version)
         output.writeBytesTl(value.signature)
     }

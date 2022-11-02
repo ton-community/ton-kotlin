@@ -11,14 +11,18 @@ import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
 import org.ton.crypto.*
 import org.ton.crypto.aes.EncryptorAes
+import org.ton.tl.TlCodec
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface PublicKey : Encryptor {
+sealed interface PublicKey : Encryptor, TlObject<PublicKey> {
+    override fun tlCodec(): TlCodec<out PublicKey> = Companion
+
     fun toAdnlIdShort(): AdnlIdShort
 
     companion object : TlCombinator<PublicKey>(
@@ -124,6 +128,7 @@ data class PublicKeyAes(
 data class PublicKeyOverlay(
     val name: ByteArray
 ) : PublicKey, Encryptor by EncryptorFail {
+
     override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
         PublicKeyOverlay.hash(this)
     )

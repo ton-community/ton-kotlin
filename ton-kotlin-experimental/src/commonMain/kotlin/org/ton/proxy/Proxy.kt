@@ -51,28 +51,3 @@ class Proxy(
         private const val HTTPS_PROTOCOL = "https://"
     }
 }
-
-/*
-suspend fun main() {
-    val address = AdnlAddressUdp(
-        ip = -1307380867,
-        port = 15888
-    )
-    val key = PublicKeyEd25519(
-        base64("C1uy64rfGxp10SPSqbsxWhbumy5SM0YbvljCudwpZeI=")
-    )
-    val peer = Peer(
-        address = address,
-        key = key
-    )
-    peer.sendPacket(
-        null,
-        AdnlMessageQuery(
-            query_id = ByteArray(32),
-            query = DhtPing(0).toByteArray()
-        )
-    )
-    while (true) {
-
-    }
- */

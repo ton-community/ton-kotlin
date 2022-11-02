@@ -3,15 +3,19 @@ package org.ton.api.dht
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlNodes
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.readVectorTl
 import org.ton.tl.constructors.writeVectorTl
 
 @Serializable
 data class DhtNodes(
     val nodes: List<DhtNode>
-) : Iterable<DhtNode> by nodes {
+) : TlObject<DhtNodes>, List<DhtNode> by nodes {
     fun toAdnlNodes(): AdnlNodes = AdnlNodes(nodes.map { it.toAdnlNode() })
+
+    override fun tlCodec(): TlCodec<DhtNodes> = Companion
 
     companion object : TlConstructor<DhtNodes>(
         type = DhtNodes::class,

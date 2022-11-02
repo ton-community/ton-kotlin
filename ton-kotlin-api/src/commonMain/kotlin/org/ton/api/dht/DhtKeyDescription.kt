@@ -10,6 +10,7 @@ import org.ton.crypto.base64
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
+import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
@@ -81,9 +82,9 @@ private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>
     schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
 ) {
     override fun encode(output: Output, value: DhtKeyDescription) {
-        output.writeTl(DhtKey, value.key)
-        output.writeTl(PublicKey, value.id)
-        output.writeTl(DhtUpdateRule, value.update_rule)
+        output.writeTl(value.key)
+        output.writeTl(value.id)
+        output.writeTl(value.update_rule)
         output.writeBytesTl(value.signature)
     }
 

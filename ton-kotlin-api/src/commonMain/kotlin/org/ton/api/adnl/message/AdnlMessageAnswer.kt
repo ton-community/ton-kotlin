@@ -5,19 +5,20 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.crypto.HexByteArraySerializer
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
-
 
 @SerialName("adnl.message.answer")
 @Serializable
 data class AdnlMessageAnswer(
-    @SerialName("query_id")
-    @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(HexByteArraySerializer::class)
     val query_id: ByteArray,
-    @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(HexByteArraySerializer::class)
     val answer: ByteArray
 ) : AdnlMessage {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -59,10 +60,5 @@ data class AdnlMessageAnswer(
             val answer = input.readBytesTl()
             return AdnlMessageAnswer(queryId, answer)
         }
-
-        override fun decode(values: Iterator<*>): AdnlMessageAnswer = AdnlMessageAnswer(
-            values.next() as ByteArray,
-            values.next() as ByteArray
-        )
     }
 }

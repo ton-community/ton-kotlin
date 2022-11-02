@@ -1,18 +1,18 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.readVectorTl
 import org.ton.tl.constructors.writeIntTl
 import org.ton.tl.constructors.writeVectorTl
 
 @SerialName("adnl.addressList")
-@Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
 data class AdnlAddressList(
@@ -21,7 +21,11 @@ data class AdnlAddressList(
     val reinit_date: Int = 0,
     val priority: Int = 0,
     val expire_at: Int = 0
-) : List<AdnlAddress> by addrs {
+) : TlObject<AdnlAddressList>, List<AdnlAddress> by addrs {
+    constructor(vararg addrs : AdnlAddress) : this(addrs.toList())
+
+    override fun tlCodec(): TlCodec<AdnlAddressList> = Companion
+
     companion object : TlConstructor<AdnlAddressList>(
         type = AdnlAddressList::class,
         schema = "adnl.addressList addrs:(vector adnl.Address) version:int reinit_date:int priority:int expire_at:int = adnl.AddressList"

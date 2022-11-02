@@ -31,6 +31,6 @@ private object DhtQueryTlConstructor : TlConstructor<DhtQuery>(
     }
 
     override fun encode(output: Output, value: DhtQuery) {
-        output.writeTl(DhtNode, value.node)
+        output.writeTl(value.node)
     }
 }

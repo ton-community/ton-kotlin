@@ -1,0 +1,26 @@
+package org.ton.proxy.dht.state
+
+import org.ton.api.adnl.AdnlIdShort
+import org.ton.proxy.dht.DhtPeer
+import org.ton.proxy.dht.storage.DhtStorage
+
+interface DhtState {
+    val knownPeers: Set<DhtPeer>
+    fun addPeer(peer: DhtPeer): AdnlIdShort
+    fun updatePeerStatus(peer: AdnlIdShort, isGood: Boolean)
+    fun setGoodPeer(peer: AdnlIdShort)
+
+    companion object {
+        @JvmStatic
+        fun full(
+            localId: AdnlIdShort,
+            knownPeers: Collection<DhtPeer>,
+            storage: DhtStorage
+        ) = FullDhtState(localId, knownPeers.toMutableSet(), storage)
+
+        @JvmStatic
+        fun lite(
+            knownPeers: Collection<DhtPeer>
+        ) = LiteDhtState(knownPeers.toMutableSet())
+    }
+}

@@ -17,7 +17,11 @@ abstract class TlConstructor<T : Any>(
     val id: Int = crc32(schema),
     val fields: List<TlCodec<*>> = emptyList()
 ) : TlCodec<T> {
-    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema), fields: List<TlCodec<*>> = listOf()) : this(
+    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema
+        .replace("(", "")
+        .replace(")", "")
+        .replace(";", "")
+    ), fields: List<TlCodec<*>> = listOf()) : this(
         type.createType(),
         schema,
         id,
@@ -58,5 +62,16 @@ abstract class TlConstructor<T : Any>(
     fun <R : Any> Input.readBoxedTl(codec: TlConstructor<R>) = codec.decodeBoxed(this)
 
     override fun toString(): String = schema
-}
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TlConstructor<*>) return false
+        if (id != other.id) return false
+        if (type != other.type) return false
+        if (schema != other.schema) return false
+        if (fields != other.fields) return false
+        return true
+    }
+
+    override fun hashCode(): Int = id
+}

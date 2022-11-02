@@ -3,6 +3,7 @@ package org.ton.api.adnl.message
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeIntTl
@@ -12,6 +13,7 @@ import org.ton.tl.constructors.writeIntTl
 data class AdnlMessageReinit(
     val date: Int
 ) : AdnlMessage {
+
     companion object : TlConstructor<AdnlMessageReinit>(
         type = AdnlMessageReinit::class,
         schema = "adnl.message.reinit date:int = adnl.Message"

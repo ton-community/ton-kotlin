@@ -4,15 +4,21 @@ package org.ton.api.adnl
 
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
+import org.ton.api.dht.DhtNode
+import org.ton.api.overlay.OverlayNode
+import org.ton.api.overlay.OverlayNodeToSign
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.writeInt256Tl
 
 inline fun AdnlIdShort(byteArray: ByteArray): AdnlIdShort = AdnlIdShort.of(byteArray)
 
-interface AdnlIdShort : Comparable<AdnlIdShort> {
+interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
     val id: ByteArray
+
+    fun verify(node: OverlayNode): Boolean
 
     companion object : TlCodec<AdnlIdShort> by AdnlIdShortTlConstructor {
         @JvmStatic
@@ -31,6 +37,20 @@ private data class AdnlIdShortImpl(
     private val _id: ByteArray
 ) : AdnlIdShort {
     override val id: ByteArray get() = _id.copyOf()
+
+    override fun tlCodec() = AdnlIdShort.tlConstructor()
+
+    override fun verify(node: OverlayNode): Boolean {
+        if (!node.overlay.contentEquals(_id)) return false
+        val key = node.id
+        val peerId = key.toAdnlIdShort()
+        val nodeToSign = OverlayNodeToSign(
+            id = peerId,
+            overlay = node.overlay,
+            version = node.version
+        )
+        return key.verify(nodeToSign.toByteArray(), node.signature)
+    }
 
     override fun compareTo(other: AdnlIdShort): Int {
         val otherId = if (other is AdnlIdShortImpl) other._id else other.id

@@ -6,24 +6,29 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
+@Serializable
 @JsonClassDiscriminator("@type")
-interface DhtValueResult {
+sealed interface DhtValueResult : TlObject<DhtValueResult> {
+    fun value(): DhtValue?
+
+    override fun tlCodec(): TlCodec<out DhtValueResult> = Companion
+
     companion object : TlCombinator<DhtValueResult>(
         DhtValueNotFound,
         DhtValueFound
     )
 }
 
-@SerialName("dht.valueNotFound")
 @Serializable
+@SerialName("dht.valueNotFound")
 data class DhtValueNotFound(
     val nodes: DhtNodes
 ) : DhtValueResult {
+    override fun value(): DhtValue? = null
+
+
     companion object : TlConstructor<DhtValueNotFound>(
         type = DhtValueNotFound::class,
         schema = "dht.valueNotFound nodes:dht.nodes = dht.ValueResult"
@@ -39,21 +44,24 @@ data class DhtValueNotFound(
     }
 }
 
-@SerialName("dht.valueFound")
 @Serializable
+@SerialName("dht.valueFound")
 data class DhtValueFound(
     val value: DhtValue
 ) : DhtValueResult {
+    override fun value(): DhtValue = value
+
     companion object : TlConstructor<DhtValueFound>(
         type = DhtValueFound::class,
         schema = "dht.valueFound value:dht.Value = dht.ValueResult"
     ) {
         override fun encode(output: Output, value: DhtValueFound) {
+            DhtValue.encodeBoxed(value.value)
             output.writeTl(DhtValue, value.value)
         }
 
         override fun decode(input: Input): DhtValueFound {
-            val value = input.readTl(DhtValue)
+            val value = DhtValue.decodeBoxed(input)
             return DhtValueFound(value)
         }
     }

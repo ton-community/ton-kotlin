@@ -1,6 +1,7 @@
 package org.ton.api.dht
 
 import io.ktor.utils.io.core.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
@@ -25,6 +26,14 @@ data class DhtValue(
     @Serializable(Base64ByteArraySerializer::class)
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtValue> {
+    constructor(
+        key: DhtKeyDescription,
+        value: ByteArray,
+        ttl: Instant,
+        signature: ByteArray
+    ) : this(key, value, ttl.epochSeconds.toUInt().toInt(), signature)
+
+    fun ttl(): Instant = Instant.fromEpochSeconds(ttl.toUInt().toLong())
 
     override fun signed(privateKey: PrivateKey): DhtValue =
         copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))

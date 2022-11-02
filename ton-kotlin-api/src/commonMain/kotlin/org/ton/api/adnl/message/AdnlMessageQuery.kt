@@ -1,24 +1,25 @@
 package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.hex
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.BytesTlConstructor
-import org.ton.tl.constructors.Int256TlConstructor
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.query")
 @Serializable
 data class AdnlMessageQuery(
-    @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(HexByteArraySerializer::class)
     val query_id: ByteArray,
-    @Serializable(Base64ByteArraySerializer::class)
+    @Serializable(HexByteArraySerializer::class)
     val query: ByteArray
 ) : AdnlMessage {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AdnlMessageQuery) return false
@@ -54,9 +55,10 @@ data class AdnlMessageQuery(
             output.writeBytesTl(value.query)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageQuery = AdnlMessageQuery(
-            values.next() as ByteArray,
-            values.next() as ByteArray
-        )
+        override fun decode(input: Input): AdnlMessageQuery {
+            val query_id = input.readInt256Tl()
+            val query = input.readBytesTl()
+            return AdnlMessageQuery(query_id, query)
+        }
     }
 }

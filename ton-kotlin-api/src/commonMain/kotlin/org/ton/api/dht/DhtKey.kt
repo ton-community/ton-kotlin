@@ -1,11 +1,15 @@
 package org.ton.api.dht
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
+import org.ton.crypto.encodeHex
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.*
 
 @Serializable
@@ -14,8 +18,12 @@ data class DhtKey(
     val id: ByteArray,
     val name: String,
     val idx: Int = 0
-) {
+) : TlObject<DhtKey> {
     constructor(id: AdnlIdShort, name: String, idx: Int = 0) : this(id.id, name, idx)
+
+    override fun tlCodec(): TlCodec<DhtKey> = DhtKey
+
+    fun key(): ByteArray = hash(this)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -51,6 +59,12 @@ data class DhtKey(
         type = DhtKey::class,
         schema = "dht.key id:int256 name:bytes idx:int = dht.Key"
     ) {
+        @JvmStatic
+        fun address(adnlIdShort: AdnlIdShort) = DhtKey(adnlIdShort, "address")
+
+        @JvmStatic
+        fun nodes(adnlIdShort: AdnlIdShort) = DhtKey(adnlIdShort, "nodes")
+
         override fun encode(output: Output, value: DhtKey) {
             output.writeInt256Tl(value.id)
             output.writeBytesTl(value.name.encodeToByteArray())
@@ -59,6 +73,8 @@ data class DhtKey(
 
         override fun decode(input: Input): DhtKey {
             val id = input.readInt256Tl()
+            println(id.encodeBase64())
+            println(id.encodeHex())
             val name = input.readBytesTl().decodeToString()
             val idx = input.readIntTl()
             return DhtKey(id, name, idx)

@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
+import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.readIntTl
@@ -21,6 +22,7 @@ data class AdnlMessageConfirmChannel(
     val peerKey: ByteArray,
     val date: Int
 ) : AdnlMessage {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

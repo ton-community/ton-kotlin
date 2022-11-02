@@ -35,7 +35,7 @@ abstract class TlCombinator<T : Any>(
         return constructor as TlConstructor<T>
     }
 
-    override fun decode(input: Input): T = decode(input)
+    override fun decode(input: Input): T = decodeBoxed(input)
 
     override fun decodeBoxed(input: Input): T {
         val id = input.readIntLittleEndian()

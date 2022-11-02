@@ -2,25 +2,27 @@
 
 package org.ton.api.adnl.message
 
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.TlCodec
 import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 
+@Polymorphic
+@Serializable
 @JsonClassDiscriminator("@type")
-sealed interface AdnlMessage {
-    companion object :
-        TlCodec<AdnlMessage> by AdnlMessageTlCombinator,
-        List<TlConstructor<out AdnlMessage>> by AdnlMessageTlCombinator.constructors
-}
+sealed interface AdnlMessage : TlObject<AdnlMessage> {
+    override fun tlCodec(): TlCodec<out AdnlMessage> = Companion
 
-private object AdnlMessageTlCombinator : TlCombinator<AdnlMessage>(
-    AdnlMessageQuery,
-    AdnlMessageAnswer,
-    AdnlMessageCreateChannel,
-    AdnlMessageConfirmChannel,
-    AdnlMessageCustom,
-    AdnlMessageNop,
-    AdnlMessageReinit,
-    AdnlMessagePart
-)
+    companion object : TlCombinator<AdnlMessage>(
+        AdnlMessageQuery,
+        AdnlMessageAnswer,
+        AdnlMessageCreateChannel,
+        AdnlMessageConfirmChannel,
+        AdnlMessageCustom,
+        AdnlMessageNop,
+        AdnlMessageReinit,
+        AdnlMessagePart
+    )
+}

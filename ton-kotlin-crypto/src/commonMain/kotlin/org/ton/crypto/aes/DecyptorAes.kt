@@ -1,6 +1,7 @@
 package org.ton.crypto.aes
 
 import org.ton.crypto.Decryptor
+import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
 
 class DecryptorAes(
@@ -19,7 +20,7 @@ class DecryptorAes(
         secret.copyInto(iv, destinationOffset = 4, startIndex = 20, endIndex = 32)
 
         val cipher = AesCtr(key, iv)
-        val decryptedData = cipher.update(data)
+        val decryptedData = cipher.update(data.copyOfRange(32, data.size))
 
         val actualDigest = sha256(decryptedData)
         check(digest.contentEquals(actualDigest)) { "sha256 mismatch after decryption" }
