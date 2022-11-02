@@ -1,3 +1,5 @@
+package org.ton.asm.dictspecial
+
 import org.ton.asm.AsmInstruction
 import org.ton.bigint.toUShort
 import org.ton.cell.Cell

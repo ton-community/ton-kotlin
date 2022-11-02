@@ -35,7 +35,7 @@ private object PUSHCONTTlbConstructor : TlbConstructor<PUSHCONT>(
     schema = "asm_pushrefcont#8f_ r:(## 2) xx:(## 7) c:(r * ^Cell) ssss:((8 * xx) * Bit) = PUSHCONT;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: PUSHCONT) {
-        cellBuilder.storeUIntLeq(value.r, 2)
+        cellBuilder.storeUInt(value.r, 2)
         cellBuilder.storeUInt(value.xx, 7)
         value.c.forEach { cell ->
             cellBuilder.storeRef(cell)
@@ -44,7 +44,7 @@ private object PUSHCONTTlbConstructor : TlbConstructor<PUSHCONT>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): PUSHCONT {
-        val r = cellSlice.loadUIntLeq(2).toUByte()
+        val r = cellSlice.loadUInt(2).toUByte()
         val xx = cellSlice.loadUInt(7).toUByte()
         val c = cellSlice.loadRefs(r.toInt())
         val ssss = cellSlice.loadBits(8 * xx.toInt())

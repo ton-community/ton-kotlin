@@ -23,11 +23,11 @@ private object SETNUMARGSTlbConstructor : TlbConstructor<SETNUMARGS>(
     schema = "asm_setnumargs#ec0 n:(#<= 14) = SETNUMARGS;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETNUMARGS) {
-        cellBuilder.storeUIntLeq(value.n, 4)
+        cellBuilder.storeUIntLeq(value.n, 14)
     }
 
     override fun loadTlb(cellSlice: CellSlice): SETNUMARGS {
-        val n = cellSlice.loadUIntLeq(4).toUByte()
+        val n = cellSlice.loadUIntLeq(14).toUByte()
         return SETNUMARGS(n)
     }
 }
