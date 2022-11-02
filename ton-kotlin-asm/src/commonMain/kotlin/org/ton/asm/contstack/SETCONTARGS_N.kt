@@ -25,12 +25,12 @@ private object SETCONTARGS_NTlbConstructor : TlbConstructor<SETCONTARGS_N>(
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETCONTARGS_N) {
         cellBuilder.storeUInt(value.r, 4)
-        cellBuilder.storeUIntLeq(value.n, 4)
+        cellBuilder.storeUIntLeq(value.n, 14)
     }
 
     override fun loadTlb(cellSlice: CellSlice): SETCONTARGS_N {
         val r = cellSlice.loadUInt(4).toUByte()
-        val n = cellSlice.loadUIntLeq(4).toUByte()
+        val n = cellSlice.loadUIntLeq(14).toUByte()
         return SETCONTARGS_N(r, n)
     }
 }

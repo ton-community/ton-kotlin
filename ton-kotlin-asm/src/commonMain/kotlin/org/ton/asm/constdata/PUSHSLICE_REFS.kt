@@ -50,7 +50,7 @@ private object PUSHSLICE_REFSTlbConstructor : TlbConstructor<PUSHSLICE_REFS>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): PUSHSLICE_REFS {
-        val r = cellSlice.loadUIntLeq(2).toUByte()
+        val r = cellSlice.loadUInt(2).toUByte()
         val xx = cellSlice.loadUInt(5).toUByte()
         val c = cellSlice.loadRefs(r.toInt() + 1)
         val ssss = cellSlice.loadBits(8 * xx.toInt() + 1)
