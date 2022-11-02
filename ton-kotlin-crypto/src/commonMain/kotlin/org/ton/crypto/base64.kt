@@ -1,9 +1,12 @@
 package org.ton.crypto
 
-expect fun base64(string: String): ByteArray
+import com.github.andreypfau.kotlinio.base64.Base64
+import com.github.andreypfau.kotlinio.base64.Base64Url
 
-expect fun base64(byteArray: ByteArray): String
+fun base64(string: String): ByteArray = Base64.decode(string)
 
-expect fun base64url(string: String): ByteArray
+fun base64(byteArray: ByteArray): String = Base64.encode(byteArray)
 
-expect fun base64url(byteArray: ByteArray): String
+fun base64url(string: String): ByteArray = Base64Url.decode(string)
+
+fun base64url(byteArray: ByteArray): String = Base64Url.encode(byteArray)

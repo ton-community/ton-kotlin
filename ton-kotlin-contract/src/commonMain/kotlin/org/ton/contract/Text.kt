@@ -22,12 +22,10 @@ private object TextCombinator : TlbCombinator<Text>() {
     private object TextConstructor : TlbConstructor<Text>(
         schema = "text#_ {n:#} data:(SnakeData ~n) = Text;"
     ) {
-        private val snakeDataCodec by lazy { SnakeData.tlbCodec() }
-
         override fun storeTlb(cellBuilder: CellBuilder, value: Text) {
-            cellBuilder.storeTlb(snakeDataCodec, value.data)
+            cellBuilder.storeTlb(SnakeData, value.data)
         }
 
-        override fun loadTlb(cellSlice: CellSlice): Text = Text(cellSlice.loadTlb(snakeDataCodec))
+        override fun loadTlb(cellSlice: CellSlice): Text = Text(cellSlice.loadTlb(SnakeData))
     }
 }

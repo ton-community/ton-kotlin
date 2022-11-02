@@ -29,7 +29,7 @@ private object ChunkedDataCombinator : TlbCombinator<ChunkedData>() {
     ) {
         // SnakeData ~0  is SnakeDataTail
         private val dataCodec =
-            HashMapE.tlbCodec(32, Cell.tlbCodec(SnakeDataTail.tlbCodec()))
+            HashMapE.tlbCodec(32, Cell.tlbCodec(SnakeDataTail))
 
         override fun storeTlb(cellBuilder: CellBuilder, value: ChunkedData) {
             cellBuilder.storeTlb(dataCodec, value.data)

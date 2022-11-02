@@ -32,17 +32,15 @@ private object ContentDataCombinator : TlbCombinator<ContentData>() {
     private object ContentDataSnakeConstructor : TlbConstructor<ContentData.Snake>(
         schema = "snake#00 data:(SnakeData ~n) = ContentData;"
     ) {
-        private val snakeDataCodec = SnakeData.tlbCodec()
-
         override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Snake) {
             cellBuilder.storeTlb(
-                snakeDataCodec,
+                SnakeData,
                 value.data
             )
         }
 
         override fun loadTlb(cellSlice: CellSlice): ContentData.Snake =
-            ContentData.Snake(cellSlice.loadTlb(snakeDataCodec))
+            ContentData.Snake(cellSlice.loadTlb(SnakeData))
     }
 
     private object ContentDataChunksConstructor :

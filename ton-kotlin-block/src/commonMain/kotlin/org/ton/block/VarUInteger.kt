@@ -10,6 +10,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import java.math.BigInteger
 
 @SerialName("var_uint")
 @Serializable
@@ -34,6 +35,58 @@ data class VarUInteger(
     fun toInt(): Int = value.toInt()
     fun toLong(): Long = value.toLong()
     fun toShort(): Short = value.toShort()
+
+    operator fun plus(other: VarUInteger): VarUInteger {
+        val result = value + other.value
+        val maxLen = maxOf(len, other.len)
+        val actualLen = result.bitLength
+        val length = if (actualLen <= maxLen) maxLen else throw NumberFormatException("Integer overflow")
+        return VarUInteger(length, result)
+    }
+
+    operator fun minus(other: VarUInteger): VarUInteger {
+        val result = value - other.value
+        if (result < BigInteger.ZERO) throw NumberFormatException("Integer underflow")
+        val len = maxOf(len, other.len)
+        return VarUInteger(len, result)
+    }
+
+    operator fun times(other: VarUInteger): VarUInteger {
+        val result = value * other.value
+        val maxLen = maxOf(len, other.len)
+        val actualLen = result.bitLength
+        val len = if (actualLen <= maxLen) maxLen else throw NumberFormatException("Integer overflow")
+        return VarUInteger(len, result)
+    }
+
+    operator fun div(other: VarUInteger): VarUInteger {
+        val result = value / other.value
+        val maxLen = maxOf(len, other.len)
+        val actualLen = result.bitLength
+        val len = if (actualLen <= maxLen) maxLen else throw NumberFormatException("Integer overflow")
+        return VarUInteger(len, result)
+    }
+
+    operator fun rem(other: VarUInteger): VarUInteger {
+        val result = value % other.value
+        val maxLen = maxOf(len, other.len)
+        val actualLen = result.bitLength
+        val len = if (actualLen <= maxLen) maxLen else throw NumberFormatException("Integer overflow")
+        return VarUInteger(len, result)
+    }
+
+    operator fun inc(): VarUInteger {
+        val result = value + BigInt.ONE
+        val actualLen = result.bitLength
+        val length = if (actualLen < len) len else throw NumberFormatException("Integer overflow")
+        return VarUInteger(length, result)
+    }
+
+    operator fun dec(): VarUInteger {
+        val result = value - BigInt.ONE
+        if (result < BigInt.ZERO) throw NumberFormatException("Integer overflow")
+        return VarUInteger(len, result)
+    }
 
     override fun toString(): String = value.toString()
 
