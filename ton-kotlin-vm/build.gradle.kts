@@ -7,7 +7,6 @@ kotlin {
                 api(projects.tonKotlinTlb)
                 api(projects.tonKotlinAsm)
                 api(projects.tonKotlinBlock)
-                api(projects.tonKotlinLogger)
                 implementation(libs.serialization.json)
             }
         }
