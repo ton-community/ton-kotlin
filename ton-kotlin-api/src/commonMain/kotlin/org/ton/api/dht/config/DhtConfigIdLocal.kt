@@ -19,7 +19,7 @@ data class DhtConfigIdLocal(
         schema = "dht.config.local id:adnl.id_short = dht.config.Local"
     ) {
         override fun encode(output: Output, value: DhtConfigIdLocal) {
-            output.writeTl(value.id)
+            output.writeTl(AdnlIdShort, value.id)
         }
 
         override fun decode(input: Input): DhtConfigIdLocal {

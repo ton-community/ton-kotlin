@@ -1,15 +1,21 @@
 package org.ton.experimental
 
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.streams.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.buffer
+import org.ton.api.fec.FecRaptorQ
+import org.ton.api.rldp.RldpMessagePart
+import org.ton.api.rldp.RldpMessagePartData
+import org.ton.bitstring.BitString
+import org.ton.crypto.encodeHex
 import org.ton.proxy.rldp.RldpInputTransfer
 import org.ton.proxy.rldp.RldpOutputTransfer
 import org.ton.proxy.rldp.fec.RaptorQFecEncoder
-import kotlin.concurrent.thread
 import kotlin.random.Random
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -21,31 +27,34 @@ class RldpTest {
         val output = newSingleThreadContext("RLDP output")
         val input = newSingleThreadContext("RLDP input")
 
-        repeat(1000) {
-            val originalData = Random.nextBytes(1024 * 4)
+        repeat(10) {
+            val originalData = ByteArray(1024 * 1024 * 100)
 
             val outputTransfer = RldpOutputTransfer.of(originalData)
             val inputTransfer = RldpInputTransfer.of(outputTransfer.id)
 
             launch(output) {
-                outputTransfer.transferPackets().buffer().collect {
-                    inputTransfer.receivePart(it)
+                outputTransfer.transferPackets().collect { part ->
+                    launch {
+                        inputTransfer.receivePart(part)
+                    }
                 }
             }
+
             launch(input) {
-                inputTransfer.transferPackets().collect {
-                    outputTransfer.receivePart(it)
+                inputTransfer.transferPackets().collect { part ->
+                    launch {
+                        outputTransfer.receivePart(part)
+                    }
                 }
             }
 
-            val (transferred, time) = measureTimedValue {
-                inputTransfer.byteChannel.readRemaining().readBytes()
+            val (value, time) = measureTimedValue {
+                inputTransfer.byteChannel.discard()
             }
-
-            assertContentEquals(originalData, transferred)
-            val speed = transferred.size * 8.0 / time.toDouble(DurationUnit.SECONDS) / 1024 / 1024
-
-            println("$it Speed: $speed MBit/s")
+            // speed in megabytes per second
+            val speed = value.toDouble() * 8.0 / time.toDouble(DurationUnit.MILLISECONDS) * 1000 / 1024 / 1024
+            println("speed: $speed MB/s")
         }
     }
 
@@ -59,5 +68,26 @@ class RldpTest {
             val seqno = encoder.encode(it, array)
             seqno to array
         }
+    }
+
+    @Test
+    fun testSerializtion() {
+        val packet = RldpMessagePartData(
+            transfer_id = BitString(ByteArray(32)),
+            fec_type = FecRaptorQ(
+                data_size = 1024,
+                symbol_size = 768,
+                symbol_count = 10,
+            ),
+            part = 0,
+            total_size = 1000,
+            seqno = 12,
+            data = ByteArray(768),
+        )
+        val bytes = RldpMessagePart.encode(packet)
+        println(packet)
+        println(bytes.encodeHex())
+        val decoded = RldpMessagePart.decode(bytes)
+        println(decoded)
     }
 }

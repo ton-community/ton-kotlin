@@ -36,7 +36,7 @@ data class DhtConfigGlobal(
         schema = "dht.config.global static_nodes:dht.nodes k:int a:int = dht.config.Global"
     ) {
         override fun encode(output: Output, value: DhtConfigGlobal) {
-            output.writeTl(value.static_nodes)
+            output.writeTl(DhtNodes, value.static_nodes)
             output.writeIntTl(value.k)
             output.writeIntTl(value.a)
         }

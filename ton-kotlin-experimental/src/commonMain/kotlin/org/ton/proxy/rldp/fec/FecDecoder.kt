@@ -21,7 +21,6 @@ class RaptorQFecDecoder(
 
     private var decoded = false
     private val outputBuffer = ByteArray(fecType.data_size)
-    private val inputBuffer = ByteArray(fecType.data_size + 4)
     private val engine = RaptorQDecoder(fecType.data_size, fecType.symbol_size)
 
     override fun decode(seqno: Int, data: ByteArray): ByteArray? {

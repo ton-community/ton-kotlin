@@ -16,7 +16,7 @@ abstract class TlCombinator<T : Any>(
         val constructor = checkNotNull(
             constructors.find { it.id == id }
         ) {
-            "Invalid ID. actual: $id"
+            "Invalid ID. actual: $id, constructors: $constructors"
         }
         return constructor
     }

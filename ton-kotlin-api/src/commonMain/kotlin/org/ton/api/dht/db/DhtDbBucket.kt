@@ -4,7 +4,10 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
-import org.ton.tl.*
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
+import org.ton.tl.readTl
+import org.ton.tl.writeTl
 
 @Serializable
 data class DhtDbBucket(
@@ -19,7 +22,7 @@ data class DhtDbBucket(
         schema = "dht.db.bucket nodes:dht.nodes = dht.db.Bucket"
     ) {
         override fun encode(output: Output, value: DhtDbBucket) {
-            output.writeTl(value.nodes)
+            output.writeTl(DhtNodes, value.nodes)
         }
 
         override fun decode(input: Input): DhtDbBucket {

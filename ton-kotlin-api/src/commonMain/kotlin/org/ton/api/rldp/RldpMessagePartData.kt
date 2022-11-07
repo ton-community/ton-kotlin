@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.fec.FecType
 import org.ton.bitstring.BitString
+import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
@@ -48,7 +49,9 @@ data class RldpMessagePartData(
         return result
     }
 
-    override fun toString(): String = "rldp.MessagePart(part: $part, seqno: $seqno, data: ${data.size} bytes)"
+    override fun toString(): String {
+        return "RldpMessagePartData(transfer_id=$transfer_id, fec_type=$fec_type, part=$part, total_size=$total_size, seqno=$seqno, data=${data.encodeHex()})"
+    }
 
     companion object : TlConstructor<RldpMessagePartData>(
         type = RldpMessagePartData::class,
@@ -64,7 +67,7 @@ data class RldpMessagePartData(
     ) {
         override fun encode(output: Output, value: RldpMessagePartData) {
             output.writeInt256Tl(value.transfer_id)
-            output.writeTl(value.fec_type)
+            output.writeTl(FecType, value.fec_type)
             output.writeIntTl(value.part)
             output.writeLongTl(value.total_size)
             output.writeIntTl(value.seqno)

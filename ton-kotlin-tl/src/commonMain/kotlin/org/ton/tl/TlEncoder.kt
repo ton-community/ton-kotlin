@@ -3,9 +3,6 @@ package org.ton.tl
 import io.ktor.utils.io.core.*
 import org.ton.crypto.sha256
 
-@Suppress("UNCHECKED_CAST")
-fun <T : TlObject<T>> Output.writeTl(value: T) = (value.tlCodec() as TlCodec<T>).encode(this, value)
-
 interface TlEncoder<T : Any> {
     fun encode(value: T): ByteArray = buildPacket {
         encode(this, value)

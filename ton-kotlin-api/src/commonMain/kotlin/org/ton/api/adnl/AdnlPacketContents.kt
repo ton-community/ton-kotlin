@@ -2,9 +2,6 @@ package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
 import org.ton.api.SignedTlObject
 import org.ton.api.adnl.AdnlPacketContents.Companion.FLAG_ADDRESS
 import org.ton.api.adnl.AdnlPacketContents.Companion.FLAG_CONFIRM_SEQNO
@@ -265,12 +262,12 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
     override fun encode(output: Output, value: AdnlPacketContents) {
         output.writeBytesTl(value.rand1)
         output.writeIntTl(value.flags)
-        if (value.flags and FLAG_FROM != 0) output.writeTl(value.from!!)
-        if (value.flags and FLAG_FROM_SHORT != 0) output.writeTl(value.from_short!!)
-        if (value.flags and FLAG_MESSAGE != 0) output.writeTl(value.message!!)
+        if (value.flags and FLAG_FROM != 0) output.writeTl(PublicKey, value.from!!)
+        if (value.flags and FLAG_FROM_SHORT != 0) output.writeTl(AdnlIdShort, value.from_short!!)
+        if (value.flags and FLAG_MESSAGE != 0) output.writeTl(AdnlMessage, value.message!!)
         if (value.flags and FLAG_MESSAGES != 0) output.writeVectorTl(value.messages!!, AdnlMessage)
-        if (value.flags and FLAG_ADDRESS != 0) output.writeTl(value.address!!)
-        if (value.flags and FLAG_PRIORITY_ADDRESS != 0) output.writeTl(value.priority_address!!)
+        if (value.flags and FLAG_ADDRESS != 0) output.writeTl(AdnlAddressList, value.address!!)
+        if (value.flags and FLAG_PRIORITY_ADDRESS != 0) output.writeTl(AdnlAddressList, value.priority_address!!)
         if (value.flags and FLAG_SEQNO != 0) output.writeLongTl(value.seqno!!)
         if (value.flags and FLAG_CONFIRM_SEQNO != 0) output.writeLongTl(value.confirm_seqno!!)
         if (value.flags and FLAG_RECV_ADDR_VERSION != 0) output.writeIntTl(value.recv_addr_list_version!!)
