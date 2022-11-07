@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeoutOrNull
 import org.ton.api.rldp.RldpComplete
 import org.ton.api.rldp.RldpConfirm
 import org.ton.api.rldp.RldpMessagePart
@@ -67,21 +68,25 @@ private class RldOutputTransferImpl(
     private var seqnoOut by atomic(0)
     private var seqnoIn by atomic(0)
     private var hasReply by atomic(false)
+    private var responseChannel = Channel<Unit>()
 
     override fun transferPackets() = flow {
         transfer@ while (currentCoroutineContext().isActive) {
-            val packetCount = startNextPart()
+            var packetCount = startNextPart()
             if (packetCount <= 0) break
-            val waves = min(packetCount, 10)
             val part = part
-            part@ while (currentCoroutineContext().isActive) {
+            part@ while (currentCoroutineContext().isActive && packetCount > 0) {
+                val waves = min(packetCount, 10)
                 for (wave in 0 until waves) {
                     emit(preparePart())
+                    packetCount--
                     if (isFinishedOrNext(part)) {
                         break@part
                     }
                 }
-                delay(10)
+                withTimeoutOrNull(1000) {
+                    responseChannel.receive()
+                }
                 if (isFinishedOrNext(part)) {
                     break@part
                 }
@@ -93,6 +98,7 @@ private class RldOutputTransferImpl(
         if (part == this.part) {
             if (message.seqno in seqnoIn..seqnoOut) {
                 seqnoIn = message.seqno
+                responseChannel.trySend(Unit)
             }
         }
     }
@@ -100,6 +106,7 @@ private class RldOutputTransferImpl(
     override fun complete(part: Int) {
         if (part == this.part) {
             this.part++
+            responseChannel.trySend(Unit)
         }
     }
 

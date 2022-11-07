@@ -1,17 +1,15 @@
 package org.ton.experimental
 
 import io.ktor.utils.io.core.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.ton.crypto.SecureRandom
 import org.ton.proxy.rldp.RldpInputTransfer
 import org.ton.proxy.rldp.RldpOutputTransfer
 import org.ton.proxy.rldp.fec.RaptorQFecEncoder
+import kotlin.concurrent.thread
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -20,18 +18,23 @@ class RldpTest {
     @OptIn(ExperimentalTime::class)
     @Test
     fun test() = runBlocking {
-        repeat(100) {
-            val originalData = Random.nextBytes(1024 * 1024)
+        val output = newSingleThreadContext("RLDP output")
+        val input = newSingleThreadContext("RLDP input")
+
+        repeat(1000) {
+            val originalData = Random.nextBytes(1024 * 4)
 
             val outputTransfer = RldpOutputTransfer.of(originalData)
             val inputTransfer = RldpInputTransfer.of(outputTransfer.id)
 
-            GlobalScope.launch {
-                outputTransfer.transferPackets().buffer(2).collect {
-                    val result = inputTransfer.receivePart(it)
-                    if (result != null) {
-                        outputTransfer.receivePart(result)
-                    }
+            launch(output) {
+                outputTransfer.transferPackets().buffer().collect {
+                    inputTransfer.receivePart(it)
+                }
+            }
+            launch(input) {
+                inputTransfer.transferPackets().collect {
+                    outputTransfer.receivePart(it)
                 }
             }
 
@@ -39,11 +42,10 @@ class RldpTest {
                 inputTransfer.byteChannel.readRemaining().readBytes()
             }
 
-            println("original   : ${originalData.size}")
-            println("transferred: ${transferred.size}")
-            println("time       : $time")
-            // Calculate megabits per sec
-            println("speed      : ${transferred.size * 8.0 / time.toDouble(DurationUnit.SECONDS) / 1024 / 1024} MBits/sec")
+            assertContentEquals(originalData, transferred)
+            val speed = transferred.size * 8.0 / time.toDouble(DurationUnit.SECONDS) / 1024 / 1024
+
+            println("$it Speed: $speed MBit/s")
         }
     }
 

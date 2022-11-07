@@ -20,22 +20,20 @@ class RaptorQFecDecoder(
         private set
 
     private var decoded = false
-    private val buffer = ByteArray(fecType.data_size)
+    private val outputBuffer = ByteArray(fecType.data_size)
+    private val inputBuffer = ByteArray(fecType.data_size + 4)
     private val engine = RaptorQDecoder(fecType.data_size, fecType.symbol_size)
 
     override fun decode(seqno: Int, data: ByteArray): ByteArray? {
-        if (decoded) {
-            return buffer
-        }
+        if (decoded) return null
         this.seqno = seqno
         val packet = buildPacket {
-            writeShort(0)
-            writeShort(seqno.toShort())
+            writeInt(seqno)
             writeFully(data)
         }.readBytes()
-        return if(engine.decode(packet, buffer)) {
+        return if (engine.decode(packet, outputBuffer)) {
             decoded = true
-            buffer
+            outputBuffer
         } else {
             null
         }

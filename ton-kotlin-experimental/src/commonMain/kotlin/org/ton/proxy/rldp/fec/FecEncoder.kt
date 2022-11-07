@@ -1,6 +1,8 @@
 package org.ton.proxy.rldp.fec
 
 import io.github.andreypfau.raptorq.RaptorQEncoder
+import io.ktor.util.*
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import org.ton.api.fec.FecRaptorQ
 import org.ton.api.fec.FecType
@@ -26,10 +28,11 @@ class RaptorQFecEncoder(
     constructor(data: ByteArray) : this(data.size, RaptorQEncoder(data, 768, 1).encode())
 
     override fun encode(seqno: Int, output: ByteArray): Int {
-        val packet = ByteReadPacket(packets[seqno])
-        packet.discard(2)
-        val newSeqno = packet.readShort().toInt()
-        packet.readFully(output)
-        return newSeqno
+        val packet = packets[seqno]
+        return packet.useMemory(0, packet.size) {
+            val newSeqno = it.loadIntAt(0)
+            it.loadByteArray(4, output)
+            newSeqno
+        }
     }
 }
