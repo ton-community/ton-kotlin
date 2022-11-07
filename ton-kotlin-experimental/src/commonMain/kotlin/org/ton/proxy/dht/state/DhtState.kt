@@ -6,6 +6,7 @@ import org.ton.proxy.dht.storage.DhtStorage
 
 interface DhtState {
     val knownPeers: Set<DhtPeer>
+    val badPeers: Map<AdnlIdShort, Int>
     fun addPeer(peer: DhtPeer): AdnlIdShort
     fun updatePeerStatus(peer: AdnlIdShort, isGood: Boolean)
     fun setGoodPeer(peer: AdnlIdShort)

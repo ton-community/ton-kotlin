@@ -1,5 +1,6 @@
 package org.ton.tl
 
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -37,7 +38,15 @@ abstract class TlCombinator<T : Any>(
 
     override fun decode(input: Input): T = decodeBoxed(input)
 
+    override suspend fun decode(input: ByteReadChannel): T = decodeBoxed(input)
+
     override fun decodeBoxed(input: Input): T {
+        val id = input.readIntLittleEndian()
+        val constructor = findConstructor(id)
+        return constructor.decode(input)
+    }
+
+    override suspend fun decodeBoxed(input: ByteReadChannel): T {
         val id = input.readIntLittleEndian()
         val constructor = findConstructor(id)
         return constructor.decode(input)

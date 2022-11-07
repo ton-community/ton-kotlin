@@ -5,79 +5,98 @@ package org.ton.proxy.dht
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtValueFound
 import org.ton.api.dht.DhtValueNotFound
 import org.ton.api.dht.DhtValueResult
 import org.ton.api.dht.functions.DhtFindValue
+import org.ton.crypto.encodeHex
+import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 
 class DhtValuesFlow(
     val key: ByteArray,
-    val knownPeers: Set<DhtPeer>
+    knownPeers: Collection<DhtPeer>
 ) : AbstractFlow<Pair<DhtPeer, DhtValueResult?>>() {
     private val query = DhtFindValue(key, 6).toByteArray()
-    private val peersChannel = Channel<DhtPeer>()
-    private val logger = PrintLnLogger("DhtValuesFlow")
+    private val knownPeers = HashSet<AdnlIdShort>()
+    private val peersChannel = Channel<DhtPeer>(
+        capacity = Channel.UNLIMITED
+    )
+    private val logger = PrintLnLogger("DhtValuesFlow", Logger.Level.DEBUG)
+
+    init {
+        knownPeers.forEachIndexed { index, dhtPeer ->
+            if (index < MAX_BATCH_COUNT) {
+                addNode(dhtPeer.dhtNode)
+            } else {
+                return@forEachIndexed
+            }
+        }
+    }
 
     companion object {
-        const val QUERY_TIMEOUT = 5000L
-        const val MAX_BATCH_COUNT = 5
+        const val QUERY_TIMEOUT = 1_000L
+        const val MAX_BATCH_COUNT = 10
     }
 
     @FlowPreview
     override suspend fun collectSafely(collector: FlowCollector<Pair<DhtPeer, DhtValueResult?>>): Unit =
         coroutineScope {
-            launch {
-                knownPeers.forEach { peer ->
-                    addPeer(peer)
-                }
-            }
-            while (isActive) {
+            println("key: ${key.encodeHex()}")
+            while (isActive && !peersChannel.isEmpty) {
                 var batchCount = 0
-                val results = peersChannel.receiveAsFlow().map { peer ->
-                    async {
-                        logger.debug { "Querying peer: $peer" }
-                        val result = peerQuery(peer)
-                        logger.debug { "Peer: $peer: $result" }
-                        if (result is DhtValueNotFound) {
-                            launch {
-                                result.nodes.forEach { node ->
-                                    addNode(node)
-                                }
-                            }
+                val results = ArrayList<Pair<DhtPeer, Deferred<DhtValueResult?>>>(MAX_BATCH_COUNT)
+                while (batchCount++ < MAX_BATCH_COUNT && !peersChannel.isEmpty) {
+                    val peer = peersChannel.receive()
+                    val result = peer to async {
+                        withTimeoutOrNull(QUERY_TIMEOUT) {
+                            DhtValueResult.decodeBoxed(peer.rawQuery(query))
                         }
-                        collector.emit(peer to result)
-                        result
                     }
-                }.takeWhile {
-                    batchCount++
-                    logger.debug { "Batch counter: $batchCount" }
-                    batchCount >= MAX_BATCH_COUNT
-                }.toList()
-                if (results.any { it.await() is DhtValueFound }) {
-                    logger.debug { "result found! stopping" }
-                    break
+                    results.add(result)
+                }
+                val nodes = ArrayList<DhtNode>()
+                for ((peer, asyncValue) in results) {
+                    val value = asyncValue.await()
+                    logger.debug { "receive value: ${value?.javaClass?.simpleName} - $peer" }
+                    println("found in: ${Dht.affinity(key, peer.dhtNode.id.toAdnlIdShort().id)}")
+                    collector.emit(peer to value)
+                    if (value is DhtValueFound) {
+                        return@coroutineScope
+                    } else if (value is DhtValueNotFound) {
+                        nodes.addAll(value.nodes)
+                    }
+                }
+                val affinityNodes = nodes.map {
+                    val nodeId = it.id.toAdnlIdShort().id
+                    val affinity = Dht.affinity(key, nodeId)
+                    it to affinity
+                }.sortedByDescending { it.second }
+                var added = 0
+                val iterator = affinityNodes.iterator()
+                while (added < MAX_BATCH_COUNT && iterator.hasNext()) {
+                    val (node, affinity) = iterator.next()
+                    if (addNode(node)) {
+                        added++
+                    }
                 }
             }
         }
 
-    private suspend fun peerQuery(peer: DhtPeer): DhtValueResult? {
-        return withTimeoutOrNull(QUERY_TIMEOUT) {
-            val rawResult = peer.rawQuery(query)
-            DhtValueResult.decodeBoxed(rawResult)
-        }
-    }
 
-    private suspend fun addNode(node: DhtNode) {
-        val peer = DhtPeer(node)
-        if (peer != null) {
-            addPeer(peer)
+    private fun addNode(node: DhtNode): Boolean {
+        val id = node.id.toAdnlIdShort()
+        return if (knownPeers.add(id)) {
+            logger.debug { "New peer added: $id" }
+            DhtPeer(node)?.let {
+                peersChannel.trySend(it)
+            }
+            true
+        } else {
+            logger.debug { "Already known: $node" }
+            false
         }
-    }
-
-    private suspend fun addPeer(peer: DhtPeer) {
-        logger.debug { "Adding new peer: $peer" }
-        peersChannel.send(peer)
     }
 }

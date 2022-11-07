@@ -15,20 +15,18 @@ import org.ton.tl.TlConstructor
 data class PrivateKeyAes(
     val key: ByteArray
 ) : PrivateKey, Decryptor by DecryptorAes(key) {
+    private val _hashCode by lazy { key.contentHashCode() }
+
     override fun publicKey() = PublicKeyAes(key)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PrivateKeyAes
-
+        if (other !is PrivateKeyAes) return false
         if (!key.contentEquals(other.key)) return false
-
         return true
     }
 
-    override fun hashCode(): Int = key.contentHashCode()
+    override fun hashCode(): Int = _hashCode
     override fun toString(): String = toAdnlIdShort().toString()
 
     companion object : TlConstructor<PrivateKeyAes>(

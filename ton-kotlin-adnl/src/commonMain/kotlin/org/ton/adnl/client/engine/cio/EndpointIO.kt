@@ -55,8 +55,8 @@ internal suspend fun readAnswer(
     } catch (e: Exception) {
         throw IOException("Can't parse ADNL answer for query: $query", e)
     }
-    check(answer.query_id.contentEquals(query.query_id)) {
-        "query_id mismatch, expected: ${query.query_id.encodeHex()} actual: ${answer.query_id.encodeHex()}"
+    check(answer.query_id == query.query_id) {
+        "query_id mismatch, expected: ${query.query_id} actual: ${answer.query_id}"
     }
     return@withContext answer
 }

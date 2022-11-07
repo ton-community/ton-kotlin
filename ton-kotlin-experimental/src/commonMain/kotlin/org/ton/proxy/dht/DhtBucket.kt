@@ -3,13 +3,14 @@ package org.ton.proxy.dht
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
-import kotlin.experimental.and
+import org.ton.proxy.dht.Dht.Companion.AFFINITY_BITS
+import org.ton.proxy.dht.Dht.Companion.affinity
 import kotlin.experimental.xor
 
 class DhtBucket(
     val localId: AdnlIdShort,
     buckets: Array<MutableMap<AdnlIdShort, DhtNode>> = Array(256) { HashMap() }
-) : Iterable<Map<AdnlIdShort, DhtNode>>{
+) : Iterable<Map<AdnlIdShort, DhtNode>> {
     private val _buckets = buckets
     val buckets: List<Map<AdnlIdShort, DhtNode>> get() = _buckets.toList()
 
@@ -51,7 +52,7 @@ class DhtBucket(
                     xor = xor shl 4
                 } else {
                     // Get equal bits count
-                    val shift = BITS[xor shr 4]
+                    val shift = AFFINITY_BITS[xor shr 4]
                     subDistance += shift
 
                     // Add nodes from the bucket
@@ -79,26 +80,5 @@ class DhtBucket(
         }
 
         return DhtNodes(nodes)
-    }
-    
-    companion object {
-        private val BITS = intArrayOf(4, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
-
-        fun affinity(key1: ByteArray, key2: ByteArray): Int {
-            var result = 0
-            for (i in 0 until 32) {
-                val x = key1[i] xor key2[i]
-                result += if (x == 0.toByte()) {
-                    8
-                } else {
-                    if (x and 0xF0.toByte() == 0.toByte()) {
-                        BITS[(x.toUInt() and 0x0Fu).toInt()] + 4
-                    } else {
-                        BITS[(x.toUInt() shr 4).toInt()]
-                    }
-                }
-            }
-            return 0
-        }
     }
 }

@@ -2,6 +2,7 @@ package org.ton.api.dht
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.SignedTlObject
 import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlNode
@@ -19,6 +20,7 @@ import org.ton.tl.readTl
 import org.ton.tl.writeTl
 
 @Serializable
+@JsonClassDiscriminator("@type")
 data class DhtNode(
     val id: PublicKey,
     val addr_list: AdnlAddressList,

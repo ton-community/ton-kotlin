@@ -1,31 +1,33 @@
+@file:Suppress("OPT_IN_USAGE", "PropertyName")
+
 package org.ton.api.validator.config
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.readVectorTl
 import org.ton.tl.constructors.writeVectorTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
 
-@SerialName("validator.config.global")
 @Serializable
+@SerialName("validator.config.global")
+@JsonClassDiscriminator("@type")
 data class ValidatorConfigGlobal(
-    @SerialName("zero_state")
-    val zeroState: TonNodeBlockIdExt = TonNodeBlockIdExt(),
-    @SerialName("init_block")
-    val initBlock: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val zero_state: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val init_block: TonNodeBlockIdExt = TonNodeBlockIdExt(),
     val hardforks: List<TonNodeBlockIdExt> = listOf()
-) {
+) : TlObject<ValidatorConfigGlobal> {
+    override fun tlCodec(): TlCodec<ValidatorConfigGlobal> = Companion
+
     companion object : TlConstructor<ValidatorConfigGlobal>(
         type = ValidatorConfigGlobal::class,
         schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
     ) {
         override fun encode(output: Output, value: ValidatorConfigGlobal) {
-            output.writeTl(TonNodeBlockIdExt, value.zeroState)
-            output.writeTl(TonNodeBlockIdExt, value.initBlock)
+            output.writeTl(TonNodeBlockIdExt, value.zero_state)
+            output.writeTl(TonNodeBlockIdExt, value.init_block)
             output.writeVectorTl(value.hardforks, TonNodeBlockIdExt)
         }
 

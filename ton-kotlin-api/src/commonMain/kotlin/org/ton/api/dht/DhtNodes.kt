@@ -2,6 +2,7 @@ package org.ton.api.dht
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlNodes
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -10,8 +11,9 @@ import org.ton.tl.constructors.readVectorTl
 import org.ton.tl.constructors.writeVectorTl
 
 @Serializable
+@JsonClassDiscriminator("@type")
 data class DhtNodes(
-    val nodes: List<DhtNode>
+    val nodes: List<DhtNode> = emptyList()
 ) : TlObject<DhtNodes>, List<DhtNode> by nodes {
     fun toAdnlNodes(): AdnlNodes = AdnlNodes(nodes.map { it.toAdnlNode() })
 

@@ -1,8 +1,11 @@
+@file:Suppress("OPT_IN_USAGE", "PropertyName")
+
 package org.ton.api.dht.config
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
 import org.ton.tl.TlConstructor
@@ -12,13 +15,13 @@ import org.ton.tl.constructors.writeIntTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
 
-@SerialName("dht.config.global")
 @Serializable
+@SerialName("dht.config.global")
+@JsonClassDiscriminator("@type")
 data class DhtConfigGlobal(
-    @SerialName("static_nodes")
-    val staticNodes: DhtNodes,
-    val k: Int,
-    val a: Int
+    val static_nodes: DhtNodes = DhtNodes(),
+    val k: Int = 0,
+    val a: Int = 0
 ) : TlObject<DhtConfigGlobal> {
     constructor(
         staticNodes: List<DhtNode>,
@@ -33,7 +36,7 @@ data class DhtConfigGlobal(
         schema = "dht.config.global static_nodes:dht.nodes k:int a:int = dht.config.Global"
     ) {
         override fun encode(output: Output, value: DhtConfigGlobal) {
-            output.writeTl(value.staticNodes)
+            output.writeTl(value.static_nodes)
             output.writeIntTl(value.k)
             output.writeIntTl(value.a)
         }

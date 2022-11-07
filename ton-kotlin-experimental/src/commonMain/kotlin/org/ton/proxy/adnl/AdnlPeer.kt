@@ -5,11 +5,14 @@ import io.ktor.network.sockets.*
 import io.ktor.util.collections.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.datetime.Clock
 import org.ton.adnl.ipv4
 import org.ton.adnl.packet.AdnlHandshakePacket
 import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlAddressUdp
+import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessageAnswer
@@ -17,33 +20,37 @@ import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKey
 import org.ton.bitstring.BitString
-import org.ton.crypto.encodeHex
 import org.ton.tl.TLFunction
 import org.ton.tl.TlObject
-import kotlin.coroutines.resume
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 open class AdnlPeer(
     val address: AdnlAddressUdp,
     val key: PublicKey
-) : AdnlPacketReceiver {
+) : AdnlPacketReceiver, CoroutineScope, Closeable {
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
     private val startTime = Clock.System.now()
-    internal val localKey = PrivateKeyEd25519()
+    private val localKey = AtomicReference(PrivateKeyEd25519())
+    private val localId = AtomicReference(localKey.get().toAdnlIdShort())
     private val queries = ConcurrentMap<BitString, CompletableDeferred<AdnlMessageAnswer>>()
     private val receiverState = PeerState.receiver(startTime)
     private val senderState = PeerState.sender()
     private val socketAddress = InetSocketAddress(ipv4(address.ip), address.port)
-    private val socket = aSocket(SelectorManager()).udp().configure {
-        reusePort = true
-    }.bind()
-
-    fun start() = GlobalScope.launch {
+    private val job = launch {
         while (isActive) {
-            val packet = receivePacket()
-            receivePacket(packet)
+            receive.collectLatest { (adnlId, datagram) ->
+                launch {
+                    if (localId.get() == adnlId) {
+                        receiveDatagram(datagram)
+                    } else {
+//                        println("expected: ${localId.get()}, actual: $adnlId")
+                    }
+                }
+            }
         }
     }
 
@@ -53,61 +60,42 @@ open class AdnlPeer(
         deferred?.complete(message)
     }
 
-    private suspend fun receiveDatagram(): Datagram = socket.receive()
-
-    private suspend fun receivePacket(): AdnlPacketContents = coroutineScope {
-        var packet: AdnlPacketContents? = null
-        while (isActive && packet == null) {
-            val datagram = receiveDatagram()
-            packet = receiveDatagram(datagram)
-        }
-        return@coroutineScope suspendCancellableCoroutine {
-            if (packet != null) {
-                it.resume(packet)
-            } else {
-                it.cancel()
-            }
-        }
+    private fun receiveDatagram(datagram: Datagram) {
+        val encryptedData = datagram.packet.readBytes()
+        val decryptedData = localKey.get().decrypt(encryptedData)
+        val packet = AdnlPacketContents.decodeBoxed(decryptedData)
+        receivePacket(packet)
     }
 
-    private fun receiveDatagram(datagram: Datagram): AdnlPacketContents? {
-        val receiverId = datagram.packet.readBytes(32)
-        if (receiverId.contentEquals(localKey.toAdnlIdShort().id)) {
-            val encryptedData = datagram.packet.readBytes()
-            val decryptedData = localKey.decrypt(encryptedData)
-            return AdnlPacketContents.decodeBoxed(decryptedData)
-        }
-        return null
-    }
-
-    suspend fun <Q : TLFunction<Q, A>, A : TlObject<A>> query(query: Q): A {
+    suspend fun <Q : TLFunction<Q, A>, A : TlObject<A>> query(
+        query: Q,
+        id: ByteArray = randomQueryId(),
+        timeout: Duration = 1.seconds,
+        maxAnswerSize: Long = DEFAULT_MTU
+    ): A {
         val queryData = query.toByteArray()
-        val answerData = rawQuery(queryData)
+        val answerData = rawQuery(queryData, id, timeout, maxAnswerSize)
         return query.resultTlCodec().decodeBoxed(answerData)
     }
 
-    suspend fun rawQuery(query: ByteArray): ByteArray {
-        val queryIdRaw = Random.nextBytes(32)
-        val queryId = BitString(queryIdRaw)
-        val queryMessage = AdnlMessageQuery(queryIdRaw, query)
+    open suspend fun rawQuery(
+        query: ByteArray,
+        id: ByteArray = randomQueryId(),
+        timeout: Duration = 5.seconds,
+        maxAnswerSize: Long = DEFAULT_MTU
+    ): ByteArray {
+        val queryId = BitString(id)
+        val queryMessage = AdnlMessageQuery(queryId, query)
         val deferred = CompletableDeferred<AdnlMessageAnswer>()
         queries[queryId] = deferred
         return try {
-            coroutineScope {
-                while (isActive) {
-                    try {
-                        sendQuery(queryMessage)
-                        return@coroutineScope withTimeout(500.milliseconds) {
-                            deferred.await().answer
-                        }
-                    } catch (e: TimeoutCancellationException) {
-                        println("retry query: $queryId")
-                    }
-                }
-                throw CancellationException()
+            sendQuery(queryMessage)
+            withTimeout(timeout) {
+                deferred.await().answer
             }
         } finally {
             queries.remove(queryId)
+            setLocalKey(PrivateKeyEd25519())
         }
     }
 
@@ -135,7 +123,7 @@ open class AdnlPeer(
             expire_at = (now + ADDRESS_LIST_TIMEOUT).epochSeconds.toInt()
         )
         val packet = AdnlPacketContents(
-            from = if (channel == null) localKey.publicKey() else null,
+            from = if (channel == null) localKey.get().publicKey() else null,
             messages = if (messages.size > 1) messages else null,
             message = if (messages.size == 1) messages.first() else null,
             address = addressList,
@@ -154,7 +142,7 @@ open class AdnlPeer(
 
         val data = if (channel == null) {
             val handshake = AdnlHandshakePacket(
-                packet.signed(localKey),
+                packet.signed(localKey.get()),
                 key
             )
             handshake.build()
@@ -169,7 +157,32 @@ open class AdnlPeer(
         socket.send(datagram)
     }
 
+    private fun setLocalKey(key: PrivateKeyEd25519) {
+        localKey.set(key)
+        localId.set(key.toAdnlIdShort())
+    }
+
+    override fun close() {
+        job.cancel()
+        queries.clear()
+    }
+
     companion object {
+        val DEFAULT_MTU = 1024L
         val ADDRESS_LIST_TIMEOUT: Duration = 1000.seconds
+        private val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).udp().bind()
+        private val receive = MutableSharedFlow<Pair<AdnlIdShort, Datagram>>()
+        private val globalJob = GlobalScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                val datagram = socket.receive()
+                launch {
+                    val adnlId = AdnlIdShort.decode(datagram.packet)
+                    receive.emit(adnlId to datagram)
+                }
+            }
+        }
+
+        @JvmStatic
+        fun randomQueryId(): ByteArray = Random.nextBytes(32)
     }
 }

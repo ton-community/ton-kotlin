@@ -3,6 +3,9 @@ package org.ton.api.adnl.message
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.ton.api.JSON
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64
@@ -20,16 +23,13 @@ data class AdnlMessagePart(
     @Serializable(HexByteArraySerializer::class)
     val data: ByteArray
 ) : AdnlMessage {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AdnlMessagePart) return false
-
         if (total_size != other.total_size) return false
         if (offset != other.offset) return false
         if (!hash.contentEquals(other.hash)) return false
         if (!data.contentEquals(other.data)) return false
-
         return true
     }
 
@@ -41,29 +41,43 @@ data class AdnlMessagePart(
         return result
     }
 
-    override fun toString(): String = buildString {
-        append("AdnlMessagePart(hash=")
-        append(base64(hash))
-        append(", totalSize=")
-        append(total_size)
-        append(", offset=")
-        append(offset)
-        append(", data=")
-        append(base64(data))
-        append(")")
-    }
+    override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessagePart>(
-        AdnlMessagePart::class,
-        "adnl.message.part hash:int256 total_size:int offset:int data:bytes = adnl.Message;"
+       type =  AdnlMessagePart::class,
+        schema = "adnl.message.part hash:int256 total_size:int offset:int data:bytes = adnl.Message;",
+        fields = listOf(Int256TlConstructor, IntTlConstructor, IntTlConstructor, BytesTlConstructor)
     ) {
-        override fun decode(
-            input: Input
-        ): AdnlMessagePart {
-            val hash = input.readInt256Tl()
-            val totalSize = input.readIntTl()
-            val offset = input.readIntTl()
-            val data = input.readBytesTl()
+        fun sizeOf(value: AdnlMessagePart): Int =
+            Int256TlConstructor.SIZE_BYTES +
+            IntTlConstructor.SIZE_BYTES +
+            IntTlConstructor.SIZE_BYTES +
+            BytesTlConstructor.sizeOf(value.data)
+
+        fun build(message: AdnlMessage, maxSize: Int): List<AdnlMessagePart> {
+            val data = message.toByteArray()
+            val hash = message.hash()
+            var offset = 0
+            val parts = ArrayList<AdnlMessagePart>()
+            while (offset < data.size) {
+                val partSize = minOf(maxSize, data.size - offset)
+                val part = AdnlMessagePart(
+                    hash = hash,
+                    total_size = data.size,
+                    offset = offset,
+                    data = data.copyOfRange(offset, offset + partSize)
+                )
+                parts.add(part)
+                offset += partSize
+            }
+            return parts
+        }
+
+        override fun decode(values: Iterator<*>): AdnlMessagePart {
+            val hash = values.next() as ByteArray
+            val totalSize = values.next() as Int
+            val offset = values.next() as Int
+            val data = values.next() as ByteArray
             return AdnlMessagePart(hash, totalSize, offset, data)
         }
 

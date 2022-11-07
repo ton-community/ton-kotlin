@@ -6,6 +6,8 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
 import org.ton.crypto.Base64ByteArraySerializer
@@ -50,6 +52,8 @@ data class AdnlAddressUdp(
             return AdnlAddressUdp(ip, port)
         }
     }
+
+    override fun toString(): String = Json.encodeToString(this)
 }
 
 @JsonClassDiscriminator("@type")

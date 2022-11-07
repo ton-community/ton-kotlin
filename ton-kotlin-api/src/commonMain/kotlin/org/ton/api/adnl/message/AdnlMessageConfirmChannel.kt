@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
@@ -5,23 +7,32 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
-import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import kotlinx.datetime.Instant
+import kotlinx.serialization.encodeToString
+import org.ton.api.JSON
+import org.ton.bitstring.BitString
+import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.confirmChannel")
 @Serializable
 data class AdnlMessageConfirmChannel(
-    @Serializable(Base64ByteArraySerializer::class)
-    val key: ByteArray,
-    @SerialName("peer_key")
-    @Serializable(Base64ByteArraySerializer::class)
-    val peerKey: ByteArray,
+    val key: BitString,
+    val peer_key: BitString,
     val date: Int
 ) : AdnlMessage {
+    constructor(
+        key: BitString,
+        peerKey: BitString,
+        date: Instant
+    ) : this(key, peerKey, date.epochSeconds.toInt())
+
+    init {
+        require(key.size == 256) { "Invalid key size. expected: 256, actual: ${key.size}" }
+        require(peer_key.size == 256) { "Invalid peer_key size. expected: 256, actual: ${peer_key.size}" }
+    }
+
+    fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -29,45 +40,40 @@ data class AdnlMessageConfirmChannel(
 
         other as AdnlMessageConfirmChannel
 
-        if (!key.contentEquals(other.key)) return false
-        if (!peerKey.contentEquals(other.peerKey)) return false
+        if (key != other.key) return false
+        if (peer_key != other.peer_key) return false
         if (date != other.date) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = key.contentHashCode()
-        result = 31 * result + peerKey.contentHashCode()
+        var result = key.hashCode()
+        result = 31 * result + peer_key.hashCode()
         result = 31 * result + date
         return result
     }
 
-    override fun toString(): String = buildString {
-        append("AdnlMessageConfirmChannel(key=")
-        append(base64(key))
-        append(", peerKey=")
-        append(base64(peerKey))
-        append(", date=")
-        append(date)
-        append(")")
-    }
+    override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageConfirmChannel>(
         type = AdnlMessageConfirmChannel::class,
-        schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message"
+        schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",
+        fields = listOf(Int256TlConstructor, Int256TlConstructor, IntTlConstructor)
     ) {
+        const val SIZE_BYTES = Int256TlConstructor.SIZE_BYTES + Int256TlConstructor.SIZE_BYTES + IntTlConstructor.SIZE_BYTES
+
         override fun encode(output: Output, value: AdnlMessageConfirmChannel) {
-            output.writeInt256Tl(value.key)
-            output.writeInt256Tl(value.peerKey)
+            output.writeInt256Tl(value.key.toByteArray())
+            output.writeInt256Tl(value.peer_key.toByteArray())
             output.writeIntTl(value.date)
         }
 
-        override fun decode(input: Input): AdnlMessageConfirmChannel {
-            val key = input.readInt256Tl()
-            val peerKey = input.readInt256Tl()
-            val date = input.readIntTl()
-            return AdnlMessageConfirmChannel(key, peerKey, date)
+        override fun decode(values: Iterator<*>): AdnlMessageConfirmChannel {
+            val key = values.next() as ByteArray
+            val peerKey = values.next() as ByteArray
+            val date = values.next() as Int
+            return AdnlMessageConfirmChannel(BitString(key), BitString(peerKey), date)
         }
     }
 }

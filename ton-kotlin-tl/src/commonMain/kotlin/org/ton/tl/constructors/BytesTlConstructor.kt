@@ -11,6 +11,19 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
     type = typeOf<ByteArray>(),
     schema = "bytes data:string = Bytes"
 ) {
+    fun sizeOf(value: ByteArray): Int {
+        var size = value.size
+        size += if (size < 254) {
+            1
+        } else if (size < (1 shl 24)) {
+            4
+        } else {
+            8
+        }
+        size += size % 4
+        return size
+    }
+
     override fun decode(input: Input): ByteArray {
         var resultLength = input.readUByte().toInt()
         var resultAlignedLength: Int

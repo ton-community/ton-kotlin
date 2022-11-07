@@ -24,6 +24,8 @@ interface PrivateKeyEd25519 : PrivateKey {
 
     override fun publicKey(): PublicKeyEd25519
 
+    fun sharedKey(publicKey: PublicKeyEd25519): ByteArray
+
     companion object : TlCodec<PrivateKeyEd25519> by PrivateKeyEd25519TlConstructor {
         const val KEY_SIZE = 32
 
@@ -60,6 +62,8 @@ private class PrivateKeyEd25519Impl(
     override val key: ByteArray get() = _key.copyOf()
 
     override fun publicKey(): PublicKeyEd25519 = _publicKey
+
+    override fun sharedKey(publicKey: PublicKeyEd25519): ByteArray = Ed25519.sharedKey(_key, publicKey.key)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

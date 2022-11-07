@@ -73,8 +73,6 @@ data class DhtKey(
 
         override fun decode(input: Input): DhtKey {
             val id = input.readInt256Tl()
-            println(id.encodeBase64())
-            println(id.encodeHex())
             val name = input.readBytesTl().decodeToString()
             val idx = input.readIntTl()
             return DhtKey(id, name, idx)

@@ -1,22 +1,26 @@
+@file:Suppress("OPT_IN_USAGE")
+
 package org.ton.api.config
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.config.AdnlConfigGlobal
 import org.ton.api.dht.config.DhtConfigGlobal
 import org.ton.api.validator.config.ValidatorConfigGlobal
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
-@SerialName("config.global")
 @Serializable
+@SerialName("config.global")
+@JsonClassDiscriminator("@type")
 data class ConfigGlobal(
-    val adnl: AdnlConfigGlobal,
-    val dht: DhtConfigGlobal,
-    val validator: ValidatorConfigGlobal
-) {
+    val adnl: AdnlConfigGlobal = AdnlConfigGlobal(),
+    val dht: DhtConfigGlobal = DhtConfigGlobal(),
+    val validator: ValidatorConfigGlobal = ValidatorConfigGlobal()
+) : TlObject<ConfigGlobal> {
+    override fun tlCodec(): TlCodec<ConfigGlobal> = Companion
+
     companion object : TlConstructor<ConfigGlobal>(
         type = ConfigGlobal::class,
         schema = "config.global adnl:adnl.config.global dht:dht.config.global validator:validator.config.global = config.Global"

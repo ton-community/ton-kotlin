@@ -84,8 +84,9 @@ data class PublicKeyAes(
     @Serializable(Base64ByteArraySerializer::class)
     val key: ByteArray
 ) : PublicKey, Encryptor by EncryptorAes(key) {
+    private val _adnlIdShort by lazy { AdnlIdShort(hash(this)) }
 
-    override fun toAdnlIdShort() = AdnlIdShort(PublicKeyAes.hash(this))
+    override fun toAdnlIdShort() = _adnlIdShort
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

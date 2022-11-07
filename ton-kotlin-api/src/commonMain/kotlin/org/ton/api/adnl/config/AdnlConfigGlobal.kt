@@ -11,15 +11,14 @@ import org.ton.tl.writeTl
 @SerialName("adnl.config.global")
 @Serializable
 data class AdnlConfigGlobal(
-    @SerialName("static_nodes")
-    val staticNodes: AdnlNodes
+    val static_nodes: AdnlNodes = AdnlNodes()
 ) {
     companion object : TlConstructor<AdnlConfigGlobal>(
         type = AdnlConfigGlobal::class,
         schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
     ) {
         override fun encode(output: Output, value: AdnlConfigGlobal) {
-            output.writeTl(AdnlNodes, value.staticNodes)
+            output.writeTl(AdnlNodes, value.static_nodes)
         }
 
         override fun decode(input: Input): AdnlConfigGlobal {

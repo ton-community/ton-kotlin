@@ -17,11 +17,14 @@ abstract class TlConstructor<T : Any>(
     val id: Int = crc32(schema),
     val fields: List<TlCodec<*>> = emptyList()
 ) : TlCodec<T> {
-    constructor(type: KClass<T>, schema: String, id: Int = crc32(schema
-        .replace("(", "")
-        .replace(")", "")
-        .replace(";", "")
-    ), fields: List<TlCodec<*>> = listOf()) : this(
+    constructor(
+        type: KClass<T>, schema: String, id: Int = crc32(
+            schema
+                .replace("(", "")
+                .replace(")", "")
+                .replace(";", "")
+        ), fields: List<TlCodec<*>> = listOf()
+    ) : this(
         type.createType(),
         schema,
         id,

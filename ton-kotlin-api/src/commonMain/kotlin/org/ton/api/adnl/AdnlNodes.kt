@@ -8,7 +8,7 @@ import org.ton.tl.constructors.writeVectorTl
 
 @Serializable
 data class AdnlNodes(
-    val nodes: List<AdnlNode>
+    val nodes: List<AdnlNode> = emptyList()
 ) : Iterable<AdnlNode> by nodes {
     companion object : TlConstructor<AdnlNodes>(
         type = AdnlNodes::class,

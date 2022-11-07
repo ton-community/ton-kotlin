@@ -1,25 +1,24 @@
 package org.ton.crypto.ed25519
 
+import io.github.andreypfau.curve25519.ed25519.Ed25519
+import io.github.andreypfau.curve25519.ed25519.Ed25519PrivateKey
 import io.github.andreypfau.curve25519.ed25519.Ed25519PublicKey
-import io.github.andreypfau.curve25519.x25519.X25519
 import org.ton.crypto.Encryptor
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.aes.EncryptorAes
-import org.ton.crypto.ed25519.Ed25519.convertToEd25519
-import org.ton.crypto.encodeHex
 
 class EncryptorEd25519(
-    publicKey: ByteArray
+    val publicKey: Ed25519PublicKey,
+    val privateKey: Ed25519PrivateKey? = null
 ) : Encryptor {
-    private val publicKey = Ed25519PublicKey(publicKey)
+    constructor(data: ByteArray) : this(Ed25519PublicKey(data))
 
     override fun encrypt(data: ByteArray): ByteArray {
-        val privateKey = Ed25519.privateKey(SecureRandom)
-        val decryptionKey = convertToEd25519(X25519.x25519(privateKey))
-        val secret = X25519.x25519(privateKey, X25519.toX25519(publicKey))
-        val aes = EncryptorAes(secret)
-        val encryptedData = aes.encrypt(data)
-        return decryptionKey + encryptedData
+        val privateKey = privateKey ?: Ed25519.generateKey(SecureRandom)
+        val sharedKey = privateKey.sharedKey(publicKey)
+        val aes = EncryptorAes(sharedKey)
+        val encrypted = aes.encrypt(data)
+        return privateKey.publicKey().toByteArray() + encrypted
     }
 
     override fun verify(message: ByteArray, signature: ByteArray?): Boolean {

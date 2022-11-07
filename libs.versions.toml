@@ -7,6 +7,7 @@ serialization = "1.4.1"
 ktor = "2.1.3"
 bouncycastle = "1.70"
 curve25519 = "0.0.4"
+raptorq = "1.0-SNAPSHOT"
 mockk = "1.12.4"
 kotlinio = "db57f3e429"
 
@@ -28,5 +29,6 @@ ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bouncycastle" }
 curve25519 = { module = "io.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
+raptorq = { module = "io.github.andreypfau:raptorq-kotlin", version.ref = "raptorq" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlinio-base64 = { module = "com.github.andreypfau.kotlinio:kotlinio-base64", version.ref = "kotlinio" }

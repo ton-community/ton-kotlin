@@ -9,7 +9,5 @@ enum class DnsCategory(
     WALLET("wallet"),
     SITE("site");
 
-    constructor(name: String) : this(BigInt(sha256(name.toByteArray()).also {
-        println("name=$name "+it.contentToString())
-    }))
+    constructor(name: String) : this(BigInt(sha256(name.toByteArray())))
 }

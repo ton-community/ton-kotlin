@@ -35,7 +35,7 @@ interface AdnlMessageReceiver {
     }
 
     fun receiveNop(message: AdnlMessageNop) {
-        // NOP.
+
     }
 
     fun receivePart(message: AdnlMessagePart) {

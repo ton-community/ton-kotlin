@@ -2,6 +2,8 @@ package org.ton.proxy.dht.state
 
 import io.ktor.util.collections.*
 import org.ton.api.adnl.AdnlIdShort
+import org.ton.logger.Logger
+import org.ton.logger.PrintLnLogger
 import org.ton.proxy.dht.DhtBucket
 import org.ton.proxy.dht.DhtPeer
 import org.ton.proxy.dht.storage.DhtStorage
@@ -11,15 +13,16 @@ abstract class AbstractDhtState(
 ) : DhtState {
     abstract val buckets: DhtBucket?
     abstract val storage: DhtStorage?
+    override val badPeers = ConcurrentMap<AdnlIdShort, Int>()
 
-    val penalties = ConcurrentMap<AdnlIdShort, Int>()
+    private val logger = PrintLnLogger("DhtState", Logger.Level.DEBUG)
 
     override fun addPeer(peer: DhtPeer): AdnlIdShort {
         val peerKey = peer.key
         val peerId = peerKey.toAdnlIdShort()
 
         if (knownPeers.add(peer)) {
-            peer.start()
+            logger.debug { "Add new peer: $peer" }
             buckets?.set(peerId, peer.dhtNode)
         } else {
             setGoodPeer(peerId)
@@ -32,21 +35,23 @@ abstract class AbstractDhtState(
         if (isGood) {
             setGoodPeer(peer)
         } else {
-            val value = penalties[peer]
+            val value = badPeers[peer]
             if (value == null) {
-                penalties[peer] = 0
+                badPeers[peer] = 0
             } else {
-                penalties[peer] = value + 2
+                badPeers[peer] = value + 2
             }
+            logger.debug { "Bad peer: ${badPeers[peer]}" }
         }
     }
 
     override fun setGoodPeer(peer: AdnlIdShort) {
-        val value = penalties[peer] ?: return
+        logger.debug { "Good peer: $peer" }
+        val value = badPeers[peer] ?: return
         if (value <= 1) {
-            penalties.remove(peer)
+            badPeers.remove(peer)
         } else {
-            penalties[peer] = value - 1
+            badPeers[peer] = value - 1
         }
     }
 }

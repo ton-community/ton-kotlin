@@ -3,6 +3,7 @@
 package org.ton.api.pub
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
@@ -14,11 +15,13 @@ import org.ton.crypto.ed25519.EncryptorEd25519
 import org.ton.crypto.hex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.constructors.Int256TlConstructor
 
 inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519) = PublicKeyEd25519.of(privateKey)
 
 @Serializable
 @SerialName("pub.ed25519")
+@Polymorphic
 data class PublicKeyEd25519(
     @Serializable(Base64ByteArraySerializer::class)
     val key: ByteArray
@@ -57,7 +60,8 @@ data class PublicKeyEd25519(
 
 private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
     type = PublicKeyEd25519::class,
-    schema = "pub.ed25519 key:int256 = PublicKey"
+    schema = "pub.ed25519 key:int256 = PublicKey",
+    fields = listOf(Int256TlConstructor)
 ) {
     override fun encode(output: Output, value: PublicKeyEd25519) {
         output.writeFully(value.key)
@@ -65,6 +69,11 @@ private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
 
     override fun decode(input: Input): PublicKeyEd25519 {
         val key = input.readBytes(32)
+        return PublicKeyEd25519(key)
+    }
+
+    override fun decode(values: Iterator<*>): PublicKeyEd25519 {
+        val key = values.next() as ByteArray
         return PublicKeyEd25519(key)
     }
 }

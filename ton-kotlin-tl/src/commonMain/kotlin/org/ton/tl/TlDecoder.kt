@@ -8,7 +8,7 @@ interface TlDecoder<T : Any> {
     fun decode(byteArray: ByteArray): T = decode(ByteReadPacket(byteArray))
     fun decode(input: Input): T
     suspend fun decode(input: ByteReadChannel): T = TODO()
-    fun decode(values: Iterator<*>): T = TODO()
+    fun decode(values: Iterator<*>): T = TODO(this.toString())
 
     fun decodeBoxed(byteArray: ByteArray): T = decodeBoxed(ByteReadPacket(byteArray))
     fun decodeBoxed(input: Input): T

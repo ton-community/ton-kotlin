@@ -58,7 +58,6 @@ class DnsResolver constructor(
     suspend fun resolve(host: String, category: DnsCategory, block: TonNodeBlockIdExt? = null): DnsRecord? {
         val encodedHost = encodeHostname(host)
         val currentBlock = block ?: blockIdCache.get(Unit) {
-            println("get last block...")
             liteClient.getLastBlockId()
         }
         return resolveCache(encodedHost, category, currentBlock)
@@ -93,7 +92,6 @@ class DnsResolver constructor(
     }
 
     private suspend fun resolveOrNull(encodedHost: String, block: TonNodeBlockIdExt): Map<BitString, DnsRecord>? {
-        println("EXECUTE $encodedHost - $resolverAddress")
         val vmStack = liteClient.runSmcMethod(
             resolverAddress,
             block,

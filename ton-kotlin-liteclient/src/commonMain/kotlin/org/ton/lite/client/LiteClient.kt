@@ -10,6 +10,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.adnl.client.engine.AdnlClientEngine
 import org.ton.adnl.client.engine.cio.CIOAdnlClientEngine
+import org.ton.api.dht.config.DhtConfigGlobal
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
@@ -50,7 +51,7 @@ open class LiteClient(
     )
 
     constructor(liteServer: LiteServerDesc, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
-        CIOAdnlClientEngine.create(), LiteClientConfigGlobal(listOf(liteServer), ValidatorConfigGlobal()), logger
+        CIOAdnlClientEngine.create(), LiteClientConfigGlobal(liteservers = listOf(liteServer)), logger
     )
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
@@ -75,7 +76,7 @@ open class LiteClient(
     private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
     private var zeroStateId: TonNodeZeroStateIdExt by atomic(
         TonNodeZeroStateIdExt(
-            liteClientConfigGlobal.validator.zeroState
+            liteClientConfigGlobal.validator.zero_state
         )
     )
     private var lastBlock: LiteServerBlockData? by atomic(null)

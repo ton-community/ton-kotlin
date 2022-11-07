@@ -3,6 +3,8 @@ package org.ton.api.adnl
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.encodeToString
+import org.ton.api.JSON
 import org.ton.api.SignedTlObject
 import org.ton.api.adnl.AdnlPacketContents.Companion.FLAG_ADDRESS
 import org.ton.api.adnl.AdnlPacketContents.Companion.FLAG_CONFIRM_SEQNO

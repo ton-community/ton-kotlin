@@ -28,6 +28,7 @@ allprojects {
 //    apply(plugin = "kotlinx-atomicfu")
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven("https://jitpack.io")
     }
