@@ -14,9 +14,9 @@ import org.ton.tl.writeTl
 @Serializable
 @SerialName("rldp.messagePart")
 data class RldpMessagePartData(
-    val transfer_id: BitString,
+    override val transfer_id: BitString,
     val fec_type: FecType,
-    val part: Int,
+    override val part: Int,
     val total_size: Long,
     val seqno: Int,
     val data: ByteArray

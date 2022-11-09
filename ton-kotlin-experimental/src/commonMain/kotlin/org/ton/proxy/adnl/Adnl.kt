@@ -7,6 +7,9 @@ import kotlinx.datetime.Clock
 import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
+import org.ton.api.pk.PrivateKey
+import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.api.pub.PublicKey
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.encodeHex
 import org.ton.logger.Logger
@@ -17,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class Adnl(
+open class Adnl(
     val networkEngine: AdnlNetworkEngine,
     val addressResolver: AdnlAddressResolver
 ) : CoroutineScope, AdnlSender {
@@ -63,20 +66,16 @@ class Adnl(
         networkEngine.sendDatagram(address, ByteReadPacket(payload))
     }
 
-    override suspend fun message(destination: AdnlIdShort, payload: ByteArray) {
-        val peer = getPeer(destination)
-        return peer.message(payload)
-    }
+    override suspend fun message(destination: AdnlIdShort, payload: ByteArray) =
+        getPeer(destination).message(payload)
 
     override suspend fun query(
         destination: AdnlIdShort,
         payload: ByteArray,
         timeout: Duration,
-        maxAnswerSize: Int
-    ): ByteArray {
-        val peer = getPeer(destination)
-        return peer.query(payload, timeout)
-    }
+        maxAnswerSize: Long
+    ): ByteArray =
+        getPeer(destination).query(payload, timeout)
 
     private fun <T> throwUnknownAddress(value: T?, adnlIdShort: AdnlIdShort): T = requireNotNull(value) {
         "Unknown address for $adnlIdShort"
@@ -84,14 +83,18 @@ class Adnl(
 
     suspend fun getPeer(destination: AdnlIdShort): AdnlPeerSession {
         val (publicKey, _) = throwUnknownAddress(addressResolver.resolve(destination), destination) // save in cache
-        require(publicKey is PublicKeyEd25519) { "Unsupported public key type: ${publicKey::class}" }
         val peer = remotePeer.getOrPut(destination) {
-            AdnlPeerSession(this, publicKey).also { peer ->
-                logger.debug { "Created session: $destination" }
-                localPeer[peer.localKey.toAdnlIdShort()] = peer
+            createPeer(publicKey, PrivateKeyEd25519()).also {
+                localPeer[it.localKey.toAdnlIdShort()] = it
             }
         }
         return peer
+    }
+
+    override fun createPeer(remoteKey: PublicKey, localKey: PrivateKey): AdnlPeerSession {
+        require(remoteKey is PublicKeyEd25519) { "Unsupported remote key type: ${remoteKey::class}" }
+        require(localKey is PrivateKeyEd25519) { "Unsupported local key type: ${localKey::class}" }
+        return object : AbstractAdnlPeerSession(this@Adnl, localKey, remoteKey) {}
     }
 
     private suspend fun receiveDatagram() {

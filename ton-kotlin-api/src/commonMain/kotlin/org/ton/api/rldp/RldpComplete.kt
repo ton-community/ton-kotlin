@@ -14,8 +14,8 @@ import org.ton.tl.constructors.writeIntTl
 @Serializable
 @SerialName("rldp.complete")
 data class RldpComplete(
-    val transfer_id: BitString,
-    val part: Int,
+    override val transfer_id: BitString,
+    override val part: Int,
 ) : RldpMessagePart {
     init {
         require(transfer_id.size == 256) { "Invalid transfer_id size; expected: 256, actual: ${transfer_id.size}" }

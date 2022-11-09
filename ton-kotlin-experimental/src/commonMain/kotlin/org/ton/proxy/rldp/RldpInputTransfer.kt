@@ -13,16 +13,11 @@ import org.ton.api.rldp.RldpMessagePartData
 import org.ton.bitstring.BitString
 import org.ton.proxy.rldp.fec.RaptorQFecDecoder
 
-interface RldpInputTransfer {
+interface RldpInputTransfer : RldpReceiver {
     val id: BitString
     val byteChannel: ByteReadChannel
 
-    fun receivePart(message: RldpMessagePart) = when (message) {
-        is RldpMessagePartData -> receivePart(message)
-        else -> throw IllegalArgumentException("Unsupported message type: ${message::class}")
-    }
-
-    fun receivePart(message: RldpMessagePartData)
+    override fun receiveRldpMessagePart(message: RldpMessagePart)
 
     fun transferPackets(): Flow<RldpMessagePart>
 
@@ -89,7 +84,14 @@ private class RldpInputTransferImpl(
         }
     }
 
-    override fun receivePart(message: RldpMessagePartData) {
+    override fun receiveRldpMessagePart(message: RldpMessagePart) {
+        when (message) {
+            is RldpMessagePartData -> receiveRldpMessagePartData(message)
+            else -> throw IllegalArgumentException("Unsupported message type: ${message::class}")
+        }
+    }
+
+    fun receiveRldpMessagePartData(message: RldpMessagePartData) {
         messagesChannel.trySend(message)
     }
 }

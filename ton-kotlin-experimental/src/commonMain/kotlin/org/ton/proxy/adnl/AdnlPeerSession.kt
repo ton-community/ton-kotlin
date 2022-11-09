@@ -23,40 +23,25 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlin.time.Duration
 
-inline fun AdnlPeerSession(
-    adnl: Adnl,
-    remoteKey: PublicKeyEd25519,
-    localKey: PrivateKeyEd25519 = PrivateKeyEd25519()
-) = AdnlPeerSession.of(adnl, remoteKey, localKey)
-
 interface AdnlPeerSession : CoroutineScope, AdnlPacketReceiver {
     val adnl: Adnl
     val localKey: PrivateKeyEd25519
     val remoteKey: PublicKeyEd25519
 
-    suspend fun query(payload: ByteArray, timeout: Duration): ByteArray
+    suspend fun query(payload: ByteArray, timeout: Duration, maxAnswerSize: Long = Int.MAX_VALUE.toLong()): ByteArray
 
     suspend fun message(payload: ByteArray)
 
     fun receiveDatagram(payload: ByteArray, channel: AdnlChannel?)
-
-    companion object {
-        @JvmStatic
-        fun of(
-            adnl: Adnl,
-            remoteKey: PublicKeyEd25519,
-            localKey: PrivateKeyEd25519 = PrivateKeyEd25519()
-        ): AdnlPeerSession = AdnlPeerSessionImpl(adnl, localKey, remoteKey)
-    }
 }
 
-private class AdnlPeerSessionImpl(
+abstract class AbstractAdnlPeerSession(
     override val adnl: Adnl,
     override val localKey: PrivateKeyEd25519,
     override val remoteKey: PublicKeyEd25519,
 ) : AdnlPeerSession {
     private var channel: AdnlChannel? by atomic(null)
-    private val logger = PrintLnLogger({ toString() }, Logger.Level.DEBUG)
+    private val logger = PrintLnLogger({ toString() }, Logger.Level.INFO)
     override val coroutineContext: CoroutineContext = adnl.coroutineContext + CoroutineName(toString())
 
     private val messagesQueue = Channel<AdnlMessage>()
@@ -136,24 +121,24 @@ private class AdnlPeerSessionImpl(
         super.receivePacket(packet)
     }
 
-    override fun receiveMessage(message: AdnlMessage) {
+    override fun receiveAdnlMessage(message: AdnlMessage) {
         logger.debug { "Received message: $message" }
-        super.receiveMessage(message)
+        super.receiveAdnlMessage(message)
     }
 
-    override fun receiveCreateChannel(message: AdnlMessageCreateChannel) {
+    override fun receiveAdnlCreateChannel(message: AdnlMessageCreateChannel) {
         val publicKey = PublicKeyEd25519(message.key.toByteArray())
         val date = message.date()
         createChannel(publicKey, date)
     }
 
-    override fun receiveConfirmChannel(message: AdnlMessageConfirmChannel) {
+    override fun receiveAdnlConfirmChannel(message: AdnlMessageConfirmChannel) {
         val publicKey = PublicKeyEd25519(message.key.toByteArray())
         val date = message.date()
         return confirmChannel(publicKey, date)
     }
 
-    override fun receiveAnswer(message: AdnlMessageAnswer) {
+    override fun receiveAdnlAnswer(message: AdnlMessageAnswer) {
         val queryDeferred = queries[message.query_id]
         if (queryDeferred != null) {
             queryDeferred.complete(message.answer)
@@ -162,7 +147,7 @@ private class AdnlPeerSessionImpl(
         }
     }
 
-    override fun receiveCustom(message: AdnlMessageCustom) {
+    override fun receiveAdnlCustom(message: AdnlMessageCustom) {
         logger.info { "Custom message: $message" }
     }
 
@@ -170,7 +155,7 @@ private class AdnlPeerSessionImpl(
         logger.info { "Nop message: $message" }
     }
 
-    override suspend fun query(payload: ByteArray, timeout: Duration): ByteArray {
+    override suspend fun query(payload: ByteArray, timeout: Duration, maxAnswerSize: Long): ByteArray {
         val queryId = BitString(Random.nextBytes(32))
         val query = AdnlMessageQuery(queryId, payload)
         val deferred = CompletableDeferred<ByteArray>()
@@ -298,7 +283,7 @@ private class AdnlPeerSessionImpl(
         receivePacket(packet)
     }
 
-    override fun toString(): String = "[$localKey<->$remoteKey, channel=${channel?.isReady}]"
+    override fun toString(): String = "ADNL[$localKey<->$remoteKey]"
 
     companion object {
         const val MTU = Adnl.MTU + 128

@@ -1,12 +1,9 @@
 package org.ton.proxy.rldp.fec
 
 import io.github.andreypfau.raptorq.RaptorQEncoder
-import io.ktor.util.*
 import io.ktor.utils.io.bits.*
-import io.ktor.utils.io.core.*
 import org.ton.api.fec.FecRaptorQ
 import org.ton.api.fec.FecType
-import org.ton.crypto.encodeHex
 
 interface FecEncoder {
     val fecType: FecType
@@ -21,11 +18,11 @@ class RaptorQFecEncoder(
         FecRaptorQ(
             data_size = totalSize,
             symbol_size = 768,
-            symbol_count = packets.size,
+            symbol_count = (totalSize + 768 - 1) / 768,
         ), packets
     )
 
-    constructor(data: ByteArray) : this(data.size, RaptorQEncoder(data, 768, 1).encode())
+    constructor(data: ByteArray) : this(data.size, RaptorQEncoder(data, 768, 5).encode())
 
     override fun encode(seqno: Int, output: ByteArray): Int {
         val packet = packets[seqno]

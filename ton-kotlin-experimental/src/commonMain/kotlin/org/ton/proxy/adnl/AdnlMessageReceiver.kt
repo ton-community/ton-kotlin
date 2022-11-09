@@ -3,34 +3,34 @@ package org.ton.proxy.adnl
 import org.ton.api.adnl.message.*
 
 interface AdnlMessageReceiver {
-    fun receiveMessage(message: AdnlMessage) = when (message) {
-        is AdnlMessageAnswer -> receiveAnswer(message)
-        is AdnlMessageConfirmChannel -> receiveConfirmChannel(message)
-        is AdnlMessageCreateChannel -> receiveCreateChannel(message)
-        is AdnlMessageCustom -> receiveCustom(message)
+    fun receiveAdnlMessage(message: AdnlMessage) = when (message) {
+        is AdnlMessageAnswer -> receiveAdnlAnswer(message)
+        is AdnlMessageConfirmChannel -> receiveAdnlConfirmChannel(message)
+        is AdnlMessageCreateChannel -> receiveAdnlCreateChannel(message)
+        is AdnlMessageCustom -> receiveAdnlCustom(message)
         is AdnlMessageNop -> receiveNop(message)
         is AdnlMessagePart -> receivePart(message)
-        is AdnlMessageQuery -> receiveQuery(message)
+        is AdnlMessageQuery -> receiveAdnlQuery(message)
         is AdnlMessageReinit -> receiveReinit(message)
     }
 
-    fun receiveConfirmChannel(message: AdnlMessageConfirmChannel) {
+    fun receiveAdnlConfirmChannel(message: AdnlMessageConfirmChannel) {
 
     }
 
-    fun receiveCreateChannel(message: AdnlMessageCreateChannel) {
+    fun receiveAdnlCreateChannel(message: AdnlMessageCreateChannel) {
 
     }
 
-    fun receiveCustom(message: AdnlMessageCustom) {
+    fun receiveAdnlCustom(message: AdnlMessageCustom) {
 
     }
 
-    fun receiveAnswer(message: AdnlMessageAnswer) {
+    fun receiveAdnlAnswer(message: AdnlMessageAnswer) {
 
     }
 
-    fun receiveQuery(message: AdnlMessageQuery) {
+    fun receiveAdnlQuery(message: AdnlMessageQuery) {
 
     }
 

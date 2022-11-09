@@ -5,7 +5,7 @@ import org.ton.api.adnl.AdnlPacketContents
 interface AdnlPacketReceiver : AdnlMessageReceiver {
     fun receivePacket(packet: AdnlPacketContents) {
         packet.messages().forEach {
-            receiveMessage(it)
+            receiveAdnlMessage(it)
         }
     }
 }

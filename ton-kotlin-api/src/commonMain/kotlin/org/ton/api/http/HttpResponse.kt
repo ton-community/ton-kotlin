@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.*
 
 @SerialName("http.response")
@@ -15,13 +16,15 @@ data class HttpResponse(
     val reason: String,
     val headers: List<HttpHeader>,
     val on_payload: Boolean
-) {
+) : TlObject<HttpResponse> {
+    override fun tlCodec(): TlCodec<HttpResponse> = Companion
+
     companion object : TlCodec<HttpResponse> by HttpResponseTlConstructor
 }
 
 private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
     type = HttpResponse::class,
-    schema = "http.response http_version:string status_code:int reason:string headers:(vector http.Header) on_payload:Bool = http.Response"
+    schema = "http.response http_version:string status_code:int reason:string headers:(vector http.header) no_payload:Bool = http.Response"
 ) {
     override fun decode(input: Input): HttpResponse {
         val http_version = input.readStringTl()

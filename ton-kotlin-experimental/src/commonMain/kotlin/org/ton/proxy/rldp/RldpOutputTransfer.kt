@@ -13,7 +13,7 @@ import org.ton.bitstring.BitString
 import org.ton.proxy.rldp.fec.RaptorQFecEncoder
 import kotlin.random.Random
 
-interface RldpOutputTransfer {
+interface RldpOutputTransfer : RldpReceiver {
     val id: BitString
     val totalSize: Long
 
@@ -21,7 +21,7 @@ interface RldpOutputTransfer {
 
     fun progress(): Flow<Double>
 
-    fun receivePart(message: RldpMessagePart)
+    override fun receiveRldpMessagePart(message: RldpMessagePart)
 
     companion object {
         @JvmStatic
@@ -78,7 +78,7 @@ private class RldOutputTransferImpl(
         }
     }
 
-    override fun receivePart(message: RldpMessagePart) {
+    override fun receiveRldpMessagePart(message: RldpMessagePart) {
         ackParts.trySend(message)
     }
 

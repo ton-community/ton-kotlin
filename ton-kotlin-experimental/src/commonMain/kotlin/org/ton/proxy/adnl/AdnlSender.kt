@@ -1,7 +1,9 @@
 package org.ton.proxy.adnl
 
 import org.ton.api.adnl.AdnlIdShort
-import org.ton.api.pub.PublicKeyEd25519
+import org.ton.api.pk.PrivateKey
+import org.ton.api.pub.PublicKey
+import org.ton.crypto.encodeHex
 import org.ton.tl.TLFunction
 import org.ton.tl.TlCodec
 import org.ton.tl.TlObject
@@ -18,7 +20,7 @@ interface AdnlSender {
         destination: AdnlIdShort,
         payload: ByteArray,
         timeout: Duration = 5.seconds,
-        maxAnswerSize: Int = Int.MAX_VALUE
+        maxAnswerSize: Long = Int.MAX_VALUE.toLong()
     ): ByteArray
 
     @Suppress("UNCHECKED_CAST")
@@ -26,7 +28,7 @@ interface AdnlSender {
         destination: AdnlIdShort,
         query: Q,
         timeout: Duration = 5.seconds,
-        maxAnswerSize: Int = Int.MAX_VALUE
+        maxAnswerSize: Long = Int.MAX_VALUE.toLong()
     ): A {
         val queryCodec = query.tlCodec() as TlCodec<Q>
         val answerCodec = query.resultTlCodec()
@@ -34,6 +36,15 @@ interface AdnlSender {
         val queryPayload = queryCodec.encodeBoxed(query)
         val answerPayload = query(destination, queryPayload, timeout, maxAnswerSize)
 
-        return answerCodec.decodeBoxed(answerPayload)
+        return try {
+            answerCodec.decodeBoxed(answerPayload)
+        } catch (e: Exception) {
+            throw IllegalStateException("Failed to decode answer: ${answerPayload.encodeHex()}", e)
+        }
     }
+
+    fun createPeer(
+        remoteKey: PublicKey,
+        localKey: PrivateKey
+    ): AdnlPeerSession
 }

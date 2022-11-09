@@ -1,35 +1,31 @@
 package org.ton.experimental
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.adnl.AdnlPacketContents
-import org.ton.api.adnl.message.AdnlMessageCreateChannel
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
-import org.ton.api.dht.functions.DhtPing
+import org.ton.api.http.HttpHeader
+import org.ton.api.http.functions.HttpRequest
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.api.pub.PublicKeyEd25519
+import org.ton.bitstring.BitString
 import org.ton.block.DnsAdnlAddress
-import org.ton.crypto.base64
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
-import org.ton.proxy.adnl.Adnl
 import org.ton.proxy.adnl.engine.CIOAdnlNetworkEngine
-import org.ton.proxy.adnl.resolver.AdnlAddressResolver
-import org.ton.proxy.adnl.resolver.MapAdnlAddressResolver
 import org.ton.proxy.dht.Dht
-import org.ton.proxy.dht.DhtPeer
 import org.ton.proxy.dns.DnsCategory
 import org.ton.proxy.dns.DnsResolver
 import org.ton.proxy.rldp.Rldp
 import java.io.File
+import kotlin.random.Random
 import kotlin.test.Test
 
 class Test {
@@ -48,28 +44,29 @@ class Test {
 
     @Test
     fun testPing() = runBlocking {
-        val privateKey = PrivateKeyEd25519(File("/Users/andreypfau/CLionProjects/ton/cmake-build-debug/dht-server/db/keyring/D6B538ADA6729B917DA714E3C1DE6A3F0E3807169A43B980849205FDF663EAD7").readBytes())
-        val publicKey = privateKey.publicKey()
-        println(publicKey.toAdnlIdShort().id.encodeHex())
-        val resolver = MapAdnlAddressResolver(
-            mapOf(
-                publicKey.toAdnlIdShort() to (publicKey to listOf(
-                    AdnlAddressUdp(2130706433, 3278)
-                ))
-            )
+        val liteClient = LiteClient(CONFIG_GLOBAL)
+        val dns = DnsResolver(liteClient)
+        val dht = Dht.lite(CONFIG_GLOBAL.dht.static_nodes)
+
+        val host = "foundation.ton"
+        val dnsRecord = dns.resolve(host, DnsCategory.SITE) as? DnsAdnlAddress ?: return@runBlocking
+        val siteAddr = AdnlIdShort(dnsRecord.adnl_addr)
+
+        val rldp = Rldp(CIOAdnlNetworkEngine(), dht)
+        val response = rldp.query(
+            siteAddr, HttpRequest(
+                id = BitString(Random.nextBytes(32)),
+                method = "GET",
+                url = "/",
+                http_version = "HTTP/1.1",
+                headers = listOf(
+                    HttpHeader("Host", host)
+                ),
+            ).also {
+                println(JSON.encodeToString(it))
+            }
         )
-        val adnl = Adnl(
-            CIOAdnlNetworkEngine(),
-            resolver
-        )
-//        val transfer = Rldp(
-//            adnl
-//        ).transfer(
-//            publicKey.toAdnlIdShort(),
-//            ByteArray(32) { 0xFF.toByte() }
-//        )
-//        transfer.job.start()
-//        delay(Long.MAX_VALUE)
+        println(JSON.encodeToString(response))
     }
 
     private fun loadNodes() = Json.decodeFromString<DhtNodes>(File("dht.json").readText())
@@ -101,14 +98,14 @@ class Test {
         val alicePrivate = PrivateKeyEd25519(ByteArray(32) { 0xFF.toByte() })
         val alicePublic = alicePrivate.publicKey()
 
-        println("alice secret "+alicePrivate.key.encodeHex())
-        println("alice public "+alicePublic.key.encodeHex())
+        println("alice secret " + alicePrivate.key.encodeHex())
+        println("alice public " + alicePublic.key.encodeHex())
 
         val bobPrivate = PrivateKeyEd25519(ByteArray(32) { 0x00.toByte() })
         val bobPublic = bobPrivate.publicKey()
 
-        println("bob secret "+bobPrivate.key.encodeHex())
-        println("bob public "+bobPublic.key.encodeHex())
+        println("bob secret " + bobPrivate.key.encodeHex())
+        println("bob public " + bobPublic.key.encodeHex())
 
         val original = "Hello, world!".toByteArray()
         val encrypted = alicePublic.encrypt(original)

@@ -14,8 +14,8 @@ import org.ton.tl.constructors.writeIntTl
 @Serializable
 @SerialName("rldp.confirm")
 data class RldpConfirm(
-    val transfer_id: BitString,
-    val part: Int,
+    override val transfer_id: BitString,
+    override val part: Int,
     val seqno: Int
 ) : RldpMessagePart {
     init {

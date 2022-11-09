@@ -27,6 +27,7 @@ class RldpTest {
         val output = newSingleThreadContext("RLDP output")
         val input = newSingleThreadContext("RLDP input")
 
+
         repeat(10) {
             val originalData = ByteArray(1024 * 1024 * 100)
 
@@ -36,7 +37,7 @@ class RldpTest {
             launch(output) {
                 outputTransfer.transferPackets().collect { part ->
                     launch {
-                        inputTransfer.receivePart(part)
+                        inputTransfer.receiveRldpMessagePart(part)
                     }
                 }
             }
@@ -44,10 +45,11 @@ class RldpTest {
             launch(input) {
                 inputTransfer.transferPackets().collect { part ->
                     launch {
-                        outputTransfer.receivePart(part)
+                        outputTransfer.receiveRldpMessagePart(part)
                     }
                 }
             }
+
 
             val (value, time) = measureTimedValue {
                 inputTransfer.byteChannel.discard()

@@ -54,7 +54,7 @@ open class AdnlPeer(
         }
     }
 
-    override fun receiveAnswer(message: AdnlMessageAnswer) {
+    override fun receiveAdnlAnswer(message: AdnlMessageAnswer) {
         val key = BitString(message.query_id)
         val deferred = queries[key]
         deferred?.complete(message)
