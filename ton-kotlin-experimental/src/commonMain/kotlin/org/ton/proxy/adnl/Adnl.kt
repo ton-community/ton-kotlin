@@ -25,7 +25,7 @@ open class Adnl(
     val addressResolver: AdnlAddressResolver
 ) : CoroutineScope, AdnlSender {
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName(toString())
-    private val logger = Logger.println(toString(), Logger.Level.DEBUG)
+    private val logger = Logger.println(toString(), Logger.Level.INFO)
     private val channels: MutableMap<AdnlIdShort, AdnlChannel> = ConcurrentMap()
     private val remotePeer: MutableMap<AdnlIdShort, AdnlPeerSession> = ConcurrentMap()
     private val localPeer: MutableMap<AdnlIdShort, AdnlPeerSession> = ConcurrentMap()
@@ -67,7 +67,7 @@ open class Adnl(
     }
 
     override suspend fun message(destination: AdnlIdShort, payload: ByteArray) =
-        getPeer(destination).message(payload)
+        getPeer(destination).sendMessage(payload)
 
     override suspend fun query(
         destination: AdnlIdShort,
@@ -88,6 +88,7 @@ open class Adnl(
                 localPeer[it.localKey.toAdnlIdShort()] = it
             }
         }
+        println("peer is active: ${peer.isActive}")
         return peer
     }
 

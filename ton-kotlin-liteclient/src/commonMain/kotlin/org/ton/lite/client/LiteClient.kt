@@ -10,13 +10,11 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.adnl.client.engine.AdnlClientEngine
 import org.ton.adnl.client.engine.cio.CIOAdnlClientEngine
-import org.ton.api.dht.config.DhtConfigGlobal
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
-import org.ton.api.validator.config.ValidatorConfigGlobal
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellType
@@ -60,10 +58,11 @@ open class LiteClient(
         var result: ByteArray
         while (true) {
             try {
-                result = adnlClientEngine.query(liteClientConfigGlobal.liteservers.random(), query)
+                val server = liteClientConfigGlobal.liteservers.random()
+                result = adnlClientEngine.query(server, query)
                 break
             } catch (e: ConnectTimeoutException) {
-                if (reconnectAttempts++ > 3) {
+                if (reconnectAttempts++ > 10) {
                     throw e
                 }
             }

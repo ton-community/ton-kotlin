@@ -15,7 +15,7 @@ data class HttpResponse(
     val status_code: Int,
     val reason: String,
     val headers: List<HttpHeader>,
-    val on_payload: Boolean
+    val no_payload: Boolean
 ) : TlObject<HttpResponse> {
     override fun tlCodec(): TlCodec<HttpResponse> = Companion
 
@@ -40,6 +40,6 @@ private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
         output.writeIntTl(value.status_code)
         output.writeStringTl(value.reason)
         output.writeVectorTl(value.headers, HttpHeader)
-        output.writeBoolTl(value.on_payload)
+        output.writeBoolTl(value.no_payload)
     }
 }

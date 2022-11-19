@@ -30,17 +30,17 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
         if (resultLength < 254) {
             resultAlignedLength = resultLength + 1
         } else if (resultLength == 254) {
-            resultLength = input.readUByte().toInt() +
-                    (input.readUByte().toInt() shl 8) +
+            resultLength = input.readUByte().toInt() or
+                    (input.readUByte().toInt() shl 8) or
                     (input.readUByte().toInt() shl 16)
             resultAlignedLength = resultLength + 4
         } else {
-            val resultLengthLong = input.readUByte().toLong() +
-                    (input.readUByte().toLong() shl 8) +
-                    (input.readUByte().toLong() shl 16) +
-                    (input.readUByte().toLong() shl 24) +
-                    (input.readUByte().toLong() shl 32) +
-                    (input.readUByte().toLong() shl 40) +
+            val resultLengthLong = input.readUByte().toLong() or
+                    (input.readUByte().toLong() shl 8) or
+                    (input.readUByte().toLong() shl 16) or
+                    (input.readUByte().toLong() shl 24) or
+                    (input.readUByte().toLong() shl 32) or
+                    (input.readUByte().toLong() shl 40) or
                     (input.readUByte().toLong() shl 48)
             if (resultLengthLong > Int.MAX_VALUE) {
                 throw IllegalStateException("Too big byte array: $resultLengthLong")
@@ -50,15 +50,12 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
         }
         val result = input.readBytes(resultLength)
         while (resultAlignedLength++ % 4 > 0) {
-            input.discardExact(1)
+            check(input.readByte() == 0.toByte())
         }
         return result
     }
 
     override suspend fun decode(input: ByteReadChannel): ByteArray {
-        input.readAvailable {
-            ByteReadPacket(it)
-        }
         var resultLength = input.readUByte().toInt()
         var resultAlignedLength: Int
         if (resultLength < 254) {
@@ -84,7 +81,7 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
         }
         val result = input.readBytes(resultLength)
         while (resultAlignedLength++ % 4 > 0) {
-            input.discardExact(1)
+            check(input.readByte() == 0.toByte())
         }
         return result
     }

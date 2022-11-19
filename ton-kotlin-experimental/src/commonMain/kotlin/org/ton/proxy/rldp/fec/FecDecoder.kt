@@ -25,7 +25,6 @@ class RaptorQFecDecoder(
 
     override fun decode(seqno: Int, data: ByteArray): ByteArray? {
         if (decoded) return null
-        this.seqno = seqno
         val packet = buildPacket {
             writeInt(seqno)
             writeFully(data)

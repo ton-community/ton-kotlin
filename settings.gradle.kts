@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 }
 
 include(":ton-kotlin-adnl")
+include(":ton-kotlin-adnl-ktor")
 include(":ton-kotlin-api")
 include(":ton-kotlin-bigint")
 include(":ton-kotlin-bitstring")

@@ -1,12 +1,13 @@
 package org.ton.api.http
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.*
 
 @SerialName("http.payloadPart")
@@ -16,9 +17,7 @@ data class HttpPayloadPart(
     val data: ByteArray,
     val trailer: List<HttpHeader>,
     val last: Boolean
-) {
-    companion object : TlCodec<HttpPayloadPart> by HttpPayloadPartTlConstructor
-
+) : TlObject<HttpPayloadPart> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is HttpPayloadPart) return false
@@ -37,12 +36,17 @@ data class HttpPayloadPart(
         return result
     }
 
-    override fun toString(): String = "HttpPayloadPart(data=${data.encodeHex()}, trailer=$trailer, last=$last)"
+    override fun tlCodec(): TlCodec<HttpPayloadPart> = Companion
+
+    override fun toString(): String =
+        "HttpPayloadPart(trailer=$trailer, last=$last, data=(${data.size} bytes) ${data.encodeBase64()})"
+
+    companion object : TlCodec<HttpPayloadPart> by HttpPayloadPartTlConstructor
 }
 
 private object HttpPayloadPartTlConstructor : TlConstructor<HttpPayloadPart>(
     type = HttpPayloadPart::class,
-    schema = "http.payloadPart data:bytes trailer:(vector http.Header) last:Bool = http.PayloadPart"
+    schema = "http.payloadPart data:bytes trailer:(vector http.header) last:Bool = http.PayloadPart"
 ) {
     override fun decode(input: Input): HttpPayloadPart {
         val data = input.readBytesTl()

@@ -12,6 +12,8 @@ import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
 import org.ton.api.http.HttpHeader
+import org.ton.api.http.HttpResponse
+import org.ton.api.http.functions.HttpGetNextPayloadPart
 import org.ton.api.http.functions.HttpRequest
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bitstring.BitString
@@ -19,6 +21,8 @@ import org.ton.block.DnsAdnlAddress
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
+import org.ton.proxy.CONFIG_GLOBAL
+import org.ton.proxy.JSON
 import org.ton.proxy.adnl.engine.CIOAdnlNetworkEngine
 import org.ton.proxy.dht.Dht
 import org.ton.proxy.dns.DnsCategory
@@ -53,20 +57,29 @@ class Test {
         val siteAddr = AdnlIdShort(dnsRecord.adnl_addr)
 
         val rldp = Rldp(CIOAdnlNetworkEngine(), dht)
-        val response = rldp.query(
-            siteAddr, HttpRequest(
-                id = BitString(Random.nextBytes(32)),
+
+        val id2 = BitString(Random.nextBytes(32))
+        val response2 = rldp.get(siteAddr, host, id2)
+        println(JSON.encodeToString(response2))
+
+        val payload = rldp.query(siteAddr, HttpGetNextPayloadPart(id2, 0, 1 shl 10))
+        println(JSON.encodeToString(payload))
+    }
+
+    suspend fun Rldp.get(address: AdnlIdShort, host: String, id: BitString): HttpResponse {
+        return query(
+            address, HttpRequest(
+                id = id,
                 method = "GET",
-                url = "/",
+                url = "http://$host",
                 http_version = "HTTP/1.1",
                 headers = listOf(
-                    HttpHeader("Host", host)
+                    HttpHeader("Host", host),
+                    HttpHeader("Connection", "Keep-Alive"),
+                    HttpHeader("Accept", "*/*"),
                 ),
-            ).also {
-                println(JSON.encodeToString(it))
-            }
+            )
         )
-        println(JSON.encodeToString(response))
     }
 
     private fun loadNodes() = Json.decodeFromString<DhtNodes>(File("dht.json").readText())

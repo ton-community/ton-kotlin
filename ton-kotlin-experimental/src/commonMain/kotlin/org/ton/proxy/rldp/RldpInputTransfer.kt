@@ -1,10 +1,11 @@
 package org.ton.proxy.rldp
 
 import io.ktor.utils.io.*
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 import org.ton.api.fec.FecRaptorQ
 import org.ton.api.rldp.RldpComplete
 import org.ton.api.rldp.RldpConfirm
@@ -31,9 +32,8 @@ interface RldpInputTransfer : RldpReceiver {
 
 private class RldpInputTransferImpl(
     override val id: BitString,
-    override val byteChannel: ByteChannel = ByteChannel(),
+    override val byteChannel: ByteChannel = ByteChannel(true),
 ) : RldpInputTransfer {
-    private var decoder = atomic<RaptorQFecDecoder?>(null)
     private val messagesChannel = Channel<RldpMessagePartData>(Channel.UNLIMITED)
 
     override fun transferPackets(): Flow<RldpMessagePart> = flow {
@@ -41,8 +41,9 @@ private class RldpInputTransferImpl(
         var totalSize = -1L
         var part = 0
         var processed = -2L
+        var confirmCount = 0
         try {
-            while (processed < totalSize) {
+            while (processed < totalSize && currentCoroutineContext().isActive) {
                 val message = messagesChannel.receive()
                 if (message.part != part) {
                     continue
@@ -63,19 +64,21 @@ private class RldpInputTransferImpl(
                     require(currentDecoder.fecType == message.fec_type) { "Fec type mismatch, expected: ${currentDecoder.fecType}, actual: ${message.fec_type}" }
                 }
 
+//                println("decode $id - part=$part - seqno=${message.seqno} - data_size=${message.data.size} | ${message.fec_type}")
                 val result = currentDecoder.decode(message.seqno, message.data)
                 if (result != null) {
-                    val confirm = RldpConfirm(id, part, message.seqno)
-                    emit(confirm)
-                    byteChannel.writeFully(result)
-                    val complete = RldpComplete(id, part)
+                    val complete = RldpComplete(id, message.part)
                     emit(complete)
                     part++
                     processed += result.size
                     decoder = null
+                    byteChannel.writeFully(result)
                 } else {
-                    val confirm = RldpConfirm(id, part, message.seqno)
-                    emit(confirm)
+                    if (++confirmCount >= 10) {
+                        val confirm = RldpConfirm(id, message.part, message.seqno)
+                        emit(confirm)
+                        confirmCount = 0
+                    }
                 }
             }
         } finally {

@@ -17,14 +17,14 @@ import org.ton.proxy.dht.state.DhtState
 import org.ton.proxy.dht.storage.DhtStorage
 import kotlin.experimental.and
 import kotlin.experimental.xor
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 class Dht(
     val state: DhtState,
     val config: DhtConfig = DhtConfig()
 ) : AdnlAddressResolver {
     private val cache = Cache.Builder()
-        .expireAfterWrite(15.seconds)
+        .expireAfterWrite(60.minutes)
         .build<BitString, DhtValue>()
 
     suspend fun findValue(key: DhtKey): DhtValue? = findValue(key.key())

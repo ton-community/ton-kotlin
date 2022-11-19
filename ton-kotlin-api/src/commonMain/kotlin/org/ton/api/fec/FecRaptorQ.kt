@@ -1,11 +1,13 @@
 package org.ton.api.fec
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.IntTlConstructor
 import org.ton.tl.constructors.writeIntTl
 
+@Serializable
 data class FecRaptorQ(
     val data_size: Int,
     val symbol_size: Int,

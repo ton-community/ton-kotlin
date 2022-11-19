@@ -19,14 +19,14 @@ class VectorTlConstructor<T : Any>(
 
     companion object {
         fun <T : Any> encode(output: Output, value: List<T>, constructor: TlCodec<T>) {
-            output.writeIntLittleEndian(value.size)
+            output.writeIntTl(value.size)
             value.forEach { element ->
                 output.writeTl(constructor, element)
             }
         }
 
         fun <T : Any> decode(input: Input, constructor: TlCodec<T>): List<T> {
-            val size = input.readIntLittleEndian()
+            val size = input.readIntTl()
             return List(size) {
                 input.readTl(constructor)
             }

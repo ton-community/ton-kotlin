@@ -17,6 +17,9 @@ data class HttpHeader(
     companion object : TlCodec<HttpHeader> by HttpHeaderTlConstructor
 }
 
+operator fun Iterable<HttpHeader>.get(name: String) = firstOrNull { it.name == name }?.value
+fun Iterable<HttpHeader>.getAll(name: String) = asSequence().filter { it.name == name }.map { it.value }
+
 private object HttpHeaderTlConstructor : TlConstructor<HttpHeader>(
     type = HttpHeader::class,
     schema = "http.header name:string value:string = http.Header"

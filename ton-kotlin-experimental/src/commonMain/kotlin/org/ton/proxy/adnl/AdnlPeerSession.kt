@@ -30,7 +30,7 @@ interface AdnlPeerSession : CoroutineScope, AdnlPacketReceiver {
 
     suspend fun query(payload: ByteArray, timeout: Duration, maxAnswerSize: Long = Int.MAX_VALUE.toLong()): ByteArray
 
-    suspend fun message(payload: ByteArray)
+    suspend fun sendMessage(payload: ByteArray)
 
     fun receiveDatagram(payload: ByteArray, channel: AdnlChannel?)
 }
@@ -173,7 +173,7 @@ abstract class AbstractAdnlPeerSession(
         }
     }
 
-    override suspend fun message(payload: ByteArray) {
+    override suspend fun sendMessage(payload: ByteArray) {
         val message = AdnlMessageCustom(payload)
         sendMessage(message)
     }

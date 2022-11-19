@@ -20,7 +20,7 @@ interface AdnlSender {
         destination: AdnlIdShort,
         payload: ByteArray,
         timeout: Duration = 5.seconds,
-        maxAnswerSize: Long = Int.MAX_VALUE.toLong()
+        maxAnswerSize: Long = Long.MAX_VALUE
     ): ByteArray
 
     @Suppress("UNCHECKED_CAST")
@@ -28,7 +28,7 @@ interface AdnlSender {
         destination: AdnlIdShort,
         query: Q,
         timeout: Duration = 5.seconds,
-        maxAnswerSize: Long = Int.MAX_VALUE.toLong()
+        maxAnswerSize: Long = Long.MAX_VALUE
     ): A {
         val queryCodec = query.tlCodec() as TlCodec<Q>
         val answerCodec = query.resultTlCodec()
@@ -38,7 +38,7 @@ interface AdnlSender {
 
         return try {
             answerCodec.decodeBoxed(answerPayload)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             throw IllegalStateException("Failed to decode answer: ${answerPayload.encodeHex()}", e)
         }
     }

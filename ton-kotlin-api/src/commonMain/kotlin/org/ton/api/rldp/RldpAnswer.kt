@@ -1,5 +1,6 @@
 package org.ton.api.rldp
 
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.tl.TlCodec
@@ -33,6 +34,9 @@ data class RldpAnswer(
         result = 31 * result + data.contentHashCode()
         return result
     }
+
+    override fun toString(): String =
+        "RldpAnswer(query_id=$query_id, data=[(${data.size} bytes) ${data.encodeBase64()}])"
 
     companion object : TlConstructor<RldpAnswer>(
         type = RldpAnswer::class,

@@ -6,6 +6,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.ton.api.adnl.message.AdnlMessageCustom
 import org.ton.api.adnl.message.AdnlMessageQuery
@@ -49,7 +50,8 @@ abstract class AbstractRldpPeerSession(
         receivers[id] = transfer
         try {
             transfer.transferPackets().buffer().collect { part ->
-                super.message(part.toByteArray())
+//                println("output OUTGOING: $part")
+                super.sendMessage(part.toByteArray())
             }
         } finally {
             receivers.remove(id)
@@ -62,24 +64,27 @@ abstract class AbstractRldpPeerSession(
     ) = coroutineScope {
         val transfer = RldpInputTransfer.of(id)
         receivers[id] = transfer
+        val byteChannel = ByteChannel()
         try {
-            val byteChannel = ByteChannel()
-            transfer.transferPackets().buffer().collect { part ->
-                super.message(part.toByteArray())
+//            println("start input transfer: $id")
+            val transferAckJob = launch {
+                transfer.transferPackets().buffer().collect { part ->
+//                    println("input OUTGOING: $part")
+                    super.sendMessage(part.toByteArray())
+                }
             }
-            val readJob = async {
-                val result = read(byteChannel)
-                byteChannel.close()
-                result
-            }
-            transfer.byteChannel.copyAndClose(byteChannel)
-            readJob.await()
+            val result = read(transfer.byteChannel)
+//            println("result: $id - $result")
+            transferAckJob.cancel()
+            result
         } finally {
+//            println("remove input transfer: $id")
             receivers.remove(id)
+            byteChannel.close()
         }
     }
 
-    override suspend fun message(payload: ByteArray) {
+    override suspend fun sendMessage(payload: ByteArray) {
         val rldpMessage = RldpMessageData(
             id = BitString(Random.nextBytes(32)),
             data = payload
@@ -94,17 +99,34 @@ abstract class AbstractRldpPeerSession(
             RldpQuery(BitString(Random.nextBytes(32)), maxAnswerSize, Clock.System.now() + timeout, payload)
         val rldpAnswer = async {
             inputTransfer(BitString(inputTransferId)) {
-                RldpAnswer.decodeBoxed(it)
+                val packet = buildPacket {
+                    while (!it.isClosedForRead) {
+                        it.read(it.availableForRead) { bb ->
+                            writeFully(bb)
+                        }
+                    }
+                }.readBytes()
+                RldpAnswer.decodeBoxed(packet)
             }
         }
         transfer(rldpQuery.toByteArray(), BitString(outputTransferId))
         rldpAnswer.await().data
     }
+    // java.lang.IllegalArgumentException: Invalid ID. expected: 035cfca3 (-1543742461) actual: e515f568 (1760892389)
+    //
 
     override fun receiveAdnlCustom(message: AdnlMessageCustom) {
         val part = RldpMessagePart.decodeBoxed(message.data)
         val receiver = receivers[part.transfer_id]
-        receiver?.receiveRldpMessagePart(part)
+//        println("INCOMING: $part")
+        if (receiver != null) {
+            receiver.receiveRldpMessagePart(part)
+        } else {
+//            sendMessage(RldpComplete(part.transfer_id, part.part).toByteArray())
+//            launch {
+////                println("resend complete - ${part.transfer_id} ${part.part}")
+//            }
+        }
     }
 
     override fun receiveAdnlQuery(message: AdnlMessageQuery) {
