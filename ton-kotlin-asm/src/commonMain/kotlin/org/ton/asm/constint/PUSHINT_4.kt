@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 data class PUSHINT_4(
     val i: UByte,
 ) : AsmInstruction {
-    private val x get(): UByte = (((i + 5u) and 15u) - 5u).toUByte()
+    val x get(): UByte = (((i + 5u) and 15u) - 5u).toUByte()
 
     override fun toString(): String {
         return "$x PUSHINT"
