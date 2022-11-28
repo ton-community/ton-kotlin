@@ -12,6 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.util.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.encodeToString
@@ -33,6 +34,9 @@ import org.ton.proxy.rldp.Rldp
 import java.util.*
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
 class ProxyClient(configGlobal: LiteClientConfigGlobal) {
     val dht = Dht.lite(configGlobal.dht.static_nodes)
@@ -82,17 +86,17 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) {
                             }.flatten()
                     )
                     println("Sending RLDP query: ${Json.encodeToString(rldpHttpRequest)}")
-                    val rldpHttpResponse = rldp.query(address, rldpHttpRequest, 120.seconds)
+                    val rldpHttpResponse = rldp.query(address, rldpHttpRequest, 10.seconds)
                     println("Received RLDP response: ${Json.encodeToString(rldpHttpResponse)}")
                     rldpHttpResponse.headers.forEach { header ->
-                        call.response.headers.append(header.name, header.value)
+                        call.response.headers.append(header.name, header.value, false)
                     }
                     val statusCode = HttpStatusCode.fromValue(rldpHttpResponse.status_code)
                     call.response.status(statusCode)
                     if (rldpHttpResponse.no_payload) {
                         call.respondNullable(NullBody)
                     } else {
-                        call.respondRldpPayload(address, rldpHttpRequest.id)
+                        call.respondRldpPayload(address, rldpHttpRequest)
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Only .adnl and .ton domains are supported")
@@ -104,21 +108,24 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun payloadFlow(address: AdnlIdShort, id: BitString) = flow {
         var isLast = false
         var seqno = 0
         while (!isLast) {
-            val rldpHttpPayloadPart = rldp.query(
-                destination = address,
-                query = HttpGetNextPayloadPart(
-                    id = id,
-                    seqno = seqno++,
-                    max_chunk_size = PAYLOAD_SIZE
-                ),
-                timeout = 120.seconds,
-                maxAnswerSize = MAX_RLDP_ANSWER_SIZE
-            )
-            println("[$id] seqno:$seqno - $rldpHttpPayloadPart")
+            val (rldpHttpPayloadPart, time) = measureTimedValue {
+                rldp.query(
+                    destination = address,
+                    query = HttpGetNextPayloadPart(
+                        id = id,
+                        seqno = seqno++,
+                        max_chunk_size = PAYLOAD_SIZE
+                    ),
+                    timeout = 120.seconds,
+                    maxAnswerSize = MAX_RLDP_ANSWER_SIZE
+                )
+            }
+            println("[$id] seqno:$seqno - ${rldpHttpPayloadPart.data.size} - $time")
             emit(rldpHttpPayloadPart)
             isLast = rldpHttpPayloadPart.last
         }
@@ -143,43 +150,53 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) {
         return rldp.query(address, request, 120.seconds)
     }
 
+    @OptIn(ExperimentalTime::class)
     suspend fun ApplicationCall.respondRldpPayload(
         address: AdnlIdShort,
-        id: BitString,
+        rldpRequest: HttpRequest,
         payloadPartSize: Int = -1,
     ) = coroutineScope {
-
         val acceptRanges = response.headers[HttpHeaders.AcceptRanges] == "bytes"
         val contentLength = response.headers[HttpHeaders.ContentLength]?.toLong()
         val contentType = response.headers[HttpHeaders.ContentType]?.let { ContentType.parse(it) }
         if (payloadPartSize > 0 && acceptRanges && contentLength != null && contentLength > payloadPartSize) {
-//            println("start downloading with offsets: $contentLength - ${request.url}")
-//            val bytes = ByteArray(contentLength.toInt())
-//            val payloadParts = (contentLength / payloadPartSize).toInt() + (contentLength % payloadPartSize).toInt()
-//            val offsetRequests = List(payloadParts) { offset ->
-//                launch {
-//                    val newHeaders = request.headers.filter {
-//                        it.name != "Range"
-//                    } + HttpHeader("Range", "bytes=${offset * payloadPartSize}-${(offset + 1) * payloadPartSize - 1}")
-//                    val offsetRequest = request.copy(
-//                        id = BitString(Random.nextBytes(32)),
-//                        headers = newHeaders
-//                    )
-//                    rldp.query(address, offsetRequest, 120.seconds)
-//                    payloadFlow(address, offsetRequest.id).buffer().toList().forEach {
-//                        it.data.copyInto(bytes, offset * payloadPartSize)
-//                    }
-//                }
-//            }
-//            offsetRequests.joinAll()
-//            bytes
-        } else {
-            println("start downloading without offsets - ${request.uri} [$payloadPartSize]")
-            val httpPayloadPartFlow = payloadFlow(address, id).buffer()
-            respondBytesWriter(contentType, null, contentLength) {
-                httpPayloadPartFlow.collect { payloadPart ->
-                    writeFully(payloadPart.data)
+            println("start downloading with offsets - ${request.uri} [$payloadPartSize]")
+            val payloadParts = (contentLength / payloadPartSize).toInt() + (contentLength % payloadPartSize).toInt()
+            val asyncParts = List(payloadParts) { offset ->
+                async {
+                    val newHeaders = rldpRequest.headers.filter {
+                        it.name != "Range"
+                    } + HttpHeader("Range", "bytes=${offset * payloadPartSize}-${(offset + 1) * payloadPartSize - 1}")
+                    val offsetRequest = rldpRequest.copy(
+                        id = BitString(Random.nextBytes(32)),
+                        headers = newHeaders
+                    )
+                    val offsetResponse = rldp.query(address, offsetRequest, 120.seconds)
+                    println("offset response: ${Json.encodeToString(offsetResponse)}")
+                    buildPacket {
+//                        payloadFlow(address, offsetRequest.id).buffer().collect {
+//                            writeFully(it.data)
+//                        }
+                    }
                 }
+            }
+            respondBytesWriter(contentType, null, contentLength) {
+                val asyncTime = measureTime {
+                    asyncParts.forEach {
+                        writePacket(it.await())
+                    }
+                }
+                println("${request.uri} - ASYNC $asyncTime - $contentLength bytes")
+            }
+        } else {
+            println("start downloading without offsets - ${request.uri}")
+            respondBytesWriter(contentType, null, contentLength) {
+                val time = measureTime {
+                    payloadFlow(address, rldpRequest.id).buffer().collect { payloadPart ->
+                        writeFully(payloadPart.data)
+                    }
+                }
+                println("${request.uri} - $time - $contentLength bytes")
             }
         }
     }
@@ -192,7 +209,7 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) {
         @Suppress("HttpUrlsUsage")
         private const val HTTP_PROTOCOL = "http://"
         private const val HTTPS_PROTOCOL = "https://"
-        private const val PAYLOAD_SIZE = 1 shl 20
+        private const val PAYLOAD_SIZE = 1 shl 22
         private const val MAX_RLDP_ANSWER_SIZE = PAYLOAD_SIZE * 2L + 1024L
     }
 }

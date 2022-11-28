@@ -13,6 +13,7 @@ import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpMessagePartData
 import org.ton.bitstring.BitString
 import org.ton.proxy.rldp.fec.RaptorQFecDecoder
+import org.ton.proxy.rldp.fec.raptorq.RaptorQFecDecoder
 
 interface RldpInputTransfer : RldpReceiver {
     val id: BitString
@@ -74,7 +75,7 @@ private class RldpInputTransferImpl(
                     decoder = null
                     byteChannel.writeFully(result)
                 } else {
-                    if (++confirmCount >= 10) {
+                    if (++confirmCount >= 5) {
                         val confirm = RldpConfirm(id, message.part, message.seqno)
                         emit(confirm)
                         confirmCount = 0

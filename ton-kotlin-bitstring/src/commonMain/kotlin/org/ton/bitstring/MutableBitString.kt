@@ -11,4 +11,9 @@ interface MutableBitString : BitString, MutableList<Boolean> {
     override fun plus(bytes: ByteArray, bits: Int): MutableBitString
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableBitString
+
+    companion object {
+        @JvmStatic
+        fun of(size: Int): MutableBitString = ByteBackedMutableBitString.of(size)
+    }
 }

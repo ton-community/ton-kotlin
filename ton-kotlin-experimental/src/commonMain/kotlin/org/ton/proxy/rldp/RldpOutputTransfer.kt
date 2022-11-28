@@ -55,19 +55,18 @@ private class RldOutputTransferImpl(
                 break
             }
             val encoder = RaptorQFecEncoder(bytes)
-            part@ for (i in 0 until encoder.fecType.symbol_count) {
+            part@ for (i in 0 until encoder.fecType.symbol_count + 50) {
                 while (currentCoroutineContext().isActive) {
                     val ackMessage = ackParts.tryReceive().getOrNull() ?: break
                     if (ackMessage is RldpComplete && ackMessage.part == part) {
                         break@part
                     }
                 }
-                val symbol = ByteArray(encoder.fecType.symbol_size)
-                val seqno = encoder.encode(i, symbol)
+                val symbol = encoder.encode(i)
                 val packet = RldpMessagePartData(
                     transfer_id = id,
                     part = part,
-                    seqno = seqno,
+                    seqno = i,
                     fec_type = encoder.fecType,
                     data = symbol,
                     total_size = totalSize,

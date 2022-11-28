@@ -9,9 +9,9 @@ import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 data class FecRaptorQ(
-    val data_size: Int,
-    val symbol_size: Int,
-    val symbol_count: Int
+    override val data_size: Int,
+    override val symbol_size: Int,
+    override val symbol_count: Int
 ) : FecType {
     override fun tlCodec(): TlCodec<FecRaptorQ> = Companion
 

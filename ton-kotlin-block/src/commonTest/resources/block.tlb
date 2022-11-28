@@ -129,10 +129,18 @@ ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt
 ext_out_msg_info$11 src:MsgAddressInt dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfo;
 
-int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
-  src:MsgAddress dest:MsgAddressInt
-  value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins
-  created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+int_msg_info$0
+ihr_disabled:Bool
+bounce:Bool
+bounced:Bool
+  src:MsgAddress
+  dest:MsgAddressInt
+  value:CurrencyCollection
+   ihr_fee:Coins
+   fwd_fee:Coins
+  created_lt:uint64
+  created_at:uint32
+   = CommonMsgInfoRelaxed;
 ext_out_msg_info$11 src:MsgAddress dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
 

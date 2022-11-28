@@ -88,7 +88,6 @@ open class Adnl(
                 localPeer[it.localKey.toAdnlIdShort()] = it
             }
         }
-        println("peer is active: ${peer.isActive}")
         return peer
     }
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Clock
 import org.ton.api.adnl.message.AdnlMessageCustom
 import org.ton.api.adnl.message.AdnlMessageQuery
@@ -110,7 +111,9 @@ abstract class AbstractRldpPeerSession(
             }
         }
         transfer(rldpQuery.toByteArray(), BitString(outputTransferId))
-        rldpAnswer.await().data
+        withTimeout(timeout) {
+            rldpAnswer.await()
+        }.data
     }
     // java.lang.IllegalArgumentException: Invalid ID. expected: 035cfca3 (-1543742461) actual: e515f568 (1760892389)
     //

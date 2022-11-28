@@ -13,8 +13,6 @@ import org.ton.bitstring.BitString
 import org.ton.crypto.encodeHex
 import org.ton.proxy.rldp.RldpInputTransfer
 import org.ton.proxy.rldp.RldpOutputTransfer
-import org.ton.proxy.rldp.fec.RaptorQFecEncoder
-import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
@@ -60,17 +58,17 @@ class RldpTest {
         }
     }
 
-    @Test
-    fun raptorQFec() = runBlocking {
-        val data = Random.nextBytes(1024 * 20)
-        val encoder = RaptorQFecEncoder(data)
-        println(encoder.fecType)
-        val symbols = Array(encoder.fecType.symbol_count) {
-            val array = ByteArray(encoder.fecType.symbol_size)
-            val seqno = encoder.encode(it, array)
-            seqno to array
-        }
-    }
+//    @Test
+//    fun raptorQFec() = runBlocking {
+//        val data = Random.nextBytes(1024 * 20)
+//        val encoder = RaptorQFecEncoder(data)
+//        println(encoder.fecType)
+//        val symbols = Array(encoder.fecType.symbol_count) {
+//            val array = ByteArray(encoder.fecType.symbol_size)
+//            val seqno = encoder.encode(it, array)
+//            seqno to array
+//        }
+//    }
 
     @Test
     fun testSerializtion() {
