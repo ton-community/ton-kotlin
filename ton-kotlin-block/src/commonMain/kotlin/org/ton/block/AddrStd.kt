@@ -71,7 +71,7 @@ data class AddrStd(
         ): String {
             return if (userFriendly) {
                 val raw = byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()) +
-                        address.address.toByteArray() + crc(address, testOnly, bounceable).toShort().toBigInt()
+                        address.address.toByteArray() + crc(address, testOnly, bounceable).toBigInt()
                     .toByteArray()
                 if (urlSafe) {
                     base64url(raw)
