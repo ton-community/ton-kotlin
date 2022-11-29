@@ -185,10 +185,10 @@ private val V3 = uintArrayOf(
 )
 
 @Suppress("OPT_IN_USAGE")
-internal fun rand(y: Long, i: Int, m: Long): UInt {
+internal fun rand(y: Long, i: Int, m: Long): Long {
     val x0 = ((y + i) and 0xFF).toInt()
     val x1 = (((y shr 8) + i) and 0xFF).toInt()
     val x2 = (((y shr 16) + i) and 0xFF).toInt()
     val x3 = (((y shr 24) + i) and 0xFF).toInt()
-    return (V0[x0] xor V1[x1] xor V2[x2] xor V3[x3]) % m.toUInt()
+    return (V0[x0].toLong() xor V1[x1].toLong() xor V2[x2].toLong() xor V3[x3].toLong()) % m
 }

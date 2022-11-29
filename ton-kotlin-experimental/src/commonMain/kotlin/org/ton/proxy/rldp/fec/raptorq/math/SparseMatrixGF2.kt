@@ -3,7 +3,7 @@ package org.ton.proxy.rldp.fec.raptorq.math
 class SparseMatrixGF2(
     val rows: Int,
     val cols: Int,
-    val data: MutableSet<Long> = HashSet()
+    val data: MutableSet<Long> = LinkedHashSet()
 ) : Iterable<Pair<Int, Int>> {
     val size get() = data.size
 
@@ -26,10 +26,10 @@ class SparseMatrixGF2(
         }
     }
 
-    fun getCols(row: Int) =
+    fun getRows(row: Int) =
         data.asSequence().filter { (it shr 32).toInt() == row }.map { it.toInt() }.sorted()
 
-    fun getRows(col: Int) =
+    fun getCols(col: Int) =
         data.asSequence().filter { it.toInt() == col }.map { (it shr 32).toInt() }.sorted()
 
     fun applyRowsPermutation(permutation: IntArray): SparseMatrixGF2 {
@@ -48,11 +48,11 @@ class SparseMatrixGF2(
         return result
     }
 
-    fun toDense(rowFrom: Int, colFrom: Int, rowSize: Int, colSize: Int): MatrixGF256 {
-        val result = MatrixGF256(rowSize, colSize)
+    fun toDense(rowFrom: Int, colFrom: Int, rowSize: Int, colSize: Int): MatrixGF2 {
+        val result = MatrixGF2(rowSize, colSize)
         forEach { (row, col) ->
             if (row in rowFrom until rowFrom + rowSize && col in colFrom until colFrom + colSize) {
-                result[row - rowFrom, col - colFrom] = 1.toByte()
+                result[row - rowFrom, col - colFrom] = true
             }
         }
         return result
@@ -66,16 +66,5 @@ class SparseMatrixGF2(
             }
         }
         return result
-    }
-
-    companion object {
-        @JvmStatic
-        fun inversePermutation(permutation: IntArray): IntArray {
-            val result = IntArray(permutation.size)
-            permutation.forEachIndexed { index, value ->
-                result[value] = index
-            }
-            return result
-        }
     }
 }

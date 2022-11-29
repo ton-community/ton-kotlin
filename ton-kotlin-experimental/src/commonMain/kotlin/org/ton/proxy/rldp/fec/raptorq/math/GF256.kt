@@ -13,15 +13,15 @@ class GF256(
         }
     }
 
-    fun mul(x: Byte) {
+    fun mul(x: Octet) {
         for (i in data.indices) {
-            data[i] = (data[i].toOctet() * x.toOctet()).toByte()
+            data[i] = (data[i].toOctet() * x).toByte()
         }
     }
 
-    fun addMul(other: GF256, x: Byte) {
+    fun addMul(other: GF256, x: Octet) {
         for (i in data.indices) {
-            data[i] = (data[i].toOctet() + (x.toOctet() * other.data[i].toOctet())).toByte()
+            data[i] = (data[i].toOctet() + (x * other.data[i].toOctet())).toByte()
         }
     }
 }

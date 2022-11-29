@@ -1,5 +1,7 @@
 package org.ton.proxy.rldp.fec.raptorq
 
+import kotlin.math.min
+
 class Symbol(
     val id: Int,
     val data: ByteArray
@@ -11,7 +13,7 @@ class Symbol(
                 val offset = id * symbolsSize
                 val symbolData = ByteArray(symbolsSize)
                 if (offset < data.size) {
-                    data.copyInto(symbolData, 0, offset, offset + symbolsSize)
+                    data.copyInto(symbolData, 0, offset, min(offset + symbolsSize, data.size))
                 }
                 Symbol(id, symbolData)
             }

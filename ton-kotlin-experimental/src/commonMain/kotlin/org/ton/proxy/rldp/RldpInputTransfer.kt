@@ -12,7 +12,6 @@ import org.ton.api.rldp.RldpConfirm
 import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpMessagePartData
 import org.ton.bitstring.BitString
-import org.ton.proxy.rldp.fec.RaptorQFecDecoder
 import org.ton.proxy.rldp.fec.raptorq.RaptorQFecDecoder
 
 interface RldpInputTransfer : RldpReceiver {
@@ -66,7 +65,7 @@ private class RldpInputTransferImpl(
                 }
 
 //                println("decode $id - part=$part - seqno=${message.seqno} - data_size=${message.data.size} | ${message.fec_type}")
-                val result = currentDecoder.decode(message.seqno, message.data)
+                val result = currentDecoder.decode()
                 if (result != null) {
                     val complete = RldpComplete(id, message.part)
                     emit(complete)
