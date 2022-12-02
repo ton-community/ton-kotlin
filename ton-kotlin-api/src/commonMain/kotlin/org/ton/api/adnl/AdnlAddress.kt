@@ -10,8 +10,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.base64.base64
 import org.ton.tl.*
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.readIntTl
@@ -64,11 +64,19 @@ data class AdnlAddressUdp6(
     val ip: ByteArray,
     val port: Int
 ) : AdnlAddress {
+
+
+    override fun toString(): String = buildString {
+        append("AdnlAddressUdp6(ip=")
+        append(base64(ip))
+        append(", port=")
+        append(port)
+        append(")")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlAddressUdp6
+        if (other !is AdnlAddressUdp6) return false
 
         if (!ip.contentEquals(other.ip)) return false
         if (port != other.port) return false
@@ -80,14 +88,6 @@ data class AdnlAddressUdp6(
         var result = ip.contentHashCode()
         result = 31 * result + port
         return result
-    }
-
-    override fun toString(): String = buildString {
-        append("AdnlAddressUdp6(ip=")
-        append(base64(ip))
-        append(", port=")
-        append(port)
-        append(")")
     }
 
     companion object : TlConstructor<AdnlAddressUdp6>(
@@ -117,11 +117,18 @@ data class AdnlAddressTunnel(
 ) : AdnlAddress {
     constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
 
+
+    override fun toString(): String = buildString {
+        append("AdnlAddressTunnel(to=")
+        append(base64(to))
+        append(", pubKey=")
+        append(pubkey)
+        append(")")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlAddressTunnel
+        if (other !is AdnlAddressTunnel) return false
 
         if (!to.contentEquals(other.to)) return false
         if (pubkey != other.pubkey) return false
@@ -133,14 +140,6 @@ data class AdnlAddressTunnel(
         var result = to.contentHashCode()
         result = 31 * result + pubkey.hashCode()
         return result
-    }
-
-    override fun toString(): String = buildString {
-        append("AdnlAddressTunnel(to=")
-        append(base64(to))
-        append(", pubKey=")
-        append(pubkey)
-        append(")")
     }
 
     companion object : TlConstructor<AdnlAddressTunnel>(

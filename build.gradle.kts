@@ -41,6 +41,7 @@ allprojects {
             }
         }
         macosArm64()
+
         sourceSets {
             val commonMain by getting {
                 dependencies {
@@ -63,6 +64,19 @@ allprojects {
                     implementation(kotlin("test"))
                     implementation("junit:junit:4.13.1")
                 }
+            }
+
+            val nativeMain by creating {
+                dependsOn(commonMain)
+            }
+            val darwinMain by creating {
+                dependsOn(nativeMain)
+            }
+            val macosMain by creating {
+                dependsOn(darwinMain)
+            }
+            val macosArm64Main by getting {
+                dependsOn(macosMain)
             }
         }
     }
