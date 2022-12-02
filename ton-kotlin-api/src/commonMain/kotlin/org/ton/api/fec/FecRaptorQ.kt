@@ -13,6 +13,10 @@ data class FecRaptorQ(
     override val symbol_size: Int,
     override val symbol_count: Int
 ) : FecType {
+    init {
+        FecType.check(this)
+    }
+
     override fun tlCodec(): TlCodec<FecRaptorQ> = Companion
 
     companion object : TlConstructor<FecRaptorQ>(

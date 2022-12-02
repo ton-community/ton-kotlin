@@ -13,6 +13,7 @@ import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpMessagePartData
 import org.ton.bitstring.BitString
 import org.ton.proxy.rldp.fec.raptorq.RaptorQFecDecoder
+import kotlin.jvm.JvmStatic
 
 interface RldpInputTransfer : RldpReceiver {
     val id: BitString
@@ -64,15 +65,15 @@ private class RldpInputTransferImpl(
                     require(currentDecoder.fecType == message.fec_type) { "Fec type mismatch, expected: ${currentDecoder.fecType}, actual: ${message.fec_type}" }
                 }
 
-//                println("decode $id - part=$part - seqno=${message.seqno} - data_size=${message.data.size} | ${message.fec_type}")
-                val result = currentDecoder.decode()
-                if (result != null) {
+                if (currentDecoder.addSymbol(message.seqno, message.data)) {
+                    val payload = ByteArray(message.fec_type.data_size)
+                    currentDecoder.decode(payload)
                     val complete = RldpComplete(id, message.part)
                     emit(complete)
                     part++
-                    processed += result.size
+                    processed += payload.size
                     decoder = null
-                    byteChannel.writeFully(result)
+                    byteChannel.writeFully(payload)
                 } else {
                     if (++confirmCount >= 5) {
                         val confirm = RldpConfirm(id, message.part, message.seqno)

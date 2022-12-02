@@ -1,5 +1,3 @@
-import java.util.*
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -42,6 +40,7 @@ allprojects {
                 useJUnitPlatform()
             }
         }
+        macosArm64()
         sourceSets {
             val commonMain by getting {
                 dependencies {

@@ -29,6 +29,7 @@ data class DhtNode(
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtNode> {
     fun toAdnlNode(): AdnlNode = AdnlNode(id, addr_list)
+    fun key() = id.toAdnlIdShort().toBitString()
 
     override fun signed(privateKey: PrivateKey) =
         copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))

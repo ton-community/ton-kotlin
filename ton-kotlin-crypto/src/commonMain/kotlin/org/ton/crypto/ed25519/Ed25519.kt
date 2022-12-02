@@ -2,10 +2,8 @@ package org.ton.crypto.ed25519
 
 import io.github.andreypfau.curve25519.ed25519.Ed25519
 import io.github.andreypfau.curve25519.ed25519.Ed25519PublicKey
-import io.github.andreypfau.curve25519.edwards.CompressedEdwardsY
-import io.github.andreypfau.curve25519.edwards.EdwardsPoint
-import io.github.andreypfau.curve25519.montgomery.MontgomeryPoint
 import org.ton.crypto.SecureRandom
+import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 
 object Ed25519 {

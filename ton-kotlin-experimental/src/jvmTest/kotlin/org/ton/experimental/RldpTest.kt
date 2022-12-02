@@ -48,7 +48,6 @@ class RldpTest {
                 }
             }
 
-
             val (value, time) = measureTimedValue {
                 inputTransfer.byteChannel.discard()
             }

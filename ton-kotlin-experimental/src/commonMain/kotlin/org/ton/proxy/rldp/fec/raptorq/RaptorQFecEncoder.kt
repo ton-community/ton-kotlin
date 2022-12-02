@@ -27,7 +27,7 @@ class RaptorQFecEncoder(
     override val fecType = FecRaptorQ(
         data_size = dataSize,
         symbol_size = symbolSize,
-        symbol_count = symbols.size
+        symbol_count = (dataSize + symbolSize - 1) / symbolSize
     )
 
     override fun encode(seqno: Int, output: ByteArray): ByteArray {

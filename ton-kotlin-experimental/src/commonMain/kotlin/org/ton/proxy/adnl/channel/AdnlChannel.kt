@@ -5,8 +5,6 @@ package org.ton.proxy.adnl.channel
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.api.pk.PrivateKeyAes
@@ -14,7 +12,7 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyAes
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.proxy.adnl.AdnlPeerSession
-import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmStatic
 
 inline fun AdnlChannel(
     peerSession: AdnlPeerSession,
@@ -24,7 +22,7 @@ inline fun AdnlChannel(
     date: Instant = Clock.System.now(),
 ): AdnlChannel = AdnlChannel.of(peerSession, channelLocalKey, channelRemoteKey, isReady, date)
 
-interface AdnlChannel : CoroutineScope {
+interface AdnlChannel {
     val peerSession: AdnlPeerSession
     val input: AdnlInputChannel
     val output: AdnlOutputChannel
@@ -80,8 +78,6 @@ private class AdnlChannelImpl(
 ) : AdnlChannel {
     private val _isReady = atomic(isReady)
     override var isReady by _isReady
-
-    override val coroutineContext: CoroutineContext = peerSession.coroutineContext + CoroutineName(toString())
 
     override suspend fun sendDatagram(payload: ByteArray) {
         val destId = output.id.id

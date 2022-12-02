@@ -1,22 +1,24 @@
 package org.ton.proxy.dns
 
 import io.github.reactivecircus.cache4k.Cache
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
-import org.ton.block.AddrStd
-import org.ton.block.DnsNextResolver
-import org.ton.block.DnsRecord
-import org.ton.block.VmStackValue
+import org.ton.block.*
+import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 import org.ton.crypto.hex
 import org.ton.hashmap.HashMapEdge
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.client.LiteClient
+import org.ton.logger.PrintLnLogger
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.parse
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmStatic
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -24,13 +26,14 @@ import kotlin.time.Duration.Companion.seconds
 
 class DnsResolver constructor(
     val liteClient: LiteClient,
-    val resolverAddress: LiteServerAccountId,
+    resolverAddress: LiteServerAccountId?,
     cacheTtl: Duration = 5.minutes
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext =
-        Dispatchers.Default + CoroutineName("DnsResolver: $resolverAddress")
+        DISPATCHER + CoroutineName("DnsResolver: $resolverAddress")
+    private val logger = PrintLnLogger("DnsResolver")
 
-    constructor(liteClient: LiteClient) : this(liteClient, MAINNET_ADDRESS, 24.hours)
+    constructor(liteClient: LiteClient) : this(liteClient, null, 24.hours)
 
     private val dnsCache = Cache.Builder()
         .expireAfterWrite(cacheTtl)
@@ -39,8 +42,15 @@ class DnsResolver constructor(
         .expireAfterWrite(cacheTtl)
         .build<LiteServerAccountId, DnsResolver>()
     private val blockIdCache = Cache.Builder()
-        .expireAfterWrite(5.seconds)
+        .expireAfterWrite(60.seconds)
         .build<Unit, TonNodeBlockIdExt>()
+    private val resolverAddress by lazy {
+        resolverAddress?.let { CompletableDeferred(it) } ?: async {
+            val rootResolver = getRootResolver()
+            logger.info { "Root resolver: $rootResolver" }
+            rootResolver
+        }
+    }
 
     suspend fun resolveAll(host: String, block: TonNodeBlockIdExt? = null): Map<DnsCategory, DnsRecord> =
         DnsCategory.values().map { category ->
@@ -57,9 +67,7 @@ class DnsResolver constructor(
 
     suspend fun resolve(host: String, category: DnsCategory, block: TonNodeBlockIdExt? = null): DnsRecord? {
         val encodedHost = encodeHostname(host)
-        val currentBlock = block ?: blockIdCache.get(Unit) {
-            liteClient.getLastBlockId()
-        }
+        val currentBlock = getOrUpdateBlock(block)
         return resolveCache(encodedHost, category, currentBlock)
     }
 
@@ -93,7 +101,7 @@ class DnsResolver constructor(
 
     private suspend fun resolveOrNull(encodedHost: String, block: TonNodeBlockIdExt): Map<BitString, DnsRecord>? {
         val vmStack = liteClient.runSmcMethod(
-            resolverAddress,
+            resolverAddress.await(),
             block,
             "dnsresolve",
             VmStackValue(CellBuilder.createCell {
@@ -112,7 +120,27 @@ class DnsResolver constructor(
         }
     }
 
-    private fun split(encodedHost: String) = encodedHost.split(DNS_NAME_DELIMITER)
+    private suspend fun getRootResolver(): LiteServerAccountId {
+        val blockId = getOrUpdateBlock()
+        val configInfo = liteClient.liteApi.getConfigAll(0, blockId)
+
+        // TODO: support TL-B lazy load with pruned cells
+        var cell = BagOfCells(configInfo.config_proof).first().beginParse().loadRef().beginParse()
+        cell.loadRef() // skip pruned cell out_msg_queue_info:^OutMsgQueueInfo
+        cell.loadRef() // skip pruned cell accounts:^ShardAccounts
+        cell.loadRef() // skip pruned cell ^[overload_history:uint64 underload_history:uint64 total_balance:CurrencyCollection total_validator_fees:CurrencyCollection libraries:(HashmapE 256 LibDescr) master_ref:(Maybe BlkMasterInfo) ]
+        cell = cell.loadRef().beginParse() // load cell custom:(Maybe ^McStateExtra)
+        cell.loadRef() // skip shard_hashes:ShardHashes
+        val config = cell.loadRef().parse(HashMapEdge.tlbCodec(32, Cell.tlbCodec())) // load config:^(Hashmap 32 ^Cell)
+        val (_, rawAddress) = config.nodes().find { (key, _) ->
+            CellSlice(key).loadUInt32().toInt() == 4
+        } ?: throw IllegalStateException("No dns resolver address found")
+        return LiteServerAccountId(-1, rawAddress.beginParse().loadBits(256).toByteArray())
+    }
+
+    private suspend fun getOrUpdateBlock(block: TonNodeBlockIdExt? = null) = block ?: blockIdCache.get(Unit) {
+        liteClient.getLastBlockId()
+    }
 
     companion object {
         private const val MAX_DEFAULT_MAX_NAME_SIZE = 128
@@ -121,6 +149,7 @@ class DnsResolver constructor(
         private val MAINNET_ADDRESS =
             LiteServerAccountId(-1, hex("8E25DD08174C9CD3192181A022AEAD7659AC2A9D4A12B84F5160EDD2ECC706EA"))
         private val DNS_RECORDS_CODEC = HashMapEdge.tlbCodec(256, Cell.tlbCodec(DnsRecord))
+        private val DISPATCHER = newSingleThreadContext("dns-resolver")
 
         @JvmStatic
         fun encodeHostname(host: String?): String {

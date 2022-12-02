@@ -4,7 +4,6 @@ kotlin {
             dependencies {
                 api(libs.ktor.utils)
                 implementation(libs.curve25519)
-                implementation(libs.kotlinio.base64)
                 compileOnly(libs.serialization.core)
             }
         }

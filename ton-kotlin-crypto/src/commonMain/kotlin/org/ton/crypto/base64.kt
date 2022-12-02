@@ -1,7 +1,7 @@
 package org.ton.crypto
 
-import com.github.andreypfau.kotlinio.base64.Base64
-import com.github.andreypfau.kotlinio.base64.Base64Url
+import org.ton.crypto.base64.Base64
+import org.ton.crypto.base64.Base64Url
 
 fun base64(string: String): ByteArray = Base64.decode(string)
 

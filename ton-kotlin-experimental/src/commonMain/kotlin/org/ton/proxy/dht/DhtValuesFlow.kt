@@ -11,7 +11,6 @@ import org.ton.api.dht.DhtValueFound
 import org.ton.api.dht.DhtValueNotFound
 import org.ton.api.dht.DhtValueResult
 import org.ton.api.dht.functions.DhtFindValue
-import org.ton.crypto.encodeHex
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 
@@ -44,7 +43,6 @@ class DhtValuesFlow(
     @FlowPreview
     override suspend fun collectSafely(collector: FlowCollector<Pair<DhtPeer, DhtValueResult?>>): Unit =
         coroutineScope {
-            println("key: ${key.encodeHex()}")
             while (isActive && !peersChannel.isEmpty) {
                 var batchCount = 0
                 val results = ArrayList<Pair<DhtPeer, Deferred<DhtValueResult?>>>(MAX_BATCH_COUNT)

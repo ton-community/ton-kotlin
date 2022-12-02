@@ -4,6 +4,10 @@ import org.ton.bitstring.exception.BitStringOverflowException
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.crypto.hex
 import kotlin.experimental.and
+import kotlin.experimental.or
+import kotlin.experimental.xor
+import kotlin.jvm.JvmStatic
+import kotlin.math.min
 
 open class ByteBackedBitString protected constructor(
     override val size: Int,
@@ -48,6 +52,38 @@ open class ByteBackedBitString protected constructor(
     override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
     override fun indexOf(element: Boolean): Int = indexOfFirst { it == element }
     override fun iterator(): Iterator<Boolean> = listIterator()
+
+    override fun xor(other: BitString): BitString {
+        return if (other !is ByteBackedBitString) {
+            val result = ByteBackedMutableBitString.of(maxOf(size, other.size))
+            for (i in 0 until min(size, other.size)) {
+                result[i] = get(i) xor other[i]
+            }
+            result
+        } else {
+            val result = ByteArray(maxOf(bytes.size, other.bytes.size))
+            for (i in 0 until min(bytes.size, other.bytes.size)) {
+                result[i] = bytes[i] xor other.bytes[i]
+            }
+            of(result, maxOf(size, other.size))
+        }
+    }
+
+    override fun or(other: BitString): BitString {
+        return if (other !is ByteBackedBitString) {
+            val result = ByteBackedMutableBitString.of(maxOf(size, other.size))
+            for (i in 0 until min(size, other.size)) {
+                result[i] = get(i) or other[i]
+            }
+            result
+        } else {
+            val result = ByteArray(maxOf(bytes.size, other.bytes.size))
+            for (i in 0 until min(bytes.size, other.bytes.size)) {
+                result[i] = bytes[i] or other.bytes[i]
+            }
+            of(result, maxOf(size, other.size))
+        }
+    }
 
     override fun toString(): String {
         if (size == 0) return ""

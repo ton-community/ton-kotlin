@@ -24,6 +24,7 @@ import org.ton.tl.TLFunction
 import org.ton.tl.TlObject
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +33,7 @@ open class AdnlPeer(
     val address: AdnlAddressUdp,
     val key: PublicKey
 ) : AdnlPacketReceiver, CoroutineScope, Closeable {
-    override val coroutineContext: CoroutineContext = Dispatchers.IO
+    override val coroutineContext: CoroutineContext = DISPATCHER
     private val startTime = Clock.System.now()
     private val localKey = AtomicReference(PrivateKeyEd25519())
     private val localId = AtomicReference(localKey.get().toAdnlIdShort())
@@ -170,15 +171,14 @@ open class AdnlPeer(
     companion object {
         val DEFAULT_MTU = 1024L
         val ADDRESS_LIST_TIMEOUT: Duration = 1000.seconds
-        private val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).udp().bind()
+        private val DISPATCHER = newSingleThreadContext("adnl-peer-dispatcher")
+        private val socket = aSocket(ActorSelectorManager(DISPATCHER)).udp().bind()
         private val receive = MutableSharedFlow<Pair<AdnlIdShort, Datagram>>()
-        private val globalJob = GlobalScope.launch(Dispatchers.IO) {
+        private val globalJob = CoroutineScope(DISPATCHER).launch {
             while (isActive) {
                 val datagram = socket.receive()
-                launch {
-                    val adnlId = AdnlIdShort.decode(datagram.packet)
-                    receive.emit(adnlId to datagram)
-                }
+                val adnlId = AdnlIdShort.decode(datagram.packet)
+                receive.emit(adnlId to datagram)
             }
         }
 

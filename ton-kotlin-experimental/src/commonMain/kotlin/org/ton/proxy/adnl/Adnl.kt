@@ -4,6 +4,7 @@ import io.ktor.util.collections.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
+import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
@@ -24,7 +25,7 @@ open class Adnl(
     val networkEngine: AdnlNetworkEngine,
     val addressResolver: AdnlAddressResolver
 ) : CoroutineScope, AdnlSender {
-    override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName(toString())
+    override val coroutineContext: CoroutineContext = newFixedThreadPoolContext(1, "ADNL") + CoroutineName(toString())
     private val logger = Logger.println(toString(), Logger.Level.INFO)
     private val channels: MutableMap<AdnlIdShort, AdnlChannel> = ConcurrentMap()
     private val remotePeer: MutableMap<AdnlIdShort, AdnlPeerSession> = ConcurrentMap()
@@ -62,7 +63,7 @@ open class Adnl(
                 ?.firstOrNull(),
             adnlIdShort
         )
-        logger.debug { "send datagram: ${payload.encodeHex()}" }
+        logger.debug { "[${ipv4(address.ip)}:${address.port}] send datagram: ${payload.encodeHex()}" }
         networkEngine.sendDatagram(address, ByteReadPacket(payload))
     }
 
@@ -104,14 +105,16 @@ open class Adnl(
             return
         }
         val id = AdnlIdShort.decode(datagram)
+        val payload = datagram.readBytes()
+        logger.debug { "[${ipv4(address.ip)}:${address.port}] Received datagram: ${payload.encodeHex()}" }
         val peer = localPeer[id]
         if (peer != null) {
-            peer.receiveDatagram(datagram.readBytes(), null)
+            peer.receiveDatagram(payload, null)
             return
         }
         val channel = channels[id]
         if (channel != null) {
-            channel.receiveDatagram(datagram.readBytes())
+            channel.receiveDatagram(payload)
             return
         }
         logger.warn { "Dropping datagram from: $address, unknown local id: $id" }

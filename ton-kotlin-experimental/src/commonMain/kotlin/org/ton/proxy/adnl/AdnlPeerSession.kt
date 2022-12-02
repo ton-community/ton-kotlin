@@ -15,11 +15,11 @@ import org.ton.api.adnl.message.*
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.bitstring.BitString
-import org.ton.crypto.encodeHex
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.proxy.adnl.channel.AdnlChannel
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.Volatile
 import kotlin.random.Random
 import kotlin.time.Duration
 
@@ -36,7 +36,7 @@ interface AdnlPeerSession : CoroutineScope, AdnlPacketReceiver {
 }
 
 abstract class AbstractAdnlPeerSession(
-    override val adnl: Adnl,
+    final override val adnl: Adnl,
     override val localKey: PrivateKeyEd25519,
     override val remoteKey: PublicKeyEd25519,
 ) : AdnlPeerSession {
@@ -235,6 +235,10 @@ abstract class AbstractAdnlPeerSession(
             messages.add(additionalMessage)
         }
         messages.add(message)
+        sendMessages(messages, channel)
+    }
+
+    private suspend fun sendMessages(messages: List<AdnlMessage>, channel: AdnlChannel?) {
         var seqno = 0L
         var confirmSeqno = 0L
         receiveLock.withLock {
@@ -268,7 +272,6 @@ abstract class AbstractAdnlPeerSession(
             val datagram = ByteArray(destId.size + encryptedPayload.size)
             destId.copyInto(datagram)
             encryptedPayload.copyInto(datagram, destId.size)
-            logger.debug { "send datagram: ${datagram.encodeHex()}" }
             adnl.sendDatagram(remoteKey.toAdnlIdShort(), datagram)
         }
     }

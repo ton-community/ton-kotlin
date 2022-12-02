@@ -1,5 +1,9 @@
 package org.ton.experimental
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -15,14 +19,13 @@ import org.ton.api.http.HttpHeader
 import org.ton.api.http.HttpResponse
 import org.ton.api.http.functions.HttpGetNextPayloadPart
 import org.ton.api.http.functions.HttpRequest
+import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bitstring.BitString
 import org.ton.block.DnsAdnlAddress
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.lite.client.LiteClient
-import org.ton.proxy.CONFIG_GLOBAL
-import org.ton.proxy.JSON
 import org.ton.proxy.adnl.engine.CIOAdnlNetworkEngine
 import org.ton.proxy.dht.Dht
 import org.ton.proxy.dns.DnsCategory
@@ -33,37 +36,35 @@ import kotlin.random.Random
 import kotlin.test.Test
 
 class Test {
-    @Test
-    fun dhtTest() = runBlocking {
-        val dht = Dht.lite(CONFIG_GLOBAL.dht.static_nodes)
-        val liteClient = LiteClient(CONFIG_GLOBAL)
-        val dns = DnsResolver(liteClient)
-
-        val site = dns.resolve("foundation.ton", DnsCategory.SITE) as? DnsAdnlAddress ?: return@runBlocking
-        println(site)
-
-        val res = dht.resolve(AdnlIdShort(site.adnl_addr))
-        println(res)
-    }
 
     @Test
     fun testPing() = runBlocking {
-        val liteClient = LiteClient(CONFIG_GLOBAL)
+        val file = HttpClient(CIO).get("https://ton.org/global-config.json").readBytes().decodeToString()
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val config = json.decodeFromString<LiteClientConfigGlobal>(file)
+        val liteClient = LiteClient(config)
         val dns = DnsResolver(liteClient)
-        val dht = Dht.lite(CONFIG_GLOBAL.dht.static_nodes)
+//        val siteKey = PublicKeyEd25519(hex("f8ee48b91cfd7cdfa2f840e18cc1f54e6e790cd3200a403e5ba5ef88e295b55f"))
+//        val siteAddr = siteKey.toAdnlIdShort()
+//        val resolver = MapAdnlAddressResolver(mapOf(
+//            siteAddr to (siteKey to listOf(AdnlAddressUdp(ipv4("127.0.0.1"), 3333)))
+//        ))
+        val dht = Dht.lite(config.dht.static_nodes)
 
         val host = "foundation.ton"
-        val dnsRecord = dns.resolve(host, DnsCategory.SITE) as? DnsAdnlAddress ?: return@runBlocking
-        val siteAddr = AdnlIdShort(dnsRecord.adnl_addr)
+        val siteAddr = AdnlIdShort((dns.resolve(host, DnsCategory.SITE) as DnsAdnlAddress).adnl_addr)
 
         val rldp = Rldp(CIOAdnlNetworkEngine(), dht)
+        println("addr: $siteAddr")
 
         val id2 = BitString(Random.nextBytes(32))
         val response2 = rldp.get(siteAddr, host, id2)
-        println(JSON.encodeToString(response2))
+        println(json.encodeToString(response2))
 
-        val payload = rldp.query(siteAddr, HttpGetNextPayloadPart(id2, 0, 1 shl 10))
-        println(JSON.encodeToString(payload))
+        val payload = rldp.query(siteAddr, HttpGetNextPayloadPart(id2, 0, 1 shl 25))
+        println(json.encodeToString(payload))
     }
 
     suspend fun Rldp.get(address: AdnlIdShort, host: String, id: BitString): HttpResponse {
