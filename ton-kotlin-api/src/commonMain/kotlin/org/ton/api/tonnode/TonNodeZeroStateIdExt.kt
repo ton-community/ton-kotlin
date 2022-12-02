@@ -5,8 +5,8 @@ package org.ton.api.tonnode
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.crypto.encodeHex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readIntTl

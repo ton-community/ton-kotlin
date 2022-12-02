@@ -1,6 +1,6 @@
 package org.ton.api.pk
 
-import org.ton.crypto.base64
+import org.ton.crypto.base64.base64
 import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertContentEquals

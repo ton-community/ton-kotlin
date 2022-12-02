@@ -4,8 +4,8 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.base64.base64
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.readIntTl

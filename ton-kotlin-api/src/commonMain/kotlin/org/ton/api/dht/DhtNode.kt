@@ -7,8 +7,8 @@ import org.ton.api.adnl.AdnlAddressList
 import org.ton.api.adnl.AdnlNode
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.base64.base64
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl

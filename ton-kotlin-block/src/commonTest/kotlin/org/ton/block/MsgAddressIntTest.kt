@@ -4,6 +4,7 @@ import org.ton.bitstring.BitString
 import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class MsgAddressIntTest {
     @Test
@@ -25,7 +26,7 @@ class MsgAddressIntTest {
     }
 
     @Test
-    fun `parse user-friendly base64(url) addresses`() {
+    fun `parse user-friendly base64url addresses`() {
         val bounceableAddr1 =
             AddrStd.parseUserFriendly("Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF")
         assertEquals(-1, bounceableAddr1.workchain_id)
@@ -137,7 +138,7 @@ class MsgAddressIntTest {
     }
 
     @Test
-    fun `address to user-friendly base64(url) string`() {
+    fun `address to user-friendly base64url string`() {
         val addr1 =
             AddrStd(null, -1, hex("3333333333333333333333333333333333333333333333333333333333333333"))
         assertEquals(

@@ -11,6 +11,8 @@ import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
 import org.ton.crypto.*
 import org.ton.crypto.aes.EncryptorAes
+import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.base64.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl

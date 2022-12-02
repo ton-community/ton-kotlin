@@ -7,8 +7,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.base64.base64
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readInt256Tl

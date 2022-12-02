@@ -9,8 +9,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readInt256Tl

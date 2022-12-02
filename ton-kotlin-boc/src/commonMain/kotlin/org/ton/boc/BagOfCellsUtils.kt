@@ -4,7 +4,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
-import org.ton.crypto.crc32c
+import org.ton.crypto.crc32.crc32c
 import kotlin.experimental.and
 import kotlin.time.ExperimentalTime
 
