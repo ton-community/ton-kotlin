@@ -88,7 +88,7 @@ data class AddrStd(
                     base64(data)
                 }
             } else {
-                address.workchain_id.toString() + ":" + hex(address.address.toByteArray())
+                "${address.workchain_id}:${address.address}"
             }
         }
 
