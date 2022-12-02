@@ -1,6 +1,6 @@
 package org.ton.proxy.adnl
 
-import java.util.concurrent.atomic.AtomicLong
+import kotlinx.atomicfu.AtomicLong
 
 class PacketsHistory private constructor(
     val deliveredSet: ArrayDeque<Long>?,

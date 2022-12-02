@@ -17,6 +17,7 @@ import org.ton.proxy.dht.state.DhtState
 import org.ton.proxy.dht.storage.DhtStorage
 import kotlin.experimental.and
 import kotlin.experimental.xor
+import kotlin.jvm.JvmStatic
 import kotlin.time.Duration.Companion.minutes
 
 class Dht(
