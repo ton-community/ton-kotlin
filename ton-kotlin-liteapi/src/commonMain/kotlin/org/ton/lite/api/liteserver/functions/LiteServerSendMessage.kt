@@ -6,7 +6,7 @@ import org.ton.block.Message
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
-import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.crypto.hex
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tl.TlConstructor

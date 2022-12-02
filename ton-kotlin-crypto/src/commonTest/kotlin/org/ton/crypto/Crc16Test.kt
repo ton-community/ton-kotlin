@@ -1,5 +1,6 @@
 package org.ton.crypto
 
+import org.ton.crypto.crc16.crc16
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

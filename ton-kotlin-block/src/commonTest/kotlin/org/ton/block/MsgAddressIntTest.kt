@@ -4,6 +4,7 @@ import org.ton.bitstring.BitString
 import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class MsgAddressIntTest {
     @Test
@@ -25,7 +26,7 @@ class MsgAddressIntTest {
     }
 
     @Test
-    fun `parse user-friendly base64(url) addresses`() {
+    fun `parse user-friendly base64url addresses`() {
         val bounceableAddr1 =
             AddrStd.parseUserFriendly("Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF")
         assertEquals(-1, bounceableAddr1.workchain_id)
@@ -137,7 +138,7 @@ class MsgAddressIntTest {
     }
 
     @Test
-    fun `address to user-friendly base64(url) string`() {
+    fun `address to user-friendly base64url string`() {
         val addr1 =
             AddrStd(null, -1, hex("3333333333333333333333333333333333333333333333333333333333333333"))
         assertEquals(
@@ -190,5 +191,25 @@ class MsgAddressIntTest {
             "kf_dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN-xdzh",
             addr3.toString(urlSafe = true, testOnly = true, bounceable = true)
         )
+    }
+
+    @Test
+    fun `user friendly address representation`() {
+        val okAddr1 = AddrStd(0, hex("0F3DCC67E2C308314D56D3F0CA042A392CDD560F7B8514A8EA6348E9CADD1665"))
+        val okAddr2 = AddrStd(0, hex("AE94287A412BC6B3CC73FBB6C0D57EAEBF7C24E8D24AC092313A55007137A2F9"))
+
+        assertEquals("EQAPPcxn4sMIMU1W0_DKBCo5LN1WD3uFFKjqY0jpyt0WZf7D", okAddr1.toString(userFriendly = true))
+        assertEquals("EQCulCh6QSvGs8xz-7bA1X6uv3wk6NJKwJIxOlUAcTei-cjj", okAddr2.toString(userFriendly = true))
+
+        assertEquals(
+            AddrStd("EQBLAcMnTcyx-_mWQtrVEC1eyDfK2nHI-A54P5eL7y-uE2Ht").toString(userFriendly = true),
+            "EQBLAcMnTcyx-_mWQtrVEC1eyDfK2nHI-A54P5eL7y-uE2Ht"
+        )
+
+        val badAddr = AddrStd(0, hex("6C5FADFB25D8F6E55D26537BAC5B90E09ACEB0D447C6EE2DE2A94D93AB34B25D"))
+
+        assertEquals(AddrStd("EQBsX637Jdj25V0mU3usW5Dgms6w1EfG7i3iqU2TqzSyXf_s"), badAddr)
+        // crc = 65516 , user friendly has wrong tail
+        assertNotEquals("EQBsX637Jdj25V0mU3usW5Dgms6w1EfG7i3iqU2TqzSyXew=", badAddr.toString(userFriendly = true))
     }
 }
