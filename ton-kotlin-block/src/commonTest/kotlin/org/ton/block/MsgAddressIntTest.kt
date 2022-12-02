@@ -125,14 +125,14 @@ class MsgAddressIntTest {
         val addr2 =
             AddrStd(null, 0, hex("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"))
         assertEquals(
-            "0:83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8",
+            "0:83DFD552E63729B472FCBCC8C45EBCC6691702558B68EC7527E1BA403A0F31A8",
             addr2.toString(userFriendly = false)
         )
 
         val addr3 =
             AddrStd(null, -1, hex("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"))
         assertEquals(
-            "-1:dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5",
+            "-1:DD24C4A1F2B88F8B7053513B5CC6C5A31BC44B2A72DCB4D8C0338AF0F0D37EC5",
             addr3.toString(userFriendly = false)
         )
     }
