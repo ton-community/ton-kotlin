@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain.INVALID_WORKCHAIN
 import org.ton.bitstring.BitString
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.ByteArray
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor

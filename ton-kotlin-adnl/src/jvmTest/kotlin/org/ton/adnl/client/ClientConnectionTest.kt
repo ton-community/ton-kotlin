@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.ton.adnl.client.socket.adnl
 import org.ton.adnl.ipv4
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.crypto.base64
+import org.ton.crypto.base64.base64
 import org.ton.crypto.hex
 import kotlin.math.ceil
 import kotlin.random.Random

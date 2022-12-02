@@ -7,8 +7,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.Encryptor
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.crypto.ed25519.Ed25519
 import org.ton.crypto.ed25519.EncryptorEd25519
 import org.ton.crypto.hex

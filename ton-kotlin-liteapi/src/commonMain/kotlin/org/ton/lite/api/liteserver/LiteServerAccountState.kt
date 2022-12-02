@@ -9,7 +9,7 @@ import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Shard
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.boc.BagOfCells
-import org.ton.crypto.Base64ByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl

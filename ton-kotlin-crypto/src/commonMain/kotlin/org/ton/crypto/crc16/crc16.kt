@@ -1,6 +1,6 @@
 @file:Suppress("OPT_IN_USAGE")
 
-package org.ton.crypto
+package org.ton.crypto.crc16
 
 private val CRC16_TABLE = ushortArrayOf(
     0x0000u,
@@ -267,7 +267,7 @@ fun crc16(vararg byteArrays: ByteArray): Int {
     var crc: UShort = 0u
     byteArrays.forEach { byteArray ->
         byteArray.forEach { byte ->
-            val t = (byte.toInt() xor (crc.toInt() shr 8)) and 0xff
+            val t = (byte.toInt() xor (crc.toInt() ushr 8)) and 0xff
             crc = CRC16_TABLE[t] xor (crc.toInt() shl 8).toUShort()
         }
     }

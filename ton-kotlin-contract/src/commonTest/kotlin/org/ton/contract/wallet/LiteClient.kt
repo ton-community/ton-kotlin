@@ -2,7 +2,7 @@ package org.ton.contract.wallet
 
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.crypto.base64
+import org.ton.crypto.base64.base64
 import org.ton.lite.client.LiteClient
 
 fun liteClient() = LiteClient(
