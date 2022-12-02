@@ -9,7 +9,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.1.0")
+    implementation("org.ton:ton-kotlin:0.1.1")
 }
 ```
 
