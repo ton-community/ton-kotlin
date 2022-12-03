@@ -1,5 +1,7 @@
 package org.ton.bitstring
 
+import kotlin.jvm.JvmStatic
+
 interface MutableBitString : BitString, MutableList<Boolean> {
     operator fun set(index: Int, bit: Int)
     override operator fun set(index: Int, element: Boolean): Boolean
