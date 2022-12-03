@@ -53,7 +53,7 @@ class WalletV2R2Test {
         val wallet = wallet()
         val address = wallet.address()
         val actual = address.toString(userFriendly = false, testOnly = true)
-        val expected = "0:f31ec5cc91a9a225ea822dcacd0d4bb2067efc26becd51cc74ef95a111fa883e"
+        val expected = "0:F31EC5CC91A9A225EA822DCACD0D4BB2067EFC26BECD51CC74EF95A111FA883E"
         assertEquals(expected, actual)
     }
 
