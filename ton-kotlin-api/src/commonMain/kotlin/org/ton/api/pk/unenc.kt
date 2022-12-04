@@ -10,6 +10,7 @@ import org.ton.crypto.DecryptorNone
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
+import kotlin.reflect.typeOf
 
 @JsonClassDiscriminator("@type")
 @SerialName("pk.unenc")
@@ -19,16 +20,7 @@ data class PrivateKeyUnencrypted(
 ) : PrivateKey, Decryptor by DecryptorNone {
     override fun publicKey() = PublicKeyUnencrypted(data)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
 
-        other as PrivateKeyUnencrypted
-
-        if (!data.contentEquals(other.data)) return false
-
-        return true
-    }
 
     override fun hashCode(): Int {
         return data.contentHashCode()
@@ -36,8 +28,15 @@ data class PrivateKeyUnencrypted(
 
     override fun toString(): String = toAdnlIdShort().toString()
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PrivateKeyUnencrypted) return false
+        if (!data.contentEquals(other.data)) return false
+        return true
+    }
+
     companion object : TlConstructor<PrivateKeyUnencrypted>(
-        type = PrivateKeyUnencrypted::class,
+        type = typeOf<PrivateKeyUnencrypted>(),
         schema = "pk.unenc data:bytes = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyUnencrypted) {

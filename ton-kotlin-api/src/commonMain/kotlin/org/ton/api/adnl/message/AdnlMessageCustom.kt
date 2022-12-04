@@ -5,8 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import org.ton.api.JSON
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.BytesTlConstructor
 import org.ton.tl.constructors.writeBytesTl

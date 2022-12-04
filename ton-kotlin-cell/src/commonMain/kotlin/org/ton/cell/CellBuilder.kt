@@ -8,6 +8,7 @@ import org.ton.cell.exception.CellOverflowException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.jvm.JvmStatic
 
 interface CellBuilder {
     var bits: MutableBitString

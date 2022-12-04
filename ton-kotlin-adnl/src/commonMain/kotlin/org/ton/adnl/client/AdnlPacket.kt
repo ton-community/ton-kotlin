@@ -3,7 +3,7 @@ package org.ton.adnl.client
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import org.ton.crypto.encodeHex
-import org.ton.crypto.sha256
+import org.ton.crypto.sha256.sha256
 import kotlin.random.Random
 
 class AdnlPacket(

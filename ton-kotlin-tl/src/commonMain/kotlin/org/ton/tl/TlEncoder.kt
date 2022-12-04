@@ -1,7 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.crypto.sha256
+import org.ton.crypto.sha256.sha256
 
 interface TlEncoder<T : Any> {
     fun encode(value: T): ByteArray = buildPacket {

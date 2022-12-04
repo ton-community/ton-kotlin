@@ -8,9 +8,8 @@ import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain
 import org.ton.bitstring.BitString
 import org.ton.block.AddrStd
-import org.ton.block.MsgAddressInt
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.crypto.encodeHex
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readBytesTl

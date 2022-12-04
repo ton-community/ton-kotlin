@@ -2,7 +2,7 @@ package org.ton.crypto.ed25519
 
 import io.github.andreypfau.curve25519.ed25519.Ed25519
 import io.github.andreypfau.curve25519.ed25519.Ed25519PublicKey
-import org.ton.crypto.SecureRandom
+import org.ton.crypto.random.SecureRandom
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 

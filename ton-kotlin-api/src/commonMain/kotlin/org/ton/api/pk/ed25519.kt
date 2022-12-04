@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.crypto.Decryptor
-import org.ton.crypto.SecureRandom
+import org.ton.crypto.random.SecureRandom
 import org.ton.crypto.ed25519.DecryptorEd25519
 import org.ton.crypto.ed25519.Ed25519
 import org.ton.tl.TlCodec

@@ -23,6 +23,7 @@ data class AccountStorage(
 }
 
 private object AccountStorageTlbConstructor : TlbConstructor<AccountStorage>(
+    type = AccountStorage::class,
     schema = "account_storage\$_ last_trans_lt:uint64 " +
             "balance:CurrencyCollection state:AccountState = AccountStorage;"
 ) {

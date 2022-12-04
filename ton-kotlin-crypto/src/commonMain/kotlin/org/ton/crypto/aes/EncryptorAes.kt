@@ -1,8 +1,7 @@
 package org.ton.crypto.aes
 
 import org.ton.crypto.Encryptor
-import org.ton.crypto.encodeHex
-import org.ton.crypto.sha256
+import org.ton.crypto.sha256.sha256
 
 class EncryptorAes(
     val secret: ByteArray

@@ -7,6 +7,7 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.cell.exception.CellUnderflowException
+import kotlin.jvm.JvmStatic
 
 inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()) = CellSlice.of(bits, refs)
 

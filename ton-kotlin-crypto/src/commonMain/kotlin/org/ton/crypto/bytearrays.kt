@@ -2,8 +2,8 @@ package org.ton.crypto
 
 import io.ktor.util.*
 
-fun ByteArray(string: String): ByteArray {
-    if (string.isEmpty()) return ByteArray(0)
+fun ByteArray(string: String?): ByteArray {
+    if (string.isNullOrEmpty()) return ByteArray(0)
     return try {
         string.decodeBase64Bytes()
     } catch (e: Exception) {

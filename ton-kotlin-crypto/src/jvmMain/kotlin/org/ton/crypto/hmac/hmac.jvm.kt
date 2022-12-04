@@ -1,4 +1,4 @@
-package org.ton.crypto
+package org.ton.crypto.hmac
 
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec

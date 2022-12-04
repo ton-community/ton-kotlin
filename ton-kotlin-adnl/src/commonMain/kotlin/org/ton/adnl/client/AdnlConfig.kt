@@ -1,7 +1,7 @@
 package org.ton.adnl.client
 
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.SecureRandom
+import org.ton.crypto.random.SecureRandom
 import kotlin.random.Random
 
 data class AdnlConfig(

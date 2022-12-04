@@ -40,7 +40,7 @@ allprojects {
                 useJUnitPlatform()
             }
         }
-        macosArm64()
+//        macosArm64()
 
         sourceSets {
             val commonMain by getting {
@@ -52,7 +52,6 @@ allprojects {
             }
             val commonTest by getting {
                 dependencies {
-                    implementation("io.mockk:mockk:1.12.4")
                     implementation(kotlin("test"))
                 }
             }
@@ -65,7 +64,6 @@ allprojects {
                     implementation("junit:junit:4.13.1")
                 }
             }
-
             val nativeMain by creating {
                 dependsOn(commonMain)
             }
@@ -75,9 +73,9 @@ allprojects {
             val macosMain by creating {
                 dependsOn(darwinMain)
             }
-            val macosArm64Main by getting {
-                dependsOn(macosMain)
-            }
+//            val macosArm64Main by getting {
+//                dependsOn(macosMain)
+//            }
         }
     }
 

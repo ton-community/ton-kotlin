@@ -3,6 +3,7 @@ package org.ton.boc
 import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
 import org.ton.crypto.encodeHex
+import kotlin.jvm.JvmStatic
 
 fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
 fun BagOfCells(roots: Iterable<Cell>): BagOfCells = BagOfCells.of(roots)

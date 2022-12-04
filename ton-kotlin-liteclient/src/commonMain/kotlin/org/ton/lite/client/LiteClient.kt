@@ -19,7 +19,7 @@ import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellType
 import org.ton.crypto.encodeHex
-import org.ton.crypto.sha256
+import org.ton.crypto.sha256.sha256
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerBlockData

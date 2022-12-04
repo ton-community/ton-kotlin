@@ -1,7 +1,7 @@
 package org.ton.proxy.dns
 
 import org.ton.bigint.BigInt
-import org.ton.crypto.sha256
+import org.ton.crypto.sha256.sha256
 
 enum class DnsCategory(
     val value: BigInt

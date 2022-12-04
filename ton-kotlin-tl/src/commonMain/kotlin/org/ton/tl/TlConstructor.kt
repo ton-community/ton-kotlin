@@ -4,7 +4,7 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import org.intellij.lang.annotations.Language
-import org.ton.crypto.crc32
+import org.ton.crypto.crc32.crc32
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeIntTl
 import kotlin.reflect.KClass
@@ -15,7 +15,7 @@ abstract class TlConstructor<T : Any>(
     val type: KType,
     @Language("TL")
     val schema: String,
-    val id: Int = crc32(schema),
+    val id: Int = crc32(schema.toByteArray()),
     val fields: List<TlCodec<*>> = emptyList()
 ) : TlCodec<T> {
     constructor(
@@ -24,6 +24,7 @@ abstract class TlConstructor<T : Any>(
                 .replace("(", "")
                 .replace(")", "")
                 .replace(";", "")
+                .toByteArray()
         ), fields: List<TlCodec<*>> = listOf()
     ) : this(
         type.createType(),

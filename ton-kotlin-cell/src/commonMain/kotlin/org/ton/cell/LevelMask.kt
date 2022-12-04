@@ -1,5 +1,7 @@
 package org.ton.cell
 
+import kotlin.jvm.JvmInline
+
 @JvmInline
 value class LevelMask(
     val mask: Int = 0
@@ -16,7 +18,7 @@ value class LevelMask(
     fun isSignificant(level: Int): Boolean {
         require(level < 32)
         val result = level == 0 || ((mask shr (level - 1)) % 2 != 0)
-        assert(result == (apply(level).level == level))
+        check(result == (apply(level).level == level))
         return result
     }
 

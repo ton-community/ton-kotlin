@@ -1,4 +1,4 @@
-package org.ton.crypto
+package org.ton.crypto.pbkdf2
 
 import org.bouncycastle.crypto.digests.SHA512Digest
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator

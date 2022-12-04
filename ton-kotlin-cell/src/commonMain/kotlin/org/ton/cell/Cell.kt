@@ -4,6 +4,7 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
+import kotlin.jvm.JvmStatic
 
 fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
     Cell.of(BitString(hex), refs = refs.toList(), isExotic)
@@ -139,4 +140,3 @@ interface Cell {
         }
     }
 }
-
