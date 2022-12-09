@@ -17,6 +17,7 @@ import org.ton.crypto.base64.base64
 import org.ton.crypto.hex
 import kotlin.math.ceil
 import kotlin.random.Random
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -25,7 +26,7 @@ class ClientConnectionTest {
     @get:Rule
     val timeout = CoroutinesTimeout.seconds(15)
 
-    @Test
+    @Ignore
     fun adnlSocketTest() = runBlocking {
         val socket = aSocket(SelectorManager())
             .tcp()
