@@ -73,7 +73,6 @@ data class LiteServerAccountState(
     }
 
     companion object : TlConstructor<LiteServerAccountState>(
-        type = LiteServerAccountState::class,
         schema = "liteServer.accountState id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:bytes proof:bytes state:bytes = liteServer.AccountState"
     ) {
         override fun decode(input: Input): LiteServerAccountState {

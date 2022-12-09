@@ -9,7 +9,6 @@ fun interface LiteServerGetTimeFunction : LiteServerQueryFunction {
 }
 
 object LiteServerGetTime : TlConstructor<LiteServerGetTime>(
-    type = LiteServerGetTime::class,
     schema = "liteServer.getTime = liteServer.CurrentTime"
 ) {
     override fun decode(input: Input): LiteServerGetTime = LiteServerGetTime

@@ -18,7 +18,6 @@ data class DhtPong(
 }
 
 private object DhtPongTlConstructor : TlConstructor<DhtPong>(
-    type = DhtPong::class,
     schema = "dht.pong random_id:long = dht.Pong"
 ) {
     override fun encode(output: Output, value: DhtPong) {

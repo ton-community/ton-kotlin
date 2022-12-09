@@ -8,7 +8,6 @@ import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
 
 object BytesTlConstructor : TlConstructor<ByteArray>(
-    type = typeOf<ByteArray>(),
     schema = "bytes data:string = Bytes"
 ) {
     fun sizeOf(value: ByteArray): Int {
@@ -55,37 +54,6 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
         return result
     }
 
-    override suspend fun decode(input: ByteReadChannel): ByteArray {
-        var resultLength = input.readUByte().toInt()
-        var resultAlignedLength: Int
-        if (resultLength < 254) {
-            resultAlignedLength = resultLength + 1
-        } else if (resultLength == 254) {
-            resultLength = input.readUByte().toInt() +
-                    (input.readUByte().toInt() shl 8) +
-                    (input.readUByte().toInt() shl 16)
-            resultAlignedLength = resultLength + 4
-        } else {
-            val resultLengthLong = input.readUByte().toLong() +
-                    (input.readUByte().toLong() shl 8) +
-                    (input.readUByte().toLong() shl 16) +
-                    (input.readUByte().toLong() shl 24) +
-                    (input.readUByte().toLong() shl 32) +
-                    (input.readUByte().toLong() shl 40) +
-                    (input.readUByte().toLong() shl 48)
-            if (resultLengthLong > Int.MAX_VALUE) {
-                throw IllegalStateException("Too big byte array: $resultLengthLong")
-            }
-            resultLength = resultLengthLong.toInt()
-            resultAlignedLength = resultLength + 8
-        }
-        val result = input.readBytes(resultLength)
-        while (resultAlignedLength++ % 4 > 0) {
-            check(input.readByte() == 0.toByte())
-        }
-        return result
-    }
-
     override fun encode(output: Output, value: ByteArray) {
         var length = value.size
         if (length < 254) {
@@ -114,13 +82,6 @@ object BytesTlConstructor : TlConstructor<ByteArray>(
         while (length++ % 4 > 0) {
             output.writeByte(0)
         }
-    }
-}
-
-private suspend fun ByteReadChannel.readUByte() = readByte().toUByte()
-private suspend fun ByteReadChannel.readBytes(length: Int): ByteArray {
-    return ByteArray(length) {
-        readByte()
     }
 }
 

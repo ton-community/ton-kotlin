@@ -12,7 +12,6 @@ data class DhtStore(
 }
 
 private object DhtStoreTlConstructor : TlConstructor<DhtStore>(
-    type = DhtStore::class,
     schema = "dht.store value:dht.value = dht.Stored"
 ) {
     override fun decode(input: Input): DhtStore {

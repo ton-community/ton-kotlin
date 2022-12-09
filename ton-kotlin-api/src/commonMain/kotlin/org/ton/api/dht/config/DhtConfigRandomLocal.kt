@@ -20,7 +20,6 @@ class DhtConfigRandomLocal(
 ) : DhtConfigLocal {
     companion object : TlConstructor<DhtConfigRandomLocal>(
         schema = "dht.config.random.local cnt:int = dht.config.Local",
-        type = DhtConfigRandomLocal::class
     ) {
         override fun encode(output: Output, value: DhtConfigRandomLocal) {
             output.writeIntTl(value.cnt)

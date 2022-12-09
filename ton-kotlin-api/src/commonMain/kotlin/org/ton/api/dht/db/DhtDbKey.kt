@@ -15,7 +15,6 @@ data class DhtDbKey(
     override fun tlCodec() = Companion
 
     companion object : TlConstructor<DhtDbKey>(
-        type = DhtDbKey::class,
         schema = "dht.db.key.bucket id:int = dht.db.Key"
     ) {
         override fun encode(output: Output, value: DhtDbKey) {

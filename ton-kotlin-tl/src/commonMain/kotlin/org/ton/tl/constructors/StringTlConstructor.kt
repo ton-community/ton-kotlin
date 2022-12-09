@@ -5,7 +5,6 @@ import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
 
 object StringTlConstructor : TlConstructor<String>(
-    type = typeOf<String>(),
     schema = "string ? = String"
 ) {
     override fun decode(input: Input): String {

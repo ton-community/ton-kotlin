@@ -62,7 +62,6 @@ data class OverlayNode(
 
     companion object : TlConstructor<OverlayNode>(
         schema = "overlay.node id:PublicKey overlay:int256 version:int signature:bytes = overlay.Node",
-        type = OverlayNode::class
     ) {
         override fun encode(output: Output, value: OverlayNode) {
             output.writeTl(PublicKey, value.id)

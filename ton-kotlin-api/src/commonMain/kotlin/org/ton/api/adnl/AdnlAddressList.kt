@@ -27,7 +27,6 @@ data class AdnlAddressList(
     override fun tlCodec(): TlCodec<AdnlAddressList> = Companion
 
     companion object : TlConstructor<AdnlAddressList>(
-        type = AdnlAddressList::class,
         schema = "adnl.addressList addrs:(vector adnl.Address) version:int reinit_date:int priority:int expire_at:int = adnl.AddressList"
     ) {
         override fun encode(output: Output, value: AdnlAddressList) {

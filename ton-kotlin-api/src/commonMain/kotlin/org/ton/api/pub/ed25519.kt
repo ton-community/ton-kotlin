@@ -59,9 +59,7 @@ data class PublicKeyEd25519(
 }
 
 private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
-    type = PublicKeyEd25519::class,
     schema = "pub.ed25519 key:int256 = PublicKey",
-    fields = listOf(Int256TlConstructor)
 ) {
     override fun encode(output: Output, value: PublicKeyEd25519) {
         output.writeFully(value.key)
@@ -69,11 +67,6 @@ private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
 
     override fun decode(input: Input): PublicKeyEd25519 {
         val key = input.readBytes(32)
-        return PublicKeyEd25519(key)
-    }
-
-    override fun decode(values: Iterator<*>): PublicKeyEd25519 {
-        val key = values.next() as ByteArray
         return PublicKeyEd25519(key)
     }
 }

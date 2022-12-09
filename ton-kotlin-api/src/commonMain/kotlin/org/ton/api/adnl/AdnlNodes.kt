@@ -11,7 +11,6 @@ data class AdnlNodes(
     val nodes: List<AdnlNode> = emptyList()
 ) : Iterable<AdnlNode> by nodes {
     companion object : TlConstructor<AdnlNodes>(
-        type = AdnlNodes::class,
         schema = "adnl.nodes nodes:(vector adnl.node) = adnl.Nodes"
     ) {
         override fun encode(output: Output, value: AdnlNodes) {

@@ -11,7 +11,6 @@ data class AdnlPing(
     val value: Long
 ) {
     companion object : TlConstructor<AdnlPing>(
-        AdnlPing::class,
         "adnl.ping value:long = adnl.Pong"
     ) {
         override fun decode(input: Input): AdnlPing {

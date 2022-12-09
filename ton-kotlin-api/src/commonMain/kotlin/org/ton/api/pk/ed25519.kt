@@ -78,7 +78,6 @@ private class PrivateKeyEd25519Impl(
 }
 
 private object PrivateKeyEd25519TlConstructor : TlConstructor<PrivateKeyEd25519>(
-    type = PrivateKeyEd25519::class,
     schema = "pk.ed25519 key:int256 = PrivateKey"
 ) {
     override fun encode(output: Output, value: PrivateKeyEd25519) {

@@ -11,7 +11,6 @@ data class DhtMessage(
     override fun tlCodec(): TlCodec<DhtMessage> = Companion
 
     companion object : TlConstructor<DhtMessage>(
-        type = DhtMessage::class,
         schema = "dht.message node:dht.node = dht.Message"
     ) {
         override fun encode(output: Output, value: DhtMessage) {

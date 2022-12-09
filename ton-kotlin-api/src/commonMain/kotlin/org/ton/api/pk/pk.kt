@@ -14,9 +14,10 @@ sealed interface PrivateKey : Decryptor {
     fun toAdnlIdShort(): AdnlIdShort = publicKey().toAdnlIdShort()
 
     companion object : TlCombinator<PrivateKey>(
-        PrivateKeyUnencrypted,
-        PrivateKeyEd25519.tlConstructor(),
-        PrivateKeyAes,
-        PrivateKeyOverlay
+        PrivateKey::class,
+        PrivateKeyUnencrypted::class to PrivateKeyUnencrypted,
+        PrivateKeyEd25519::class to PrivateKeyEd25519.tlConstructor(),
+        PrivateKeyAes::class to PrivateKeyAes ,
+        PrivateKeyOverlay::class to PrivateKeyOverlay,
     )
 }

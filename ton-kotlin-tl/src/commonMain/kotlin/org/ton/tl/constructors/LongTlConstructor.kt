@@ -5,7 +5,6 @@ import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
 
 object LongTlConstructor : TlConstructor<Long>(
-    type = typeOf<Long>(),
     schema = "long ? = Long"
 ) {
     override fun decode(input: Input): Long {

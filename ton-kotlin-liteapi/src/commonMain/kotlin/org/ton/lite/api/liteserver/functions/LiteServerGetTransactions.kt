@@ -64,7 +64,6 @@ data class LiteServerGetTransactions(
     }
 
     companion object : TlConstructor<LiteServerGetTransactions>(
-        type = LiteServerGetTransactions::class,
         schema = "liteServer.getTransactions count:# account:liteServer.accountId lt:long hash:int256 = liteServer.TransactionList"
     ) {
         override fun decode(input: Input): LiteServerGetTransactions {

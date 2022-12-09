@@ -11,7 +11,6 @@ data class LiteServerCurrentTime(
     val now: Int
 ) {
     companion object : TlConstructor<LiteServerCurrentTime>(
-        type = LiteServerCurrentTime::class,
         schema = "liteServer.currentTime now:int = liteServer.CurrentTime"
     ) {
         override fun decode(input: Input): LiteServerCurrentTime {

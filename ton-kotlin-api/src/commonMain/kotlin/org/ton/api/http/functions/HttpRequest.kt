@@ -47,7 +47,6 @@ data class HttpRequest(
     }
 
     companion object : TlConstructor<HttpRequest>(
-        type = HttpRequest::class,
         schema = "http.request id:int256 method:string url:string http_version:string headers:(vector http.header) = http.Response"
     ) {
         override fun decode(input: Input): HttpRequest {

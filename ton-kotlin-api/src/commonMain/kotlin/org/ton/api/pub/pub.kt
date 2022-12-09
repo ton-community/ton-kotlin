@@ -28,10 +28,11 @@ sealed interface PublicKey : Encryptor, TlObject<PublicKey> {
     fun toAdnlIdShort(): AdnlIdShort
 
     companion object : TlCombinator<PublicKey>(
-        PublicKeyEd25519.tlConstructor(),
-        PublicKeyUnencrypted,
-        PublicKeyAes,
-        PublicKeyOverlay
+        PublicKey::class,
+        PublicKeyEd25519::class to PublicKeyEd25519.tlConstructor(),
+        PublicKeyUnencrypted::class to PublicKeyUnencrypted,
+        PublicKeyAes::class to PublicKeyAes,
+        PublicKeyOverlay::class to PublicKeyOverlay,
     )
 }
 
@@ -66,7 +67,6 @@ data class PublicKeyUnencrypted(
     }
 
     companion object : TlConstructor<PublicKeyUnencrypted>(
-        type = PublicKeyUnencrypted::class,
         schema = "pub.unenc data:bytes = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyUnencrypted) {
@@ -112,7 +112,6 @@ data class PublicKeyAes(
     }
 
     companion object : TlConstructor<PublicKeyAes>(
-        type = PublicKeyAes::class,
         schema = "pub.aes key:int256 = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyAes) {
@@ -137,7 +136,6 @@ data class PublicKeyOverlay(
     )
 
     companion object : TlConstructor<PublicKeyOverlay>(
-        type = PublicKeyOverlay::class,
         schema = "pub.overlay name:bytes = PublicKey"
     ) {
         override fun encode(output: Output, value: PublicKeyOverlay) {

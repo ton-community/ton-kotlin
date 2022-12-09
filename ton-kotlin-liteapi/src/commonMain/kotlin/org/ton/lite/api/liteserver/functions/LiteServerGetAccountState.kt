@@ -28,7 +28,6 @@ data class LiteServerGetAccountState(
     val account: LiteServerAccountId,
 ) {
     companion object : TlConstructor<LiteServerGetAccountState>(
-        type = LiteServerGetAccountState::class,
         schema = "liteServer.getAccountState id:tonNode.blockIdExt account:liteServer.accountId = liteServer.AccountState"
     ) {
         override fun decode(input: Input): LiteServerGetAccountState {

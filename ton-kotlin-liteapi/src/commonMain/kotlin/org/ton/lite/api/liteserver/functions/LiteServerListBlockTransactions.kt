@@ -36,7 +36,6 @@ data class LiteServerListBlockTransactions(
 }
 
 private object LiteServerListBlockTransactionsTlConstructor : TlConstructor<LiteServerListBlockTransactions>(
-    type = LiteServerListBlockTransactions::class,
     schema = "liteServer.listBlockTransactions id:tonNode.blockIdExt mode:# count:# after:mode.7?liteServer.transactionId3 reverse_order:mode.6?true want_proof:mode.5?true = liteServer.BlockTransactions"
 ) {
     override fun decode(input: Input): LiteServerListBlockTransactions {

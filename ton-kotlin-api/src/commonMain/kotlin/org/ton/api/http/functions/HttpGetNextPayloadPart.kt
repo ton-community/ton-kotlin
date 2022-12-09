@@ -46,7 +46,6 @@ data class HttpGetNextPayloadPart(
 }
 
 private object HttpGetNextPayloadPartTlConstructor : TlConstructor<HttpGetNextPayloadPart>(
-    type = HttpGetNextPayloadPart::class,
     schema = "http.getNextPayloadPart id:int256 seqno:int max_chunk_size:int = http.PayloadPart"
 ) {
     override fun decode(input: Input): HttpGetNextPayloadPart {

@@ -6,10 +6,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.Int256TlConstructor
-import org.ton.tl.constructors.IntTlConstructor
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.complete")
@@ -24,22 +21,17 @@ data class RldpComplete(
     override fun tlCodec(): TlCodec<RldpComplete> = Companion
 
     companion object : TlConstructor<RldpComplete>(
-        type = RldpComplete::class,
         schema = "rldp.complete transfer_id:int256 part:int = rldp.MessagePart",
-        fields = listOf(
-            Int256TlConstructor,
-            IntTlConstructor,
-        )
     ) {
         override fun encode(output: Output, value: RldpComplete) {
             output.writeInt256Tl(value.transfer_id)
             output.writeIntTl(value.part)
         }
 
-        override fun decode(values: Iterator<*>): RldpComplete {
-            val transfer_id = BitString(values.next() as ByteArray)
-            val part = values.next() as Int
-            return RldpComplete(transfer_id, part)
+        override fun decode(input: Input): RldpComplete {
+            val transfer_id = input.readInt256Tl()
+            val part = input.readIntTl()
+            return RldpComplete(BitString(transfer_id), part)
         }
     }
 }

@@ -14,7 +14,6 @@ data class AdnlConfigGlobal(
     val static_nodes: AdnlNodes = AdnlNodes()
 ) {
     companion object : TlConstructor<AdnlConfigGlobal>(
-        type = AdnlConfigGlobal::class,
         schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
     ) {
         override fun encode(output: Output, value: AdnlConfigGlobal) {

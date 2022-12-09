@@ -43,9 +43,7 @@ data class AdnlMessagePart(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessagePart>(
-       type =  AdnlMessagePart::class,
         schema = "adnl.message.part hash:int256 total_size:int offset:int data:bytes = adnl.Message;",
-        fields = listOf(Int256TlConstructor, IntTlConstructor, IntTlConstructor, BytesTlConstructor)
     ) {
         fun sizeOf(value: AdnlMessagePart): Int =
             Int256TlConstructor.SIZE_BYTES +
@@ -72,11 +70,11 @@ data class AdnlMessagePart(
             return parts
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessagePart {
-            val hash = values.next() as ByteArray
-            val totalSize = values.next() as Int
-            val offset = values.next() as Int
-            val data = values.next() as ByteArray
+        override fun decode(input: Input): AdnlMessagePart {
+            val hash = input.readInt256Tl()
+            val totalSize = input.readIntTl()
+            val offset = input.readIntTl()
+            val data = input.readBytesTl()
             return AdnlMessagePart(hash, totalSize, offset, data)
         }
 

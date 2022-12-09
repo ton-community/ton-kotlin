@@ -14,6 +14,7 @@ sealed interface LiteServerBlockLink {
 }
 
 private object LiteServerBlockLinkTlCombinator : TlCombinator<LiteServerBlockLink>(
-    LiteServerBlockLinkBack.tlConstructor(),
-    LiteServerBlockLinkForward.tlConstructor()
+    LiteServerBlockLink::class,
+    LiteServerBlockLinkBack::class to LiteServerBlockLinkBack.tlConstructor(),
+    LiteServerBlockLinkForward::class to LiteServerBlockLinkForward.tlConstructor()
 )

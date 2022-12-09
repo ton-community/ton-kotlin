@@ -22,7 +22,6 @@ data class DhtQuery(
 }
 
 private object DhtQueryTlConstructor : TlConstructor<DhtQuery>(
-    type = DhtQuery::class,
     schema = "dht.query node:dht.node = True"
 ) {
     override fun decode(input: Input): DhtQuery {

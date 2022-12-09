@@ -6,16 +6,11 @@ import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
 
 object IntTlConstructor : TlConstructor<Int>(
-    type = typeOf<Int>(),
     schema = "int ? = Int"
 ) {
     const val SIZE_BYTES = Int.SIZE_BYTES
 
     override fun decode(input: Input): Int {
-        return input.readIntLittleEndian()
-    }
-
-    override suspend fun decode(input: ByteReadChannel): Int {
         return input.readIntLittleEndian()
     }
 

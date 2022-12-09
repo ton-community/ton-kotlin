@@ -70,7 +70,6 @@ data class LiteServerBlockLinkForward(
 }
 
 private object LiteServerBlockLinkForwardTlConstructor : TlConstructor<LiteServerBlockLinkForward>(
-    type = LiteServerBlockLinkForward::class,
     schema = "liteServer.blockLinkForward to_key_block:Bool from:tonNode.blockIdExt to:tonNode.blockIdExt dest_proof:bytes config_proof:bytes signatures:liteServer.SignatureSet = liteServer.BlockLink"
 ) {
     override fun decode(input: Input): LiteServerBlockLinkForward {

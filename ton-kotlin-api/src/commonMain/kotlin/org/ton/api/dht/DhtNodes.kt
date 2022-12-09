@@ -20,7 +20,6 @@ data class DhtNodes(
     override fun tlCodec(): TlCodec<DhtNodes> = Companion
 
     companion object : TlConstructor<DhtNodes>(
-        type = DhtNodes::class,
         schema = "dht.nodes nodes:(vector dht.node) = dht.Nodes"
     ) {
         override fun encode(output: Output, value: DhtNodes) {

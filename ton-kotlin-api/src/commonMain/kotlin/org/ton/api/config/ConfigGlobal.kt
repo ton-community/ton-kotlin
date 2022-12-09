@@ -22,7 +22,6 @@ data class ConfigGlobal(
     override fun tlCodec(): TlCodec<ConfigGlobal> = Companion
 
     companion object : TlConstructor<ConfigGlobal>(
-        type = ConfigGlobal::class,
         schema = "config.global adnl:adnl.config.global dht:dht.config.global validator:validator.config.global = config.Global"
     ) {
         override fun encode(output: Output, value: ConfigGlobal) {

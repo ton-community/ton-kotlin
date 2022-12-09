@@ -45,7 +45,6 @@ data class LiteServerTransactionList(
 }
 
 private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServerTransactionList>(
-    type = LiteServerTransactionList::class,
     schema = "liteServer.transactionList ids:(vector tonNode.blockIdExt) transactions:bytes = liteServer.TransactionList",
     id = 1864812043
 ) {

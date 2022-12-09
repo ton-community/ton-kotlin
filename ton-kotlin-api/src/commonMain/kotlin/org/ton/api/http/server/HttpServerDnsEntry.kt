@@ -21,7 +21,6 @@ data class HttpServerDnsEntry(
 }
 
 private object HttpServerDnsEntryTlConstructor : TlConstructor<HttpServerDnsEntry>(
-    type = HttpServerDnsEntry::class,
     schema = "http.server.dnsEntry domain:string addr:adnl.id_short = http.server.DnsEntry"
 ) {
     override fun decode(input: Input): HttpServerDnsEntry {

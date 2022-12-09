@@ -22,7 +22,6 @@ data class LiteServerGetAllShardsInfo(
 }
 
 private object LiteServerGetAllShardsInfoTlConstructor : TlConstructor<LiteServerGetAllShardsInfo>(
-    type = LiteServerGetAllShardsInfo::class,
     schema = "liteServer.getAllShardsInfo id:tonNode.blockIdExt = liteServer.AllShardsInfo"
 ) {
     override fun decode(input: Input): LiteServerGetAllShardsInfo {

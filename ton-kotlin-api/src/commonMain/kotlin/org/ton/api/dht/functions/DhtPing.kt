@@ -22,7 +22,6 @@ data class DhtPing(
 }
 
 private object DhtPingTlConstructor : TlConstructor<DhtPing>(
-    type = DhtPing::class,
     schema = "dht.ping random_id:long = dht.Pong"
 ) {
     override fun decode(input: Input): DhtPing {

@@ -77,7 +77,6 @@ data class DhtNode(
 }
 
 private object DhtNodeTlConstructor : TlConstructor<DhtNode>(
-    type = DhtNode::class,
     schema = "dht.node id:PublicKey addr_list:adnl.addressList version:int signature:bytes = dht.Node"
 ) {
     override fun encode(output: Output, value: DhtNode) {

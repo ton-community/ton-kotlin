@@ -17,8 +17,9 @@ sealed interface RldpMessage : TlObject<RldpMessage> {
     val data: ByteArray
 
     companion object : TlCombinator<RldpMessage>(
-        RldpMessageData,
-        RldpQuery,
-        RldpAnswer,
+        RldpMessage::class,
+        RldpMessageData::class to RldpMessageData,
+        RldpQuery::class to RldpQuery,
+        RldpAnswer::class to RldpAnswer,
     )
 }

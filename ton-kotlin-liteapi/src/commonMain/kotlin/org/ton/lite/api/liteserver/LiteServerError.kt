@@ -16,7 +16,6 @@ data class LiteServerError(
     override fun toString(): String = "[$code] $message"
 
     companion object : TlConstructor<LiteServerError>(
-        type = LiteServerError::class,
         schema = "liteServer.error code:int message:string = liteServer.Error"
     ) {
         override fun decode(input: Input): LiteServerError {

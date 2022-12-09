@@ -20,7 +20,6 @@ class OverlayNodes(
 
     companion object : TlConstructor<OverlayNodes>(
         schema = "overlay.nodes nodes:(vector overlay.node) = overlay.Nodes",
-        type = OverlayNodes::class
     ) {
         override fun encode(output: Output, value: OverlayNodes) {
             output.writeVectorTl(value.nodes, OverlayNode)

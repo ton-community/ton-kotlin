@@ -15,7 +15,6 @@ data class DhtConfigIdLocal(
 ) : DhtConfigLocal {
 
     companion object : TlConstructor<DhtConfigIdLocal>(
-        type = DhtConfigIdLocal::class,
         schema = "dht.config.local id:adnl.id_short = dht.config.Local"
     ) {
         override fun encode(output: Output, value: DhtConfigIdLocal) {

@@ -56,7 +56,6 @@ data class LiteServerBlockHeader(
 }
 
 private object LiteServerBlockHeaderTlConstructor : TlConstructor<LiteServerBlockHeader>(
-    LiteServerBlockHeader::class,
     "liteServer.blockHeader id:tonNode.blockIdExt mode:# header_proof:bytes = liteServer.BlockHeader"
 ) {
     override fun decode(input: Input): LiteServerBlockHeader {

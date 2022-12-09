@@ -16,7 +16,8 @@ sealed interface DhtConfigLocal : TlObject<DhtConfigLocal> {
     override fun tlCodec(): TlCodec<out DhtConfigLocal> = Companion
 
     companion object : TlCombinator<DhtConfigLocal>(
-        DhtConfigRandomLocal,
-        DhtConfigIdLocal,
+        DhtConfigLocal::class,
+        DhtConfigRandomLocal::class to DhtConfigRandomLocal.Companion,
+        DhtConfigIdLocal::class to DhtConfigIdLocal.Companion,
     )
 }

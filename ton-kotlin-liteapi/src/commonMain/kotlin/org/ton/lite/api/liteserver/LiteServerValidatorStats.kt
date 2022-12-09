@@ -65,7 +65,6 @@ data class LiteServerValidatorStats(
 }
 
 private object LiteServerValidatorStatsTlConstructor : TlConstructor<LiteServerValidatorStats>(
-    type = LiteServerValidatorStats::class,
     schema = "liteServer.validatorStats mode:# id:tonNode.blockIdExt count:int complete:Bool state_proof:bytes data_proof:bytes = liteServer.ValidatorStats"
 ) {
     override fun decode(input: Input): LiteServerValidatorStats {

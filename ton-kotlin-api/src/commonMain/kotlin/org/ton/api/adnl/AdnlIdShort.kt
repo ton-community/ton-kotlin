@@ -99,7 +99,6 @@ private data class AdnlIdShortImpl(
 }
 
 private object AdnlIdShortTlConstructor : TlConstructor<AdnlIdShort>(
-    type = AdnlIdShort::class,
     schema = "adnl.id.short id:int256 = adnl.id.Short"
 ) {
     override fun decode(input: Input): AdnlIdShort {

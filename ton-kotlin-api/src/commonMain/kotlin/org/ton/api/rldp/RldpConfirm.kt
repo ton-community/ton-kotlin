@@ -6,10 +6,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.Int256TlConstructor
-import org.ton.tl.constructors.IntTlConstructor
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.confirm")
@@ -25,13 +22,7 @@ data class RldpConfirm(
     override fun tlCodec(): TlCodec< RldpConfirm> = Companion
 
     companion object : TlConstructor<RldpConfirm>(
-        type = RldpConfirm::class,
         schema = "rldp.confirm transfer_id:int256 part:int seqno:int = rldp.MessagePart",
-        fields = listOf(
-            Int256TlConstructor,
-            IntTlConstructor,
-            IntTlConstructor
-        )
     ) {
         override fun encode(output: Output, value: RldpConfirm) {
             output.writeInt256Tl(value.transfer_id)
@@ -39,11 +30,11 @@ data class RldpConfirm(
             output.writeIntTl(value.seqno)
         }
 
-        override fun decode(values: Iterator<*>): RldpConfirm {
-            val transfer_id = BitString(values.next() as ByteArray)
-            val part = values.next() as Int
-            val seqno = values.next() as Int
-            return RldpConfirm(transfer_id, part, seqno)
+        override fun decode(input: Input): RldpConfirm {
+            val transfer_id = input.readInt256Tl()
+            val part = input.readIntTl()
+            val seqno = input.readIntTl()
+            return RldpConfirm(BitString(transfer_id), part, seqno)
         }
     }
 }

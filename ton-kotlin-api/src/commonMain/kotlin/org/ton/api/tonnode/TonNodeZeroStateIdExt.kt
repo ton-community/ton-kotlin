@@ -54,7 +54,6 @@ data class TonNodeZeroStateIdExt(
     override fun toString() = "($workchain:${root_hash.encodeHex().uppercase()}:${file_hash.encodeHex().uppercase()})"
 
     companion object : TlConstructor<TonNodeZeroStateIdExt>(
-        type = TonNodeZeroStateIdExt::class,
         schema = "tonNode.zeroStateIdExt workchain:int root_hash:int256 file_hash:int256 = tonNode.ZeroStateIdExt"
     ) {
         override fun decode(input: Input): TonNodeZeroStateIdExt {

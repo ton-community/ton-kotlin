@@ -16,7 +16,6 @@ data class LiteServerVersion(
     val now: Int
 ) {
     companion object : TlConstructor<LiteServerVersion>(
-        type = LiteServerVersion::class,
         schema = "liteServer.version mode:# version:int capabilities:long now:int = liteServer.Version"
     ) {
         override fun decode(input: Input): LiteServerVersion {

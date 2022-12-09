@@ -21,7 +21,6 @@ operator fun Iterable<HttpHeader>.get(name: String) = firstOrNull { it.name == n
 fun Iterable<HttpHeader>.getAll(name: String) = asSequence().filter { it.name == name }.map { it.value }
 
 private object HttpHeaderTlConstructor : TlConstructor<HttpHeader>(
-    type = HttpHeader::class,
     schema = "http.header name:string value:string = http.Header"
 ) {
     override fun decode(input: Input): HttpHeader {

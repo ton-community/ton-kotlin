@@ -40,7 +40,6 @@ data class LiteServerTransactionInfo(
 }
 
 private object LiteServerTransactionInfoTlConstructor : TlConstructor<LiteServerTransactionInfo>(
-    type = LiteServerTransactionInfo::class,
     schema = "liteServer.transactionInfo id:tonNode.blockIdExt proof:bytes transaction:bytes = liteServer.TransactionInfo"
 ) {
     override fun decode(input: Input): LiteServerTransactionInfo {

@@ -16,14 +16,15 @@ sealed interface AdnlMessage : TlObject<AdnlMessage> {
     override fun tlCodec(): TlCodec<out AdnlMessage> = Companion
 
     companion object : TlCombinator<AdnlMessage>(
-        AdnlMessageQuery,
-        AdnlMessageAnswer,
-        AdnlMessageCreateChannel,
-        AdnlMessageConfirmChannel,
-        AdnlMessageCustom,
-        AdnlMessageNop,
-        AdnlMessageReinit,
-        AdnlMessagePart
+        AdnlMessage::class,
+        AdnlMessageQuery::class to AdnlMessageQuery,
+        AdnlMessageAnswer::class to AdnlMessageAnswer,
+        AdnlMessageCreateChannel::class to AdnlMessageCreateChannel,
+        AdnlMessageConfirmChannel::class to AdnlMessageConfirmChannel,
+        AdnlMessageCustom::class to AdnlMessageCustom,
+        AdnlMessageNop::class to AdnlMessageNop,
+        AdnlMessageReinit::class to AdnlMessageReinit,
+        AdnlMessagePart::class to AdnlMessagePart,
     ) {
         fun sizeOf(message: AdnlMessage): Int = Int.SIZE_BYTES + when(message) {
             is AdnlMessageQuery -> AdnlMessageQuery.sizeOf(message)

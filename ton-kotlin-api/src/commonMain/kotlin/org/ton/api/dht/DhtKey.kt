@@ -55,7 +55,6 @@ data class DhtKey(
     }
 
     companion object : TlConstructor<DhtKey>(
-        type = DhtKey::class,
         schema = "dht.key id:int256 name:bytes idx:int = dht.Key"
     ) {
         @JvmStatic

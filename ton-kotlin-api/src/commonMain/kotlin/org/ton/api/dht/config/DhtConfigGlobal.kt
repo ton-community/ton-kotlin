@@ -32,7 +32,6 @@ data class DhtConfigGlobal(
     override fun tlCodec() = Companion
 
     companion object : TlConstructor<DhtConfigGlobal>(
-        type = DhtConfigGlobal::class,
         schema = "dht.config.global static_nodes:dht.nodes k:int a:int = dht.config.Global"
     ) {
         override fun encode(output: Output, value: DhtConfigGlobal) {

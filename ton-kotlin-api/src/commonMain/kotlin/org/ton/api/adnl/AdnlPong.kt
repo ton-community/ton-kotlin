@@ -11,7 +11,6 @@ data class AdnlPong(
     val value: Long
 ) {
     companion object : TlConstructor<AdnlPong>(
-        AdnlPong::class,
         schema = "adnl.pong value:long = adnl.Pong"
     ) {
         override fun decode(input: Input): AdnlPong {

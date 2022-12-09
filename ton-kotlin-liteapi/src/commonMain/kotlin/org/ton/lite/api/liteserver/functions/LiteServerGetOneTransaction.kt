@@ -30,7 +30,6 @@ data class LiteServerGetOneTransaction(
 }
 
 private object LiteServerGetOneTransactionTlConstructor : TlConstructor<LiteServerGetOneTransaction>(
-    type = LiteServerGetOneTransaction::class,
     schema = "liteServer.getOneTransaction id:tonNode.blockIdExt account:liteServer.accountId lt:long = liteServer.TransactionInfo"
 ) {
     override fun decode(input: Input): LiteServerGetOneTransaction {

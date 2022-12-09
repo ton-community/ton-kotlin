@@ -23,7 +23,6 @@ class LiteServerBlockState(
 }
 
 private object LiteServerBlockStateTlConstructor : TlConstructor<LiteServerBlockState>(
-    type = LiteServerBlockState::class,
     schema = "liteServer.blockState id:tonNode.blockIdExt root_hash:int256 file_hash:int256 data:bytes = liteServer.BlockState"
 ) {
     override fun decode(input: Input): LiteServerBlockState {

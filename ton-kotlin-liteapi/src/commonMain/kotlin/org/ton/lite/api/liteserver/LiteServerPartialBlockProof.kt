@@ -23,7 +23,6 @@ data class LiteServerPartialBlockProof(
 }
 
 private object LiteServerPartialBlockProofTlConstructor : TlConstructor<LiteServerPartialBlockProof>(
-    type = LiteServerPartialBlockProof::class,
     schema = "liteServer.partialBlockProof complete:Bool from:tonNode.blockIdExt to:tonNode.blockIdExt steps:(vector liteServer.BlockLink) = liteServer.PartialBlockProof"
 ) {
     override fun decode(input: Input): LiteServerPartialBlockProof {

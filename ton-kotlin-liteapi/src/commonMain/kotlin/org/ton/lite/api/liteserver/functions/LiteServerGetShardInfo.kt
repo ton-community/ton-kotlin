@@ -31,7 +31,6 @@ data class LiteServerGetShardInfo(
 }
 
 private object LiteServerGetShardInfoTlConstructor : TlConstructor<LiteServerGetShardInfo>(
-    type = LiteServerGetShardInfo::class,
     schema = "liteServer.getShardInfo id:tonNode.blockIdExt workchain:int shard:long exact:Bool = liteServer.ShardInfo"
 ) {
     override fun decode(input: Input): LiteServerGetShardInfo {
@@ -49,4 +48,3 @@ private object LiteServerGetShardInfoTlConstructor : TlConstructor<LiteServerGet
         output.writeBoolTl(value.exact)
     }
 }
-

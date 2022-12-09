@@ -53,7 +53,6 @@ data class AdnlProxyToSign(
     }
 
     companion object : TlConstructor<AdnlProxyToSign>(
-        type = AdnlProxyToSign::class,
         schema = "adnl.proxyToFast ip:int port:int date:int signature:int256 = adnl.ProxyToSign"
     ) {
         override fun encode(output: Output, value: AdnlProxyToSign) {

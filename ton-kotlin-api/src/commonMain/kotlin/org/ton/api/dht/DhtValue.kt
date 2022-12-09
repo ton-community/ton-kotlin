@@ -91,7 +91,6 @@ data class DhtValue(
 }
 
 private object DhtValueTlConstructor : TlConstructor<DhtValue>(
-    type = DhtValue::class,
     schema = "dht.value key:dht.keyDescription value:bytes ttl:int signature:bytes = dht.Value"
 ) {
     override fun encode(output: Output, value: DhtValue) {

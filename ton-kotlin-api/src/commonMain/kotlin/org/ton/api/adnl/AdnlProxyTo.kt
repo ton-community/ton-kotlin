@@ -62,7 +62,6 @@ data class AdnlProxyTo(
     }
 
     companion object : TlConstructor<AdnlProxyTo>(
-        type = AdnlProxyTo::class,
         schema = "adnl.proxyToFastHash ip:int port:int date:int data_hash:int256 shared_secret:int256 = adnl.ProxyTo"
     ) {
         override fun encode(output: Output, value: AdnlProxyTo) {

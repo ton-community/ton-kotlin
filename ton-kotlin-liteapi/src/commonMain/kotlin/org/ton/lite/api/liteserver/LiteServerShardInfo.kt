@@ -43,7 +43,6 @@ data class LiteServerShardInfo(
 }
 
 private object LiteServerShardInfoTlConstructor : TlConstructor<LiteServerShardInfo>(
-    type = LiteServerShardInfo::class,
     schema = "liteServer.shardInfo id:tonNode.blockIdExt shardblk:tonNode.blockIdExt shard_proof:bytes shard_descr:bytes = liteServer.ShardInfo"
 ) {
     override fun decode(input: Input): LiteServerShardInfo {

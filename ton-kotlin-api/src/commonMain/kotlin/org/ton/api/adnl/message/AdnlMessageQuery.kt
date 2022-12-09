@@ -35,9 +35,7 @@ data class AdnlMessageQuery(
     }
 
     companion object : TlConstructor<AdnlMessageQuery>(
-        type = AdnlMessageQuery::class,
         schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message",
-        fields = listOf(Int256TlConstructor, BytesTlConstructor)
     ) {
         fun sizeOf(value: AdnlMessageQuery): Int =
             Int256TlConstructor.SIZE_BYTES + BytesTlConstructor.sizeOf(value.query)
@@ -47,9 +45,9 @@ data class AdnlMessageQuery(
             output.writeBytesTl(value.query)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageQuery {
-            val queryId = values.next() as ByteArray
-            val query = values.next() as ByteArray
+        override fun decode(input: Input): AdnlMessageQuery {
+            val queryId = input.readInt256Tl()
+            val query = input.readBytesTl()
             return AdnlMessageQuery(BitString(queryId), query)
         }
     }

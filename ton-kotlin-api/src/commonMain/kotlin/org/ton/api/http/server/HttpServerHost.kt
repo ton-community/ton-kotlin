@@ -18,7 +18,6 @@ data class HttpServerHost(
 }
 
 private object HttpServerHostTlConstructor : TlConstructor<HttpServerHost>(
-    type = HttpServerHost::class,
     schema = "http.server.host domains:(vector string) ip:int32 port:int32 adnl_id:adnl.id.short = http.server.Host"
 ) {
     override fun decode(input: Input): HttpServerHost {

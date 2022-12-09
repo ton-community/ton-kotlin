@@ -7,19 +7,12 @@ import org.ton.tl.TlConstructor
 import kotlin.reflect.typeOf
 
 object Int256TlConstructor : TlConstructor<ByteArray>(
-    type = typeOf<ByteArray>(),
     schema = "int256 8*[ int ] = Int256"
 ) {
     const val SIZE_BYTES = 8 * Int.SIZE_BYTES
 
     override fun decode(input: Input): ByteArray {
         return input.readBytes(SIZE_BYTES)
-    }
-
-    override suspend fun decode(input: ByteReadChannel): ByteArray {
-        return ByteArray(SIZE_BYTES) {
-            input.readByte()
-        }
     }
 
     override fun encode(output: Output, value: ByteArray) {

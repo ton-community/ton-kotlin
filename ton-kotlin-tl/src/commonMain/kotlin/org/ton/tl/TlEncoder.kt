@@ -3,13 +3,12 @@ package org.ton.tl
 import io.ktor.utils.io.core.*
 import org.ton.crypto.sha256.sha256
 
-interface TlEncoder<T : Any> {
+interface TlEncoder<in T> {
     fun encode(value: T): ByteArray = buildPacket {
         encode(this, value)
     }.readBytes()
 
     fun encode(output: Output, value: T)
-    fun encodeFields(value: T): List<*> = TODO()
 
     fun encodeBoxed(output: Output, value: T)
     fun encodeBoxed(value: T): ByteArray = buildPacket {
@@ -32,3 +31,6 @@ fun Output.writeOptionalTl(flag: Int, index: Int, block: Output.() -> Unit) {
         block()
     }
 }
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+internal inline fun <T> TlEncoder<*>.cast(): TlEncoder<T> = this as TlEncoder<T>

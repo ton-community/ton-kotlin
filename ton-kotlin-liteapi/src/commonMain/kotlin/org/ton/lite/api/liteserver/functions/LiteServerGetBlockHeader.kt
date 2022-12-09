@@ -27,7 +27,6 @@ data class LiteServerGetBlockHeader(
 }
 
 private object LiteServerGetBlockHeaderTlConstructor : TlConstructor<LiteServerGetBlockHeader>(
-    type = LiteServerGetBlockHeader::class,
     schema = "liteServer.getBlockHeader id:tonNode.blockIdExt mode:# = liteServer.BlockHeader"
 ) {
     override fun decode(input: Input): LiteServerGetBlockHeader {

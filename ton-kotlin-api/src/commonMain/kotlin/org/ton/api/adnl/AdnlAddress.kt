@@ -25,9 +25,10 @@ sealed interface AdnlAddress : TlObject<AdnlAddress> {
     override fun tlCodec(): TlCodec<out AdnlAddress> = Companion
 
     companion object : TlCombinator<AdnlAddress>(
-        AdnlAddressUdp,
-        AdnlAddressUdp6,
-        AdnlAddressTunnel
+        AdnlAddress::class,
+        AdnlAddressUdp::class to AdnlAddressUdp,
+        AdnlAddressUdp6::class to AdnlAddressUdp6,
+        AdnlAddressTunnel::class to AdnlAddressTunnel,
     )
 }
 
@@ -38,7 +39,6 @@ data class AdnlAddressUdp(
     val port: Int
 ) : AdnlAddress {
     companion object : TlConstructor<AdnlAddressUdp>(
-        type = AdnlAddressUdp::class,
         schema = "adnl.address.udp ip:int port:int = adnl.Address"
     ) {
         override fun encode(output: Output, value: AdnlAddressUdp) {
@@ -91,7 +91,6 @@ data class AdnlAddressUdp6(
     }
 
     companion object : TlConstructor<AdnlAddressUdp6>(
-        type = AdnlAddressUdp6::class,
         schema = "adnl.address.udp6 ip:int128 port:int = adnl.Address"
     ) {
         override fun decode(input: Input): AdnlAddressUdp6 {
@@ -116,7 +115,6 @@ data class AdnlAddressTunnel(
     val pubkey: PublicKey
 ) : AdnlAddress {
     constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
-
 
     override fun toString(): String = buildString {
         append("AdnlAddressTunnel(to=")
@@ -143,7 +141,6 @@ data class AdnlAddressTunnel(
     }
 
     companion object : TlConstructor<AdnlAddressTunnel>(
-        type = AdnlAddressTunnel::class,
         schema = "adnl.address.tunnel to:int256 pubkey:PublicKey = adnl.Address"
     ) {
         override fun encode(output: Output, value: AdnlAddressTunnel) {

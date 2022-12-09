@@ -56,7 +56,6 @@ data class LiteServerSendMessage(
     }
 
     companion object : TlConstructor<LiteServerSendMessage>(
-        type = LiteServerSendMessage::class,
         schema = "liteServer.sendMessage body:bytes = liteServer.SendMsgStatus"
     ) {
         override fun decode(input: Input): LiteServerSendMessage {

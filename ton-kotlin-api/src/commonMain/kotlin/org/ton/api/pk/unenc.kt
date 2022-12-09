@@ -20,8 +20,6 @@ data class PrivateKeyUnencrypted(
 ) : PrivateKey, Decryptor by DecryptorNone {
     override fun publicKey() = PublicKeyUnencrypted(data)
 
-
-
     override fun hashCode(): Int {
         return data.contentHashCode()
     }
@@ -36,7 +34,6 @@ data class PrivateKeyUnencrypted(
     }
 
     companion object : TlConstructor<PrivateKeyUnencrypted>(
-        type = typeOf<PrivateKeyUnencrypted>(),
         schema = "pk.unenc data:bytes = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyUnencrypted) {

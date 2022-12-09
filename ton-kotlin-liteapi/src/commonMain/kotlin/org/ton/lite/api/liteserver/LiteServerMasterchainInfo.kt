@@ -80,7 +80,6 @@ private data class LiteServerMasterchainInfoImpl(
 }
 
 private object LiteServerMasterchainInfoTlbConstructor : TlConstructor<LiteServerMasterchainInfo>(
-    type = LiteServerMasterchainInfo::class,
     schema = "liteServer.masterchainInfo last:tonNode.blockIdExt state_root_hash:int256 init:tonNode.zeroStateIdExt = liteServer.MasterchainInfo"
 ) {
     override fun decode(input: Input): LiteServerMasterchainInfo {

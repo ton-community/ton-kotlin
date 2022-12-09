@@ -45,7 +45,6 @@ data class HttpPayloadPart(
 }
 
 private object HttpPayloadPartTlConstructor : TlConstructor<HttpPayloadPart>(
-    type = HttpPayloadPart::class,
     schema = "http.payloadPart data:bytes trailer:(vector http.header) last:Bool = http.PayloadPart"
 ) {
     override fun decode(input: Input): HttpPayloadPart {

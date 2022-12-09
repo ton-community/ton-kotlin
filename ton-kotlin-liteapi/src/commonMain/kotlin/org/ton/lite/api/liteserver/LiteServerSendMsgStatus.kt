@@ -11,7 +11,6 @@ data class LiteServerSendMsgStatus(
     val status: Int
 ) {
     companion object : TlConstructor<LiteServerSendMsgStatus>(
-        type = LiteServerSendMsgStatus::class,
         schema = "liteServer.sendMsgStatus status:int = liteServer.SendMsgStatus"
     ) {
         override fun decode(input: Input): LiteServerSendMsgStatus {

@@ -6,10 +6,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.BytesTlConstructor
-import org.ton.tl.constructors.Int256TlConstructor
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.message")
@@ -36,18 +33,16 @@ data class RldpMessageData(
     }
 
     companion object : TlConstructor<RldpMessageData>(
-        type = RldpMessageData::class,
         schema = "rldp.message id:int256 data:bytes = rldp.Message",
-        fields = listOf(Int256TlConstructor, BytesTlConstructor)
     ) {
         override fun encode(output: Output, value: RldpMessageData) {
             output.writeInt256Tl(value.id)
             output.writeBytesTl(value.data)
         }
 
-        override fun decode(values: Iterator<*>): RldpMessageData {
-            val id = values.next() as ByteArray
-            val data = values.next() as ByteArray
+        override fun decode(input: Input): RldpMessageData {
+            val id = input.readInt256Tl()
+            val data = input.readBytesTl()
             return RldpMessageData(BitString(id), data)
         }
     }

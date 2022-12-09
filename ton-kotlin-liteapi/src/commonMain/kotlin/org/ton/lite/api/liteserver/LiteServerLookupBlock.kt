@@ -51,7 +51,6 @@ data class LiteServerLookupBlock(
 }
 
 private object LiteServerLookupBlockTlConstructor : TlConstructor<LiteServerLookupBlock>(
-    type = LiteServerLookupBlock::class,
     schema = "liteServer.lookupBlock mode:# id:tonNode.blockId lt:mode.1?long utime:mode.2?int = liteServer.BlockHeader"
 ) {
     override fun decode(input: Input): LiteServerLookupBlock {

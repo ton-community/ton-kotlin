@@ -77,7 +77,6 @@ data class LiteServerGetValidatorStats(
 }
 
 private object LiteServerGetValidatorStatsTlConstructor : TlConstructor<LiteServerGetValidatorStats>(
-    type = LiteServerGetValidatorStats::class,
     schema = "liteServer.getValidatorStats#091a58bc mode:# id:tonNode.blockIdExt limit:int start_after:mode.0?int256 modified_after:mode.2?int = liteServer.ValidatorStats",
     id = 0x091a58bc
 ) {

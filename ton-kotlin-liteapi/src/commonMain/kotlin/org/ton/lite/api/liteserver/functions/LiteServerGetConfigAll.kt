@@ -30,7 +30,6 @@ data class LiteServerGetConfigAll(
 }
 
 private object LiteServerGetConfigAllTlConstructor : TlConstructor<LiteServerGetConfigAll>(
-    type = LiteServerGetConfigAll::class,
     schema = "liteServer.getConfigAll mode:# id:tonNode.blockIdExt = liteServer.ConfigInfo"
 ) {
     override fun decode(input: Input): LiteServerGetConfigAll {

@@ -57,9 +57,7 @@ data class AdnlMessageConfirmChannel(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageConfirmChannel>(
-        type = AdnlMessageConfirmChannel::class,
         schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",
-        fields = listOf(Int256TlConstructor, Int256TlConstructor, IntTlConstructor)
     ) {
         const val SIZE_BYTES = Int256TlConstructor.SIZE_BYTES + Int256TlConstructor.SIZE_BYTES + IntTlConstructor.SIZE_BYTES
 
@@ -69,10 +67,10 @@ data class AdnlMessageConfirmChannel(
             output.writeIntTl(value.date)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageConfirmChannel {
-            val key = values.next() as ByteArray
-            val peerKey = values.next() as ByteArray
-            val date = values.next() as Int
+        override fun decode(input: Input): AdnlMessageConfirmChannel {
+            val key = input.readInt256Tl()
+            val peerKey = input.readInt256Tl()
+            val date = input.readIntTl()
             return AdnlMessageConfirmChannel(BitString(key), BitString(peerKey), date)
         }
     }

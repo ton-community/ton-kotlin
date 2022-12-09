@@ -22,7 +22,6 @@ data class ValidatorConfigGlobal(
     override fun tlCodec(): TlCodec<ValidatorConfigGlobal> = Companion
 
     companion object : TlConstructor<ValidatorConfigGlobal>(
-        type = ValidatorConfigGlobal::class,
         schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
     ) {
         override fun encode(output: Output, value: ValidatorConfigGlobal) {

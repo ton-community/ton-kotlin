@@ -16,7 +16,6 @@ data class LiteServerWaitMasterchainSeqno(
 }
 
 private object LiteServerWaitMasterchainSeqnoTlConstructor : TlConstructor<LiteServerWaitMasterchainSeqno>(
-    type = LiteServerWaitMasterchainSeqno::class,
     schema = "liteServer.waitMasterchainSeqno seqno:int timeout_ms:int = Object"
 ) {
     override fun decode(input: Input): LiteServerWaitMasterchainSeqno {

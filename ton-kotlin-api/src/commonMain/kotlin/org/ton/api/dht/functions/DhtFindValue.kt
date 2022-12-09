@@ -37,7 +37,6 @@ data class DhtFindValue(
 }
 
 private object DhtFindValueTlConstructor : TlConstructor<DhtFindValue>(
-    type = DhtFindValue::class,
     schema = "dht.findValue key:int256 k:int = dht.ValueResult"
 ) {
     override fun encode(output: Output, value: DhtFindValue) {

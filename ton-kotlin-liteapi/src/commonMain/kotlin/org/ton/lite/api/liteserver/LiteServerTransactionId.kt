@@ -71,7 +71,6 @@ data class LiteServerTransactionId(
 }
 
 private object LiteServerTransactionIdTlConstructor : TlConstructor<LiteServerTransactionId>(
-    type = LiteServerTransactionId::class,
     schema = "liteServer.transactionId mode:# account:mode.0?int256 lt:mode.1?long hash:mode.2?int256 = liteServer.TransactionId"
 ) {
     override fun decode(input: Input): LiteServerTransactionId {

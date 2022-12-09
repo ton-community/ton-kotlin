@@ -9,6 +9,7 @@ import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
+import org.ton.tl.readTl
 import org.ton.tl.writeTl
 
 @Serializable
@@ -54,16 +55,7 @@ data class RldpMessagePartData(
     }
 
     companion object : TlConstructor<RldpMessagePartData>(
-        type = RldpMessagePartData::class,
         schema = "rldp.messagePart transfer_id:int256 fec_type:fec.Type part:int total_size:long seqno:int data:bytes = rldp.MessagePart",
-        fields = listOf(
-            Int256TlConstructor,
-            FecType,
-            IntTlConstructor,
-            LongTlConstructor,
-            IntTlConstructor,
-            BytesTlConstructor
-        )
     ) {
         override fun encode(output: Output, value: RldpMessagePartData) {
             output.writeInt256Tl(value.transfer_id)
@@ -74,14 +66,14 @@ data class RldpMessagePartData(
             output.writeBytesTl(value.data)
         }
 
-        override fun decode(values: Iterator<*>): RldpMessagePartData {
-            val transfer_id = BitString(values.next() as ByteArray)
-            val fec_type = values.next() as FecType
-            val part = values.next() as Int
-            val total_size = values.next() as Long
-            val seqno = values.next() as Int
-            val data = values.next() as ByteArray
-            return RldpMessagePartData(transfer_id, fec_type, part, total_size, seqno, data)
+        override fun decode(input: Input): RldpMessagePartData {
+            val transfer_id = input.readInt256Tl()
+            val fec_type = input.readTl(FecType)
+            val part = input.readIntTl()
+            val total_size = input.readLongTl()
+            val seqno = input.readIntTl()
+            val data = input.readBytesTl()
+            return RldpMessagePartData(BitString(transfer_id), fec_type, part, total_size, seqno, data)
         }
     }
 }

@@ -56,7 +56,6 @@ data class LiteServerConfigInfo(
 }
 
 private object LiteServerConfigInfoTlConstructor : TlConstructor<LiteServerConfigInfo>(
-    type = LiteServerConfigInfo::class,
     schema = "liteServer.configInfo mode:# id:tonNode.blockIdExt state_proof:bytes config_proof:bytes = liteServer.ConfigInfo"
 ) {
     override fun decode(input: Input): LiteServerConfigInfo {

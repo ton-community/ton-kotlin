@@ -50,15 +50,16 @@ internal suspend fun readAnswer(
     input: ByteReadChannel,
     callContext: CoroutineContext
 ): AdnlMessageAnswer = withContext(callContext) {
-    val answer = try {
-        AdnlMessageAnswer.decodeBoxed(input)
-    } catch (e: Exception) {
-        throw IOException("Can't parse ADNL answer for query: $query", e)
-    }
-    check(answer.query_id == query.query_id) {
-        "query_id mismatch, expected: ${query.query_id} actual: ${answer.query_id}"
-    }
-    return@withContext answer
+//    val answer = try {
+//        AdnlMessageAnswer.decodeBoxed(input)
+//    } catch (e: Exception) {
+//        throw IOException("Can't parse ADNL answer for query: $query", e)
+//    }
+//    check(answer.query_id == query.query_id) {
+//        "query_id mismatch, expected: ${query.query_id} actual: ${answer.query_id}"
+//    }
+//    return@withContext answer
+    TODO()
 }
 
 /**

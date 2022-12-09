@@ -54,9 +54,7 @@ data class RldpQuery(
     }
 
     companion object : TlConstructor<RldpQuery>(
-        type = RldpQuery::class,
         schema = "rldp.query query_id:int256 max_answer_size:long timeout:int data:bytes = rldp.Message",
-        fields = listOf(Int256TlConstructor, LongTlConstructor, IntTlConstructor, BytesTlConstructor)
     ) {
         override fun encode(output: Output, value: RldpQuery) {
             output.writeInt256Tl(value.query_id)
@@ -65,11 +63,11 @@ data class RldpQuery(
             output.writeBytesTl(value.data)
         }
 
-        override fun decode(values: Iterator<*>): RldpQuery {
-            val query_id = values.next() as ByteArray
-            val max_answer_size = values.next() as Long
-            val timeout = values.next() as Int
-            val data = values.next() as ByteArray
+        override fun decode(input: Input): RldpQuery {
+            val query_id = input.readInt256Tl()
+            val max_answer_size = input.readLongTl()
+            val timeout = input.readIntTl()
+            val data = input.readBytesTl()
             return RldpQuery(BitString(query_id), max_answer_size, timeout, data)
         }
     }

@@ -39,7 +39,6 @@ data class OverlayNodeToSign(
 
     companion object : TlConstructor<OverlayNodeToSign>(
         schema = "overlay.node.toSign id:adnl.id.short overlay:int256 version:int = overlay.node.ToSign",
-        type = OverlayNodeToSign::class
     ) {
         override fun encode(output: Output, value: OverlayNodeToSign) {
             output.writeTl(AdnlIdShort, value.id)

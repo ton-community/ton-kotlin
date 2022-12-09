@@ -200,7 +200,6 @@ data class AdnlPacketContents(
 }
 
 private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContents>(
-    type = AdnlPacketContents::class,
     schema = "adnl.packetContents" +
             " rand1:bytes" +
             " flags:#" +

@@ -23,7 +23,6 @@ data class HttpResponse(
 }
 
 private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
-    type = HttpResponse::class,
     schema = "http.response http_version:string status_code:int reason:string headers:(vector http.header) no_payload:Bool = http.Response"
 ) {
     override fun decode(input: Input): HttpResponse {

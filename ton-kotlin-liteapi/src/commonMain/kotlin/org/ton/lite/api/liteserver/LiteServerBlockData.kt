@@ -51,7 +51,6 @@ data class LiteServerBlockData(
     }
 
     companion object : TlConstructor<LiteServerBlockData>(
-        type = LiteServerBlockData::class,
         schema = "liteServer.blockData id:tonNode.blockIdExt data:bytes = liteServer.BlockData"
     ) {
         override fun decode(input: Input): LiteServerBlockData {

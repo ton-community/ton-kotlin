@@ -25,7 +25,6 @@ data class LiteServerGetState(
 }
 
 private object LiteServerGetStateTlConstructor : TlConstructor<LiteServerGetState>(
-    type = LiteServerGetState::class,
     schema = "liteServer.getState id:tonNode.blockIdExt = liteServer.BlockState"
 ) {
     override fun decode(input: Input): LiteServerGetState {

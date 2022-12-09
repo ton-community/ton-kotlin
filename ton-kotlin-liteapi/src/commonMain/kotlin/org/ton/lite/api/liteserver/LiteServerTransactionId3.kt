@@ -36,7 +36,6 @@ data class LiteServerTransactionId3(
 }
 
 private object LiteServerTransactionId3TlConstructor : TlConstructor<LiteServerTransactionId3>(
-    type = LiteServerTransactionId3::class,
     schema = "liteServer.transactionId3 account:int256 lt:long = liteServer.TransactionId3"
 ) {
     override fun decode(input: Input): LiteServerTransactionId3 {

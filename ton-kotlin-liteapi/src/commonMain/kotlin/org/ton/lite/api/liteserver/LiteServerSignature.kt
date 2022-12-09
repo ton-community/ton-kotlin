@@ -36,7 +36,6 @@ data class LiteServerSignature(
 }
 
 private object LiteServerSignatureTlConstructor : TlConstructor<LiteServerSignature>(
-    type = LiteServerSignature::class,
     schema = "liteServer.signature node_id_short:int256 signature:bytes = liteServer.Signature"
 ) {
     override fun decode(input: Input): LiteServerSignature {

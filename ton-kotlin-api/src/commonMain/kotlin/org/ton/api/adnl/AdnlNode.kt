@@ -15,7 +15,6 @@ data class AdnlNode(
     val addr_list: AdnlAddressList
 ) {
     companion object : TlConstructor<AdnlNode>(
-        type = AdnlNode::class,
         schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
     ) {
         override fun encode(output: Output, value: AdnlNode) {

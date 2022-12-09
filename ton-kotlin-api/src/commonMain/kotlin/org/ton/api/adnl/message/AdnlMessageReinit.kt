@@ -7,6 +7,7 @@ import kotlinx.serialization.encodeToString
 import org.ton.api.JSON
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.IntTlConstructor
+import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeIntTl
 
 @SerialName("adnl.message.reinit")
@@ -18,9 +19,7 @@ data class AdnlMessageReinit(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageReinit>(
-        type = AdnlMessageReinit::class,
         schema = "adnl.message.reinit date:int = adnl.Message",
-        fields = listOf(IntTlConstructor)
     ) {
         const val SIZE_BYTES = IntTlConstructor.SIZE_BYTES
 
@@ -28,8 +27,8 @@ data class AdnlMessageReinit(
             output.writeIntTl(value.date)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageReinit {
-            val date = values.next() as Int
+        override fun decode(input: Input): AdnlMessageReinit {
+            val date = input.readIntTl()
             return AdnlMessageReinit(date)
         }
     }

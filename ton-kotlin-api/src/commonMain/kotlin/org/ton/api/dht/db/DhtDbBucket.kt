@@ -18,7 +18,6 @@ data class DhtDbBucket(
     override fun tlCodec() = Companion
 
     companion object : TlConstructor<DhtDbBucket>(
-        type = DhtDbBucket::class,
         schema = "dht.db.bucket nodes:dht.nodes = dht.db.Bucket"
     ) {
         override fun encode(output: Output, value: DhtDbBucket) {

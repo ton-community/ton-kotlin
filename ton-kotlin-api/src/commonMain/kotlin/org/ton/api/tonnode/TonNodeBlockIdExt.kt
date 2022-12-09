@@ -114,7 +114,6 @@ data class TonNodeBlockIdExt(
 }
 
 private object TonNodeBlockIdExtTlConstructor : TlConstructor<TonNodeBlockIdExt>(
-    type = TonNodeBlockIdExt::class,
     schema = "tonNode.blockIdExt workchain:int shard:long seqno:int root_hash:int256 file_hash:int256 = tonNode.BlockIdExt"
 ) {
     override fun decode(input: Input): TonNodeBlockIdExt {

@@ -77,7 +77,6 @@ data class DhtKeyDescription(
 }
 
 private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>(
-    type = DhtKeyDescription::class,
     schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
 ) {
     override fun encode(output: Output, value: DhtKeyDescription) {

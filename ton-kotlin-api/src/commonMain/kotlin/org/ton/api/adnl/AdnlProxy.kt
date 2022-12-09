@@ -20,8 +20,9 @@ interface AdnlProxy {
     val id: BitString
 
     companion object : TlCombinator<AdnlProxy>(
-        AdnlProxyNone,
-        AdnlProxyFast
+        AdnlProxy::class,
+        AdnlProxyNone::class to AdnlProxyNone,
+        AdnlProxyFast::class to AdnlProxyFast
     )
 }
 
@@ -31,7 +32,6 @@ data class AdnlProxyNone(
     override val id: BitString
 ) : AdnlProxy {
     companion object : TlConstructor<AdnlProxyNone>(
-        type = AdnlProxyNone::class,
         schema = "adnl.proxy.none id:int256 = adnl.Proxy"
     ) {
         override fun encode(output: Output, value: AdnlProxyNone) {
@@ -53,10 +53,7 @@ data class AdnlProxyFast(
     @Serializable(Base64ByteArraySerializer::class)
     val sharedSecret: ByteArray
 ) : AdnlProxy {
-
-
     companion object : TlConstructor<AdnlProxyFast>(
-        type = AdnlProxyFast::class,
         schema = "adnl.proxy.fast id:int256 shared_secret:bytes = adnl.Proxy"
     ) {
         override fun encode(output: Output, value: AdnlProxyFast) {

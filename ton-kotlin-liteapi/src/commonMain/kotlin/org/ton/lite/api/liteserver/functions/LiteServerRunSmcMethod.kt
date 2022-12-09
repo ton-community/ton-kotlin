@@ -182,7 +182,6 @@ data class LiteServerRunSmcMethod(
 }
 
 private object LiteServerRunSmcMethodTlConstructor : TlConstructor<LiteServerRunSmcMethod>(
-    type = LiteServerRunSmcMethod::class,
     schema = "liteServer.runSmcMethod mode:# id:tonNode.blockIdExt account:liteServer.accountId method_id:long params:bytes = liteServer.RunMethodResult"
 ) {
     override fun encode(output: Output, value: LiteServerRunSmcMethod) {

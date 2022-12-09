@@ -77,7 +77,6 @@ data class LiteServerMasterchainInfoExt(
     }
 
     companion object : TlConstructor<LiteServerMasterchainInfoExt>(
-        type = LiteServerMasterchainInfoExt::class,
         schema = "liteServer.masterchainInfoExt mode:# version:int capabilities:long last:tonNode.blockIdExt last_utime:int now:int state_root_hash:int256 init:tonNode.zeroStateIdExt = liteServer.MasterchainInfoExt"
     ) {
         override fun encode(output: Output, value: LiteServerMasterchainInfoExt) {

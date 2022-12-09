@@ -10,7 +10,6 @@ fun interface LiteServerGetMasterchainInfoFunction : LiteServerQueryFunction {
 }
 
 object LiteServerGetMasterchainInfo : TlConstructor<LiteServerGetMasterchainInfo>(
-    type = LiteServerGetMasterchainInfo::class,
     schema = "liteServer.getMasterchainInfo = liteServer.MasterchainInfo"
 ) {
     override fun decode(input: Input): LiteServerGetMasterchainInfo = this

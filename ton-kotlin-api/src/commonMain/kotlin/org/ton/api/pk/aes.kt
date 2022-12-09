@@ -30,7 +30,6 @@ data class PrivateKeyAes(
     override fun toString(): String = toAdnlIdShort().toString()
 
     companion object : TlConstructor<PrivateKeyAes>(
-        type = PrivateKeyAes::class,
         schema = "pk.aes key:int256 = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyAes) {

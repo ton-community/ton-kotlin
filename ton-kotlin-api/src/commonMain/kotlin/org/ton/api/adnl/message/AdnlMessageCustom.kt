@@ -8,6 +8,7 @@ import org.ton.api.JSON
 import org.ton.crypto.base64.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.BytesTlConstructor
+import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 
 
@@ -31,9 +32,7 @@ data class AdnlMessageCustom(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageCustom>(
-        type = AdnlMessageCustom::class,
         schema = "adnl.message.custom data:bytes = adnl.Message",
-        fields = listOf(BytesTlConstructor)
     ) {
         fun sizeOf(value: AdnlMessageCustom): Int =
             BytesTlConstructor.sizeOf(value.data)
@@ -42,8 +41,8 @@ data class AdnlMessageCustom(
             output.writeBytesTl(value.data)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageCustom {
-            val data = values.next() as ByteArray
+        override fun decode(input: Input): AdnlMessageCustom {
+            val data = input.readBytesTl()
             return AdnlMessageCustom(data)
         }
     }

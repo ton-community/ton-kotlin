@@ -56,7 +56,6 @@ data class LiteServerAccountId(
     override fun toString(): String = "$workchain:${id.encodeHex().uppercase()}"
 
     companion object : TlConstructor<LiteServerAccountId>(
-        type = LiteServerAccountId::class,
         schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
     ) {
         override fun decode(input: Input): LiteServerAccountId {

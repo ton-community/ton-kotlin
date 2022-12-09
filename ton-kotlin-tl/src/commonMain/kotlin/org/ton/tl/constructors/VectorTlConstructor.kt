@@ -10,7 +10,6 @@ import kotlin.reflect.typeOf
 class VectorTlConstructor<T : Any>(
     val elementConstructor: TlCodec<T>
 ) : TlConstructor<List<T>>(
-    type = typeOf<List<T>>(),
     schema = "vector {t:Type} # [ t ] = Vector t"
 ) {
     override fun encode(output: Output, value: List<T>) = encode(output, value, elementConstructor)

@@ -11,8 +11,9 @@ sealed interface RldpMessagePart : TlObject<RldpMessagePart> {
     val part: Int
 
     companion object : TlCombinator<RldpMessagePart>(
-        RldpMessagePartData,
-        RldpConfirm,
-        RldpComplete,
+        RldpMessagePart::class,
+        RldpMessagePartData::class to RldpMessagePartData,
+        RldpConfirm::class to RldpConfirm,
+        RldpComplete::class to RldpComplete,
     )
 }

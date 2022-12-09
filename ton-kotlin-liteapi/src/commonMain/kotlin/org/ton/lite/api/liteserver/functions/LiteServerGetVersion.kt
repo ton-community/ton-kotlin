@@ -10,7 +10,6 @@ fun interface LiteServerGetVersionFunction : LiteServerQueryFunction {
 }
 
 object LiteServerGetVersion : TlConstructor<LiteServerGetVersion>(
-    type = LiteServerGetVersion::class,
     schema = "liteServer.getVersion = liteServer.Version"
 ) {
     override fun decode(input: Input): LiteServerGetVersion = this

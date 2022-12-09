@@ -16,8 +16,9 @@ sealed interface DhtValueResult : TlObject<DhtValueResult> {
     override fun tlCodec(): TlCodec<out DhtValueResult> = Companion
 
     companion object : TlCombinator<DhtValueResult>(
-        DhtValueNotFound,
-        DhtValueFound
+        DhtValueResult::class,
+        DhtValueNotFound::class to DhtValueNotFound,
+        DhtValueFound::class to DhtValueFound
     )
 }
 
@@ -30,7 +31,6 @@ data class DhtValueNotFound(
 
 
     companion object : TlConstructor<DhtValueNotFound>(
-        type = DhtValueNotFound::class,
         schema = "dht.valueNotFound nodes:dht.nodes = dht.ValueResult"
     ) {
         override fun encode(output: Output, value: DhtValueNotFound) {
@@ -52,7 +52,6 @@ data class DhtValueFound(
     override fun value(): DhtValue = value
 
     companion object : TlConstructor<DhtValueFound>(
-        type = DhtValueFound::class,
         schema = "dht.valueFound value:dht.Value = dht.ValueResult"
     ) {
         override fun encode(output: Output, value: DhtValueFound) {

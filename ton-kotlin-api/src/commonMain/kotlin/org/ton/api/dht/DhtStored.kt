@@ -6,7 +6,6 @@ import org.ton.tl.TlConstructor
 import org.ton.tl.TlObject
 
 object DhtStored : TlConstructor<DhtStored>(
-    type = DhtStored::class,
     schema = "dht.stored = dht.Stored"
 ), TlObject<DhtStored> {
     override fun tlCodec(): TlCodec<DhtStored> = this

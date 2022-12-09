@@ -31,7 +31,6 @@ data class LiteServerGetConfigParams(
 }
 
 private object LiteServerGetConfigParamsTlConstructor : TlConstructor<LiteServerGetConfigParams>(
-    type = LiteServerGetConfigParams::class,
     schema = "liteServer.getConfigParams mode:# id:tonNode.blockIdExt param_list:(vector int) = liteServer.ConfigInfo"
 ) {
     override fun decode(input: Input): LiteServerGetConfigParams {

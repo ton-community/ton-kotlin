@@ -15,7 +15,6 @@ data class LiteServerDebugVerbosity(
 }
 
 private object LiteServerDebugVerbosityTlConstructor : TlConstructor<LiteServerDebugVerbosity>(
-    type = LiteServerDebugVerbosity::class,
     schema = "liteServer.debug.verbosity value:int = liteServer.debug.Verbosity"
 ) {
     override fun decode(input: Input): LiteServerDebugVerbosity {

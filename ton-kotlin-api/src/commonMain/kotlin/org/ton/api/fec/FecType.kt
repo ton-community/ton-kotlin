@@ -11,7 +11,8 @@ sealed interface FecType : TlObject<FecType> {
     val symbol_count: Int
 
     companion object : TlCombinator<FecType>(
-        FecRaptorQ,
+        FecType::class,
+        FecRaptorQ::class to FecRaptorQ,
     ) {
         fun check(fecType: FecType) {
             require(fecType.symbol_size != 0) { "expected symbol_size != 0, actual: ${fecType.symbol_size}" }

@@ -19,7 +19,6 @@ data class LiteServerSignatureSet(
 }
 
 private object LiteServerSignatureSetTlConstructor : TlConstructor<LiteServerSignatureSet>(
-    type = LiteServerSignatureSet::class,
     schema = "liteServer.signatureSet validator_set_hash:int catchain_seqno:int signatures:(vector liteServer.signature) = liteServer.SignatureSet"
 ) {
     override fun decode(input: Input): LiteServerSignatureSet {

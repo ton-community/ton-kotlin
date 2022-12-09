@@ -76,7 +76,6 @@ data class LiteServerQuery(
 }
 
 private object LiteServerQueryTlConstructor : TlConstructor<LiteServerQuery>(
-    type = LiteServerQuery::class,
     schema = "liteServer.query data:bytes = Object"
 ) {
     override fun decode(input: Input): LiteServerQuery {

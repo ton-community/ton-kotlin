@@ -44,9 +44,7 @@ data class AdnlMessageCreateChannel(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageCreateChannel>(
-        type = AdnlMessageCreateChannel::class,
         schema = "adnl.message.createChannel key:int256 date:int = adnl.Message",
-        fields = listOf(Int256TlConstructor, IntTlConstructor)
     ) {
         const val SIZE_BYTES = Int256TlConstructor.SIZE_BYTES + IntTlConstructor.SIZE_BYTES
 
@@ -55,10 +53,10 @@ data class AdnlMessageCreateChannel(
             output.writeIntTl(value.date)
         }
 
-        override fun decode(values: Iterator<*>): AdnlMessageCreateChannel {
-            val key = values.next() as ByteArray
-            val date = values.next() as Int
-            return AdnlMessageCreateChannel(BitString(key), date)
+        override fun decode(input: Input): AdnlMessageCreateChannel {
+            val key = BitString(input.readInt256Tl())
+            val date = input.readIntTl()
+            return AdnlMessageCreateChannel(key, date)
         }
     }
 }

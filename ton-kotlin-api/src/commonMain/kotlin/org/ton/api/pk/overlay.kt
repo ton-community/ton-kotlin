@@ -22,7 +22,6 @@ data class PrivateKeyOverlay(
     override fun toString(): String = toAdnlIdShort().toString()
 
     companion object : TlConstructor<PrivateKeyOverlay>(
-        type = PrivateKeyOverlay::class,
         schema = "pk.overlay name:bytes = PrivateKey"
     ) {
         override fun encode(output: Output, value: PrivateKeyOverlay) {

@@ -39,7 +39,6 @@ data class LiteServerGetBlockProof(
 }
 
 private object LiteServerGetBlockProofTlConstructor : TlConstructor<LiteServerGetBlockProof>(
-    type = LiteServerGetBlockProof::class,
     schema = "liteServer.getBlockProof mode:# known_block:tonNode.blockIdExt target_block:mode.0?tonNode.blockIdExt = liteServer.PartialBlockProof"
 ) {
     override fun decode(input: Input): LiteServerGetBlockProof {

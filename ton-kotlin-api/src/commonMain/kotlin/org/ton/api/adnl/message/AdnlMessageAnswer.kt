@@ -35,9 +35,7 @@ data class AdnlMessageAnswer(
     override fun toString(): String = JSON.encodeToString(this)
 
     companion object : TlConstructor<AdnlMessageAnswer>(
-        type = AdnlMessageAnswer::class,
         schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message",
-        fields = listOf(Int256TlConstructor, BytesTlConstructor)
     ) {
         fun sizeOf(value: AdnlMessageAnswer): Int =
             Int256TlConstructor.SIZE_BYTES + BytesTlConstructor.sizeOf(value.answer)
@@ -50,12 +48,6 @@ data class AdnlMessageAnswer(
         override fun decode(input: Input): AdnlMessageAnswer {
             val queryId = input.readInt256Tl()
             val answer = input.readBytesTl()
-            return AdnlMessageAnswer(BitString(queryId), answer)
-        }
-
-        override fun decode(values: Iterator<*>): AdnlMessageAnswer {
-            val queryId = values.next() as ByteArray
-            val answer = values.next() as ByteArray
             return AdnlMessageAnswer(BitString(queryId), answer)
         }
     }

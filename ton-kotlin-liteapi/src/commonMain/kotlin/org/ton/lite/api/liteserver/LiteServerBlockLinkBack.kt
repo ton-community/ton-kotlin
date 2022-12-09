@@ -68,7 +68,6 @@ data class LiteServerBlockLinkBack(
 }
 
 private object LiteServerBlockLinkBackTlConstructor : TlConstructor<LiteServerBlockLinkBack>(
-    type = LiteServerBlockLinkBack::class,
     schema = "liteServer.blockLinkBack to_key_block:Bool from:tonNode.blockIdExt to:tonNode.blockIdExt dest_proof:bytes proof:bytes state_proof:bytes = liteServer.BlockLink"
 ) {
     override fun decode(input: Input): LiteServerBlockLinkBack {

@@ -23,7 +23,6 @@ data class LiteServerGetMasterchainInfoExt(
 }
 
 private object LiteServerGetMasterchainInfoExtTlConstructor : TlConstructor<LiteServerGetMasterchainInfoExt>(
-    type = LiteServerGetMasterchainInfoExt::class,
     schema = "liteServer.getMasterchainInfoExt mode:# = liteServer.MasterchainInfoExt"
 ) {
     override fun decode(input: Input): LiteServerGetMasterchainInfoExt {

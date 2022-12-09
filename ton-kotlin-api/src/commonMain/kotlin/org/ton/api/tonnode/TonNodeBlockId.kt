@@ -81,7 +81,6 @@ private data class TonNodeBlockIdImpl(
 }
 
 private object TonNodeBlockIdTlbConstructor : TlConstructor<TonNodeBlockId>(
-    type = TonNodeBlockId::class,
     schema = "tonNode.blockId workchain:int shard:long seqno:int = tonNode.BlockId"
 ) {
     override fun decode(input: Input): TonNodeBlockId {

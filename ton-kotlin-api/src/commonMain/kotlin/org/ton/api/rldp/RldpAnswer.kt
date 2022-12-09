@@ -5,10 +5,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.BytesTlConstructor
-import org.ton.tl.constructors.Int256TlConstructor
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.constructors.*
 
 data class RldpAnswer(
     val query_id: BitString,
@@ -39,18 +36,16 @@ data class RldpAnswer(
         "RldpAnswer(query_id=$query_id, data=[(${data.size} bytes) ${data.encodeBase64()}])"
 
     companion object : TlConstructor<RldpAnswer>(
-        type = RldpAnswer::class,
         schema = "rldp.answer query_id:int256 data:bytes = rldp.Message",
-        fields = listOf(Int256TlConstructor, BytesTlConstructor)
     ) {
         override fun encode(output: Output, value: RldpAnswer) {
             output.writeInt256Tl(value.query_id)
             output.writeBytesTl(value.data)
         }
 
-        override fun decode(values: Iterator<*>): RldpAnswer {
-            val query_id = values.next() as ByteArray
-            val data = values.next() as ByteArray
+        override fun decode(input: Input): RldpAnswer {
+            val query_id = input.readInt256Tl()
+            val data = input.readBytesTl()
             return RldpAnswer(BitString(query_id), data)
         }
     }
