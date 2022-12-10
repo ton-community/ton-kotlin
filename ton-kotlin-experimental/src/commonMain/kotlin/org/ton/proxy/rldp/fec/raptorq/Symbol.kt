@@ -1,5 +1,6 @@
 package org.ton.proxy.rldp.fec.raptorq
 
+import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
 class Symbol(

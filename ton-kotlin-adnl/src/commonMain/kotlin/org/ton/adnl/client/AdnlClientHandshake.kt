@@ -49,26 +49,30 @@ class AdnlClientHandshake(
         }.channel
     }
 
-    val output: SendChannel<AdnlPacket> = actor(CoroutineName("adnl-output-encoder")) {
-        try {
-            val handshake = AdnlHandshakePacket(authNonce, config.serverPublicKey)
-            val packet = handshake.build()
-            rawOutput.writePacket(packet)
-            rawOutput.flush()
-
-            channel.consumeEach { rawPacket ->
-                try {
-                    encryptedOutput.writeAdnlPacket(rawPacket)
-                    encryptedOutput.flush()
-                } catch (cause: Throwable) {
-                    cause.printStackTrace()
-                    channel.close(cause)
-                }
-            }
-        } finally {
-            rawOutput.close()
-        }
+    val output: SendChannel<AdnlPacket> by lazy {
+        TODO()
     }
+
+//    val output: SendChannel<AdnlPacket> = actor(CoroutineName("adnl-output-encoder")) {
+//        try {
+//            val handshake = AdnlHandshakePacket(authNonce, config.serverPublicKey)
+//            val packet = handshake.build()
+//            rawOutput.writePacket(packet)
+//            rawOutput.flush()
+//
+//            channel.consumeEach { rawPacket ->
+//                try {
+//                    encryptedOutput.writeAdnlPacket(rawPacket)
+//                    encryptedOutput.flush()
+//                } catch (cause: Throwable) {
+//                    cause.printStackTrace()
+//                    channel.close(cause)
+//                }
+//            }
+//        } finally {
+//            rawOutput.close()
+//        }
+//    }
 
     suspend fun AesCtr.encrypt(src: ByteReadChannel, dst: ByteWriteChannel) {
         val buffer = ChunkBuffer.Pool.borrow()

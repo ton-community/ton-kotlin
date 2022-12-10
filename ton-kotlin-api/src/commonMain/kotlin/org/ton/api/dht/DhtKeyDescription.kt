@@ -13,6 +13,7 @@ import org.ton.tl.constructors.readBytesTl
 import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class DhtKeyDescription(
@@ -32,15 +33,11 @@ data class DhtKeyDescription(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtKeyDescription
-
+        if (other !is DhtKeyDescription) return false
         if (key != other.key) return false
         if (id != other.id) return false
         if (update_rule != other.update_rule) return false
         if (!signature.contentEquals(other.signature)) return false
-
         return true
     }
 

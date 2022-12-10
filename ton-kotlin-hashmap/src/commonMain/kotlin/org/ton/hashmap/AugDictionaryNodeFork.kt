@@ -8,10 +8,11 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("ahmn_fork")
 @Serializable
-data class AugDictionaryNodeFork<X, Y>(
+data class AugDictionaryNodeFork< X,  Y>(
     val left: AugDictionaryEdge<X, Y>,
     val right: AugDictionaryEdge<X, Y>,
     override val extra: Y,
@@ -26,7 +27,7 @@ data class AugDictionaryNodeFork<X, Y>(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>
-        ): TlbConstructor<AugDictionaryNodeFork<X, Y>> = AugDictionaryNodeForkTlbConstructor(n, x, y)
+        ): TlbCodec<AugDictionaryNodeFork<X, Y>> = AugDictionaryNodeForkTlbConstructor(n, x, y)
     }
 }
 

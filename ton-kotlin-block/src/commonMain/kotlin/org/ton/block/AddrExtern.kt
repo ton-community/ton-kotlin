@@ -8,6 +8,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("addr_extern")
@@ -31,10 +32,7 @@ data class AddrExtern(
         append(")")
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<AddrExtern> = AddrExternTlbConstructor
-    }
+    companion object : TlbConstructorProvider<AddrExtern> by AddrExternTlbConstructor
 }
 
 private object AddrExternTlbConstructor : TlbConstructor<AddrExtern>(

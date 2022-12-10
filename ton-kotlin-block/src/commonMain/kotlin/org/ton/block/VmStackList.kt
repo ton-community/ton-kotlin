@@ -6,10 +6,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.*
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)
 inline fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)
@@ -61,74 +59,58 @@ sealed interface VmStackList : Iterable<VmStackValue> {
             return stackList
         }
 
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun tlbCodec(n: Int): TlbCombinator<VmStackList> = VmStackListCombinator(n)
+        fun tlbCodec(n: Int): TlbCodec<VmStackList> =
+            when (n) {
+                0 -> VmStackListNilConstructor
+                else -> VmStackListConsConstructor(n)
+            } as TlbCodec<VmStackList>
     }
 }
 
-private class VmStackListCombinator(val n: Int) : TlbCombinator<VmStackList>() {
-    private val vmStkConsConstructor = VmStackListConsConstructor(n)
-    private val vmStkNilConstructor = VmStackListNilConstructor
-
-    override val constructors: List<TlbConstructor<out VmStackList>> =
-        listOf(vmStkConsConstructor, vmStkNilConstructor)
-
-    override fun getConstructor(value: VmStackList): TlbConstructor<out VmStackList> = when (value) {
-        is VmStackList.Cons -> vmStkConsConstructor
-        is VmStackList.Nil -> vmStkNilConstructor
+private class VmStackListConsConstructor(
+    n: Int
+) : TlbConstructor<VmStackList.Cons>(
+    schema = "vm_stk_cons#_ {n:#} rest:^(VmStackList n) tos:VmStackValue = VmStackList (n + 1);"
+) {
+    private val vmStackListCodec by lazy {
+        VmStackList.tlbCodec(n - 1)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): VmStackList {
-        return if (n == 0) {
-            vmStkNilConstructor.loadTlb(cellSlice)
-        } else {
-            vmStkConsConstructor.loadTlb(cellSlice)
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: VmStackList.Cons
+    ) = cellBuilder {
+        storeRef {
+            storeTlb(vmStackListCodec, value.rest)
         }
+        storeTlb(VmStackValue, value.tos)
     }
 
-    private class VmStackListConsConstructor(
-        n: Int
-    ) : TlbConstructor<VmStackList.Cons>(
-        schema = "vm_stk_cons#_ {n:#} rest:^(VmStackList n) tos:VmStackValue = VmStackList (n + 1);"
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): VmStackList.Cons = cellSlice {
+        val rest = loadRef {
+            loadTlb(vmStackListCodec)
+        }
+        val tos = loadTlb(VmStackValue)
+        VmStackList.Cons(rest, tos)
+    }
+}
+
+private object VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
+    schema = "vm_stk_nil#_ = VmStackList 0;"
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: VmStackList.Nil
     ) {
-        private val vmStackListCodec by lazy {
-            VmStackList.tlbCodec(n - 1)
-        }
-
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: VmStackList.Cons
-        ) = cellBuilder {
-            storeRef {
-                storeTlb(vmStackListCodec, value.rest)
-            }
-            storeTlb(VmStackValue, value.tos)
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): VmStackList.Cons = cellSlice {
-            val rest = loadRef {
-                loadTlb(vmStackListCodec)
-            }
-            val tos = loadTlb(VmStackValue)
-            VmStackList.Cons(rest, tos)
-        }
     }
 
-    private object VmStackListNilConstructor : TlbConstructor<VmStackList.Nil>(
-        schema = "vm_stk_nil#_ = VmStackList 0;"
-    ) {
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: VmStackList.Nil
-        ) {
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): VmStackList.Nil {
-            return VmStackList.Nil
-        }
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): VmStackList.Nil {
+        return VmStackList.Nil
     }
 }

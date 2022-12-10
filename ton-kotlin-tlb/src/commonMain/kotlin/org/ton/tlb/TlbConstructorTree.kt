@@ -1,37 +1,49 @@
 package org.ton.tlb
 
 import org.ton.bitstring.BitString
+import org.ton.cell.CellSlice
 
-class TlbConstructorTree(
-    var root: Node? = null
+class TlbConstructorTree<T>(
+    var root: Node<T>? = null
 ) {
-    fun add(value: AbstractTlbConstructor<*>) {
-        root?.add(value) ?: run {
-            root = Node(value)
+    fun add(key: BitString, value: T) {
+        root?.add(key, value) ?: run {
+            root = Node(key, value)
         }
     }
 
-    operator fun get(value: BitString): AbstractTlbConstructor<*>? = root?.get(value)
+    fun find(bits: BitString): Pair<BitString,T>? {
+        return root?.get(bits)
+    }
 
-    class Node(
-        val value: AbstractTlbConstructor<*>,
-        var left: Node? = null,
-        var right: Node? = null
+    fun values() = root?.values() ?: emptySequence()
+
+    class Node<T>(
+        val key: BitString,
+        val value: T,
+        var left: Node<T>? = null,
+        var right: Node<T>? = null
     ) {
-        fun add(value: AbstractTlbConstructor<*>) {
-            if (value.id < this.value.id) {
-                left?.add(value) ?: run {
-                    left = Node(value)
+        fun values(): Sequence<Pair<BitString, T>> = sequence {
+            yield(key to value)
+            yieldAll(left?.values() ?: emptySequence())
+            yieldAll(right?.values() ?: emptySequence())
+        }
+
+        fun add(key: BitString, value: T) {
+            if (key < this.key) {
+                left?.add(key, value) ?: run {
+                    left = Node(key, value)
                 }
             } else {
-                right?.add(value) ?: run {
-                    right = Node(value)
+                right?.add(key, value) ?: run {
+                    right = Node(key, value)
                 }
             }
         }
 
-        operator fun get(key: BitString): AbstractTlbConstructor<*>? {
-            val compare = key.compareTo(this.value.id)
+        operator fun get(key: BitString): Pair<BitString, T>? {
+            val compare = key.compareTo(this.key)
             val result = when {
                 compare == -1 && left != null -> {
                     left?.get(key)
@@ -39,14 +51,14 @@ class TlbConstructorTree(
 
                 compare >= 1 -> {
                     right?.get(key) ?: kotlin.run {
-                        val slice = key.slice(0 until value.id.size)
-                        if (slice == this.value.id) value else null
+                        val slice = key.slice(0 until this.key.size)
+                        if (slice == this.key) slice to value else null
                     }
                 }
 
                 else -> {
-                    val slice = key.slice(0 until value.id.size)
-                    if (slice == this.value.id) value else null
+                    val slice = key.slice(0 until this.key.size)
+                    if (slice == this.key) slice to value else null
                 }
             }
             return result

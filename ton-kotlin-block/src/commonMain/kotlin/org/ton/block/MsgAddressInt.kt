@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.jvm.JvmStatic
 
 inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.parse(address)
 
@@ -56,16 +56,8 @@ sealed interface MsgAddressInt : MsgAddress {
     }
 }
 
-private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>() {
-    private val addrStdConstructor = AddrStd.tlbCodec()
-    private val addrVarConstructor = AddrVar.tlbCodec()
-
-    override val constructors: List<TlbConstructor<out MsgAddressInt>> =
-        listOf(addrStdConstructor, addrVarConstructor)
-
-    override fun getConstructor(value: MsgAddressInt): TlbConstructor<out MsgAddressInt> = when (value) {
-        is AddrStd -> addrStdConstructor
-        is AddrVar -> addrVarConstructor
-    }
-}
-
+private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
+    MsgAddressInt::class,
+    AddrStd::class to AddrStd,
+    AddrVar::class to AddrVar
+)

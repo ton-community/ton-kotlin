@@ -57,18 +57,11 @@ sealed interface CommonMsgInfoRelaxed {
     companion object : TlbCombinatorProvider<CommonMsgInfoRelaxed> by CommonMsgInfoRelaxedTlbCombinator
 }
 
-private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRelaxed>() {
-    private val intMsgInfo = IntMsgInfoTlbConstructor
-    private val extOutMsgInfo = ExtOutMsgInfoTlbConstructor
-
-    override val constructors: List<TlbConstructor<out CommonMsgInfoRelaxed>> by lazy {
-        listOf(intMsgInfo, extOutMsgInfo)
-    }
-
-    override fun getConstructor(value: CommonMsgInfoRelaxed): TlbConstructor<out CommonMsgInfoRelaxed> = when (value) {
-        is CommonMsgInfoRelaxed.IntMsgInfoRelaxed -> intMsgInfo
-        is CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed -> extOutMsgInfo
-    }
+private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRelaxed>(
+    CommonMsgInfoRelaxed::class,
+    CommonMsgInfoRelaxed.IntMsgInfoRelaxed::class to IntMsgInfoTlbConstructor,
+    CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed::class to ExtOutMsgInfoTlbConstructor
+) {
 
     private object IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.IntMsgInfoRelaxed>(
         schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool" +

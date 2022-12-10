@@ -14,6 +14,7 @@ import org.ton.crypto.ed25519.DecryptorEd25519
 import org.ton.crypto.ed25519.Ed25519
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
+import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 
 inline fun PrivateKeyEd25519(byteArray: ByteArray) = PrivateKeyEd25519.of(byteArray)

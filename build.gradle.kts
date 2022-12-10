@@ -40,7 +40,7 @@ allprojects {
                 useJUnitPlatform()
             }
         }
-//        macosArm64()
+        macosArm64()
 
         sourceSets {
             val commonMain by getting {
@@ -73,9 +73,9 @@ allprojects {
             val macosMain by creating {
                 dependsOn(darwinMain)
             }
-//            val macosArm64Main by getting {
-//                dependsOn(macosMain)
-//            }
+            val macosArm64Main by getting {
+                dependsOn(macosMain)
+            }
         }
     }
 

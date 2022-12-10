@@ -24,17 +24,13 @@ data class LiteServerBlockLinkForward(
 ) : LiteServerBlockLink {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerBlockLinkForward
-
+        if (other !is LiteServerBlockLinkForward) return false
         if (to_key_block != other.to_key_block) return false
         if (from != other.from) return false
         if (to != other.to) return false
         if (!dest_proof.contentEquals(other.dest_proof)) return false
         if (!config_proof.contentEquals(other.config_proof)) return false
         if (signatures != other.signatures) return false
-
         return true
     }
 

@@ -12,6 +12,7 @@ import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class StateInit(

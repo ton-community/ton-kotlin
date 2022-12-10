@@ -6,10 +6,11 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hm_edge")
-data class HashMapEdge<T>(
+data class HashMapEdge<out T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>> {

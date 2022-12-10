@@ -6,6 +6,7 @@ import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.asTlbCombinator
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbCombinatorProvider

@@ -1,5 +1,6 @@
 package org.ton.proxy.dns
 
+import io.ktor.utils.io.core.*
 import org.ton.bigint.BigInt
 import org.ton.crypto.sha256.sha256
 

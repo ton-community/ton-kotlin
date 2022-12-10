@@ -11,6 +11,7 @@ import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("vm_ctl_data")
 @Serializable

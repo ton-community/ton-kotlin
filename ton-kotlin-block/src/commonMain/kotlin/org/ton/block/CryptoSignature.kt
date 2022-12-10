@@ -14,20 +14,8 @@ sealed interface CryptoSignature {
     companion object : TlbCombinatorProvider<CryptoSignature> by CryptoSignatureTlbCombinator
 }
 
-private object CryptoSignatureTlbCombinator : TlbCombinator<CryptoSignature>() {
-    val regular = CryptoSignatureSimple.tlbConstructor()
-    val chained = ChainedSignature.tlbConstructor()
-
-    override val constructors: List<TlbConstructor<out CryptoSignature>> by lazy {
-        listOf(regular, chained)
-    }
-
-    override fun getConstructor(
-        value: CryptoSignature
-    ): TlbConstructor<out CryptoSignature> = when (value) {
-        is CryptoSignatureSimple -> regular
-        is ChainedSignature -> chained
-    }
-}
-
-
+private object CryptoSignatureTlbCombinator : TlbCombinator<CryptoSignature>(
+    CryptoSignature::class,
+    CryptoSignatureSimple::class to CryptoSignatureSimple,
+    ChainedSignature::class to ChainedSignature
+)

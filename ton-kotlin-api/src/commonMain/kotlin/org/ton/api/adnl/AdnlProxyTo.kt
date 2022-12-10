@@ -23,30 +23,6 @@ data class AdnlProxyTo(
     @Serializable(Base64ByteArraySerializer::class)
     val sharedSecret: ByteArray
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlProxyTo
-
-        if (ip != other.ip) return false
-        if (port != other.port) return false
-        if (date != other.date) return false
-        if (!dateHash.contentEquals(other.dateHash)) return false
-        if (!sharedSecret.contentEquals(other.sharedSecret)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = ip
-        result = 31 * result + port
-        result = 31 * result + date
-        result = 31 * result + dateHash.contentHashCode()
-        result = 31 * result + sharedSecret.contentHashCode()
-        return result
-    }
-
     override fun toString(): String = buildString {
         append("AdnlProxyTo(ip=")
         append(ip)
@@ -59,6 +35,26 @@ data class AdnlProxyTo(
         append(", sharedSecret=")
         append(base64(sharedSecret))
         append(")")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AdnlProxyTo) return false
+        if (ip != other.ip) return false
+        if (port != other.port) return false
+        if (date != other.date) return false
+        if (!dateHash.contentEquals(other.dateHash)) return false
+        if (!sharedSecret.contentEquals(other.sharedSecret)) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ip
+        result = 31 * result + port
+        result = 31 * result + date
+        result = 31 * result + dateHash.contentHashCode()
+        result = 31 * result + sharedSecret.contentHashCode()
+        return result
     }
 
     companion object : TlConstructor<AdnlProxyTo>(

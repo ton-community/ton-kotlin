@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbStorer
 
 @Serializable
 enum class AccStatusChange {
@@ -29,19 +30,18 @@ enum class AccStatusChange {
     companion object : TlbCodec<AccStatusChange> by AccStatusChangeTlbCombinator
 }
 
-private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>() {
-    override val constructors: List<TlbConstructor<out AccStatusChange>> = listOf(
-        AccStatusChangeUnchangedTlbConstructor,
-        AccStatusChangeFrozenTlbConstructor,
-        AccStatusChangeDeletedTlbConstructor
-    )
-
-    override fun getConstructor(
-        value: AccStatusChange
-    ): TlbConstructor<out AccStatusChange> = when (value) {
-        AccStatusChange.UNCHANGED -> AccStatusChangeUnchangedTlbConstructor
-        AccStatusChange.FROZEN -> AccStatusChangeFrozenTlbConstructor
-        AccStatusChange.DELETED -> AccStatusChangeDeletedTlbConstructor
+private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>(
+    AccStatusChange::class,
+    AccStatusChange::class to AccStatusChangeUnchangedTlbConstructor,
+    AccStatusChange::class to AccStatusChangeFrozenTlbConstructor,
+    AccStatusChange::class to AccStatusChangeDeletedTlbConstructor,
+) {
+    override fun findTlbStorerOrNull(value: AccStatusChange): TlbStorer<AccStatusChange>? {
+        return when(value) {
+            AccStatusChange.UNCHANGED -> AccStatusChangeUnchangedTlbConstructor
+            AccStatusChange.FROZEN -> AccStatusChangeFrozenTlbConstructor
+            AccStatusChange.DELETED -> AccStatusChangeDeletedTlbConstructor
+        }
     }
 }
 

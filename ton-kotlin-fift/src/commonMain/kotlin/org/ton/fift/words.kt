@@ -332,7 +332,7 @@ fun FiftInterpretator.interpretTimesDiv() {
 
 fun FiftInterpretator.interpretMod() {
     val y = stack.popInt()
-    stack.push(stack.popInt() mod y)
+    stack.push(stack.popInt() % y)
 }
 
 fun FiftInterpretator.interpretDivMod() {

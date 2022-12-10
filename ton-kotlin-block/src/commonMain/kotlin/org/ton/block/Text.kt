@@ -21,12 +21,12 @@ private object TextTlbConstructor : TlbConstructor<Text>(
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: Text) {
         cellBuilder.storeUInt8(value.chunks)
-        cellBuilder.storeTlb(TextChunks.tlbCombinator(value.chunks.toInt()), value.rest)
+        cellBuilder.storeTlb(TextChunks.tlbCodec(value.chunks.toInt()), value.rest)
     }
 
     override fun loadTlb(cellSlice: CellSlice): Text {
         val chunks = cellSlice.loadUInt8()
-        val rest = cellSlice.loadTlb(TextChunks.tlbCombinator(chunks.toInt()))
+        val rest = cellSlice.loadTlb(TextChunks.tlbCodec(chunks.toInt()))
         return Text(chunks, rest)
     }
 }

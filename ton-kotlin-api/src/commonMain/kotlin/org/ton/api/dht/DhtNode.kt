@@ -41,15 +41,11 @@ data class DhtNode(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtNode
-
+        if (other !is DhtNode) return false
         if (id != other.id) return false
         if (addr_list != other.addr_list) return false
         if (version != other.version) return false
         if (!signature.contentEquals(other.signature)) return false
-
         return true
     }
 

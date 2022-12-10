@@ -34,10 +34,7 @@ data class LiteServerGetValidatorStats(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerGetValidatorStats
-
+        if (other !is LiteServerGetValidatorStats) return false
         if (mode != other.mode) return false
         if (id != other.id) return false
         if (limit != other.limit) return false
@@ -46,7 +43,6 @@ data class LiteServerGetValidatorStats(
             if (!start_after.contentEquals(other.start_after)) return false
         } else if (other.start_after != null) return false
         if (modified_after != other.modified_after) return false
-
         return true
     }
 

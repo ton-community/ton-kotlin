@@ -3,6 +3,7 @@ package org.ton.proxy.dht.state
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.proxy.dht.DhtPeer
 import org.ton.proxy.dht.storage.DhtStorage
+import kotlin.jvm.JvmStatic
 
 interface DhtState {
     val knownPeers: Set<DhtPeer>

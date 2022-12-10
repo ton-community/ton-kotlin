@@ -2,15 +2,16 @@
 
 package org.ton.tlb
 
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 
-fun interface TlbStorer<T> {
+interface TlbStorer<in T> {
     fun storeTlb(cellBuilder: CellBuilder, value: T)
 }
 
-fun interface TlbNegatedStorer<T> : TlbStorer<T> {
+interface TlbNegatedStorer<T> : TlbStorer<T> {
     fun storeNegatedTlb(cellBuilder: CellBuilder, value: T): Int
 
     override fun storeTlb(cellBuilder: CellBuilder, value: T) {
@@ -18,17 +19,18 @@ fun interface TlbNegatedStorer<T> : TlbStorer<T> {
     }
 }
 
-fun interface TlbLoader<T> {
+interface TlbLoader<T> {
     fun loadTlb(cellSlice: CellSlice): T
 }
 
-fun interface TlbNegatedLoader<T> : TlbLoader<T> {
+interface TlbNegatedLoader<T> : TlbLoader<T> {
     fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, T>
 
     override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
 }
 
-interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
+interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T> {
+}
 interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
 
 inline fun <T> Cell.parse(tlbCodec: TlbCodec<T>): T = parse {
@@ -49,3 +51,6 @@ inline fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T) = apply {
 
 inline fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T) =
     codec.storeNegatedTlb(this, value)
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+internal inline fun <T> TlbStorer<*>.cast(): TlbStorer<T> = this as TlbStorer<T>

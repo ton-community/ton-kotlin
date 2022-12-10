@@ -16,42 +16,34 @@ sealed interface ContentData {
     companion object : TlbCombinatorProvider<ContentData> by ContentDataCombinator
 }
 
-private object ContentDataCombinator : TlbCombinator<ContentData>() {
-    override val constructors: List<TlbConstructor<out ContentData>> =
-        listOf(
-            ContentDataSnakeConstructor,
-            ContentDataChunksConstructor
+private object ContentDataCombinator : TlbCombinator<ContentData>(
+    ContentData::class,
+    ContentData.Snake::class to ContentDataSnakeConstructor,
+    ContentData.Chunks::class to ContentDataChunksConstructor
+)
+
+private object ContentDataSnakeConstructor : TlbConstructor<ContentData.Snake>(
+    schema = "snake#00 data:(SnakeData ~n) = ContentData;"
+) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Snake) {
+        cellBuilder.storeTlb(
+            SnakeData,
+            value.data
         )
+    }
 
-    override fun getConstructor(value: ContentData): TlbConstructor<out ContentData> =
-        when (value) {
-            is ContentData.Snake -> ContentDataSnakeConstructor
-            is ContentData.Chunks -> ContentDataChunksConstructor
-        }
+    override fun loadTlb(cellSlice: CellSlice): ContentData.Snake =
+        ContentData.Snake(cellSlice.loadTlb(SnakeData))
+}
 
-    private object ContentDataSnakeConstructor : TlbConstructor<ContentData.Snake>(
-        schema = "snake#00 data:(SnakeData ~n) = ContentData;"
+private object ContentDataChunksConstructor :
+    TlbConstructor<ContentData.Chunks>(
+        schema = "chunks#01 data:ChunkedData = ContentData;"
     ) {
-        override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Snake) {
-            cellBuilder.storeTlb(
-                SnakeData,
-                value.data
-            )
-        }
-
-        override fun loadTlb(cellSlice: CellSlice): ContentData.Snake =
-            ContentData.Snake(cellSlice.loadTlb(SnakeData))
+    override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Chunks) {
+        cellBuilder.storeTlb(ChunkedData, value.data)
     }
 
-    private object ContentDataChunksConstructor :
-        TlbConstructor<ContentData.Chunks>(
-            schema = "chunks#01 data:ChunkedData = ContentData;"
-        ) {
-        override fun storeTlb(cellBuilder: CellBuilder, value: ContentData.Chunks) {
-            cellBuilder.storeTlb(ChunkedData, value.data)
-        }
-
-        override fun loadTlb(cellSlice: CellSlice): ContentData.Chunks =
-            ContentData.Chunks(cellSlice.loadTlb(ChunkedData))
-    }
+    override fun loadTlb(cellSlice: CellSlice): ContentData.Chunks =
+        ContentData.Chunks(cellSlice.loadTlb(ChunkedData))
 }

@@ -10,6 +10,7 @@ import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlObject
 import org.ton.tl.constructors.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class DhtKey(
@@ -26,14 +27,10 @@ data class DhtKey(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtKey
-
+        if (other !is DhtKey) return false
         if (!id.contentEquals(other.id)) return false
         if (name != other.name) return false
         if (idx != other.idx) return false
-
         return true
     }
 

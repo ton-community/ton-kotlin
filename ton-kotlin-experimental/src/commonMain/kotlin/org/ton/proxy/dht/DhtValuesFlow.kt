@@ -58,7 +58,7 @@ class DhtValuesFlow(
                 val nodes = ArrayList<DhtNode>()
                 for ((peer, asyncValue) in results) {
                     val value = asyncValue.await()
-                    logger.debug { "receive value: ${value?.javaClass?.simpleName} - $peer" }
+                    logger.debug { "receive value: ${value?.let { it::class.simpleName }} - $peer" }
 //                    println("found in: ${Dht.affinity(key, peer.dhtNode.id.toAdnlIdShort().id)}")
                     collector.emit(peer to value)
                     if (value is DhtValueFound) {

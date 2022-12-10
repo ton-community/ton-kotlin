@@ -7,6 +7,8 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbStorer
+import kotlin.jvm.JvmStatic
 
 @Serializable
 enum class ComputeSkipReason {
@@ -32,19 +34,18 @@ enum class ComputeSkipReason {
     }
 }
 
-private object ComputeSkipReasonTlbCombinator : TlbCombinator<ComputeSkipReason>() {
-    override val constructors: List<TlbConstructor<out ComputeSkipReason>> = listOf(
-        ComputeSkipReasonNoStateTlbConstructor,
-        ComputeSkipReasonBadStateTlbConstructor,
-        ComputeSkipReasonNoGasTlbConstructor
-    )
-
-    override fun getConstructor(
-        value: ComputeSkipReason
-    ): TlbConstructor<out ComputeSkipReason> = when (value) {
-        ComputeSkipReason.NO_STATE -> ComputeSkipReasonNoStateTlbConstructor
-        ComputeSkipReason.BAD_STATE -> ComputeSkipReasonBadStateTlbConstructor
-        ComputeSkipReason.NO_GAS -> ComputeSkipReasonNoGasTlbConstructor
+private object ComputeSkipReasonTlbCombinator : TlbCombinator<ComputeSkipReason>(
+    ComputeSkipReason::class,
+    ComputeSkipReason::class to ComputeSkipReasonNoStateTlbConstructor,
+    ComputeSkipReason::class to ComputeSkipReasonBadStateTlbConstructor,
+    ComputeSkipReason::class to ComputeSkipReasonNoGasTlbConstructor,
+) {
+    override fun findTlbStorerOrNull(value: ComputeSkipReason): TlbStorer<ComputeSkipReason>? {
+        return when (value) {
+            ComputeSkipReason.NO_STATE -> ComputeSkipReasonNoStateTlbConstructor
+            ComputeSkipReason.BAD_STATE -> ComputeSkipReasonBadStateTlbConstructor
+            ComputeSkipReason.NO_GAS -> ComputeSkipReasonNoGasTlbConstructor
+        }
     }
 }
 

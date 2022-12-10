@@ -16,6 +16,7 @@ interface CellSlice {
     val refs: List<Cell>
     var bitsPosition: Int
     var refsPosition: Int
+    val remainingBits: Int get() = bits.size - bitsPosition
 
     /**
      * Checks if slice is empty. If not, throws an exception.

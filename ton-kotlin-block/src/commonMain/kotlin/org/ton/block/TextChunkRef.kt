@@ -5,19 +5,10 @@ import org.ton.tlb.TlbConstructor
 
 sealed interface TextChunkRef {
     companion object {
-        fun tlbCombinator(n: Int): TlbCombinator<TextChunkRef> = TextChunkRefTlbCombinator(n)
+        fun tlbCombinator(n: Int): TlbCombinator<TextChunkRef> = if (n == 0) {
+            ChunkRefEmpty.tlbConstructor()
+        } else {
+            ChunkRef.tlbConstructor(n)
+        } as TlbCombinator<TextChunkRef>
     }
-}
-
-private class TextChunkRefTlbCombinator(
-    n: Int
-) : TlbCombinator<TextChunkRef>() {
-    private val constructor = if (n == 0) {
-        ChunkRefEmpty.tlbConstructor()
-    } else {
-        ChunkRef.tlbConstructor(n)
-    }
-
-    override val constructors: List<TlbConstructor<out TextChunkRef>>
-        get() = listOf(constructor)
 }

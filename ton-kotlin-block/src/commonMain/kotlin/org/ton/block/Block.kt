@@ -3,25 +3,24 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @SerialName("block")
 @Serializable
 data class Block(
     val global_id: Int,
-    val info: BlockInfo,
-    val value_flow: ValueFlow,
-    val state_update: MerkleUpdate<ShardState>,
-    val extra: BlockExtra
+    val infoCell: CellRef<BlockInfo>,
+    val valueFlowCell: CellRef<ValueFlow>,
+    val stateUpdateCell: CellRef<MerkleUpdate<ShardState>>,
+    val extraCell: CellRef<BlockExtra>
 ) {
-    companion object TlbCombinator : org.ton.tlb.TlbCombinator<Block>() {
-        override val constructors: List<org.ton.tlb.TlbConstructor<out Block>> =
-            listOf(TlbConstructor)
+    val info by infoCell
+    val valueFlow by valueFlowCell
+    val stateUpdate by stateUpdateCell
+    val extra by extraCell
 
-        override fun getConstructor(value: Block): org.ton.tlb.TlbConstructor<out Block> =
-            TlbConstructor
-    }
+    companion object : TlbCombinatorProvider<Block> by TlbConstructor.asTlbCombinator()
 
     private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
         schema = "block#11ef55aa global_id:int32 " +
@@ -36,20 +35,20 @@ data class Block(
             value: Block
         ) = cellBuilder {
             storeInt(value.global_id, 32)
-            storeRef { storeTlb(BlockInfo, value.info) }
-            storeRef { storeTlb(ValueFlow, value.value_flow) }
-            storeRef { storeTlb(merkleUpdate, value.state_update) }
-            storeRef { storeTlb(BlockExtra, value.extra) }
+            storeRef(value.infoCell.cell)
+            storeRef(value.valueFlowCell.cell)
+            storeRef(value.stateUpdateCell.cell)
+            storeRef(value.extraCell.cell)
         }
 
         override fun loadTlb(
             cellSlice: CellSlice
         ): Block = cellSlice {
             val globalId = loadInt(32).toInt()
-            val info = loadRef { loadTlb(BlockInfo) }
-            val valueFlow = loadRef { loadTlb(ValueFlow) }
-            val stateUpdate = loadRef { loadTlb(merkleUpdate) }
-            val extra = loadRef { loadTlb(BlockExtra) }
+            val info = loadRef().asRef(BlockInfo)
+            val valueFlow = loadRef().asRef(ValueFlow)
+            val stateUpdate = loadRef().asRef(merkleUpdate)
+            val extra = loadRef().asRef(BlockExtra)
             Block(globalId, info, valueFlow, stateUpdate, extra)
         }
     }

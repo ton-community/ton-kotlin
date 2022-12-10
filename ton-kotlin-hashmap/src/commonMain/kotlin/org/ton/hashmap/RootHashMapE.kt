@@ -11,10 +11,11 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hme_root")
-data class RootHashMapE<T>(
+data class RootHashMapE<out T>(
     val root: HashMapEdge<T>
 ) : HashMapE<T> {
 

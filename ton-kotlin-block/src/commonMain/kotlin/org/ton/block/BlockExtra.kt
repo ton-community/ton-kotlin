@@ -5,21 +5,17 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.tlbCodec
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 @SerialName("block_extra")
 @Serializable
 data class BlockExtra(
-    val in_msg_descr: AugDictionary<InMsg, ImportFees>,
-    val out_msg_descr: AugDictionary<OutMsg, CurrencyCollection>,
-    val account_blocks: AugDictionary<AccountBlock, CurrencyCollection>,
+    val in_msg_descr: CellRef<AugDictionary<InMsg, ImportFees>>,
+    val out_msg_descr: CellRef<AugDictionary<OutMsg, CurrencyCollection>>,
+    val account_blocks: CellRef<AugDictionary<AccountBlock, CurrencyCollection>>,
     val rand_seed: BitString,
     val created_by: BitString,
-    val custom: Maybe<McBlockExtra>
+    val custom: Maybe<CellRef<McBlockExtra>>
 ) {
     init {
         require(rand_seed.size == 256) { "expected: rand_seed.size == 256, actual: ${rand_seed.size}" }
@@ -37,22 +33,24 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
             "  created_by:bits256\n" +
             "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
 ) {
-    val inMsgDescr = AugDictionary.tlbCodec(256, InMsg, ImportFees)
-    val outMsgDescr = AugDictionary.tlbCodec(256, OutMsg, CurrencyCollection)
-    val shardAccountBlock = AugDictionary.tlbCodec(
-        256,
-        AccountBlock,
-        CurrencyCollection
+    val inMsgDescr = CellRef.tlbCodec(AugDictionary.tlbCodec(256, InMsg, ImportFees))
+    val outMsgDescr = CellRef.tlbCodec(AugDictionary.tlbCodec(256, OutMsg, CurrencyCollection))
+    val shardAccountBlock = CellRef.tlbCodec(
+        AugDictionary.tlbCodec(
+            256,
+            AccountBlock,
+            CurrencyCollection
+        )
     )
-    val maybeMcBlockExtra = Maybe.tlbCodec(Cell.tlbCodec(McBlockExtra))
+    val maybeMcBlockExtra = Maybe.tlbCodec(CellRef.tlbCodec(McBlockExtra))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BlockExtra
     ) = cellBuilder {
-        storeRef { storeTlb(inMsgDescr, value.in_msg_descr) }
-        storeRef { storeTlb(outMsgDescr, value.out_msg_descr) }
-        storeRef { storeTlb(shardAccountBlock, value.account_blocks) }
+        storeTlb(inMsgDescr, value.in_msg_descr)
+        storeTlb(outMsgDescr, value.out_msg_descr)
+        storeTlb(shardAccountBlock, value.account_blocks)
         storeBits(value.rand_seed)
         storeBits(value.created_by)
         storeTlb(maybeMcBlockExtra, value.custom)
@@ -61,9 +59,9 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): BlockExtra = cellSlice {
-        val inMsgDescr = loadRef { loadTlb(inMsgDescr) }
-        val outMsgDescr = loadRef { loadTlb(outMsgDescr) }
-        val accountBlocks = loadRef { loadTlb(shardAccountBlock) }
+        val inMsgDescr = cellSlice.loadTlb(inMsgDescr)
+        val outMsgDescr = cellSlice.loadTlb(outMsgDescr)
+        val accountBlocks = loadTlb(shardAccountBlock)
         val randSeed = loadBits(256)
         val createdBy = loadBits(256)
         val custom = loadTlb(maybeMcBlockExtra)

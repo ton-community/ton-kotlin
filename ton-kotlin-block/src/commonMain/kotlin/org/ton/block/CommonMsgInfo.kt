@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
+import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
@@ -17,17 +17,9 @@ sealed interface CommonMsgInfo {
     }
 }
 
-private object CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>() {
-    private val intMsgInfoConstructor = IntMsgInfo.tlbCodec()
-    private val extInMsgConstructor = ExtInMsgInfo.tlbCodec()
-    private val extOutMsgInfoConstructor = ExtOutMsgInfo.tlbCodec()
-
-    override val constructors: List<TlbConstructor<out CommonMsgInfo>> =
-        listOf(intMsgInfoConstructor, extInMsgConstructor, extOutMsgInfoConstructor)
-
-    override fun getConstructor(value: CommonMsgInfo): TlbConstructor<out CommonMsgInfo> = when (value) {
-        is IntMsgInfo -> intMsgInfoConstructor
-        is ExtInMsgInfo -> extInMsgConstructor
-        is ExtOutMsgInfo -> extOutMsgInfoConstructor
-    }
-}
+private object CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
+    CommonMsgInfo::class,
+    IntMsgInfo::class to IntMsgInfo.tlbCodec(),
+    ExtInMsgInfo::class to ExtInMsgInfo.tlbCodec(),
+    ExtOutMsgInfo::class to ExtOutMsgInfo.tlbCodec()
+)

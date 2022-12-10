@@ -6,7 +6,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
-import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmStatic
 
 inline fun SmcCapList(capabilities: Iterable<SmcCapability>) = SmcCapList.of(capabilities)
 inline fun SmcCapList(vararg capabilities: SmcCapability) = SmcCapList.of(capabilities.toList())
@@ -41,31 +41,28 @@ sealed interface SmcCapList : Iterable<SmcCapability> {
     }
 }
 
-private object SmcCapListTlbCombinator : TlbCombinator<SmcCapList>() {
-    private val next by lazy {
-        object : TlbConstructor<SmcCapList.Next>(
-            schema = "cap_list_next\$1 head:SmcCapability tail:SmcCapList = SmcCapList;"
-        ) {
-            override fun storeTlb(cellBuilder: CellBuilder, value: SmcCapList.Next) {
-                cellBuilder.storeTlb(SmcCapability, value.head)
-                cellBuilder.storeTlb(this@SmcCapListTlbCombinator, value.tail)
-            }
+private object SmcCapListTlbCombinator : TlbCombinator<SmcCapList>(
+    SmcCapList::class,
+    SmcCapList.Nil::class to capListNil,
+    SmcCapList.Next::class to SmcCapListNextTlbConstructor,
+)
 
-            override fun loadTlb(cellSlice: CellSlice): SmcCapList.Next {
-                val head = cellSlice.loadTlb(SmcCapability)
-                val tail = cellSlice.loadTlb(this@SmcCapListTlbCombinator)
-                return SmcCapList.Next(head, tail)
-            }
-        }
+private val capListNil = ObjectTlbConstructor(
+    SmcCapList.Nil,
+    schema = "cap_list_nil\$0 = SmcCapList;",
+)
+
+private object SmcCapListNextTlbConstructor : TlbConstructor<SmcCapList.Next>(
+    schema = "cap_list_next\$1 head:SmcCapability tail:SmcCapList = SmcCapList;"
+) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: SmcCapList.Next) {
+        cellBuilder.storeTlb(SmcCapability, value.head)
+        cellBuilder.storeTlb(SmcCapList, value.tail)
     }
 
-    override val constructors: List<TlbConstructor<out SmcCapList>> by lazy {
-        listOf(
-            ObjectTlbConstructor(
-                schema = "cap_list_nil\$0 = SmcCapList;",
-                SmcCapList.Nil
-            ),
-            next
-        )
+    override fun loadTlb(cellSlice: CellSlice): SmcCapList.Next {
+        val head = cellSlice.loadTlb(SmcCapability)
+        val tail = cellSlice.loadTlb(SmcCapList)
+        return SmcCapList.Next(head, tail)
     }
 }

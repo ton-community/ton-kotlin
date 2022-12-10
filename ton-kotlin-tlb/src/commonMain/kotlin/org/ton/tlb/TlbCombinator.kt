@@ -1,45 +1,66 @@
 package org.ton.tlb
 
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.tlb.exception.UnknownTlbConstructorException
 import org.ton.tlb.providers.TlbCombinatorProvider
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSupertypeOf
+import kotlin.reflect.KClass
 
-abstract class TlbCombinator<T : Any> : AbstractTlbCombinator<T, TlbConstructor<T>>(), TlbCodec<T>,
-    TlbCombinatorProvider<T> {
-    abstract override val constructors: List<TlbConstructor<out T>>
+abstract class TlbCombinator<T : Any>(
+    override val baseClass: KClass<T>,
+    vararg subClasses: Pair<KClass<out T>, TlbCodec<out T>>
+) : AbstractTlbCombinator<T>(), TlbCombinatorProvider<T> {
+    private val class2codec: Map<KClass<out T>, TlbCodec<out T>>
+    private val constructorTree = TlbConstructorTree<TlbCodec<out T>>()
+
+    init {
+        class2codec = subClasses.toMap()
+        subClasses.forEach { (_, constructor) ->
+            if (constructor is TlbConstructor<out T>) {
+                constructorTree.add(constructor.id, constructor)
+            }
+            if (constructor is TlbCombinator<out T>) {
+                constructor.constructorTree.values().forEach { (key,value) ->
+                    constructorTree.add(key, value)
+                }
+            }
+        }
+    }
 
     override fun tlbCombinator(): TlbCombinator<T> = this
 
-    @Suppress("UNCHECKED_CAST")
-    fun getConstructor(type: KType): TlbConstructor<T> {
-        val constructor = checkNotNull(
-            constructors.find { constructor ->
-                constructor.type?.isSupertypeOf(type) == true
-            }
-        ) {
-            "Invalid type. actual: $type"
+    override fun loadTlb(cellSlice: CellSlice): T {
+        val constructor = findTlbLoaderOrNull(cellSlice) ?: throw UnknownTlbConstructorException()
+        if (constructor is TlbConstructor<*>) {
+            cellSlice.skipBits(constructor.id.size)
         }
-        return constructor as TlbConstructor<T>
+        return constructor.loadTlb(cellSlice)
     }
 
-    override fun getConstructor(value: T): TlbConstructor<out T> = getConstructor(value::class.createType())
+    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+        val constructor = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
+        if (constructor is TlbConstructor<*>) {
+            cellBuilder.storeBits(constructor.id)
+        }
+        return constructor.storeTlb(cellBuilder, value)
+    }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) =
-        storeTlbConstructor(cellBuilder, value).storeTlb(cellBuilder, value)
+    protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {
+        val preloadBits = cellSlice.loadBits(cellSlice.remainingBits)
+        return findTlbLoaderOrNull(preloadBits)
+    }
 
-    override fun loadTlb(cellSlice: CellSlice): T =
-        loadTlbConstructor(cellSlice).loadTlb(cellSlice)
+    protected open fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out T>? {
+        val (_, constructor) = constructorTree.find(bitString)
+            ?: return null
+        return constructor
+    }
 
-    override fun toString(): String = this::class.simpleName.toString()
-}
-
-fun <T : Any> TlbCombinator(vararg tlbConstructor: TlbConstructor<T>) = object : TlbCombinator<T>() {
-    override val constructors: List<TlbConstructor<out T>> = tlbConstructor.sortedBy { it.id }
-}
-
-fun <T : Any> TlbCombinator(iterable: Iterable<TlbConstructor<out T>>) = object : TlbCombinator<T>() {
-    override val constructors: List<TlbConstructor<out T>> = iterable.sortedBy { it.id }
+    @Suppress("UNCHECKED_CAST")
+    protected open fun findTlbStorerOrNull(value: T): TlbStorer<T>? {
+        val constructor = class2codec[value::class]
+            ?: return null
+        return constructor as TlbConstructor<T>
+    }
 }

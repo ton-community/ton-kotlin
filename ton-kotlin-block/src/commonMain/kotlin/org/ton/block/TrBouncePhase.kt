@@ -14,20 +14,9 @@ sealed interface TrBouncePhase {
     companion object : TlbCombinatorProvider<TrBouncePhase> by TrBouncePhaseTlbCombinator
 }
 
-private object TrBouncePhaseTlbCombinator : TlbCombinator<TrBouncePhase>() {
-    val negFunds = TrPhaseBounceNegFunds.tlbConstructor()
-    val noFunds = TrPhaseBounceNoFunds.tlbConstructor()
-    val ok = TrPhaseBounceOk.tlbConstructor()
-
-    override val constructors: List<TlbConstructor<out TrBouncePhase>> by lazy {
-        listOf(negFunds, noFunds, ok)
-    }
-
-    override fun getConstructor(
-        value: TrBouncePhase
-    ): TlbConstructor<out TrBouncePhase> = when (value) {
-        is TrPhaseBounceNegFunds -> negFunds
-        is TrPhaseBounceNoFunds -> noFunds
-        is TrPhaseBounceOk -> ok
-    }
-}
+private object TrBouncePhaseTlbCombinator : TlbCombinator<TrBouncePhase>(
+    TrBouncePhase::class,
+    TrPhaseBounceNegFunds::class to TrPhaseBounceNegFunds,
+    TrPhaseBounceNoFunds::class to TrPhaseBounceNoFunds,
+    TrPhaseBounceOk::class to TrPhaseBounceOk,
+)

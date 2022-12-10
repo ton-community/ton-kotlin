@@ -26,13 +26,9 @@ data class LiteServerBlockData(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerBlockData
-
+        if (other !is LiteServerBlockData) return false
         if (id != other.id) return false
         if (!data.contentEquals(other.data)) return false
-
         return true
     }
 

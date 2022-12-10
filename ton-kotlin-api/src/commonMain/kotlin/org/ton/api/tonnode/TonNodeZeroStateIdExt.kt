@@ -33,14 +33,10 @@ data class TonNodeZeroStateIdExt(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as TonNodeZeroStateIdExt
-
+        if (other !is TonNodeZeroStateIdExt) return false
         if (workchain != other.workchain) return false
         if (!root_hash.contentEquals(other.root_hash)) return false
         if (!file_hash.contentEquals(other.file_hash)) return false
-
         return true
     }
 

@@ -6,6 +6,7 @@ import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class LiteServerTransactionId(
@@ -20,10 +21,7 @@ data class LiteServerTransactionId(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerTransactionId
-
+        if (other !is LiteServerTransactionId) return false
         if (mode != other.mode) return false
         if (account != null) {
             if (other.account == null) return false
@@ -34,7 +32,6 @@ data class LiteServerTransactionId(
             if (other.hash == null) return false
             if (!hash.contentEquals(other.hash)) return false
         } else if (other.hash != null) return false
-
         return true
     }
 

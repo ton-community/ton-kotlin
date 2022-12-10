@@ -10,10 +10,11 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("ahme_empty")
 @Serializable
-data class AugDictionaryEmpty<X, Y>(
+data class AugDictionaryEmpty<out X, out Y>(
     override val extra: Y
 ) : AugDictionary<X, Y> {
     override fun toString(): String = "(ahme_empty\nextra:$extra)"
@@ -28,7 +29,7 @@ data class AugDictionaryEmpty<X, Y>(
     }
 }
 
-private class AugDictionaryEmptyTlbConstructor<X, Y>(
+internal class AugDictionaryEmptyTlbConstructor<X, Y>(
     val y: TlbCodec<Y>,
 ) : TlbConstructor<AugDictionaryEmpty<X, Y>>(
     schema = "ahme_empty\$0 {n:#} {X:Type} {Y:Type} extra:Y = AugDictionary n X Y;",

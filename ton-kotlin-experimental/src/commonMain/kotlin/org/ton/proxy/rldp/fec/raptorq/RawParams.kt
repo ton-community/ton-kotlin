@@ -1,5 +1,7 @@
 package org.ton.proxy.rldp.fec.raptorq
 
+import kotlin.jvm.JvmStatic
+
 class RawParams(
     val kPadded: Int,
     val j: Int,

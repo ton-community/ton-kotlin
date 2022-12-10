@@ -20,6 +20,8 @@ expect class BigInt : Number, Comparable<BigInt> {
     fun not(): BigInt
 }
 
+expect fun Int.toBigInt(): BigInt
+expect fun Long.toBigInt(): BigInt
 expect fun Number.toBigInt(): BigInt
 
 expect operator fun BigInt.plus(number: Number): BigInt
@@ -27,14 +29,16 @@ expect operator fun BigInt.minus(number: Number): BigInt
 expect operator fun BigInt.times(number: Number): BigInt
 expect operator fun BigInt.div(number: Number): BigInt
 expect operator fun BigInt.unaryMinus(): BigInt
+expect operator fun BigInt.rem(mod: BigInt): BigInt
 expect infix fun BigInt.shr(shr: Int): BigInt
 expect infix fun BigInt.shl(shl: Int): BigInt
 expect infix fun BigInt.and(and: BigInt): BigInt
-expect infix fun BigInt.mod(mod: BigInt): BigInt
 expect infix fun BigInt.or(mod: BigInt): BigInt
 expect infix fun BigInt.xor(mod: BigInt): BigInt
 expect infix fun BigInt.divRem(value: BigInt): Array<BigInt>
 expect infix fun BigInt.pow(pow: Int): BigInt
+expect operator fun BigInt.compareTo(other: Int): Int
+expect operator fun BigInt.compareTo(other: Long): Int
 
 fun BigInt(number: Number): BigInt = number.toBigInt()
 
@@ -53,4 +57,3 @@ object BigIntSerializer : KSerializer<BigInt> {
 expect val BigInt.bitLength: Int
 expect val BigInt.sign: Int
 expect val BigInt.isZero: Boolean
-

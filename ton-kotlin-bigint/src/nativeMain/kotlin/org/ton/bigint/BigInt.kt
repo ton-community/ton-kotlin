@@ -65,6 +65,7 @@ actual class BigInt : Number, Comparable<BigInt> {
     companion object {
         const val LONG_MASK = 0xffffffffL
         val ZERO = BigInt(intArrayOf(), 0)
+        val ONE = BigInt(intArrayOf(1), 1)
 
         fun bitLengthForInt(n: Int): Int = 32 - n.countLeadingZeroBits()
     }
@@ -74,6 +75,13 @@ actual fun Number.toBigInt(): BigInt {
     TODO("Not yet implemented")
 }
 
+actual fun Int.toBigInt(): BigInt {
+    TODO("Not yet implemented")
+}
+
+actual fun Long.toBigInt(): BigInt {
+    TODO("Not yet implemented")
+}
 
 actual val BigInt.bitLength: Int get() = TODO()
 actual val BigInt.sign: Int get() = TODO()
@@ -84,11 +92,13 @@ actual operator fun BigInt.minus(number: Number): BigInt = TODO()
 actual operator fun BigInt.times(number: Number): BigInt = TODO()
 actual operator fun BigInt.div(number: Number): BigInt = TODO()
 actual operator fun BigInt.unaryMinus(): BigInt = TODO()
+actual operator fun BigInt.rem(mod: BigInt): BigInt = TODO()
 actual infix fun BigInt.shr(shr: Int): BigInt = TODO()
 actual infix fun BigInt.shl(shl: Int): BigInt = TODO()
 actual infix fun BigInt.and(and: BigInt): BigInt = TODO()
-actual infix fun BigInt.mod(mod: BigInt): BigInt = TODO()
 actual infix fun BigInt.or(mod: BigInt): BigInt = TODO()
 actual infix fun BigInt.xor(mod: BigInt): BigInt = TODO()
 actual infix fun BigInt.divRem(value: BigInt): Array<BigInt> = TODO()
 actual infix fun BigInt.pow(pow: Int): BigInt = TODO()
+actual operator fun BigInt.compareTo(other: Int): Int = TODO()
+actual operator fun BigInt.compareTo(other: Long): Int = TODO()

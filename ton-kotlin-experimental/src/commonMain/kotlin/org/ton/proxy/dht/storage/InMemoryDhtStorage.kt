@@ -18,6 +18,6 @@ class InMemoryDhtStorage(
 
     override fun gc() {
         val now = Clock.System.now()
-        map.entries.removeIf { it.value.ttl() <= now }
+        map.entries.removeAll { it.value.ttl() <= now }
     }
 }

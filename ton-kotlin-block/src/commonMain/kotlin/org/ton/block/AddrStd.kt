@@ -20,6 +20,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.experimental.and
 import kotlin.experimental.or
+import kotlin.jvm.JvmStatic
 
 inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 

@@ -17,6 +17,7 @@ import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.writeInt256Tl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import kotlin.jvm.JvmStatic
 
 inline fun LiteServerMasterchainInfo(
     last: TonNodeBlockIdExt,
@@ -50,14 +51,10 @@ private data class LiteServerMasterchainInfoImpl(
 ) : LiteServerMasterchainInfo {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerMasterchainInfo
-
+        if (other !is LiteServerMasterchainInfoImpl) return false
         if (last != other.last) return false
         if (!state_root_hash.contentEquals(other.state_root_hash)) return false
         if (init != other.init) return false
-
         return true
     }
 

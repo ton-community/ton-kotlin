@@ -20,10 +20,7 @@ data class AdnlProxyToSign(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlProxyToSign
-
+        if (other !is AdnlProxyToSign) return false
         if (ip != other.ip) return false
         if (port != other.port) return false
         if (date != other.date) return false

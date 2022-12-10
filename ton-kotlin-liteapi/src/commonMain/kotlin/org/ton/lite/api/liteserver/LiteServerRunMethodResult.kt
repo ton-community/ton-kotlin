@@ -57,10 +57,7 @@ data class LiteServerRunMethodResult(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerRunMethodResult
-
+        if (other !is LiteServerRunMethodResult) return false
         if (mode != other.mode) return false
         if (id != other.id) return false
         if (shardblk != other.shardblk) return false
@@ -89,7 +86,6 @@ data class LiteServerRunMethodResult(
             if (other.result == null) return false
             if (!result.contentEquals(other.result)) return false
         } else if (other.result != null) return false
-
         return true
     }
 

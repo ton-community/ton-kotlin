@@ -14,22 +14,9 @@ sealed interface IntermediateAddress {
     companion object : TlbCombinatorProvider<IntermediateAddress> by IntermediateAddressTlbCombinator
 }
 
-private object IntermediateAddressTlbCombinator : TlbCombinator<IntermediateAddress>() {
-    val regular = IntermediateAddressRegular.tlbConstructor()
-    val simple = IntermediateAddressSimple.tlbConstructor()
-    val ext = IntermediateAddressExt.tlbConstructor()
-
-    override val constructors: List<TlbConstructor<out IntermediateAddress>> = listOf(
-        regular, simple, ext
-    )
-
-    override fun getConstructor(
-        value: IntermediateAddress
-    ): TlbConstructor<out IntermediateAddress> = when (value) {
-        is IntermediateAddressRegular -> regular
-        is IntermediateAddressSimple -> simple
-        is IntermediateAddressExt -> ext
-    }
-}
-
-
+private object IntermediateAddressTlbCombinator : TlbCombinator<IntermediateAddress>(
+    IntermediateAddress::class,
+    IntermediateAddressExt::class to IntermediateAddressExt,
+    IntermediateAddressRegular::class to IntermediateAddressRegular,
+    IntermediateAddressSimple::class to IntermediateAddressSimple,
+)

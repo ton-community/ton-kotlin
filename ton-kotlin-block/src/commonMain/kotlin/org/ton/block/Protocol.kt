@@ -7,12 +7,8 @@ sealed interface Protocol {
     companion object : TlbCombinatorProvider<Protocol> by ProtocolTlbCombinator
 }
 
-private object ProtocolTlbCombinator : TlbCombinator<Protocol>() {
-    override val constructors: List<org.ton.tlb.TlbConstructor<out Protocol>> =
-        listOf(ProtoHttp.tlbConstructor())
-
-    override fun getConstructor(value: Protocol): org.ton.tlb.TlbConstructor<out Protocol> =
-        when (value) {
-            is ProtoHttp -> ProtoHttp.tlbConstructor()
-        }
+private object ProtocolTlbCombinator : TlbCombinator<Protocol>(
+    Protocol::class,
+    ProtoHttp::class to ProtoHttp.tlbConstructor(),
+) {
 }

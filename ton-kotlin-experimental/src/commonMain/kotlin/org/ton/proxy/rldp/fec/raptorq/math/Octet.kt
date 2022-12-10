@@ -1,5 +1,7 @@
 package org.ton.proxy.rldp.fec.raptorq.math
 
+import kotlin.jvm.JvmInline
+
 @OptIn(ExperimentalUnsignedTypes::class)
 private val LOG_TABLE = ubyteArrayOf(
     0u,

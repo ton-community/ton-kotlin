@@ -36,16 +36,12 @@ data class LiteServerAccountState(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerAccountState
-
+        if (other !is LiteServerAccountState) return false
         if (id != other.id) return false
         if (shard_blk != other.shard_blk) return false
         if (!shard_proof.contentEquals(other.shard_proof)) return false
         if (!proof.contentEquals(other.proof)) return false
         if (!state.contentEquals(other.state)) return false
-
         return true
     }
 

@@ -19,15 +19,11 @@ data class LiteServerShardInfo(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerShardInfo
-
+        if (other !is LiteServerShardInfo) return false
         if (id != other.id) return false
         if (shardblk != other.shardblk) return false
         if (!shard_proof.contentEquals(other.shard_proof)) return false
         if (!shard_descr.contentEquals(other.shard_descr)) return false
-
         return true
     }
 

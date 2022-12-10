@@ -14,17 +14,8 @@ sealed interface Account {
     companion object : TlbCombinatorProvider<Account> by AccountTlbCombinator
 }
 
-private object AccountTlbCombinator : TlbCombinator<Account>() {
-    val none = AccountNone.tlbConstructor()
-    val info = AccountInfo.tlbConstructor()
-
-    override val constructors: List<TlbConstructor<out Account>> =
-        listOf(none, info)
-
-    override fun getConstructor(
-        value: Account
-    ): TlbConstructor<out Account> = when (value) {
-        is AccountNone -> none
-        is AccountInfo -> info
-    }
-}
+private object AccountTlbCombinator : TlbCombinator<Account>(
+    Account::class,
+    AccountNone::class to AccountNone,
+    AccountInfo::class to AccountInfo
+)

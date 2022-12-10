@@ -37,13 +37,9 @@ data class LiteServerAccountId(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerAccountId
-
+        if (other !is LiteServerAccountId) return false
         if (workchain != other.workchain) return false
         if (!id.contentEquals(other.id)) return false
-
         return true
     }
 

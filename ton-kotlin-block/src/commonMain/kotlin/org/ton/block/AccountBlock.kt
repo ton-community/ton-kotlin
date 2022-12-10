@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.hashmap.AugDictionaryEdge
+import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.loadTlb
@@ -33,8 +34,13 @@ data class AccountBlock(
         append(")")
     }
 
-    companion object : TlbCombinatorProvider<AccountBlock> by AccountBlockTlbConstructor.asTlbCombinator()
+    companion object : TlbCombinatorProvider<AccountBlock> by AccountBlockTlbCombinator
 }
+
+private object AccountBlockTlbCombinator : TlbCombinator<AccountBlock>(
+    AccountBlock::class,
+    AccountBlock::class to AccountBlockTlbConstructor
+)
 
 private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
     schema = "acc_trans#5 account_addr:bits256 " +

@@ -8,6 +8,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("ext_out_msg_info")
 @Serializable

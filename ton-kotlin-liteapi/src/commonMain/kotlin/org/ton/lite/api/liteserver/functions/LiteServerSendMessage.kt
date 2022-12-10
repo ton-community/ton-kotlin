@@ -15,7 +15,7 @@ import org.ton.tl.constructors.writeBytesTl
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 
-fun interface LiteServerSendMessageFunction : LiteServerQueryFunction {
+interface LiteServerSendMessageFunction : LiteServerQueryFunction {
     suspend fun query(query: LiteServerSendMessage): LiteServerSendMsgStatus =
         query(query, LiteServerSendMessage, LiteServerSendMsgStatus)
 
@@ -36,12 +36,8 @@ data class LiteServerSendMessage(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerSendMessage
-
+        if (other !is LiteServerSendMessage) return false
         if (!body.contentEquals(other.body)) return false
-
         return true
     }
 

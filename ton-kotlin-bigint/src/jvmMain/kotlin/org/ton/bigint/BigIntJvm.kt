@@ -4,6 +4,9 @@ import java.math.BigInteger
 
 actual typealias BigInt = BigInteger
 
+actual fun Int.toBigInt(): BigInt = BigInteger.valueOf(this.toLong())
+actual fun Long.toBigInt(): BigInt = BigInteger.valueOf(this)
+
 actual fun Number.toBigInt(): BigInt = when (this) {
     is Long -> BigInteger.valueOf(this)
     is Int -> BigInteger.valueOf(this.toLong())
@@ -33,13 +36,16 @@ actual infix fun BigInt.shl(shl: Int): BigInt = shiftLeft(shl)
 
 actual infix fun BigInt.and(and: BigInt): BigInt = and(and)
 
-actual infix fun BigInt.mod(mod: BigInt): BigInt = mod(mod)
+actual operator fun BigInt.rem(mod: BigInt): BigInt = mod(mod)
 
 actual infix fun BigInt.or(mod: BigInt): BigInt = or(mod)
 
 actual infix fun BigInt.xor(mod: BigInt): BigInt = xor(mod)
 
 actual infix fun BigInt.pow(pow: Int): BigInt = pow(pow)
+
+actual operator fun BigInt.compareTo(other: Int): Int = compareTo(other.toBigInt())
+actual operator fun BigInt.compareTo(other: Long): Int = compareTo(other.toBigInt())
 
 // TODO: check all cases
 actual infix fun BigInt.divRem(value: BigInt): Array<BigInt> = divideAndRemainder(value)

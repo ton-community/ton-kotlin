@@ -10,6 +10,7 @@ import org.ton.api.dht.*
 import org.ton.api.dht.functions.DhtFindValue
 import org.ton.api.dht.functions.DhtPing
 import org.ton.proxy.adnl.AdnlPeer
+import kotlin.jvm.JvmStatic
 
 class DhtPeer private constructor(
     val dhtNode: DhtNode,

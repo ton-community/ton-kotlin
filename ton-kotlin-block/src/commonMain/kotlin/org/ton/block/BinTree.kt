@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
@@ -16,27 +17,18 @@ sealed interface BinTree<X> : Iterable<X> {
     fun nodes(): Sequence<X>
 
     companion object {
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
         fun <X> tlbCodec(
             x: TlbCodec<X>
-        ): TlbCombinator<BinTree<X>> = BinTreeTlbCombinator(x)
+        ): TlbCombinator<BinTree<X>> = BinTreeTlbCombinator(x) as TlbCombinator<BinTree<X>>
     }
 }
 
-private class BinTreeTlbCombinator<X>(
-    val x: TlbCodec<X>
-) : TlbCombinator<BinTree<X>>() {
-    val leaf by lazy { BinTreeLeaf.tlbCodec(x) }
-    val fork by lazy { BinTreeFork.tlbCodec(x) }
-
-    override val constructors: List<TlbConstructor<out BinTree<X>>> by lazy {
-        listOf(leaf, fork)
-    }
-
-    override fun getConstructor(
-        value: BinTree<X>
-    ): TlbConstructor<out BinTree<X>> = when (value) {
-        is BinTreeLeaf -> leaf
-        is BinTreeFork -> fork
-    }
-}
+private class BinTreeTlbCombinator(
+    x: TlbCodec<*>
+) : TlbCombinator<BinTree<*>>(
+    BinTree::class,
+    BinTreeLeaf::class to BinTreeLeaf.tlbCodec(x),
+    BinTreeFork::class to BinTreeFork.tlbCodec(x)
+)

@@ -15,6 +15,7 @@ import org.ton.crypto.encodeHex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.*
+import kotlin.jvm.JvmStatic
 
 inline fun TonNodeBlockIdExt(string: String): TonNodeBlockIdExt = TonNodeBlockIdExt.parse(string)
 

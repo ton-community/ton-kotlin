@@ -20,7 +20,7 @@ import org.ton.tl.readTl
 import org.ton.tl.writeTl
 import org.ton.tlb.storeTlb
 
-fun interface LiteServerRunSmcMethodFunction : LiteServerQueryFunction {
+interface LiteServerRunSmcMethodFunction : LiteServerQueryFunction {
     suspend fun query(query: LiteServerRunSmcMethod): LiteServerRunMethodResult =
         query(query, LiteServerRunSmcMethod, LiteServerRunMethodResult)
 
@@ -139,16 +139,12 @@ data class LiteServerRunSmcMethod(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerRunSmcMethod
-
+        if (other !is LiteServerRunSmcMethod) return false
         if (mode != other.mode) return false
         if (id != other.id) return false
         if (account != other.account) return false
         if (method_id != other.method_id) return false
         if (!params.contentEquals(other.params)) return false
-
         return true
     }
 

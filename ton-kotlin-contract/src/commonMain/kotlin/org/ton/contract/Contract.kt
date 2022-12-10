@@ -9,6 +9,7 @@ import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 interface Contract {
     val liteApi: LiteApi

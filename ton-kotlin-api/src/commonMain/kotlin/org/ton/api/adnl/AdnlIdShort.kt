@@ -14,6 +14,7 @@ import org.ton.tl.TlConstructor
 import org.ton.tl.TlObject
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.writeInt256Tl
+import kotlin.jvm.JvmStatic
 
 inline fun AdnlIdShort(byteArray: ByteArray): AdnlIdShort = AdnlIdShort.of(byteArray)
 inline fun AdnlIdShort(input: Input): AdnlIdShort = AdnlIdShort.of(input)

@@ -8,6 +8,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("vm_tuple_tcons")
 @Serializable

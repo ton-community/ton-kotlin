@@ -3,6 +3,7 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hml_same")

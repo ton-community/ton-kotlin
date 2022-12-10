@@ -24,14 +24,10 @@ data class LiteServerBlockHeader(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerBlockHeader
-
+        if (other !is LiteServerBlockHeader) return false
         if (id != other.id) return false
         if (mode != other.mode) return false
         if (!header_proof.contentEquals(other.header_proof)) return false
-
         return true
     }
 

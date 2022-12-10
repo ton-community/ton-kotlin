@@ -25,13 +25,13 @@ private class ChunkRefTlbConstructor(
 
     override fun storeTlb(cellBuilder: CellBuilder, value: ChunkRef) {
         cellBuilder.storeRef {
-            storeTlb(TextChunks.tlbCombinator(n + 1), value.ref)
+            storeTlb(TextChunks.tlbCodec(n + 1), value.ref)
         }
     }
 
     override fun loadTlb(cellSlice: CellSlice): ChunkRef {
         val ref = cellSlice.loadRef {
-            loadTlb(TextChunks.tlbCombinator(n + 1))
+            loadTlb(TextChunks.tlbCodec(n + 1))
         }
         return ChunkRef(ref)
     }

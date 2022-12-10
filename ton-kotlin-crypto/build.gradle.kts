@@ -4,7 +4,7 @@ kotlin {
             dependencies {
                 api(libs.ktor.utils)
                 implementation(libs.curve25519)
-                compileOnly(libs.serialization.core)
+                implementation(libs.serialization.core)
             }
         }
         val jvmMain by getting {

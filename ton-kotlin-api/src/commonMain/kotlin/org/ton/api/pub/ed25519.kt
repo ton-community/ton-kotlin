@@ -16,6 +16,7 @@ import org.ton.crypto.hex
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.Int256TlConstructor
+import kotlin.jvm.JvmStatic
 
 inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519) = PublicKeyEd25519.of(privateKey)
 

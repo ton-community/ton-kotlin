@@ -31,15 +31,11 @@ data class LiteServerGetTransactions(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerGetTransactions
-
+        if (other !is LiteServerGetTransactions) return false
         if (count != other.count) return false
         if (account != other.account) return false
         if (lt != other.lt) return false
         if (!hash.contentEquals(other.hash)) return false
-
         return true
     }
 

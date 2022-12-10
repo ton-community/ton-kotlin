@@ -21,37 +21,33 @@ sealed interface FullContent {
     companion object : TlbCombinatorProvider<FullContent> by FullContentCombinator
 }
 
-private object FullContentCombinator : TlbCombinator<FullContent>() {
-    override val constructors: List<TlbConstructor<out FullContent>> =
-        listOf(FullContentOnChainConstructor, FullContentOffChainConstructor)
+private object FullContentCombinator : TlbCombinator<FullContent>(
+    FullContent::class,
+    FullContent.OnChain::class to FullContentOnChainConstructor,
+    FullContent.OffChain::class to FullContentOffChainConstructor
+)
 
-    override fun getConstructor(value: FullContent): TlbConstructor<out FullContent> = when (value) {
-        is FullContent.OnChain -> FullContentOnChainConstructor
-        is FullContent.OffChain -> FullContentOffChainConstructor
+private object FullContentOnChainConstructor : TlbConstructor<FullContent.OnChain>(
+    schema = "onchain#00 data:(HashMapE 256 ^ContentData) = FullContent;"
+) {
+    val dataCodec = HashMapE.tlbCodec(256, Cell.tlbCodec(ContentData))
+
+    override fun storeTlb(cellBuilder: CellBuilder, value: FullContent.OnChain) {
+        cellBuilder.storeTlb(dataCodec, value.data)
     }
 
-    private object FullContentOnChainConstructor : TlbConstructor<FullContent.OnChain>(
-        schema = "onchain#00 data:(HashMapE 256 ^ContentData) = FullContent;"
-    ) {
-        val dataCodec = HashMapE.tlbCodec(256, Cell.tlbCodec(ContentData))
+    override fun loadTlb(cellSlice: CellSlice): FullContent.OnChain =
+        FullContent.OnChain(cellSlice.loadTlb(dataCodec))
+}
 
-        override fun storeTlb(cellBuilder: CellBuilder, value: FullContent.OnChain) {
-            cellBuilder.storeTlb(dataCodec, value.data)
-        }
 
-        override fun loadTlb(cellSlice: CellSlice): FullContent.OnChain =
-            FullContent.OnChain(cellSlice.loadTlb(dataCodec))
+private object FullContentOffChainConstructor : TlbConstructor<FullContent.OffChain>(
+    schema = "offchain#01 uri:Text = FullContent;"
+) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: FullContent.OffChain) {
+        cellBuilder.storeTlb(Text, value.uri)
     }
 
-
-    private object FullContentOffChainConstructor : TlbConstructor<FullContent.OffChain>(
-        schema = "offchain#01 uri:Text = FullContent;"
-    ) {
-        override fun storeTlb(cellBuilder: CellBuilder, value: FullContent.OffChain) {
-            cellBuilder.storeTlb(Text, value.uri)
-        }
-
-        override fun loadTlb(cellSlice: CellSlice): FullContent.OffChain =
-            FullContent.OffChain(cellSlice.loadTlb(Text))
-    }
+    override fun loadTlb(cellSlice: CellSlice): FullContent.OffChain =
+        FullContent.OffChain(cellSlice.loadTlb(Text))
 }

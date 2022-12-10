@@ -20,15 +20,11 @@ data class LiteServerConfigInfo(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerConfigInfo
-
+        if (other !is LiteServerConfigInfo) return false
         if (mode != other.mode) return false
         if (id != other.id) return false
         if (!state_proof.contentEquals(other.state_proof)) return false
         if (!config_proof.contentEquals(other.config_proof)) return false
-
         return true
     }
 

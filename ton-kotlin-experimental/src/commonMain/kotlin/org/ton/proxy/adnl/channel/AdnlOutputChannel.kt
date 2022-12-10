@@ -5,6 +5,7 @@ package org.ton.proxy.adnl.channel
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pub.PublicKeyAes
 import org.ton.bitstring.BitString
+import kotlin.jvm.JvmStatic
 
 inline fun AdnlOutputChannel(key: PublicKeyAes): AdnlOutputChannel = AdnlOutputChannel.of(key)
 

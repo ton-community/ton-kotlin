@@ -3,7 +3,6 @@ package org.ton.tl.constructors
 import io.ktor.utils.io.core.*
 import org.ton.tl.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createType
 
 open class EnumTlCombinator<T : Enum<T>>(
     override val baseClass: KClass<T>,

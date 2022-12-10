@@ -21,17 +21,13 @@ data class LiteServerValidatorStats(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerValidatorStats
-
+        if (other !is LiteServerValidatorStats) return false
         if (mode != other.mode) return false
         if (id != other.id) return false
         if (count != other.count) return false
         if (complete != other.complete) return false
         if (!state_proof.contentEquals(other.state_proof)) return false
         if (!data_proof.contentEquals(other.data_proof)) return false
-
         return true
     }
 

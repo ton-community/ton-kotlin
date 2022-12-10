@@ -2,15 +2,13 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.BigInt
-import org.ton.bigint.BigIntSerializer
-import org.ton.bigint.bitLength
+import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import java.math.BigInteger
+import kotlin.jvm.JvmStatic
 
 @SerialName("var_uint")
 @Serializable
@@ -46,7 +44,7 @@ data class VarUInteger(
 
     operator fun minus(other: VarUInteger): VarUInteger {
         val result = value - other.value
-        if (result < BigInteger.ZERO) throw NumberFormatException("Integer underflow")
+        if (result < 0L) throw NumberFormatException("Integer underflow")
         val len = maxOf(len, other.len)
         return VarUInteger(len, result)
     }
@@ -76,15 +74,15 @@ data class VarUInteger(
     }
 
     operator fun inc(): VarUInteger {
-        val result = value + BigInt.ONE
+        val result = value + 1.toBigInt()
         val actualLen = result.bitLength
         val length = if (actualLen < len) len else throw NumberFormatException("Integer overflow")
         return VarUInteger(length, result)
     }
 
     operator fun dec(): VarUInteger {
-        val result = value - BigInt.ONE
-        if (result < BigInt.ZERO) throw NumberFormatException("Integer overflow")
+        val result = value - 1.toBigInt()
+        if (result < 0.toBigInt()) throw NumberFormatException("Integer overflow")
         return VarUInteger(len, result)
     }
 

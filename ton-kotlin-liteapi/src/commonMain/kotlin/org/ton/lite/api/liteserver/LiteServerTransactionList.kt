@@ -16,13 +16,9 @@ data class LiteServerTransactionList(
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerTransactionList
-
+        if (other !is LiteServerTransactionList) return false
         if (ids != other.ids) return false
         if (!transactions.contentEquals(other.transactions)) return false
-
         return true
     }
 

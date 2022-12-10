@@ -10,6 +10,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
@@ -23,8 +24,9 @@ sealed interface Maybe<X> {
         @JvmStatic
         fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
 
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x)
+        fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x) as TlbCodec<Maybe<X>>
     }
 }
 
@@ -47,63 +49,52 @@ data class Just<X>(
     override fun toString(): String = "(just\nvalue:$value)"
 }
 
-private class MaybeTlbCombinator<X>(
-    typeCodec: TlbCodec<X>
-) : TlbCombinator<Maybe<X>>() {
-    @Suppress("UNCHECKED_CAST")
-    private val nothingConstructor = NothingConstructor as TlbConstructor<Nothing<X>>
-    private val justConstructor = JustConstructor(typeCodec)
+private class MaybeTlbCombinator(
+    typeCodec: TlbCodec<*>
+) : TlbCombinator<Maybe<*>>(
+    Maybe::class,
+    Nothing::class to NothingConstructor,
+    Just::class to JustConstructor(typeCodec)
+)
 
-    override val constructors: List<TlbConstructor<out Maybe<X>>> =
-        listOf(
-            nothingConstructor, justConstructor
-        )
+private object NothingConstructor : TlbConstructor<Nothing<Any>>(
+    schema = "nothing\$0 {X:Type} = Maybe X;",
+    id = BitString(false)
+) {
+    private val nothing = Nothing<Any>()
 
-    override fun getConstructor(value: Maybe<X>): TlbConstructor<out Maybe<X>> = when (value) {
-        is Just -> justConstructor
-        is Nothing -> nothingConstructor
-    }
-
-    private object NothingConstructor : TlbConstructor<Nothing<Any>>(
-        schema = "nothing\$0 {X:Type} = Maybe X;",
-        id = BitString(false)
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: Nothing<Any>
     ) {
-        private val nothing = Nothing<Any>()
-
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: Nothing<Any>
-        ) {
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): Nothing<Any> = nothing
     }
 
-    private class JustConstructor<X>(
-        val typeCodec: TlbCodec<X>
-    ) : TlbConstructor<Just<X>>(
-        schema = "just\$1 {X:Type} value:X = Maybe X;",
-        id = ID
-    ) {
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: Just<X>
-        ) = cellBuilder {
-            storeTlb(typeCodec, value.value)
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): Just<X> = cellSlice {
-            val value = cellSlice.loadTlb(typeCodec)
-            Just(value)
-        }
-
-        companion object {
-            val ID = BitString(true)
-        }
-    }
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): Nothing<Any> = nothing
 }
 
+private class JustConstructor<X>(
+    val typeCodec: TlbCodec<X>
+) : TlbConstructor<Just<X>>(
+    schema = "just\$1 {X:Type} value:X = Maybe X;",
+    id = ID
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: Just<X>
+    ) = cellBuilder {
+        storeTlb(typeCodec, value.value)
+    }
+
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): Just<X> = cellSlice {
+        val value = cellSlice.loadTlb(typeCodec)
+        Just(value)
+    }
+
+    companion object {
+        val ID = BitString(true)
+    }
+}

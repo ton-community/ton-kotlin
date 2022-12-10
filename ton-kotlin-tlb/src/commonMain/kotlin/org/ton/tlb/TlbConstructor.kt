@@ -1,26 +1,23 @@
 package org.ton.tlb
 
-import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.ParseTlbException
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
 
 abstract class AbstractTlbConstructor<T>(
-    @Language("TL-B")
     val schema: String,
     id: BitString? = null,
-    val type: KType? = null
 ) {
-    val id = id ?: calculateId(schema)
+    val id by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        id ?: calculateId(formatSchema(schema))
+    }
     override fun toString(): String = schema
 
     companion object {
-        fun calculateId(@Language("TL-B") schema: String): BitString {
+        fun calculateId(schema: String): BitString {
             if (schema.isEmpty()) return BitString(0)
             try {
                 val prefix = schema.split(" ").first()
@@ -40,38 +37,26 @@ abstract class AbstractTlbConstructor<T>(
                 throw ParseTlbException("Failed to calculate id for schema: `$schema`", e)
             }
         }
+
+        fun formatSchema(schema: String): String {
+            return schema.replace(Regex("\\s+"), " ").trim()
+                .replace("(","")
+                .replace(")","")
+                .replace(";","")
+        }
     }
 }
 
 abstract class TlbConstructor<T : Any>(
-    @Language("TL-B")
     schema: String,
     id: BitString? = null,
-    type: KType?
-) : AbstractTlbConstructor<T>(schema, id, type), TlbCodec<T>, TlbConstructorProvider<T> {
-    constructor(
-        @Language("TL-B")
-        schema: String,
-        id: BitString? = null,
-        type: KClass<T>? = null
-    ) : this(schema, id, type?.createType())
-
-    abstract override fun storeTlb(cellBuilder: CellBuilder, value: T)
-    abstract override fun loadTlb(cellSlice: CellSlice): T
-
+) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T>, TlbConstructorProvider<T> {
     override fun tlbConstructor(): TlbConstructor<T> = this
-
-    fun asTlbCombinator(): TlbCombinator<T> = object : TlbCombinator<T>() {
-        override val constructors: List<TlbConstructor<out T>> = listOf(this@TlbConstructor)
-
-        override fun getConstructor(value: T): TlbConstructor<out T> = this@TlbConstructor
-    }
 }
 
 class ObjectTlbConstructor<T : Any>(
-    @Language("TL-B")
-    schema: String,
     val instance: T,
+    schema: String,
     id: BitString? = null,
 ) : TlbConstructor<T>(schema, id) {
     override fun storeTlb(cellBuilder: CellBuilder, value: T) {
@@ -79,8 +64,21 @@ class ObjectTlbConstructor<T : Any>(
     override fun loadTlb(cellSlice: CellSlice): T = instance
 }
 
-abstract class TlbNegatedConstructor<T>(
-    @Language("TL-B")
+abstract class TlbNegatedConstructor<T : Any>(
     schema: String,
     id: BitString? = null
-) : AbstractTlbConstructor<T>(schema, id), TlbNegatedCodec<T>
+) : TlbConstructor<T>(schema, id), TlbNegatedCodec<T> {
+    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+        storeNegatedTlb(cellBuilder, value)
+    }
+
+    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
+}
+
+inline fun <reified T:Any>TlbConstructor<T>.asTlbCombinator() = asTlbCombinator(T::class)
+
+fun <T:Any> TlbConstructor<T>.asTlbCombinator(clazz: KClass<T>): TlbCombinator<T> = object : TlbCombinator<T>(
+    clazz,
+    clazz to this@asTlbCombinator
+) {
+}

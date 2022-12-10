@@ -16,6 +16,7 @@ import org.ton.tl.constructors.writeBytesTl
 import org.ton.tl.constructors.writeIntTl
 import org.ton.tl.readTl
 import org.ton.tl.writeTl
+import kotlin.jvm.JvmStatic
 
 @Serializable
 data class DhtValue(
@@ -45,15 +46,11 @@ data class DhtValue(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtValue
-
+        if (other !is DhtValue) return false
         if (key != other.key) return false
         if (!value.contentEquals(other.value)) return false
         if (ttl != other.ttl) return false
         if (!signature.contentEquals(other.signature)) return false
-
         return true
     }
 

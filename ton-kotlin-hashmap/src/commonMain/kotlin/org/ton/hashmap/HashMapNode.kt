@@ -7,95 +7,74 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.cell.*
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapNode<T> {
+sealed interface HashMapNode<out T> {
     companion object {
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X> tlbCodec(n: Int, typeCodec: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
-            HashMapNodeTlbCombinator(n, typeCodec)
+        fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
+            if (n == 0) {
+                HashMapNodeLeafTlbConstructor(x)
+            } else {
+                HashMapNodeForkTlbConstructor(n, x)
+            } as TlbCodec<HashMapNode<X>>
     }
 }
 
-private class HashMapNodeTlbCombinator<X>(
-    val n: Int,
+private class HashMapNodeLeafTlbConstructor<X>(
+    val x: TlbCodec<X>
+) : TlbConstructor<HashMapNodeLeaf<X>>(
+    schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
+    id = BitString.empty()
+) {
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: HashMapNodeLeaf<X>
+    ) = cellBuilder {
+        storeTlb(x, value.value)
+    }
+
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): HashMapNodeLeaf<X> = cellSlice {
+        val value = loadTlb(x)
+        HashMapNodeLeaf(value)
+    }
+}
+
+private class HashMapNodeForkTlbConstructor<X>(
+    n: Int,
     x: TlbCodec<X>
-) : TlbCombinator<HashMapNode<X>>() {
-    private val leafConstructor =
-        HashMapNodeLeafTlbConstructor(x)
+) : TlbConstructor<HashMapNodeFork<X>>(
+    schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;",
+    id = BitString.empty()
+) {
+    private val hashmapConstructor = HashMapEdge.tlbCodec(n - 1, x)
 
-    private val forkConstructor =
-        HashMapNodeForkTlbConstructor(n, x)
-
-    override val constructors: List<TlbConstructor<out HashMapNode<X>>> =
-        listOf(leafConstructor, forkConstructor)
-
-    override fun getConstructor(value: HashMapNode<X>): TlbConstructor<out HashMapNode<X>> = when (value) {
-        is HashMapNodeFork -> forkConstructor
-        is HashMapNodeLeaf -> leafConstructor
-    }
-
-    override fun loadTlb(cellSlice: CellSlice): HashMapNode<X> {
-        return if (n == 0) {
-            leafConstructor.loadTlb(cellSlice)
-        } else {
-            forkConstructor.loadTlb(cellSlice)
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: HashMapNodeFork<X>
+    ) = cellBuilder {
+        storeRef {
+            storeTlb(hashmapConstructor, value.left)
+        }
+        storeRef {
+            storeTlb(hashmapConstructor, value.right)
         }
     }
 
-    private class HashMapNodeLeafTlbConstructor<X>(
-        val x: TlbCodec<X>
-    ) : TlbConstructor<HashMapNodeLeaf<X>>(
-        schema = "hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;",
-        id = BitString.empty()
-    ) {
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: HashMapNodeLeaf<X>
-        ) = cellBuilder {
-            storeTlb(x, value.value)
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): HashMapNodeFork<X> = cellSlice {
+        val left = loadRef {
+            loadTlb(hashmapConstructor)
         }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): HashMapNodeLeaf<X> = cellSlice {
-            val value = loadTlb(x)
-            HashMapNodeLeaf(value)
+        val right = loadRef {
+            loadTlb(hashmapConstructor)
         }
-    }
-
-    private class HashMapNodeForkTlbConstructor<X>(
-        n: Int,
-        x: TlbCodec<X>
-    ) : TlbConstructor<HashMapNodeFork<X>>(
-        schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;",
-        id = BitString.empty()
-    ) {
-        private val hashmapConstructor = HashMapEdge.tlbCodec(n - 1, x)
-
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: HashMapNodeFork<X>
-        ) = cellBuilder {
-            storeRef {
-                storeTlb(hashmapConstructor, value.left)
-            }
-            storeRef {
-                storeTlb(hashmapConstructor, value.right)
-            }
-        }
-
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): HashMapNodeFork<X> = cellSlice {
-            val left = loadRef {
-                loadTlb(hashmapConstructor)
-            }
-            val right = loadRef {
-                loadTlb(hashmapConstructor)
-            }
-            HashMapNodeFork(left, right)
-        }
+        HashMapNodeFork(left, right)
     }
 }

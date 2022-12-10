@@ -47,12 +47,8 @@ data class PublicKeyUnencrypted(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PublicKeyUnencrypted
-
+        if (other !is PublicKeyUnencrypted) return false
         if (!data.contentEquals(other.data)) return false
-
         return true
     }
 
@@ -92,12 +88,8 @@ data class PublicKeyAes(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PublicKeyAes
-
+        if (other !is PublicKeyAes) return false
         if (!key.contentEquals(other.key)) return false
-
         return true
     }
 

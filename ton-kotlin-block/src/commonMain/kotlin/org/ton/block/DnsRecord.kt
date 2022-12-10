@@ -8,12 +8,10 @@ sealed interface DnsRecord {
     companion object : TlbCombinatorProvider<DnsRecord> by DnsRecordTlbCombinator
 }
 
-private object DnsRecordTlbCombinator : TlbCombinator<DnsRecord>() {
-    override val constructors: List<TlbConstructor<out DnsRecord>>
-        get() = listOf(
-            DnsNextResolver.tlbConstructor(),
-            DnsSmcAddress.tlbConstructor(),
-            DnsAdnlAddress.tlbConstructor(),
-            DnsText.tlbConstructor(),
-        )
-}
+private object DnsRecordTlbCombinator : TlbCombinator<DnsRecord>(
+    DnsRecord::class,
+    DnsNextResolver::class to DnsNextResolver,
+    DnsSmcAddress::class to DnsSmcAddress,
+    DnsAdnlAddress::class to DnsAdnlAddress,
+    DnsText::class to DnsText,
+)

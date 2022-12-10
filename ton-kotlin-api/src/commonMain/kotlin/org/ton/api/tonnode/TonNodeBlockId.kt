@@ -8,6 +8,7 @@ import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.constructors.readIntTl
 import org.ton.tl.constructors.writeIntTl
+import kotlin.jvm.JvmStatic
 
 inline fun TonNodeBlockId(tonNodeBlockId: TonNodeBlockId) = TonNodeBlockId.of(tonNodeBlockId)
 inline fun TonNodeBlockId() = TonNodeBlockId.of()
