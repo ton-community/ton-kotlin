@@ -64,8 +64,6 @@ data class AdnlAddressUdp6(
     val ip: ByteArray,
     val port: Int
 ) : AdnlAddress {
-
-
     override fun toString(): String = buildString {
         append("AdnlAddressUdp6(ip=")
         append(base64(ip))

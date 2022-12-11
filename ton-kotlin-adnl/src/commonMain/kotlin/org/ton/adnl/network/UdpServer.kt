@@ -5,10 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
 interface UdpServer : CoroutineScope {
-    suspend fun send(host: String, port: Int, data: ByteReadPacket)
+    suspend fun send(address: IPAddress, data: ByteReadPacket)
 
     fun interface Callback {
-        suspend fun receive(host: String, port: Int, data: ByteReadPacket)
+        fun receive(address: IPAddress, data: ByteReadPacket)
     }
 
     companion object {

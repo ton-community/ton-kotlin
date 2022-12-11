@@ -11,12 +11,9 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.readInt256Tl
 import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
 import kotlin.jvm.JvmStatic
 
 inline fun LiteServerMasterchainInfo(
@@ -26,10 +23,12 @@ inline fun LiteServerMasterchainInfo(
 ) =
     LiteServerMasterchainInfo.of(last, state_root_hash, init)
 
-interface LiteServerMasterchainInfo {
+interface LiteServerMasterchainInfo : TlObject<LiteServerMasterchainInfo> {
     val last: TonNodeBlockIdExt
     val state_root_hash: ByteArray
     val init: TonNodeZeroStateIdExt
+
+    override fun tlCodec(): TlCodec<LiteServerMasterchainInfo> = Companion
 
     companion object : TlCodec<LiteServerMasterchainInfo> by LiteServerMasterchainInfoTlbConstructor {
         @JvmStatic
@@ -49,6 +48,8 @@ private data class LiteServerMasterchainInfoImpl(
     override val state_root_hash: ByteArray,
     override val init: TonNodeZeroStateIdExt
 ) : LiteServerMasterchainInfo {
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LiteServerMasterchainInfoImpl) return false

@@ -4,7 +4,10 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import org.ton.adnl.ipv4
+import org.ton.adnl.network.IPAddress
+import org.ton.adnl.network.IPv4Address
 import org.ton.adnl.network.UdpServer
+import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.bitstring.BitString
@@ -70,22 +73,22 @@ class AdnlNetworkManager(
                 return
             }
             socket.server.send(
-                ipv4(dstAddr.ip),
-                dstAddr.port,
+                IPAddress.ipv4(dstAddr.ip, dstAddr.port),
                 data
             )
         }
         sentDatagrams++
     }
 
-    suspend fun receiveDatagram(
-        host: String,
-        port: Int,
+    fun receiveDatagram(
+        address: IPAddress,
         data: ByteReadPacket
-    ) = receiveDatagram(AdnlAddressUdp(ipv4(host), port), data)
+    ) {
+        receiveDatagram(address.toAdnlAddress(), data)
+    }
 
-    suspend fun receiveDatagram(
-        address: AdnlAddressUdp,
+    fun receiveDatagram(
+        address: AdnlAddress,
         data: ByteReadPacket
     ) {
         val callback = callback ?: run {
@@ -150,7 +153,7 @@ class AdnlNetworkManager(
     }
 
     fun interface Callback {
-        suspend fun receiveDatagram(address: AdnlAddressUdp, data: ByteReadPacket)
+        fun receiveDatagram(address: AdnlAddress, data: ByteReadPacket)
     }
 
     private data class OutputDesc(

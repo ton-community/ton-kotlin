@@ -26,7 +26,7 @@ internal actual class UdpServerImpl actual constructor(
             val data = datagram.packet
             try {
                 launch {
-                    callback.receive(address, port, data)
+                    callback.receive(IPAddress.ipv4(address, port), data)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -34,8 +34,8 @@ internal actual class UdpServerImpl actual constructor(
         }
     }
 
-    override suspend fun send(host: String, port: Int, data: ByteReadPacket) {
-        val datagram = Datagram(data, InetSocketAddress(host, port))
+    override suspend fun send(address: IPAddress, data: ByteReadPacket) {
+        val datagram = Datagram(data, InetSocketAddress(address.host, port))
         socket.send(datagram)
     }
 }

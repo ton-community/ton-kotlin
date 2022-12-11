@@ -25,12 +25,12 @@ interface TlObject<T> where T : TlObject<T> {
 }
 
 interface TLFunction<Q : TLFunction<Q, A>, A : TlObject<A>> : TlObject<Q> {
-    override fun tlCodec(): TlCodec<out Q>
+    override fun tlCodec(): TlCodec<Q>
     fun resultTlCodec(): TlCodec<A>
 
     @Suppress("UNCHECKED_CAST")
     override fun toByteArray(): ByteArray {
-        val codec = tlCodec() as TlCodec<Q>
+        val codec = tlCodec()
         return codec.encodeBoxed(this as Q)
     }
 }

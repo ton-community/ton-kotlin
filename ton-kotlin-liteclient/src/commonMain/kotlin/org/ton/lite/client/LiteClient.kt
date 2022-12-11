@@ -8,12 +8,9 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.ton.adnl.client.engine.AdnlClientEngine
-import org.ton.adnl.client.engine.cio.CIOAdnlClientEngine
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
-import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.block.*
 import org.ton.boc.BagOfCells
@@ -38,36 +35,13 @@ import kotlin.time.ExperimentalTime
 private const val BLOCK_ID_CACHE_SIZE = 100
 
 open class LiteClient(
-    private val adnlClientEngine: AdnlClientEngine,
     private val liteClientConfigGlobal: LiteClientConfigGlobal,
     private val logger: Logger = PrintLnLogger("TON LiteClient")
 ) : Closeable, CoroutineScope {
-    constructor(
-        liteClientConfigGlobal: LiteClientConfigGlobal
-    ) : this(
-        CIOAdnlClientEngine.create(), liteClientConfigGlobal
-    )
-
-    constructor(liteServer: LiteServerDesc, logger: Logger = PrintLnLogger("TON LiteClient")) : this(
-        CIOAdnlClientEngine.create(), LiteClientConfigGlobal(liteservers = listOf(liteServer)), logger
-    )
 
     override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
     val liteApi: LiteApi = LiteApi { query ->
-        var reconnectAttempts = 0
-        var result: ByteArray
-        while (true) {
-            try {
-                val server = liteClientConfigGlobal.liteservers.random()
-                result = adnlClientEngine.query(server, query)
-                break
-            } catch (e: ConnectTimeoutException) {
-                if (reconnectAttempts++ > 10) {
-                    throw e
-                }
-            }
-        }
-        result
+        TODO()
     }
 
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
