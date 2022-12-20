@@ -11,6 +11,6 @@ sealed interface MsgAddress {
 
 private object MsgAddressTlbCombinator : TlbCombinator<MsgAddress>(
     MsgAddress::class,
-    MsgAddressInt::class to MsgAddressInt,
-    MsgAddressExt::class to MsgAddressExt,
+    MsgAddressInt::class to MsgAddressInt.tlbCodec(),
+    MsgAddressExt::class to MsgAddressExt.tlbCodec(),
 )

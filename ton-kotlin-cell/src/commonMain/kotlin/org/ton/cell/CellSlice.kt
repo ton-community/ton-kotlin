@@ -208,7 +208,7 @@ private class CellSliceByteBackedBitString(
     override val bits: ByteBackedBitString,
     refs: List<Cell>
 ) : CellSliceImpl(bits, refs) {
-    val data get() = bits.data
+    val data get() = bits.bytes
 
     fun getBits(offset: Int, length: Int): Byte {
         val index = bitsPosition + offset

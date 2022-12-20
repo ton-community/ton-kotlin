@@ -58,6 +58,6 @@ sealed interface MsgAddressInt : MsgAddress {
 
 private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
     MsgAddressInt::class,
-    AddrStd::class to AddrStd,
-    AddrVar::class to AddrVar
+    AddrStd::class to AddrStd.tlbCodec(),
+    AddrVar::class to AddrVar.tlbCodec()
 )

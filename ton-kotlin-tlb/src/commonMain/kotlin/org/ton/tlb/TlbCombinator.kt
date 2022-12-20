@@ -11,11 +11,11 @@ abstract class TlbCombinator<T : Any>(
     override val baseClass: KClass<T>,
     vararg subClasses: Pair<KClass<out T>, TlbCodec<out T>>
 ) : AbstractTlbCombinator<T>(), TlbCombinatorProvider<T> {
-    private val class2codec: Map<KClass<out T>, TlbCodec<out T>>
+    private val class2codec: MutableMap<KClass<out T>, TlbCodec<out T>>
     private val constructorTree = TlbConstructorTree<TlbCodec<out T>>()
 
     init {
-        class2codec = subClasses.toMap()
+        class2codec = subClasses.toMap().toMutableMap()
         subClasses.forEach { (_, constructor) ->
             if (constructor is TlbConstructor<out T>) {
                 constructorTree.add(constructor.id, constructor)
@@ -24,6 +24,7 @@ abstract class TlbCombinator<T : Any>(
                 constructor.constructorTree.values().forEach { (key,value) ->
                     constructorTree.add(key, value)
                 }
+                class2codec.putAll(constructor.class2codec)
             }
         }
     }
@@ -47,7 +48,7 @@ abstract class TlbCombinator<T : Any>(
     }
 
     protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {
-        val preloadBits = cellSlice.loadBits(cellSlice.remainingBits)
+        val preloadBits = cellSlice.preloadBits(cellSlice.remainingBits)
         return findTlbLoaderOrNull(preloadBits)
     }
 
@@ -59,8 +60,9 @@ abstract class TlbCombinator<T : Any>(
 
     @Suppress("UNCHECKED_CAST")
     protected open fun findTlbStorerOrNull(value: T): TlbStorer<T>? {
+//        println("value: ${value::class} - ${class2codec.keys}")
         val constructor = class2codec[value::class]
             ?: return null
-        return constructor as TlbConstructor<T>
+        return constructor as TlbStorer<T>
     }
 }

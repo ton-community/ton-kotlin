@@ -23,14 +23,14 @@ class WalletV1R3Test {
 
     @Test
     fun `test private key`() {
-        val actual = hex(privateKey.key)
+        val actual = hex(privateKey.key.toByteArray())
         val expected = "0000000000000000000000000000000000000000000000000000000000000000"
         assertEquals(expected, actual)
     }
 
     @Test
     fun `test public key`() {
-        val actual = hex(privateKey.publicKey().key)
+        val actual = hex(privateKey.publicKey().key.toByteArray())
         val expected = "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
         assertEquals(expected, actual)
     }

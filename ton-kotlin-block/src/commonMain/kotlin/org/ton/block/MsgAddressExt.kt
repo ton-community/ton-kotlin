@@ -35,6 +35,6 @@ sealed interface MsgAddressExt : MsgAddress {
 
 private object MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
     MsgAddressExt::class,
-    AddrNone::class to AddrNone,
-    AddrExtern::class to AddrExtern,
+    AddrNone::class to AddrNone.tlbConstructor(),
+    AddrExtern::class to AddrExtern.tlbConstructor(),
 )

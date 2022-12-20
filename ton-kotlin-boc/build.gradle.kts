@@ -7,5 +7,10 @@ kotlin {
                 implementation(libs.serialization.json)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }
