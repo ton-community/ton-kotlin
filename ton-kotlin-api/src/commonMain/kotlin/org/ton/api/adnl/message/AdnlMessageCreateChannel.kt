@@ -4,28 +4,25 @@ import io.ktor.utils.io.core.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
 import org.ton.bitstring.BitString
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.createChannel")
 @Serializable
-data class AdnlMessageCreateChannel(
-    val key: BitString,
+public data class AdnlMessageCreateChannel(
+    val key: Bits256,
     val date: Int
 ) : AdnlMessage {
-    constructor(
+    public constructor(
         key: BitString,
         date: Instant
-    ) : this(key, date.epochSeconds.toUInt().toInt())
+    ) : this(Bits256(key), date.epochSeconds.toUInt().toInt())
 
-    init {
-        require(key.size == 256) { "Invalid key size. expected: 256, actual: ${key.size}" }
-    }
-
-    fun date() = Instant.fromEpochSeconds(date.toUInt().toLong())
+    public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -41,21 +38,19 @@ data class AdnlMessageCreateChannel(
         return result
     }
 
-    override fun toString(): String = JSON.encodeToString(this)
-
-    companion object : TlConstructor<AdnlMessageCreateChannel>(
+    public companion object : TlConstructor<AdnlMessageCreateChannel>(
         schema = "adnl.message.createChannel key:int256 date:int = adnl.Message",
     ) {
-        const val SIZE_BYTES = Int256TlConstructor.SIZE_BYTES + IntTlConstructor.SIZE_BYTES
+        public const val SIZE_BYTES: Int = 256 / Byte.SIZE_BYTES + Int.SIZE_BYTES
 
-        override fun encode(output: Output, value: AdnlMessageCreateChannel) {
-            output.writeInt256Tl(value.key.toByteArray())
-            output.writeIntTl(value.date)
+        override fun encode(output: TlWriter, value: AdnlMessageCreateChannel) {
+            output.writeBits256(value.key)
+            output.writeInt(value.date)
         }
 
-        override fun decode(input: Input): AdnlMessageCreateChannel {
-            val key = BitString(input.readInt256Tl())
-            val date = input.readIntTl()
+        override fun decode(input: TlReader): AdnlMessageCreateChannel {
+            val key = input.readBits256()
+            val date = input.readInt()
             return AdnlMessageCreateChannel(key, date)
         }
     }

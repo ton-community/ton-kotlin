@@ -1,31 +1,27 @@
 package org.ton.api.dht.db
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @Serializable
-data class DhtDbBucket(
+public data class DhtDbBucket(
     val nodes: DhtNodes
-) : TlObject<DhtDbBucket> {
-    constructor(nodes: List<DhtNode>) : this(DhtNodes(nodes))
+) : TlObject<DhtDbBucket>, Collection<DhtNode> by nodes {
+    public constructor(nodes: List<DhtNode>) : this(DhtNodes(nodes))
 
-    override fun tlCodec() = Companion
+    override fun tlCodec(): TlCodec<DhtDbBucket> = Companion
 
-    companion object : TlConstructor<DhtDbBucket>(
+    public companion object : TlConstructor<DhtDbBucket>(
         schema = "dht.db.bucket nodes:dht.nodes = dht.db.Bucket"
     ) {
-        override fun encode(output: Output, value: DhtDbBucket) {
-            output.writeTl(DhtNodes, value.nodes)
+        override fun encode(writer: TlWriter, value: DhtDbBucket) {
+            writer.write(DhtNodes, value.nodes)
         }
 
-        override fun decode(input: Input): DhtDbBucket {
-            val nodes = input.readTl(DhtNodes)
+        override fun decode(reader: TlReader): DhtDbBucket {
+            val nodes = reader.read(DhtNodes)
             return DhtDbBucket(nodes)
         }
     }

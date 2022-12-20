@@ -1,29 +1,30 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
 
-abstract class AbstractTlCombinator<T : Any> : TlCodec<T> {
-    abstract val baseClass: KClass<T>
+public abstract class AbstractTlCombinator<T : Any> : TlCodec<T> {
+    public abstract val baseClass: KClass<T>
 
-    override fun decode(input: Input): T = decodeBoxed(input)
+    override fun decode(reader: TlReader): T = decodeBoxed(reader)
 
-    override fun decodeBoxed(input: Input): T {
-        val id = input.readIntLittleEndian()
+    override fun decodeBoxed(reader: TlReader): T {
+        val id = reader.readInt()
         val constructor = findConstructorOrNull(id)
         requireNotNull(constructor) { "Unknown constructor ID: $id" }
-        return constructor.decode(input)
+        return constructor.decode(reader)
     }
 
-    override fun encode(output: Output, value: T) = encodeBoxed(output, value)
+    override fun encode(writer: TlWriter, value: T) {
+        encodeBoxed(writer, value)
+    }
 
-    override fun encodeBoxed(output: Output, value: T) {
+    override fun encodeBoxed(writer: TlWriter, value: T) {
         val constructor = findConstructorOrNull(value)
         requireNotNull(constructor) { "Unknown constructor for type: ${value::class}" }
-        constructor.encodeBoxed(output, value)
+        constructor.encodeBoxed(writer, value)
     }
 
-    abstract fun findConstructorOrNull(id: Int): TlDecoder<out T>?
+    public abstract fun findConstructorOrNull(id: Int): TlDecoder<out T>?
 
-    abstract fun findConstructorOrNull(value: T): TlEncoder<T>?
+    public abstract fun findConstructorOrNull(value: T): TlEncoder<T>?
 }

@@ -1,25 +1,22 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.*
 
 @Serializable
-data class LiteServerCurrentTime(
+public data class LiteServerCurrentTime(
     val now: Int
 ) {
-    companion object : TlConstructor<LiteServerCurrentTime>(
+    public companion object : TlConstructor<LiteServerCurrentTime>(
         schema = "liteServer.currentTime now:int = liteServer.CurrentTime"
     ) {
-        override fun decode(input: Input): LiteServerCurrentTime {
-            val now = input.readIntTl()
+        override fun decode(reader: TlReader): LiteServerCurrentTime {
+            val now = reader.readInt()
             return LiteServerCurrentTime(now)
         }
 
-        override fun encode(output: Output, value: LiteServerCurrentTime) {
-            output.writeIntTl(value.now)
+        override fun encode(writer: TlWriter, value: LiteServerCurrentTime) {
+            writer.writeInt(value.now)
         }
     }
 }

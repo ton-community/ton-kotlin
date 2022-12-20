@@ -7,28 +7,26 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
+import org.ton.bitstring.toBitString
+import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.query")
-data class RldpQuery(
-    val query_id: BitString,
+public data class RldpQuery(
+    val query_id: Bits256,
     val max_answer_size: Long,
     val timeout: Int,
-    @Serializable(Base64ByteArraySerializer::class)
     override val data: ByteArray
 ) : RldpMessage {
-    constructor(
-        query_id: BitString,
+    public constructor(
+        query_id: ByteArray,
         max_answer_size: Long,
         timeout: Instant,
         data: ByteArray
-    ) : this(query_id, max_answer_size, timeout.epochSeconds.toInt(), data)
+    ) : this(Bits256(query_id), max_answer_size, timeout.epochSeconds.toInt(), data)
 
-    override val id: BitString
+    override val id: Bits256
         get() = query_id
 
     override fun tlCodec(): TlCodec<RldpQuery> = Companion
@@ -53,22 +51,22 @@ data class RldpQuery(
         return result
     }
 
-    companion object : TlConstructor<RldpQuery>(
+    public companion object : TlConstructor<RldpQuery>(
         schema = "rldp.query query_id:int256 max_answer_size:long timeout:int data:bytes = rldp.Message",
     ) {
-        override fun encode(output: Output, value: RldpQuery) {
-            output.writeInt256Tl(value.query_id)
-            output.writeLongTl(value.max_answer_size)
-            output.writeIntTl(value.timeout)
-            output.writeBytesTl(value.data)
+        override fun encode(writer: TlWriter, value: RldpQuery) {
+            writer.writeBits256(value.query_id)
+            writer.writeLong(value.max_answer_size)
+            writer.writeInt(value.timeout)
+            writer.writeBytes(value.data)
         }
 
-        override fun decode(input: Input): RldpQuery {
-            val query_id = input.readInt256Tl()
-            val max_answer_size = input.readLongTl()
-            val timeout = input.readIntTl()
-            val data = input.readBytesTl()
-            return RldpQuery(BitString(query_id), max_answer_size, timeout, data)
+        override fun decode(reader: TlReader): RldpQuery {
+            val query_id = reader.readBits256()
+            val max_answer_size = reader.readLong()
+            val timeout = reader.readInt()
+            val data = reader.readBytes()
+            return RldpQuery(query_id, max_answer_size, timeout, data)
         }
     }
 }

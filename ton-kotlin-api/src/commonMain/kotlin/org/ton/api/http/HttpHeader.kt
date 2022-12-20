@@ -5,32 +5,35 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readStringTl
-import org.ton.tl.constructors.writeStringTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @SerialName("http.header")
 @Serializable
-data class HttpHeader(
+public data class HttpHeader(
     val name: String,
     val value: String
 ) {
-    companion object : TlCodec<HttpHeader> by HttpHeaderTlConstructor
+    public companion object : TlCodec<HttpHeader> by HttpHeaderTlConstructor
 }
 
-operator fun Iterable<HttpHeader>.get(name: String) = firstOrNull { it.name == name }?.value
-fun Iterable<HttpHeader>.getAll(name: String) = asSequence().filter { it.name == name }.map { it.value }
+public inline operator fun Iterable<HttpHeader>.get(name: String): String? =
+    firstOrNull { it.name == name }?.value
+
+public inline fun Iterable<HttpHeader>.getAll(name: String): Sequence<String> =
+    asSequence().filter { it.name == name }.map { it.value }
 
 private object HttpHeaderTlConstructor : TlConstructor<HttpHeader>(
     schema = "http.header name:string value:string = http.Header"
 ) {
-    override fun decode(input: Input): HttpHeader {
-        val name = input.readStringTl()
-        val value = input.readStringTl()
+    override fun decode(input: TlReader): HttpHeader {
+        val name = input.readString()
+        val value = input.readString()
         return HttpHeader(name, value)
     }
 
-    override fun encode(output: Output, value: HttpHeader) {
-        output.writeStringTl(value.name)
-        output.writeStringTl(value.value)
+    override fun encode(output: TlWriter, value: HttpHeader) {
+        output.writeString(value.name)
+        output.writeString(value.value)
     }
 }

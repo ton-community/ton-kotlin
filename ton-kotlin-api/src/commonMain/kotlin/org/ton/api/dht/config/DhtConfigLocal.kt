@@ -12,10 +12,10 @@ import org.ton.tl.TlObject
 @Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface DhtConfigLocal : TlObject<DhtConfigLocal> {
+public sealed interface DhtConfigLocal : TlObject<DhtConfigLocal> {
     override fun tlCodec(): TlCodec<out DhtConfigLocal> = Companion
 
-    companion object : TlCombinator<DhtConfigLocal>(
+    public companion object : TlCombinator<DhtConfigLocal>(
         DhtConfigLocal::class,
         DhtConfigRandomLocal::class to DhtConfigRandomLocal.Companion,
         DhtConfigIdLocal::class to DhtConfigIdLocal.Companion,

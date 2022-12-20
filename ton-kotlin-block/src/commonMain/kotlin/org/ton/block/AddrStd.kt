@@ -10,9 +10,9 @@ import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.crypto.base64.base64
-import org.ton.crypto.base64.base64url
-import org.ton.crypto.crc16.crc16
+import org.ton.crypto.base64
+import org.ton.crypto.base64url
+import org.ton.crypto.crc16
 import org.ton.crypto.hex
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -22,28 +22,28 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.jvm.JvmStatic
 
-inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
+public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 
 @Serializable
 @SerialName("addr_std")
-data class AddrStd(
+public data class AddrStd(
     val anycast: Maybe<Anycast>,
     override val workchain_id: Int,
     val address: BitString
 ) : MsgAddressInt {
     init {
-        require(address.size == 256) { "address.size expected: 256 actual: ${address.size}" }
+        require(address.size == 256) { "invalid 'address' size, expected: 256, actual: ${address.size}" }
     }
 
-    constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
-    constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
-    constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
+    public constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
+    public constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
+    public constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
         anycast.toMaybe(),
         workchainId,
         address.toBitString()
     )
 
-    constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
+    public constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
         anycast.toMaybe(),
         workchainId,
         address
@@ -51,19 +51,19 @@ data class AddrStd(
 
     override fun toString(): String = "addr_std(anycast:$anycast workchain_id:$workchain_id address:$address)"
 
-    fun toString(
+    public fun toString(
         userFriendly: Boolean = true,
         urlSafe: Boolean = true,
         testOnly: Boolean = false,
         bounceable: Boolean = true
     ): String = toString(this, userFriendly, urlSafe, testOnly, bounceable)
 
-    companion object : TlbCodec<AddrStd> by AddrStdTlbConstructor {
+    public companion object : TlbCodec<AddrStd> by AddrStdTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
+        public fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
 
         @JvmStatic
-        fun toString(
+        public fun toString(
             address: AddrStd,
             userFriendly: Boolean = true,
             urlSafe: Boolean = true,
@@ -94,7 +94,7 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parse(address: String): AddrStd = try {
+        public fun parse(address: String): AddrStd = try {
             if (address.contains(':')) {
                 parseRaw(address)
             } else {
@@ -105,7 +105,7 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parseRaw(address: String): AddrStd {
+        public fun parseRaw(address: String): AddrStd {
             require(address.contains(':'))
             // 32 bytes, each represented as 2 characters
             require(address.substringAfter(':').length == 32 * 2)
@@ -117,7 +117,7 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parseUserFriendly(address: String): AddrStd {
+        public fun parseUserFriendly(address: String): AddrStd {
             val packet = ByteReadPacket(
                 try {
                     base64url(address)

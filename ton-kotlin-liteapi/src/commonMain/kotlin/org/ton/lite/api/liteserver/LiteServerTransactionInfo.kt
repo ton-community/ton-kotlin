@@ -1,53 +1,34 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.boc.BagOfCells
+import org.ton.lite.api.liteserver.internal.readBoc
+import org.ton.lite.api.liteserver.internal.writeBoc
+import org.ton.tl.*
 
 @Serializable
-data class LiteServerTransactionInfo(
+public data class LiteServerTransactionInfo(
     val id: TonNodeBlockIdExt,
-    val proof: ByteArray,
-    val transaction: ByteArray
+    val proof: BagOfCells,
+    val transaction: BagOfCells
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerTransactionInfo) return false
-        if (id != other.id) return false
-        if (!proof.contentEquals(other.proof)) return false
-        if (!transaction.contentEquals(other.transaction)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + proof.contentHashCode()
-        result = 31 * result + transaction.contentHashCode()
-        return result
-    }
-
-    companion object : TlCodec<LiteServerTransactionInfo> by LiteServerTransactionInfoTlConstructor
+    public companion object : TlCodec<LiteServerTransactionInfo> by LiteServerTransactionInfoTlConstructor
 }
 
 private object LiteServerTransactionInfoTlConstructor : TlConstructor<LiteServerTransactionInfo>(
     schema = "liteServer.transactionInfo id:tonNode.blockIdExt proof:bytes transaction:bytes = liteServer.TransactionInfo"
 ) {
-    override fun decode(input: Input): LiteServerTransactionInfo {
-        val id = input.readTl(TonNodeBlockIdExt)
-        val proof = input.readBytesTl()
-        val transaction = input.readBytesTl()
+    override fun decode(reader: TlReader): LiteServerTransactionInfo {
+        val id = reader.read(TonNodeBlockIdExt)
+        val proof = reader.readBoc()
+        val transaction = reader.readBoc()
         return LiteServerTransactionInfo(id, proof, transaction)
     }
 
-    override fun encode(output: Output, value: LiteServerTransactionInfo) {
-        output.writeTl(TonNodeBlockIdExt, value.id)
-        output.writeBytesTl(value.proof)
-        output.writeBytesTl(value.transaction)
+    override fun encode(writer: TlWriter, value: LiteServerTransactionInfo) {
+        writer.write(TonNodeBlockIdExt, value.id)
+        writer.writeBoc(value.proof)
+        writer.writeBoc(value.transaction)
     }
 }

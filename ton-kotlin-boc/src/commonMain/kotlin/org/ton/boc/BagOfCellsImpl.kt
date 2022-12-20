@@ -4,8 +4,8 @@ import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
 
 internal data class BagOfCellsImpl(
-    override val roots: List<Cell>
-) : BagOfCells, List<Cell> by roots {
+    override val roots: Collection<Cell>
+) : BagOfCells, Collection<Cell> by roots {
     constructor(root: Cell) : this(roots = listOf(root))
 
     override fun iterator(): Iterator<Cell> = iterator {

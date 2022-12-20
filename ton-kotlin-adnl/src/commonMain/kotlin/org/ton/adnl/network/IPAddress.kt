@@ -3,27 +3,30 @@ package org.ton.adnl.network
 import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
+import org.ton.api.adnl.AdnlAddressUdp6
 import kotlin.jvm.JvmStatic
 
-sealed interface IPAddress {
-    val host: String
-    val port: Int
+public sealed interface IPAddress {
+    public val host: String
+    public val port: Int
 
-    fun toAdnlAddress(): AdnlAddress
+    public fun toAdnlAddress(): AdnlAddress
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun ipv4(host: String, port: Int): IPAddress = IPv4Address(host, port)
+        public fun ipv4(host: String, port: Int): IPAddress = IPv4Address(host, port)
         @JvmStatic
-        fun ipv4(address: Int, port: Int): IPAddress = IPv4Address(address, port)
+        public fun ipv4(address: Int, port: Int): IPAddress = IPv4Address(address, port)
+        @JvmStatic
+        public fun ipv6(address: ByteArray, port: Int): IPAddress = IPv6Address(address, port)
     }
 }
 
-data class IPv4Address(
+public data class IPv4Address(
     val address: Int,
     override val port: Int,
 ) : IPAddress {
-    constructor(host: String, port: Int) : this(ipv4(host), port)
+    public constructor(host: String, port: Int) : this(ipv4(host), port)
 
     init {
         require(port in 0..0xFFFF) { "Invalid port: $port" }
@@ -33,6 +36,23 @@ data class IPv4Address(
         get() = ipv4(address)
 
     override fun toAdnlAddress(): AdnlAddressUdp = AdnlAddressUdp(address, port)
+
+    override fun toString(): String = "$host:$port"
+}
+
+public data class IPv6Address(
+    val address: ByteArray,
+    override val port: Int,
+) : IPAddress {
+    init {
+        require(port in 0..0xFFFF) { "Invalid port: $port" }
+        require(address.size == 16) { "Invalid address: ${address.contentToString()}" }
+    }
+
+    override val host: String
+        get() = TODO()
+
+    override fun toAdnlAddress(): AdnlAddressUdp6 = AdnlAddressUdp6(address, port)
 
     override fun toString(): String = "$host:$port"
 }

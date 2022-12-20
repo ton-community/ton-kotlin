@@ -5,39 +5,36 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyAes
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.crypto.Decryptor
-import org.ton.crypto.aes.DecryptorAes
+import org.ton.crypto.DecryptorAes
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @JsonClassDiscriminator("@type")
 @SerialName("pk.aes")
 @Serializable
-data class PrivateKeyAes(
-    val key: ByteArray
-) : PrivateKey, Decryptor by DecryptorAes(key) {
-    private val _hashCode by lazy { key.contentHashCode() }
+public data class PrivateKeyAes(
+    val key: Bits256
+) : PrivateKey, Decryptor by DecryptorAes(key.toByteArray()) {
+    public constructor(key: ByteArray) : this(Bits256(key))
 
-    override fun publicKey() = PublicKeyAes(key)
+    override fun publicKey(): PublicKeyAes = PublicKeyAes(key)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PrivateKeyAes) return false
-        if (!key.contentEquals(other.key)) return false
-        return true
-    }
-
-    override fun hashCode(): Int = _hashCode
     override fun toString(): String = toAdnlIdShort().toString()
 
-    companion object : TlConstructor<PrivateKeyAes>(
+    public companion object : TlConstructor<PrivateKeyAes>(
         schema = "pk.aes key:int256 = PrivateKey"
     ) {
-        override fun encode(output: Output, value: PrivateKeyAes) {
-            output.writeFully(value.key)
+        override fun encode(output: TlWriter, value: PrivateKeyAes) {
+            output.writeBits256(value.key)
         }
 
-        override fun decode(input: Input): PrivateKeyAes {
-            val key = input.readBytes(32)
+        override fun decode(input: TlReader): PrivateKeyAes {
+            val key = input.readBits256()
             return PrivateKeyAes(key)
         }
     }

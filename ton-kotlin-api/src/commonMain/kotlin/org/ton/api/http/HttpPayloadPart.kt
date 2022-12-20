@@ -4,18 +4,14 @@ import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
+import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @SerialName("http.payloadPart")
 @Serializable
-data class HttpPayloadPart(
-    @Serializable(HexByteArraySerializer::class)
+public data class HttpPayloadPart(
     val data: ByteArray,
-    val trailer: List<HttpHeader>,
+    val trailer: Collection<HttpHeader>,
     val last: Boolean
 ) : TlObject<HttpPayloadPart> {
     override fun equals(other: Any?): Boolean {
@@ -41,22 +37,26 @@ data class HttpPayloadPart(
     override fun toString(): String =
         "HttpPayloadPart(trailer=$trailer, last=$last, data=(${data.size} bytes) ${data.encodeBase64()})"
 
-    companion object : TlCodec<HttpPayloadPart> by HttpPayloadPartTlConstructor
+    public companion object : TlCodec<HttpPayloadPart> by HttpPayloadPartTlConstructor
 }
 
 private object HttpPayloadPartTlConstructor : TlConstructor<HttpPayloadPart>(
     schema = "http.payloadPart data:bytes trailer:(vector http.header) last:Bool = http.PayloadPart"
 ) {
-    override fun decode(input: Input): HttpPayloadPart {
-        val data = input.readBytesTl()
-        val trailer = input.readVectorTl(HttpHeader)
-        val last = input.readBoolTl()
+    override fun decode(reader: TlReader): HttpPayloadPart {
+        val data = reader.readBytes()
+        val trailer = reader.readCollection {
+            read(HttpHeader)
+        }
+        val last = reader.readBoolean()
         return HttpPayloadPart(data, trailer, last)
     }
 
-    override fun encode(output: Output, value: HttpPayloadPart) {
-        output.writeBytesTl(value.data)
-        output.writeVectorTl(value.trailer, HttpHeader)
-        output.writeBoolTl(value.last)
+    override fun encode(writer: TlWriter, value: HttpPayloadPart) {
+        writer.writeBytes(value.data)
+        writer.writeCollection(value.trailer) {
+            write(HttpHeader, it)
+        }
+        writer.writeBoolean(value.last)
     }
 }

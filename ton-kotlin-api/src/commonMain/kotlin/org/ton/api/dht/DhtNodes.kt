@@ -4,30 +4,30 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlNodes
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeVectorTl
+import org.ton.tl.*
 
 @Serializable
 @JsonClassDiscriminator("@type")
-data class DhtNodes(
-    val nodes: List<DhtNode> = emptyList()
-) : TlObject<DhtNodes>, List<DhtNode> by nodes {
-    fun toAdnlNodes(): AdnlNodes = AdnlNodes(nodes.map { it.toAdnlNode() })
+public data class DhtNodes(
+    val nodes: Collection<DhtNode> = emptyList()
+) : TlObject<DhtNodes>, Collection<DhtNode> by nodes {
+    public fun toAdnlNodes(): AdnlNodes = AdnlNodes(nodes.map { it.toAdnlNode() })
 
     override fun tlCodec(): TlCodec<DhtNodes> = Companion
 
-    companion object : TlConstructor<DhtNodes>(
+    public companion object : TlConstructor<DhtNodes>(
         schema = "dht.nodes nodes:(vector dht.node) = dht.Nodes"
     ) {
-        override fun encode(output: Output, value: DhtNodes) {
-            output.writeVectorTl(value.nodes, DhtNode)
+        override fun encode(writer: TlWriter, value: DhtNodes) {
+            writer.writeCollection(value.nodes) {
+                write(DhtNode, it)
+            }
         }
 
-        override fun decode(input: Input): DhtNodes {
-            val nodes = input.readVectorTl(DhtNode)
+        override fun decode(reader: TlReader): DhtNodes {
+            val nodes = reader.readCollection {
+                read(DhtNode)
+            }
             return DhtNodes(nodes)
         }
     }

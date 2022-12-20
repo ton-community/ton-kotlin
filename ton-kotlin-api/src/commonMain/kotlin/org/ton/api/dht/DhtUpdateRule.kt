@@ -7,7 +7,7 @@ import org.ton.tl.TlObject
 import org.ton.tl.constructors.EnumTlCombinator
 
 @Serializable
-enum class DhtUpdateRule : TlObject<DhtUpdateRule> {
+public enum class DhtUpdateRule : TlObject<DhtUpdateRule> {
     @SerialName("dht.updateRule.signature")
     SIGNATURE,
 
@@ -19,7 +19,7 @@ enum class DhtUpdateRule : TlObject<DhtUpdateRule> {
 
     override fun tlCodec(): TlCodec<DhtUpdateRule> = Companion
 
-    companion object : EnumTlCombinator<DhtUpdateRule>(
+    public companion object : EnumTlCombinator<DhtUpdateRule>(
         DhtUpdateRule::class,
         SIGNATURE to "dht.updateRule.signature = dht.UpdateRule",
         ANYBODY to "dht.updateRule.anybody = dht.UpdateRule",

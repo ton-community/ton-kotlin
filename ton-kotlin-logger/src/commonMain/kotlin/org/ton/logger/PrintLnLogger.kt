@@ -4,11 +4,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
-class PrintLnLogger(
+public class PrintLnLogger(
     private val name: () -> String = { "TON" },
     override var level: Logger.Level = Logger.Level.INFO
 ) : Logger {
-    constructor(name: String, level: Logger.Level = Logger.Level.INFO) : this({ name }, level)
+    public constructor(name: String, level: Logger.Level = Logger.Level.INFO) : this({ name }, level)
 
     private val channel = Channel<() -> String>(Channel.UNLIMITED)
     private val job = GlobalScope.launch {

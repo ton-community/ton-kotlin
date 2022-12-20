@@ -4,15 +4,15 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
-interface UdpServer : CoroutineScope {
-    suspend fun send(address: IPAddress, data: ByteReadPacket)
+public interface UdpServer : CoroutineScope {
+    public suspend fun send(address: IPAddress, data: ByteReadPacket)
 
-    fun interface Callback {
-        fun receive(address: IPAddress, data: ByteReadPacket)
+    public fun interface Callback {
+        public fun receive(address: IPAddress, data: ByteReadPacket)
     }
 
-    companion object {
-        fun create(
+    public companion object {
+        public fun create(
             coroutineContext: CoroutineContext,
             port: Int,
             callback: Callback

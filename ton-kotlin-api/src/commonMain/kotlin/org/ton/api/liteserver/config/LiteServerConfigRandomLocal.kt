@@ -9,6 +9,6 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
-data class LiteServerConfigRandomLocal(
+public data class LiteServerConfigRandomLocal(
     val port: Int
 ) : LiteServerConfigLocal

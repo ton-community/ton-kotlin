@@ -1,14 +1,13 @@
 package org.ton.tl.constructors
 
-import io.ktor.utils.io.core.*
 import org.ton.tl.*
 import kotlin.reflect.KClass
 
-open class EnumTlCombinator<T : Enum<T>>(
+public open class EnumTlCombinator<T : Enum<T>>(
     override val baseClass: KClass<T>,
     values: List<Pair<T, String>>
 ) : AbstractTlCombinator<T>() {
-    constructor(baseClass: KClass<T>, vararg values: Pair<T, String>) : this(baseClass, values.toList())
+    public constructor(baseClass: KClass<T>, vararg values: Pair<T, String>) : this(baseClass, values.toList())
 
     private val enum2Constructor: Map<T, TlCodec<out T>>
     private val constructor2Enum: Map<Int, TlCodec<out T>>
@@ -24,10 +23,9 @@ open class EnumTlCombinator<T : Enum<T>>(
         val enum: T,
         schema: String
     ) : TlConstructor<T>(schema) {
-        override fun decode(input: Input): T = enum
+        override fun decode(reader: TlReader): T = enum
 
-        override fun encode(output: Output, value: T) {
-        }
+        override fun encode(writer: TlWriter, value: T) = Unit
     }
 
     override fun findConstructorOrNull(id: Int): TlDecoder<out T>? = constructor2Enum[id]

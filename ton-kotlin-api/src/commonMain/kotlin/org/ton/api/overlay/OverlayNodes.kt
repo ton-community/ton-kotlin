@@ -3,30 +3,30 @@ package org.ton.api.overlay
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeVectorTl
+import org.ton.tl.*
 
 @Serializable
 @SerialName("overlay.nodes")
-class OverlayNodes(
-    val nodes: List<OverlayNode>
-) : TlObject<OverlayNodes>, Iterable<OverlayNode> by nodes {
-    constructor(vararg nodes: OverlayNode) : this(nodes.toList())
+public class OverlayNodes(
+    public val nodes: Collection<OverlayNode>
+) : TlObject<OverlayNodes>, Collection<OverlayNode> by nodes {
+    public constructor(vararg nodes: OverlayNode) : this(nodes.toList())
 
     override fun tlCodec(): TlCodec<OverlayNodes> = Companion
 
-    companion object : TlConstructor<OverlayNodes>(
+    public companion object : TlConstructor<OverlayNodes>(
         schema = "overlay.nodes nodes:(vector overlay.node) = overlay.Nodes",
     ) {
-        override fun encode(output: Output, value: OverlayNodes) {
-            output.writeVectorTl(value.nodes, OverlayNode)
+        override fun encode(output: TlWriter, value: OverlayNodes) {
+            output.writeCollection(value.nodes) {
+                write(OverlayNode, it)
+            }
         }
 
-        override fun decode(input: Input): OverlayNodes {
-            val nodes = input.readVectorTl(OverlayNode)
+        override fun decode(input: TlReader): OverlayNodes {
+            val nodes = input.readCollection {
+                read(OverlayNode)
+            }
             return OverlayNodes(nodes)
         }
     }

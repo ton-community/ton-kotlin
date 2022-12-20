@@ -6,7 +6,7 @@ import org.ton.api.pub.PublicKey
 
 @Serializable
 @SerialName("liteserver.desc")
-data class LiteServerDesc(
+public data class LiteServerDesc(
     val id: PublicKey,
     val ip: Int,
     val port: Int

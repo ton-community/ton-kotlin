@@ -8,33 +8,35 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeVectorTl
 
 @Serializable
 @SerialName("validator.config.global")
 @JsonClassDiscriminator("@type")
-data class ValidatorConfigGlobal(
-    val zero_state: TonNodeBlockIdExt = TonNodeBlockIdExt(),
-    val init_block: TonNodeBlockIdExt = TonNodeBlockIdExt(),
-    val hardforks: List<TonNodeBlockIdExt> = listOf()
-) : TlObject<ValidatorConfigGlobal> {
-    override fun tlCodec(): TlCodec<ValidatorConfigGlobal> = Companion
+public data class ValidatorConfigGlobal(
+    val zeroState: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val initBlock: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val hardforks: Collection<TonNodeBlockIdExt> = listOf()
+) {
+    public companion object : TlCodec<ValidatorConfigGlobal> by ValidatorConfigGlobalTlConstructor
+}
 
-    companion object : TlConstructor<ValidatorConfigGlobal>(
-        schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
-    ) {
-        override fun encode(output: Output, value: ValidatorConfigGlobal) {
-            output.writeTl(TonNodeBlockIdExt, value.zero_state)
-            output.writeTl(TonNodeBlockIdExt, value.init_block)
-            output.writeVectorTl(value.hardforks, TonNodeBlockIdExt)
+private object ValidatorConfigGlobalTlConstructor : TlConstructor<ValidatorConfigGlobal>(
+    schema = "validator.config.global zero_state:tonNode.blockIdExt init_block:tonNode.blockIdExt hardforks:(vector tonNode.blockIdExt) = validator.config.Global"
+) {
+    override fun encode(writer: TlWriter, value: ValidatorConfigGlobal) = writer {
+        writer.write(TonNodeBlockIdExt, value.zeroState)
+        writer.write(TonNodeBlockIdExt, value.initBlock)
+        writer.writeCollection(value.hardforks) {
+            writer.write(TonNodeBlockIdExt, it)
         }
+    }
 
-        override fun decode(input: Input): ValidatorConfigGlobal {
-            val zeroState = input.readTl(TonNodeBlockIdExt)
-            val initBlock = input.readTl(TonNodeBlockIdExt)
-            val hardforks = input.readVectorTl(TonNodeBlockIdExt)
-            return ValidatorConfigGlobal(zeroState, initBlock, hardforks)
+    override fun decode(reader: TlReader): ValidatorConfigGlobal = reader {
+        val zeroState = read(TonNodeBlockIdExt)
+        val initBlock = read(TonNodeBlockIdExt)
+        val hardforks = readCollection {
+            read(TonNodeBlockIdExt)
         }
+        ValidatorConfigGlobal(zeroState, initBlock, hardforks)
     }
 }

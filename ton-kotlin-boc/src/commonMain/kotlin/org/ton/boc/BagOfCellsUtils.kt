@@ -4,12 +4,11 @@ import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
-import org.ton.crypto.crc32.crc32c
+import org.ton.crypto.crc32c
 import kotlin.experimental.and
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalUnsignedTypes::class)
-fun Input.readBagOfCell(): BagOfCells {
+internal fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
     val hashCrc32: Boolean
@@ -139,7 +138,6 @@ fun Input.readBagOfCell(): BagOfCells {
     return BagOfCells(roots)
 }
 
-@OptIn(ExperimentalTime::class)
 private fun createCell(
     index: Int,
     cells: Array<Cell?>,
@@ -161,7 +159,7 @@ private fun createCell(
     return cell
 }
 
-fun Output.writeBagOfCells(
+internal fun Output.writeBagOfCells(
     bagOfCells: BagOfCells,
     hasIndex: Boolean = false,
     hasCrc32c: Boolean = false,
@@ -170,7 +168,7 @@ fun Output.writeBagOfCells(
 ) {
     val serializedBagOfCells = serializeBagOfCells(bagOfCells, hasIndex, hasCrc32c, hasCacheBits, flags)
     if (hasCrc32c) {
-        val crc32c = crc32c(serializedBagOfCells).toInt()
+        val crc32c = crc32c(serializedBagOfCells)
         writeFully(serializedBagOfCells)
         writeIntLittleEndian(crc32c)
     } else {

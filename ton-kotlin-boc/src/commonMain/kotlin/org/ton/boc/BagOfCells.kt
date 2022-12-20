@@ -6,39 +6,49 @@ import org.ton.crypto.encodeHex
 import kotlin.jvm.JvmStatic
 
 fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
-fun BagOfCells(roots: Iterable<Cell>): BagOfCells = BagOfCells.of(roots)
+fun BagOfCells(roots: Collection<Cell>): BagOfCells = BagOfCells.of(roots)
 fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
 
-interface BagOfCells : Iterable<Cell> {
-    val roots: List<Cell>
-    fun toByteArray(): ByteArray
+public interface BagOfCells : Collection<Cell> {
+    public val roots: Collection<Cell>
+
+    public fun toByteArray(): ByteArray = buildPacket {
+        writeBagOfCells(this@BagOfCells)
+    }.readBytes()
 
     override fun toString(): String
 
-    companion object {
-        const val BOC_GENERIC_MAGIC = 0xB5EE9C72.toInt()
-        const val BOC_INDEXED_MAGIC = 0x68FF65F3
-        const val BOC_INDEXED_CRC32C_MAGIC = 0xACC3A728.toInt()
+    public fun write(output: Output) {
+        output.writeBagOfCells(this)
+    }
+
+    public companion object {
+        public const val BOC_GENERIC_MAGIC: Int = 0xB5EE9C72.toInt()
+        public const val BOC_INDEXED_MAGIC: Int = 0x68FF65F3
+        public const val BOC_INDEXED_CRC32C_MAGIC: Int = 0xACC3A728.toInt()
 
         @JvmStatic
-        fun of(roots: Iterable<Cell>): BagOfCells {
+        public fun of(roots: Iterable<Cell>): BagOfCells {
             val rootsList = roots.toList()
             return CachedBagOfCells(rootsList)
         }
 
         @JvmStatic
-        fun of(vararg roots: Cell): BagOfCells {
+        public fun of(vararg roots: Cell): BagOfCells {
             val rootsList = roots.toList()
             return CachedBagOfCells(rootsList)
         }
 
         @JvmStatic
-        fun of(byteArray: ByteArray): BagOfCells {
+        public fun of(byteArray: ByteArray): BagOfCells {
             try {
-                return ByteReadPacket(byteArray).readBagOfCell()
+                return read(ByteReadPacket(byteArray))
             } catch (e: Exception) {
                 throw IllegalArgumentException("Can't load BoC: ${byteArray.encodeHex()}", e)
             }
         }
+
+        @JvmStatic
+        public fun read(input: Input): BagOfCells = input.readBagOfCell()
     }
 }

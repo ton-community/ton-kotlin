@@ -2,11 +2,11 @@ package org.ton.tl
 
 import kotlin.reflect.KClass
 
-abstract class TlCombinator<T : Any> private constructor(
+public abstract class TlCombinator<T : Any> private constructor(
     override val baseClass: KClass<T>,
     constructors: List<Pair<KClass<out T>, TlConstructor<out T>>>
 ) : AbstractTlCombinator<T>() {
-    constructor(baseClass: KClass<T>, vararg constructors: Pair<KClass<out T>, TlConstructor<out T>>) : this(
+    public constructor(baseClass: KClass<T>, vararg constructors: Pair<KClass<out T>, TlConstructor<out T>>) : this(
         baseClass,
         constructors.toList()
     )
@@ -17,7 +17,7 @@ abstract class TlCombinator<T : Any> private constructor(
     init {
         class2Constructor = constructors.toMap()
         id2Constructor = class2Constructor.entries.groupingBy { it.value.id }
-            .aggregate<Map.Entry<KClass<out T>, TlConstructor<out T>>, Int, Map.Entry<KClass<*>, TlConstructor<out T>>> { key, accumulator, element, _ ->
+            .aggregate<Map.Entry<KClass<out T>, TlConstructor<out T>>, Int, Map.Entry<KClass<*>, TlConstructor<out T>>> { _, accumulator, element, _ ->
                 if (accumulator != null) {
                     throw IllegalArgumentException("Duplicate ID: ${element.key}")
                 }

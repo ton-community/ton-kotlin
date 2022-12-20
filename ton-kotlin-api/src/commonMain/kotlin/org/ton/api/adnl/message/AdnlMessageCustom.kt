@@ -3,18 +3,15 @@ package org.ton.api.adnl.message
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
-import org.ton.crypto.base64.Base64ByteArraySerializer
+import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import org.ton.tl.constructors.BytesTlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-
 
 @SerialName("adnl.message.custom")
 @Serializable
-data class AdnlMessageCustom(
+public data class AdnlMessageCustom(
     @Serializable(Base64ByteArraySerializer::class)
     val data: ByteArray
 ) : AdnlMessage {
@@ -29,21 +26,19 @@ data class AdnlMessageCustom(
         return data.contentHashCode()
     }
 
-    override fun toString(): String = JSON.encodeToString(this)
-
-    companion object : TlConstructor<AdnlMessageCustom>(
+    public companion object : TlConstructor<AdnlMessageCustom>(
         schema = "adnl.message.custom data:bytes = adnl.Message",
     ) {
-        fun sizeOf(value: AdnlMessageCustom): Int =
+        public fun sizeOf(value: AdnlMessageCustom): Int =
             BytesTlConstructor.sizeOf(value.data)
 
-        override fun encode(output: Output, value: AdnlMessageCustom) {
-            output.writeBytesTl(value.data)
+        override fun decode(reader: TlReader): AdnlMessageCustom {
+            val data = reader.readBytes()
+            return AdnlMessageCustom(data)
         }
 
-        override fun decode(input: Input): AdnlMessageCustom {
-            val data = input.readBytesTl()
-            return AdnlMessageCustom(data)
+        override fun encode(writer: TlWriter, value: AdnlMessageCustom) {
+            writer.writeBytes(value.data)
         }
     }
 }

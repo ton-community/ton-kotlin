@@ -4,64 +4,53 @@ package org.ton.api.adnl
 
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
-import org.ton.api.adnl.AdnlIdShort.Companion.SIZE_BYTES
-import org.ton.api.dht.DhtNode
 import org.ton.api.overlay.OverlayNode
 import org.ton.api.overlay.OverlayNodeToSign
 import org.ton.bitstring.BitString
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.writeInt256Tl
+import org.ton.bitstring.toBitString
+import org.ton.tl.*
 import kotlin.jvm.JvmStatic
 
-inline fun AdnlIdShort(byteArray: ByteArray): AdnlIdShort = AdnlIdShort.of(byteArray)
-inline fun AdnlIdShort(input: Input): AdnlIdShort = AdnlIdShort.of(input)
-inline fun AdnlIdShort(bitString: BitString): AdnlIdShort = AdnlIdShort.of(bitString)
+public inline fun AdnlIdShort(byteArray: ByteArray): AdnlIdShort = AdnlIdShort.of(byteArray)
+public inline fun AdnlIdShort(bitString: BitString): AdnlIdShort = AdnlIdShort.of(bitString)
+public inline fun AdnlIdShort(bitString: Bits256): AdnlIdShort = AdnlIdShort.of(bitString)
 
-interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
-    val id: ByteArray
+public interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
+    public val id: Bits256
 
-    fun toBitString(): BitString
+    public fun verify(node: OverlayNode): Boolean
 
-    fun verify(node: OverlayNode): Boolean
-
-    companion object : TlCodec<AdnlIdShort> by AdnlIdShortTlConstructor {
-        const val SIZE_BYTES = 32
+    public companion object : TlCodec<AdnlIdShort> by AdnlIdShortTlConstructor {
+        public const val SIZE_BYTES: Int = 32
 
         @JvmStatic
-        fun tlConstructor(): TlConstructor<AdnlIdShort> = AdnlIdShortTlConstructor
+        public fun tlConstructor(): TlConstructor<AdnlIdShort> = AdnlIdShortTlConstructor
 
         @JvmStatic
-        fun of(byteArray: ByteArray): AdnlIdShort = AdnlIdShortImpl(byteArray.copyOf(SIZE_BYTES))
+        public fun of(byteArray: ByteArray): AdnlIdShort = of(Bits256(byteArray))
 
         @JvmStatic
-        fun of(input: Input): AdnlIdShort = AdnlIdShortImpl(input.readBytes(SIZE_BYTES))
+        public fun of(bitString: BitString): AdnlIdShort = of(Bits256(bitString))
 
         @JvmStatic
-        fun of(bitString: BitString): AdnlIdShort = AdnlIdShortImpl(bitString.toByteArray())
+        public fun of(bitString: Bits256): AdnlIdShort = AdnlIdShortImpl(bitString)
     }
 }
 
 private data class AdnlIdShortImpl(
-    private val _id: ByteArray
+    override val id: Bits256
 ) : AdnlIdShort {
-    private val _hashCode by lazy {
-        _id.contentHashCode()
+    private val _hashCode by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        id.hashCode()
     }
-    private val _string by lazy {
-        _id.encodeBase64()
+    private val _string by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        id.toString()
     }
-
-    override val id: ByteArray get() = _id.copyOf()
-
-    override fun toBitString(): BitString = BitString(_id)
 
     override fun tlCodec() = AdnlIdShort.tlConstructor()
 
     override fun verify(node: OverlayNode): Boolean {
-        if (!node.overlay.contentEquals(_id)) return false
+        if (node.overlay != (id)) return false
         val key = node.id
         val peerId = key.toAdnlIdShort()
         val nodeToSign = OverlayNodeToSign(
@@ -72,42 +61,29 @@ private data class AdnlIdShortImpl(
         return key.verify(nodeToSign.toByteArray(), node.signature)
     }
 
-    override fun compareTo(other: AdnlIdShort): Int {
-        val otherId = if (other is AdnlIdShortImpl) other._id else other.id
-        repeat(32) { i ->
-            val result = _id[i].toUByte().compareTo(otherId[i].toUByte())
-            if (result != 0) {
-                return result
-            }
-        }
-        return _id.size.compareTo(otherId.size)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        val otherId = when (other) {
-            is AdnlIdShortImpl -> other._id
-            is AdnlIdShort -> other.id
-            else -> return false
-        }
-        if (!_id.contentEquals(otherId)) return false
-        return true
-    }
+    override fun compareTo(other: AdnlIdShort): Int = id.compareTo(other.id)
 
     override fun hashCode(): Int = _hashCode
 
     override fun toString(): String = _string
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AdnlIdShort) return false
+        if (id != other.id) return false
+        return true
+    }
 }
 
 private object AdnlIdShortTlConstructor : TlConstructor<AdnlIdShort>(
     schema = "adnl.id.short id:int256 = adnl.id.Short"
 ) {
-    override fun decode(input: Input): AdnlIdShort {
-        val id = input.readInt256Tl()
+    override fun decode(reader: TlReader): AdnlIdShort {
+        val id = reader.readBits256()
         return AdnlIdShortImpl(id)
     }
 
-    override fun encode(output: Output, value: AdnlIdShort) {
-        output.writeInt256Tl(value.id)
+    override fun encode(writer: TlWriter, value: AdnlIdShort) {
+        writer.writeBits256(value.id)
     }
 }

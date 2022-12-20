@@ -2,6 +2,4 @@ package org.ton.adnl.network
 
 import kotlin.coroutines.CoroutineContext
 
-internal expect class TcpClientImpl(
-    coroutineContext: CoroutineContext,
-) : TcpClient
+public expect class TcpClientImpl(): TcpClient

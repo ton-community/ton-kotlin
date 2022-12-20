@@ -6,44 +6,46 @@ import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
-inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
-    BitString.of(byteArray, size)
+public inline fun BitString(
+    byteArray: ByteArray,
+    size: Int = byteArray.size * Byte.SIZE_BITS
+): BitString = BitString.of(byteArray, size)
 
-inline fun BitString(size: Int): BitString = BitString.of(size)
-inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
-inline fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
-inline fun BitString(hex: String): BitString = BitString.of(hex)
+public inline fun BitString(size: Int): BitString = BitString.of(size)
+public inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
+public inline fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
+public inline fun BitString(hex: String): BitString = BitString.of(hex)
 
-inline fun Iterable<Boolean>.toBitString(): BitString = BitString(this)
-inline fun BooleanArray.toBitString(): BitString = BitString(*this)
-inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
+public inline fun Iterable<Boolean>.toBitString(): BitString = BitString(this)
+public inline fun BooleanArray.toBitString(): BitString = BitString(*this)
+public inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
 
 @Serializable(with = FiftHexBitStringSerializer::class)
-interface BitString : List<Boolean>, Comparable<BitString> {
+public interface BitString : List<Boolean>, Comparable<BitString> {
     override val size: Int
 
     override operator fun get(index: Int): Boolean
-    fun getOrNull(index: Int): Boolean?
+    public fun getOrNull(index: Int): Boolean?
 
-    operator fun plus(bits: BooleanArray): BitString
-    operator fun plus(bits: Iterable<Boolean>): BitString
-    operator fun plus(bits: Collection<Boolean>): BitString
-    operator fun plus(bytes: ByteArray): BitString
-    fun plus(bytes: ByteArray, bits: Int): BitString
+    public operator fun plus(bits: BooleanArray): BitString
+    public operator fun plus(bits: Iterable<Boolean>): BitString
+    public operator fun plus(bits: Collection<Boolean>): BitString
+    public operator fun plus(bytes: ByteArray): BitString
+    public fun plus(bytes: ByteArray, bits: Int): BitString
 
-    fun slice(indices: IntRange): BitString
-    fun toByteArray(augment: Boolean = false): ByteArray
-    fun toBooleanArray(): BooleanArray
-    fun toMutableBitString(): MutableBitString
+    public fun slice(indices: IntRange): BitString
+    public fun toByteArray(augment: Boolean = false): ByteArray
+    public fun toBooleanArray(): BooleanArray
+    public fun toMutableBitString(): MutableBitString
 
-    infix fun xor(other: BitString): BitString
-    infix fun or(other: BitString): BitString
+    public infix fun xor(other: BitString): BitString
+    public infix fun or(other: BitString): BitString
 
     override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
 
     override fun toString(): String
 
-    fun joinToStringBits(): String = joinToString("") { if (it) "1" else "0" }
+    public fun joinToStringBits(): String = joinToString("") { if (it) "1" else "0" }
 
     override fun compareTo(other: BitString): Int {
         val limit = min(size, other.size)
@@ -61,24 +63,24 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         return size - other.size
     }
 
-    companion object {
-        const val MAX_LENGTH = 1023
+    public companion object {
+        public const val MAX_LENGTH: Int = 1023
 
         @JvmStatic
-        fun empty(): BitString = EmptyBitString
+        public fun empty(): BitString = EmptyBitString
 
         @JvmStatic
-        fun of(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
+        public fun of(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
             ByteBackedBitString.of(byteArray, size)
 
         @JvmStatic
-        fun of(size: Int = 0): BitString {
+        public fun of(size: Int = 0): BitString {
             if (size == 0) return empty()
             return ByteBackedBitString.of(size)
         }
 
         @JvmStatic
-        fun binary(bits: String): BitString {
+        public fun binary(bits: String): BitString {
             if (bits.isEmpty()) return empty()
             return BitString(bits.map { char ->
                 when (char) {
@@ -90,7 +92,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        fun of(vararg bits: Boolean): BitString {
+        public fun of(vararg bits: Boolean): BitString {
             if (bits.isEmpty()) return empty()
             val bitString = ByteBackedMutableBitString.of(bits.size)
             bits.forEachIndexed { index, bit ->
@@ -100,7 +102,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        fun of(bits: Iterable<Boolean>): BitString {
+        public fun of(bits: Iterable<Boolean>): BitString {
             val bitsList = bits.toList()
             if (bitsList.isEmpty()) return empty()
             val bitString = ByteBackedMutableBitString.of(bitsList.size)
@@ -111,7 +113,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        fun of(hex: String): BitString {
+        public fun of(hex: String): BitString {
             if (hex.isEmpty()) return empty()
             // True if bit string doesn't contain mod 4 number of bits
             val incomplete = hex.isNotEmpty() && hex.last() == '_'
@@ -133,7 +135,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
+        public fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
             val shift = bits % Byte.SIZE_BITS
             if (shift == 0 || data.isEmpty()) {
                 val newData = data.copyOf(bits / Byte.SIZE_BITS + 1)
@@ -155,7 +157,7 @@ interface BitString : List<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        fun findAugmentTag(byteArray: ByteArray): Int {
+        public fun findAugmentTag(byteArray: ByteArray): Int {
             if (byteArray.isEmpty()) return 0
             var length = byteArray.size * 8
             var index = byteArray.lastIndex

@@ -1,33 +1,29 @@
 package org.ton.api.dht
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.crypto.base64.base64
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.crypto.base64
+import org.ton.tl.*
 import kotlin.jvm.JvmStatic
 
 @Serializable
-data class DhtKeyDescription(
+public data class DhtKeyDescription(
     val key: DhtKey,
     val id: PublicKey,
     val update_rule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
-    @Serializable(Base64ByteArraySerializer::class)
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtKeyDescription> {
-    override fun signed(privateKey: PrivateKey) =
-        copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))
+    override fun signed(privateKey: PrivateKey): DhtKeyDescription =
+        copy(
+            signature = privateKey.sign(
+                copy(signature = ByteArray(0)).toByteArray()
+            )
+        )
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeBoxed(copy(signature = ByteArray(0))), signature)
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0))), signature)
 
     override fun tlCodec(): TlCodec<DhtKeyDescription> = DhtKeyDescriptionTlConstructor
 
@@ -61,9 +57,9 @@ data class DhtKeyDescription(
         append(")")
     }
 
-    companion object : TlCodec<DhtKeyDescription> by DhtKeyDescriptionTlConstructor {
+    public companion object : TlCodec<DhtKeyDescription> by DhtKeyDescriptionTlConstructor {
         @JvmStatic
-        fun signed(name: String, key: PrivateKey): DhtKeyDescription {
+        public fun signed(name: String, key: PrivateKey): DhtKeyDescription {
             val keyDescription = DhtKeyDescription(
                 id = key.publicKey(),
                 key = DhtKey(key.publicKey().toAdnlIdShort(), name)
@@ -76,18 +72,18 @@ data class DhtKeyDescription(
 private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>(
     schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
 ) {
-    override fun encode(output: Output, value: DhtKeyDescription) {
-        output.writeTl(DhtKey, value.key)
-        output.writeTl(PublicKey, value.id)
-        output.writeTl(DhtUpdateRule, value.update_rule)
-        output.writeBytesTl(value.signature)
+    override fun encode(writer: TlWriter, value: DhtKeyDescription) {
+        writer.write(DhtKey, value.key)
+        writer.write(PublicKey, value.id)
+        writer.write(DhtUpdateRule, value.update_rule)
+        writer.writeBytes(value.signature)
     }
 
-    override fun decode(input: Input): DhtKeyDescription {
-        val key = input.readTl(DhtKey)
-        val id = input.readTl(PublicKey)
-        val updateRule = input.readTl(DhtUpdateRule)
-        val signature = input.readBytesTl()
+    override fun decode(reader: TlReader): DhtKeyDescription {
+        val key = reader.read(DhtKey)
+        val id = reader.read(PublicKey)
+        val updateRule = reader.read(DhtUpdateRule)
+        val signature = reader.readBytes()
         return DhtKeyDescription(key, id, updateRule, signature)
     }
 }

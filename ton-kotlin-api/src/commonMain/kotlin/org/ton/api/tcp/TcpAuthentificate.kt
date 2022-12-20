@@ -5,12 +5,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @SerialName("tcp.authentificate")
 @Serializable
-data class TcpAuthentificate(
+public data class TcpAuthentificate(
     val nonce: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -22,18 +22,18 @@ data class TcpAuthentificate(
 
     override fun hashCode(): Int = nonce.contentHashCode()
 
-    companion object : TlCodec<TcpAuthentificate> by TcpAuthentificateTlConstructor
+    public companion object : TlCodec<TcpAuthentificate> by TcpAuthentificateTlConstructor
 }
 
 private object TcpAuthentificateTlConstructor : TlConstructor<TcpAuthentificate>(
     schema = "tcp.authentificate nonce:bytes = tcp.Authentificate"
 ) {
-    override fun decode(input: Input): TcpAuthentificate {
-        val nonce = input.readBytesTl()
+    override fun decode(input: TlReader): TcpAuthentificate {
+        val nonce = input.readBytes()
         return TcpAuthentificate(nonce)
     }
 
-    override fun encode(output: Output, value: TcpAuthentificate) {
-        output.writeBytesTl(value.nonce)
+    override fun encode(output: TlWriter, value: TcpAuthentificate) {
+        output.writeBytes(value.nonce)
     }
 }

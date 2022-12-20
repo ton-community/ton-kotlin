@@ -3,15 +3,12 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.tonKotlinApi)
-                api(libs.ktor.client.core)
-                api(libs.ktor.client.cio)
-                api(libs.ktor.server.cio)
-                api(libs.ktor.network)
                 implementation(libs.serialization.json)
                 implementation(projects.tonKotlinLogger)
                 implementation(libs.atomicfu)
                 implementation(libs.datetime)
                 implementation(libs.coroutines.core)
+                implementation(libs.ktor.utils)
             }
         }
         val commonTest by getting {
@@ -20,9 +17,28 @@ kotlin {
                 implementation(libs.coroutines.core)
                 implementation(libs.coroutines.test)
                 implementation(libs.coroutines.debug)
-                implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.utils)
                 implementation(projects.tonKotlinCrypto)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                api(libs.ktor.network)
+            }
+        }
+        val darwinMain by getting {
+            dependencies {
+                api(libs.ktor.network)
+            }
+        }
+        val linuxMain by getting {
+            dependencies {
+                api(libs.ktor.network)
+            }
+        }
+        val mingwMain by getting {
+            dependencies {
+                api(libs.ktor.utils)
             }
         }
         val jvmTest by getting {

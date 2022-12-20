@@ -4,13 +4,12 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.TlCodec
 import org.ton.tl.TlCombinator
 
-@Suppress("PropertyName")
-sealed interface LiteServerBlockLink {
-    val to_key_block: Boolean
-    val from: TonNodeBlockIdExt
-    val to: TonNodeBlockIdExt
+public sealed interface LiteServerBlockLink {
+    public val toKeyBlock: Boolean
+    public val from: TonNodeBlockIdExt
+    public val to: TonNodeBlockIdExt
 
-    companion object : TlCodec<LiteServerBlockLink> by LiteServerBlockLinkTlCombinator
+    public companion object : TlCodec<LiteServerBlockLink> by LiteServerBlockLinkTlCombinator
 }
 
 private object LiteServerBlockLinkTlCombinator : TlCombinator<LiteServerBlockLink>(

@@ -10,12 +10,12 @@ import org.ton.tl.*
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface DhtValueResult : TlObject<DhtValueResult> {
-    fun value(): DhtValue?
+public sealed interface DhtValueResult : TlObject<DhtValueResult> {
+    public fun valueOrNull(): DhtValue?
 
     override fun tlCodec(): TlCodec<out DhtValueResult> = Companion
 
-    companion object : TlCombinator<DhtValueResult>(
+    public companion object : TlCombinator<DhtValueResult>(
         DhtValueResult::class,
         DhtValueNotFound::class to DhtValueNotFound,
         DhtValueFound::class to DhtValueFound
@@ -24,21 +24,20 @@ sealed interface DhtValueResult : TlObject<DhtValueResult> {
 
 @Serializable
 @SerialName("dht.valueNotFound")
-data class DhtValueNotFound(
+public data class DhtValueNotFound(
     val nodes: DhtNodes
 ) : DhtValueResult {
-    override fun value(): DhtValue? = null
+    override fun valueOrNull(): DhtValue? = null
 
-
-    companion object : TlConstructor<DhtValueNotFound>(
+    public companion object : TlConstructor<DhtValueNotFound>(
         schema = "dht.valueNotFound nodes:dht.nodes = dht.ValueResult"
     ) {
-        override fun encode(output: Output, value: DhtValueNotFound) {
-            output.writeTl(DhtNodes, value.nodes)
+        override fun encode(writer: TlWriter, value: DhtValueNotFound) {
+            writer.write(DhtNodes, value.nodes)
         }
 
-        override fun decode(input: Input): DhtValueNotFound {
-            val nodes = input.readTl(DhtNodes)
+        override fun decode(reader: TlReader): DhtValueNotFound {
+            val nodes = reader.read(DhtNodes)
             return DhtValueNotFound(nodes)
         }
     }
@@ -46,21 +45,20 @@ data class DhtValueNotFound(
 
 @Serializable
 @SerialName("dht.valueFound")
-data class DhtValueFound(
+public data class DhtValueFound(
     val value: DhtValue
 ) : DhtValueResult {
-    override fun value(): DhtValue = value
+    override fun valueOrNull(): DhtValue = value
 
-    companion object : TlConstructor<DhtValueFound>(
+    public companion object : TlConstructor<DhtValueFound>(
         schema = "dht.valueFound value:dht.Value = dht.ValueResult"
     ) {
-        override fun encode(output: Output, value: DhtValueFound) {
-            DhtValue.encodeBoxed(value.value)
-            output.writeTl(DhtValue, value.value)
+        override fun encode(writer: TlWriter, value: DhtValueFound) {
+            DhtValue.encodeBoxed(writer, value.value)
         }
 
-        override fun decode(input: Input): DhtValueFound {
-            val value = DhtValue.decodeBoxed(input)
+        override fun decode(reader: TlReader): DhtValueFound {
+            val value = DhtValue.decodeBoxed(reader)
             return DhtValueFound(value)
         }
     }

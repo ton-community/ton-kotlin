@@ -4,28 +4,20 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.fec.FecType
-import org.ton.bitstring.BitString
 import org.ton.crypto.encodeHex
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.*
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
 
 @Serializable
 @SerialName("rldp.messagePart")
-data class RldpMessagePartData(
-    override val transfer_id: BitString,
+public data class RldpMessagePartData(
+    override val transfer_id: Bits256,
     val fec_type: FecType,
     override val part: Int,
     val total_size: Long,
     val seqno: Int,
     val data: ByteArray
 ) : RldpMessagePart {
-    init {
-        require(transfer_id.size == 256) { "Invalid transfer_id size; expected: 256, actual: ${transfer_id.size}" }
-    }
-
     override fun tlCodec(): TlCodec<RldpMessagePartData> = Companion
 
     override fun equals(other: Any?): Boolean {
@@ -54,26 +46,26 @@ data class RldpMessagePartData(
         return "RldpMessagePartData(transfer_id=$transfer_id, fec_type=$fec_type, part=$part, total_size=$total_size, seqno=$seqno, data=${data.encodeHex()})"
     }
 
-    companion object : TlConstructor<RldpMessagePartData>(
+    public companion object : TlConstructor<RldpMessagePartData>(
         schema = "rldp.messagePart transfer_id:int256 fec_type:fec.Type part:int total_size:long seqno:int data:bytes = rldp.MessagePart",
     ) {
-        override fun encode(output: Output, value: RldpMessagePartData) {
-            output.writeInt256Tl(value.transfer_id)
-            output.writeTl(FecType, value.fec_type)
-            output.writeIntTl(value.part)
-            output.writeLongTl(value.total_size)
-            output.writeIntTl(value.seqno)
-            output.writeBytesTl(value.data)
+        override fun encode(output: TlWriter, value: RldpMessagePartData) {
+            output.writeBits256(value.transfer_id)
+            output.write(FecType, value.fec_type)
+            output.writeInt(value.part)
+            output.writeLong(value.total_size)
+            output.writeInt(value.seqno)
+            output.writeBytes(value.data)
         }
 
-        override fun decode(input: Input): RldpMessagePartData {
-            val transfer_id = input.readInt256Tl()
-            val fec_type = input.readTl(FecType)
-            val part = input.readIntTl()
-            val total_size = input.readLongTl()
-            val seqno = input.readIntTl()
-            val data = input.readBytesTl()
-            return RldpMessagePartData(BitString(transfer_id), fec_type, part, total_size, seqno, data)
+        override fun decode(input: TlReader): RldpMessagePartData {
+            val transfer_id = input.readBits256()
+            val fec_type = input.read(FecType)
+            val part = input.readInt()
+            val total_size = input.readLong()
+            val seqno = input.readInt()
+            val data = input.readBytes()
+            return RldpMessagePartData(transfer_id, fec_type, part, total_size, seqno, data)
         }
     }
 }

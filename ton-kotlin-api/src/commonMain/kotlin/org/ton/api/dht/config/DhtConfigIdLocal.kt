@@ -5,24 +5,22 @@ package org.ton.api.dht.config
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import org.ton.api.adnl.AdnlIdShort
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @SerialName("dht.config.local")
-data class DhtConfigIdLocal(
+public data class DhtConfigIdLocal(
     val id: AdnlIdShort
 ) : DhtConfigLocal {
 
-    companion object : TlConstructor<DhtConfigIdLocal>(
+    public companion object : TlConstructor<DhtConfigIdLocal>(
         schema = "dht.config.local id:adnl.id_short = dht.config.Local"
     ) {
-        override fun encode(output: Output, value: DhtConfigIdLocal) {
-            output.writeTl(AdnlIdShort, value.id)
+        override fun encode(output: TlWriter, value: DhtConfigIdLocal) {
+            output.write(AdnlIdShort, value.id)
         }
 
-        override fun decode(input: Input): DhtConfigIdLocal {
-            val id = input.readTl(AdnlIdShort)
+        override fun decode(input: TlReader): DhtConfigIdLocal {
+            val id = input.read(AdnlIdShort)
             return DhtConfigIdLocal(id)
         }
     }

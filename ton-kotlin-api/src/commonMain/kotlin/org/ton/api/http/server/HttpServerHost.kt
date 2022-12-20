@@ -1,37 +1,36 @@
 package org.ton.api.http.server
 
-import io.ktor.utils.io.core.*
 import org.ton.api.adnl.AdnlIdShort
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.*
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
-data class HttpServerHost(
-    val domains: List<String>,
+public data class HttpServerHost(
+    val domains: Collection<String>,
     val ip: Int,
     val port: Int,
     val adnl_id: AdnlIdShort
 ) {
-    companion object : TlCodec<HttpServerHost> by HttpServerHostTlConstructor
+    public companion object : TlCodec<HttpServerHost> by HttpServerHostTlConstructor
 }
 
 private object HttpServerHostTlConstructor : TlConstructor<HttpServerHost>(
     schema = "http.server.host domains:(vector string) ip:int32 port:int32 adnl_id:adnl.id.short = http.server.Host"
 ) {
-    override fun decode(input: Input): HttpServerHost {
-        val domains = input.readVectorTl(StringTlConstructor)
-        val ip = input.readIntTl()
-        val port = input.readIntTl()
-        val adnl_id = input.readTl(AdnlIdShort)
+    override fun decode(input: TlReader): HttpServerHost {
+        val domains = input.readCollection {
+            readString()
+        }
+        val ip = input.readInt()
+        val port = input.readInt()
+        val adnl_id = input.read(AdnlIdShort)
         return HttpServerHost(domains, ip, port, adnl_id)
     }
 
-    override fun encode(output: Output, value: HttpServerHost) {
-        output.writeVectorTl(value.domains, StringTlConstructor)
-        output.writeIntTl(value.ip)
-        output.writeIntTl(value.port)
-        output.writeTl(AdnlIdShort, value.adnl_id)
+    override fun encode(output: TlWriter, value: HttpServerHost) {
+        output.writeCollection(value.domains) {
+            writeString(it)
+        }
+        output.writeInt(value.ip)
+        output.writeInt(value.port)
+        output.write(AdnlIdShort, value.adnl_id)
     }
 }

@@ -1,17 +1,14 @@
 package org.ton.api.rldp
 
 import io.ktor.util.*
-import io.ktor.utils.io.core.*
 import org.ton.bitstring.BitString
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.*
+import org.ton.tl.*
 
-data class RldpAnswer(
-    val query_id: BitString,
+public data class RldpAnswer(
+    val query_id: Bits256,
     override val data: ByteArray
 ) : RldpMessage {
-    override val id: BitString
+    override val id: Bits256
         get() = query_id
 
     override fun tlCodec(): TlCodec<RldpAnswer> = Companion
@@ -35,18 +32,18 @@ data class RldpAnswer(
     override fun toString(): String =
         "RldpAnswer(query_id=$query_id, data=[(${data.size} bytes) ${data.encodeBase64()}])"
 
-    companion object : TlConstructor<RldpAnswer>(
+    public companion object : TlConstructor<RldpAnswer>(
         schema = "rldp.answer query_id:int256 data:bytes = rldp.Message",
     ) {
-        override fun encode(output: Output, value: RldpAnswer) {
-            output.writeInt256Tl(value.query_id)
-            output.writeBytesTl(value.data)
+        override fun encode(writer: TlWriter, value: RldpAnswer) {
+            writer.writeBits256(value.query_id)
+            writer.writeBytes(value.data)
         }
 
-        override fun decode(input: Input): RldpAnswer {
-            val query_id = input.readInt256Tl()
-            val data = input.readBytesTl()
-            return RldpAnswer(BitString(query_id), data)
+        override fun decode(reader: TlReader): RldpAnswer {
+            val query_id = reader.readBits256()
+            val data = reader.readBytes()
+            return RldpAnswer(query_id, data)
         }
     }
 }

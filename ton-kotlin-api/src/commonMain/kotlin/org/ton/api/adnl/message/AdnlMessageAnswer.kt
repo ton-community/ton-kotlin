@@ -1,21 +1,14 @@
 package org.ton.api.adnl.message
 
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
-import org.ton.bitstring.BitString
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.answer")
 @Serializable
-data class AdnlMessageAnswer(
-    val query_id: BitString,
-    @Serializable(HexByteArraySerializer::class)
+public data class AdnlMessageAnswer(
+    val query_id: Bits256,
     val answer: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
@@ -32,23 +25,21 @@ data class AdnlMessageAnswer(
         return result
     }
 
-    override fun toString(): String = JSON.encodeToString(this)
-
-    companion object : TlConstructor<AdnlMessageAnswer>(
+    public companion object : TlConstructor<AdnlMessageAnswer>(
         schema = "adnl.message.answer query_id:int256 answer:bytes = adnl.Message",
     ) {
-        fun sizeOf(value: AdnlMessageAnswer): Int =
-            Int256TlConstructor.SIZE_BYTES + BytesTlConstructor.sizeOf(value.answer)
+        public fun sizeOf(value: AdnlMessageAnswer): Int =
+            256 / 8 + BytesTlConstructor.sizeOf(value.answer)
 
-        override fun encode(output: Output, value: AdnlMessageAnswer) {
-            output.writeInt256Tl(value.query_id.toByteArray())
-            output.writeBytesTl(value.answer)
+        override fun encode(writer: TlWriter, value: AdnlMessageAnswer): Unit = writer {
+            writeBits256(value.query_id)
+            writeBytes(value.answer)
         }
 
-        override fun decode(input: Input): AdnlMessageAnswer {
-            val queryId = input.readInt256Tl()
-            val answer = input.readBytesTl()
-            return AdnlMessageAnswer(BitString(queryId), answer)
+        override fun decode(reader: TlReader): AdnlMessageAnswer = reader {
+            val queryId = readBits256()
+            val answer = readBytes()
+            AdnlMessageAnswer(queryId, answer)
         }
     }
 }

@@ -1,6 +1,6 @@
 package org.ton.adnl
 
-fun ipv4(ipv4: Int): String = buildString {
+internal fun ipv4(ipv4: Int): String = buildString {
     append((ipv4 shr 24) and 0xFF)
     append(".")
     append((ipv4 shr 16) and 0xFF)
@@ -10,7 +10,7 @@ fun ipv4(ipv4: Int): String = buildString {
     append(ipv4 and 0xFF)
 }
 
-fun ipv4(host: String): Int {
+internal fun ipv4(host: String): Int {
     val bytes = host.split('.').reversed()
     require(bytes.size == 4) { "Invalid IPv4 address: $host" }
     var result = 0

@@ -3,23 +3,22 @@ package org.ton.adnl.node
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import org.ton.adnl.ipv4
 import org.ton.adnl.network.IPAddress
-import org.ton.adnl.network.IPv4Address
 import org.ton.adnl.network.UdpServer
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.bitstring.BitString
 import org.ton.logger.Logger
+import org.ton.tl.Bits256
 import kotlin.coroutines.CoroutineContext
 
-class AdnlNetworkManager(
+public class AdnlNetworkManager(
     coroutineContext: CoroutineContext
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext = coroutineContext + CoroutineName(toString())
 
-    var callback: Callback? = null
+    private var callback: Callback? = null
 
     private val log = Logger.println(toString())
     private val adnlId2Category = HashMap<AdnlIdShort, Int>()
@@ -28,9 +27,9 @@ class AdnlNetworkManager(
     private var sentDatagrams = 0
     private val inputDesc = ArrayList<InputDesc>()
     private val outputDesc = HashMap<Int, ArrayList<OutputDesc>>()
-    private val proxyAddrs = HashMap<BitString, UdpSocketDesc>()
+    private val proxyAddrs = HashMap<Bits256, UdpSocketDesc>()
 
-    fun addSelfAddress(
+    public fun addSelfAddress(
         address: AdnlAddressUdp,
         categoryMask: AdnlCategoryMask,
         priority: Int
@@ -41,7 +40,7 @@ class AdnlNetworkManager(
         addOutputAddress(OutputDesc(socket, null, null), categoryMask, priority)
     }
 
-    fun setLocalIdCategory(id: AdnlIdShort, category: Int) {
+    public fun setLocalIdCategory(id: AdnlIdShort, category: Int) {
         if (category == 255) {
             adnlId2Category.remove(id)
         } else {
@@ -49,7 +48,7 @@ class AdnlNetworkManager(
         }
     }
 
-    suspend fun sendDatagram(
+    public suspend fun sendDatagram(
         srcId: AdnlIdShort,
         dstId: AdnlIdShort,
         dstAddr: AdnlAddressUdp,
@@ -80,14 +79,14 @@ class AdnlNetworkManager(
         sentDatagrams++
     }
 
-    fun receiveDatagram(
+    private fun receiveDatagram(
         address: IPAddress,
         data: ByteReadPacket
     ) {
         receiveDatagram(address.toAdnlAddress(), data)
     }
 
-    fun receiveDatagram(
+    private fun receiveDatagram(
         address: AdnlAddress,
         data: ByteReadPacket
     ) {
@@ -152,8 +151,8 @@ class AdnlNetworkManager(
         }
     }
 
-    fun interface Callback {
-        fun receiveDatagram(address: AdnlAddress, data: ByteReadPacket)
+    public fun interface Callback {
+        public fun receiveDatagram(address: AdnlAddress, data: ByteReadPacket)
     }
 
     private data class OutputDesc(
@@ -195,7 +194,7 @@ class AdnlNetworkManager(
         var inDesc: InputDesc? = null,
     )
 
-    companion object {
-        const val MTU = 1440
+    public companion object {
+        public const val MTU: Int = 1440
     }
 }

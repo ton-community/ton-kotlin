@@ -5,52 +5,15 @@ package org.ton.lite.api.liteserver.functions
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.api.exception.TonException
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.crypto.encodeHex
-import org.ton.lite.api.liteserver.LiteServerError
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.*
 
-interface LiteServerQueryFunction {
-    suspend fun query(liteServerQuery: LiteServerQuery): ByteArray
+public interface LiteServerQueryFunction {
 
-    suspend fun <Q : Any, A : Any> query(
-        query: Q,
-        queryCodec: TlCodec<Q>,
-        answerCodec: TlCodec<A>,
-        seqno: Int = -1
-    ): A {
-        var queryBytes = queryCodec.encodeBoxed(query)
-        if (seqno >= 0) {
-            queryBytes = LiteServerWaitMasterchainSeqno.encodeBoxed(
-                LiteServerWaitMasterchainSeqno(
-                    seqno,
-                    Int.MAX_VALUE
-                )
-            ) + queryBytes
-        }
-        val liteServerQuery = LiteServerQuery(queryBytes)
-        val answerBytes = query(liteServerQuery)
-        val errorByteInput = ByteReadPacket(answerBytes)
-        if (errorByteInput.readIntLittleEndian() == LiteServerError.id) {
-            val liteServerError = LiteServerError.decode(errorByteInput)
-            throw TonException(
-                liteServerError.code, "Exception occurred while processing query:\n" +
-                        "${query}\n" +
-                        "$liteServerError"
-            )
-        }
-        return answerCodec.decodeBoxed(answerBytes)
-    }
 }
 
 @Serializable
-data class LiteServerQuery(
-    @Serializable(Base64ByteArraySerializer::class)
+public data class LiteServerQuery(
     val data: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -62,24 +25,18 @@ data class LiteServerQuery(
 
     override fun hashCode(): Int = data.contentHashCode()
 
-    override fun toString(): String = buildString {
-        append("LiteServerQuery(data=")
-        append(data.encodeHex())
-        append(")")
-    }
-
-    companion object : TlCodec<LiteServerQuery> by LiteServerQueryTlConstructor
+    public companion object : TlCodec<LiteServerQuery> by LiteServerQueryTlConstructor
 }
 
 private object LiteServerQueryTlConstructor : TlConstructor<LiteServerQuery>(
     schema = "liteServer.query data:bytes = Object"
 ) {
-    override fun decode(input: Input): LiteServerQuery {
-        val data = input.readBytesTl()
+    override fun decode(input: TlReader): LiteServerQuery {
+        val data = input.readBytes()
         return LiteServerQuery(data)
     }
 
-    override fun encode(output: Output, value: LiteServerQuery) {
-        output.writeBytesTl(value.data)
+    override fun encode(output: TlWriter, value: LiteServerQuery) {
+        output.writeBytes(value.data)
     }
 }

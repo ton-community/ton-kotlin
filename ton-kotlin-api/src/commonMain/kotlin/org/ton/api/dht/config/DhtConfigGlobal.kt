@@ -8,42 +8,37 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @Serializable
 @SerialName("dht.config.global")
 @JsonClassDiscriminator("@type")
-data class DhtConfigGlobal(
+public data class DhtConfigGlobal(
     val static_nodes: DhtNodes = DhtNodes(),
     val k: Int = 0,
     val a: Int = 0
 ) : TlObject<DhtConfigGlobal> {
-    constructor(
-        staticNodes: List<DhtNode>,
+    public constructor(
+        staticNodes: Collection<DhtNode>,
         k: Int,
         a: Int
     ) : this(DhtNodes(staticNodes), k, a)
 
-    override fun tlCodec() = Companion
+    override fun tlCodec(): TlCodec<DhtConfigGlobal> = Companion
 
-    companion object : TlConstructor<DhtConfigGlobal>(
+    public companion object : TlConstructor<DhtConfigGlobal>(
         schema = "dht.config.global static_nodes:dht.nodes k:int a:int = dht.config.Global"
     ) {
-        override fun encode(output: Output, value: DhtConfigGlobal) {
-            output.writeTl(DhtNodes, value.static_nodes)
-            output.writeIntTl(value.k)
-            output.writeIntTl(value.a)
+        override fun encode(output: TlWriter, value: DhtConfigGlobal) {
+            output.write(DhtNodes, value.static_nodes)
+            output.writeInt(value.k)
+            output.writeInt(value.a)
         }
 
-        override fun decode(input: Input): DhtConfigGlobal {
-            val staticNodes = input.readTl(DhtNodes)
-            val k = input.readIntTl()
-            val a = input.readIntTl()
+        override fun decode(input: TlReader): DhtConfigGlobal {
+            val staticNodes = input.read(DhtNodes)
+            val k = input.readInt()
+            val a = input.readInt()
             return DhtConfigGlobal(staticNodes, k, a)
         }
     }

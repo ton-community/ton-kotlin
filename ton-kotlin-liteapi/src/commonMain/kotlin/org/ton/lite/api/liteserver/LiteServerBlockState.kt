@@ -1,42 +1,49 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
+import org.ton.boc.BagOfCells
+import org.ton.lite.api.liteserver.internal.readBoc
+import org.ton.lite.api.liteserver.internal.writeBoc
+import org.ton.tl.*
 
 @Serializable
-class LiteServerBlockState(
+public data class LiteServerBlockState(
     val id: TonNodeBlockIdExt,
-    val root_hash: ByteArray,
-    val file_hash: ByteArray,
-    val data: ByteArray
+    @SerialName("root_hash")
+    val rootHash: Bits256,
+    @SerialName("file_hash")
+    val fileHash: Bits256,
+    val data: BagOfCells
 ) {
-    companion object : TlCodec<LiteServerBlockState> by LiteServerBlockStateTlConstructor
+    public constructor(
+        id: TonNodeBlockIdExt,
+        rootHash: ByteArray,
+        fileHash: ByteArray,
+        data: BagOfCells
+    ) : this(id, Bits256(rootHash), Bits256(fileHash), data)
+
+    public companion object : TlCodec<LiteServerBlockState> by LiteServerBlockStateTlConstructor
 }
 
 private object LiteServerBlockStateTlConstructor : TlConstructor<LiteServerBlockState>(
     schema = "liteServer.blockState id:tonNode.blockIdExt root_hash:int256 file_hash:int256 data:bytes = liteServer.BlockState"
 ) {
-    override fun decode(input: Input): LiteServerBlockState {
-        val id = input.readTl(TonNodeBlockIdExt)
-        val rootHash = input.readInt256Tl()
-        val fileHash = input.readInt256Tl()
-        val data = input.readBytesTl()
+    override fun decode(reader: TlReader): LiteServerBlockState {
+        val id = reader.read(TonNodeBlockIdExt)
+        val rootHash = reader.readBits256()
+        val fileHash = reader.readBits256()
+        val data = reader.readBoc()
         return LiteServerBlockState(id, rootHash, fileHash, data)
     }
 
-    override fun encode(output: Output, value: LiteServerBlockState) {
-        output.writeTl(TonNodeBlockIdExt, value.id)
-        output.writeInt256Tl(value.root_hash)
-        output.writeInt256Tl(value.file_hash)
-        output.writeBytesTl(value.data)
+    override fun encode(writer: TlWriter, value: LiteServerBlockState) {
+        writer.write(TonNodeBlockIdExt, value.id)
+        writer.writeBits256(value.rootHash)
+        writer.writeBits256(value.fileHash)
+        writer.writeBoc(value.data)
     }
 }

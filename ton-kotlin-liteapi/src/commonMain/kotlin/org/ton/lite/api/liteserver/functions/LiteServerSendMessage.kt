@@ -1,66 +1,36 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.block.Message
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.crypto.hex
-import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
+import org.ton.lite.api.liteserver.internal.readBoc
+import org.ton.lite.api.liteserver.internal.writeBoc
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
+import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeTlb
-
-interface LiteServerSendMessageFunction : LiteServerQueryFunction {
-    suspend fun query(query: LiteServerSendMessage): LiteServerSendMsgStatus =
-        query(query, LiteServerSendMessage, LiteServerSendMsgStatus)
-
-    suspend fun sendMessage(body: ByteArray) = query(LiteServerSendMessage(body))
-    suspend fun sendMessage(bagOfCells: BagOfCells) = query(LiteServerSendMessage(bagOfCells))
-    suspend fun sendMessage(message: Message<Cell>) = query(LiteServerSendMessage(message))
-}
 
 @Serializable
-data class LiteServerSendMessage(
-    @Serializable(Base64ByteArraySerializer::class)
-    val body: ByteArray
+public data class LiteServerSendMessage(
+    val body: BagOfCells
 ) {
-    constructor(bagOfCells: BagOfCells) : this(bagOfCells.toByteArray())
-    constructor(message: Message<Cell>) : this(BagOfCells(CellBuilder.createCell {
-        storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
-    }))
+    public constructor(body: CellRef<Message<Cell>>) : this(BagOfCells(body.cell))
+    public constructor(body: Message<Cell>) : this(CellRef(body, Message.tlbCodec(AnyTlbConstructor)))
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerSendMessage) return false
-        if (!body.contentEquals(other.body)) return false
-        return true
-    }
+    public fun parseBody(): CellRef<Message<Cell>> = CellRef(body.first(), Message.tlbCodec(AnyTlbConstructor))
 
-    override fun hashCode(): Int {
-        return body.contentHashCode()
-    }
-
-    override fun toString(): String = buildString {
-        append("LiteServerSendMessage(body=")
-        append(hex(body))
-        append(")")
-    }
-
-    companion object : TlConstructor<LiteServerSendMessage>(
+    public companion object : TlConstructor<LiteServerSendMessage>(
         schema = "liteServer.sendMessage body:bytes = liteServer.SendMsgStatus"
     ) {
-        override fun decode(input: Input): LiteServerSendMessage {
-            val body = input.readBytesTl()
+        override fun decode(reader: TlReader): LiteServerSendMessage {
+            val body = reader.readBoc()
             return LiteServerSendMessage(body)
         }
 
-        override fun encode(output: Output, value: LiteServerSendMessage) {
-            output.writeBytesTl(value.body)
+        override fun encode(writer: TlWriter, value: LiteServerSendMessage) {
+            writer.writeBoc(value.body)
         }
     }
 }

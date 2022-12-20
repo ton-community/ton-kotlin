@@ -4,7 +4,7 @@ import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.adnl.AdnlNode
 import org.ton.logger.Logger
 
-class AdnlPeerTable : Adnl {
+public class AdnlPeerTable : Adnl {
 
     private val log = Logger.println(toString())
 

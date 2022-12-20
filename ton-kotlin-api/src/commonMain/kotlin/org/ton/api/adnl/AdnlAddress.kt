@@ -10,21 +10,16 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.crypto.base64.base64
+import org.ton.bitstring.BitString
 import org.ton.tl.*
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
 
 @Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface AdnlAddress : TlObject<AdnlAddress> {
+public sealed interface AdnlAddress : TlObject<AdnlAddress> {
     override fun tlCodec(): TlCodec<out AdnlAddress> = Companion
 
-    companion object : TlCombinator<AdnlAddress>(
+    public companion object : TlCombinator<AdnlAddress>(
         AdnlAddress::class,
         AdnlAddressUdp::class to AdnlAddressUdp,
         AdnlAddressUdp6::class to AdnlAddressUdp6,
@@ -32,23 +27,33 @@ sealed interface AdnlAddress : TlObject<AdnlAddress> {
     )
 }
 
+public sealed interface AdnlIp : AdnlAddress {
+    public val ip: Int
+    public val port: Int
+}
+
+public sealed interface AdnlIp6 : AdnlAddress {
+    public val ip: Bits128
+    public val port: Int
+}
+
 @SerialName("adnl.address.udp")
 @Serializable
-data class AdnlAddressUdp(
-    val ip: Int,
-    val port: Int
-) : AdnlAddress {
-    companion object : TlConstructor<AdnlAddressUdp>(
+public data class AdnlAddressUdp(
+    override val ip: Int,
+    override val port: Int
+) : AdnlAddress, AdnlIp {
+    public companion object : TlConstructor<AdnlAddressUdp>(
         schema = "adnl.address.udp ip:int port:int = adnl.Address"
     ) {
-        override fun encode(output: Output, value: AdnlAddressUdp) {
-            output.writeIntTl(value.ip)
-            output.writeIntTl(value.port)
+        override fun encode(writer: TlWriter, value: AdnlAddressUdp) {
+            writer.writeInt(value.ip)
+            writer.writeInt(value.port)
         }
 
-        override fun decode(input: Input): AdnlAddressUdp {
-            val ip = input.readIntTl()
-            val port = input.readIntTl()
+        override fun decode(reader: TlReader): AdnlAddressUdp {
+            val ip = reader.readInt()
+            val port = reader.readInt()
             return AdnlAddressUdp(ip, port)
         }
     }
@@ -59,47 +64,24 @@ data class AdnlAddressUdp(
 @JsonClassDiscriminator("@type")
 @SerialName("adnl.address.udp6")
 @Serializable
-data class AdnlAddressUdp6(
-    @Serializable(Base64ByteArraySerializer::class)
-    val ip: ByteArray,
-    val port: Int
-) : AdnlAddress {
-    override fun toString(): String = buildString {
-        append("AdnlAddressUdp6(ip=")
-        append(base64(ip))
-        append(", port=")
-        append(port)
-        append(")")
-    }
+public data class AdnlAddressUdp6(
+    override val ip: Bits128,
+    override val port: Int
+) : AdnlAddress, AdnlIp6 {
+    public constructor(ip: ByteArray, port: Int) : this(Bits128(ip), port)
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AdnlAddressUdp6) return false
-
-        if (!ip.contentEquals(other.ip)) return false
-        if (port != other.port) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = ip.contentHashCode()
-        result = 31 * result + port
-        return result
-    }
-
-    companion object : TlConstructor<AdnlAddressUdp6>(
+    public companion object : TlConstructor<AdnlAddressUdp6>(
         schema = "adnl.address.udp6 ip:int128 port:int = adnl.Address"
     ) {
-        override fun decode(input: Input): AdnlAddressUdp6 {
-            val ip = input.readInt256Tl()
-            val port = input.readIntTl()
+        override fun decode(reader: TlReader): AdnlAddressUdp6 {
+            val ip = reader.readBits128()
+            val port = reader.readInt()
             return AdnlAddressUdp6(ip, port)
         }
 
-        override fun encode(output: Output, value: AdnlAddressUdp6) {
-            output.writeInt256Tl(value.ip)
-            output.writeIntTl(value.port)
+        override fun encode(writer: TlWriter, value: AdnlAddressUdp6) {
+            writer.writeBits128(value.ip)
+            writer.writeInt(value.port)
         }
     }
 }
@@ -107,48 +89,24 @@ data class AdnlAddressUdp6(
 @JsonClassDiscriminator("@type")
 @SerialName("adnl.address.tunnel")
 @Serializable
-data class AdnlAddressTunnel(
-    @Serializable(Base64ByteArraySerializer::class)
-    val to: ByteArray,
+public data class AdnlAddressTunnel(
+    val to: Bits256,
     val pubkey: PublicKey
 ) : AdnlAddress {
-    constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
+    public constructor(to: ByteArray, pubkey: PublicKey) : this(Bits256(to), pubkey)
+    public constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
 
-    override fun toString(): String = buildString {
-        append("AdnlAddressTunnel(to=")
-        append(base64(to))
-        append(", pubKey=")
-        append(pubkey)
-        append(")")
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AdnlAddressTunnel) return false
-
-        if (!to.contentEquals(other.to)) return false
-        if (pubkey != other.pubkey) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = to.contentHashCode()
-        result = 31 * result + pubkey.hashCode()
-        return result
-    }
-
-    companion object : TlConstructor<AdnlAddressTunnel>(
+    public companion object : TlConstructor<AdnlAddressTunnel>(
         schema = "adnl.address.tunnel to:int256 pubkey:PublicKey = adnl.Address"
     ) {
-        override fun encode(output: Output, value: AdnlAddressTunnel) {
-            output.writeInt256Tl(value.to)
-            output.writeTl(PublicKey, value.pubkey)
+        override fun encode(writer: TlWriter, value: AdnlAddressTunnel) {
+            writer.writeBits256(value.to)
+            writer.write(PublicKey, value.pubkey)
         }
 
-        override fun decode(input: Input): AdnlAddressTunnel {
-            val to = input.readInt256Tl()
-            val pubKey = input.readTl(PublicKey)
+        override fun decode(reader: TlReader): AdnlAddressTunnel {
+            val to = reader.readBits256()
+            val pubKey = reader.read(PublicKey)
             return AdnlAddressTunnel(to, pubKey)
         }
     }

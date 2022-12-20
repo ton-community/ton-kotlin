@@ -2,46 +2,36 @@ package org.ton.tl
 
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
-import org.ton.crypto.crc32.crc32
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.crypto.crc32
 
-abstract class TlConstructor<T : Any>(
+public abstract class TlConstructor<T : Any>(
     schema: String,
     id: Int? = null,
 ) : TlCodec<T> {
-    val schema by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    public val schema: String by lazy(LazyThreadSafetyMode.PUBLICATION) {
         schema
             .replace("(", "")
             .replace(")", "")
             .replace(";", "")
     }
-    val id by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    public val id: Int by lazy(LazyThreadSafetyMode.PUBLICATION) {
         id ?: crc32(schema.toByteArray())
     }
 
-    override fun encodeBoxed(value: T): ByteArray = buildPacket {
-        encodeBoxed(this, value)
-    }.readBytes()
-
-    override fun encodeBoxed(output: Output, value: T) {
-        output.writeIntTl(id)
-        encode(output, value)
+    override fun encodeBoxed(writer: TlWriter, value: T) {
+        writer.writeInt(id)
+        encode(writer, value)
     }
 
-    fun <R : Any> Output.writeBoxedTl(codec: TlCodec<R>, value: R) = codec.encodeBoxed(this, value)
-
-    override fun decodeBoxed(input: Input): T {
-        val actualId = input.readIntTl()
+    override fun decodeBoxed(reader: TlReader): T {
+        val actualId = reader.readInt()
         require(actualId == id) {
             val idHex = id.reverseByteOrder().toUInt().toString(16).padStart(8, '0')
             val actualHex = actualId.reverseByteOrder().toUInt().toString(16).padStart(8, '0')
             "Invalid ID. expected: $idHex ($id) actual: $actualHex ($actualId)"
         }
-        return decode(input)
+        return decode(reader)
     }
-
-    fun <R : Any> Input.readBoxedTl(codec: TlConstructor<R>) = codec.decodeBoxed(this)
 
     override fun toString(): String = schema
 

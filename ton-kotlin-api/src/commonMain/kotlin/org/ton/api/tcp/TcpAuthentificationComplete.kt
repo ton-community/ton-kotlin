@@ -4,16 +4,11 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKey
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @SerialName("tcp.authentificationComplete")
 @Serializable
-data class TcpAuthentificationComplete(
+public data class TcpAuthentificationComplete(
     val key: PublicKey,
     val signature: ByteArray
 ) : TcpMessage {
@@ -31,20 +26,20 @@ data class TcpAuthentificationComplete(
         return result
     }
 
-    companion object : TlCodec<TcpAuthentificationComplete> by TcpAuthentificationCompleteTlConstructor
+    public companion object : TlCodec<TcpAuthentificationComplete> by TcpAuthentificationCompleteTlConstructor
 }
 
 private object TcpAuthentificationCompleteTlConstructor : TlConstructor<TcpAuthentificationComplete>(
     schema = "tcp.authentificationComplete key:PublicKey signature:bytes = tcp.Message"
 ) {
-    override fun decode(input: Input): TcpAuthentificationComplete {
-        val key = input.readTl(PublicKey)
-        val signature = input.readBytesTl()
+    override fun decode(reader: TlReader): TcpAuthentificationComplete {
+        val key = reader.read(PublicKey)
+        val signature = reader.readBytes()
         return TcpAuthentificationComplete(key, signature)
     }
 
-    override fun encode(output: Output, value: TcpAuthentificationComplete) {
-        output.writeTl(PublicKey, value.key)
-        output.writeBytesTl(value.signature)
+    override fun encode(writer: TlWriter, value: TcpAuthentificationComplete) {
+        writer.write(PublicKey, value.key)
+        writer.writeBytes(value.signature)
     }
 }

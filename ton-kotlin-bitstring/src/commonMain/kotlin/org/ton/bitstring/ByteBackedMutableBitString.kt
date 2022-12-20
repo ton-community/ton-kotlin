@@ -5,43 +5,45 @@ import kotlin.experimental.inv
 import kotlin.experimental.or
 import kotlin.jvm.JvmStatic
 
-open class ByteBackedMutableBitString(
-    override var bytes: ByteArray,
-    override var size: Int
-) : ByteBackedBitString(size, bytes), MutableBitString {
+public open class ByteBackedMutableBitString(
+    override var size: Int,
+    override var data: ByteArray,
+    override var offset: Int = 0,
+    override var length: Int = data.size - offset
+) : ByteBackedBitString(size, data, offset, length), MutableBitString {
     override operator fun set(index: Int, bit: Int) {
         set(index, bit != 0)
     }
 
     override operator fun set(index: Int, element: Boolean): Boolean {
-        val newBytes = expandByteArray(bytes, index + 1)
+        val newBytes = expandByteArray(data, index + 1)
         val previous = set(newBytes, index, element)
-        bytes = newBytes
+        data = newBytes
         return previous
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableBitString =
         slice(fromIndex..toIndex).toMutableBitString()
 
-    override fun plus(bits: BooleanArray) = plus(bits.asIterable())
-    override fun plus(bytes: ByteArray) = plus(bytes, bytes.size * Byte.SIZE_BITS)
+    override fun plus(bits: BooleanArray): ByteBackedMutableBitString = plus(bits.asIterable())
+    override fun plus(bytes: ByteArray): ByteBackedMutableBitString = plus(bytes, bytes.size * Byte.SIZE_BITS)
     override fun plus(bits: Iterable<Boolean>): ByteBackedMutableBitString = plus(bits.toList())
-    override fun plus(bits: Collection<Boolean>) = apply {
+    override fun plus(bits: Collection<Boolean>): ByteBackedMutableBitString = apply {
         if (bits is ByteBackedBitString) {
-            plus(bits.bytes, bits.size)
+            plus(bits.data, bits.size)
         } else {
             val bitsCount = bits.size
 
-            val newBytes = expandByteArray(bytes, size + bitsCount)
+            val newBytes = expandByteArray(data, size + bitsCount)
             bits.forEachIndexed { index, bit ->
                 set(newBytes, size + index, bit)
             }
-            bytes = newBytes
+            data = newBytes
             size += bitsCount
         }
     }
 
-    override fun plus(bytes: ByteArray, bits: Int) = apply {
+    override fun plus(bytes: ByteArray, bits: Int): ByteBackedMutableBitString = apply {
         checkSize(size + bits)
         if (bits != 0) {
             if (size % 8 == 0) {
@@ -61,9 +63,9 @@ open class ByteBackedMutableBitString(
     override fun listIterator(index: Int): MutableListIterator<Boolean> = BitStringMutableIterator(this, index)
 
     override fun add(element: Boolean): Boolean {
-        val newBytes = expandByteArray(bytes, size + 1)
+        val newBytes = expandByteArray(data, size + 1)
         set(newBytes, size, element)
-        bytes = newBytes
+        data = newBytes
         size += 1
         return true
     }
@@ -82,7 +84,7 @@ open class ByteBackedMutableBitString(
     }
 
     override fun clear() {
-        bytes = ByteArray(0)
+        data = ByteArray(0)
         size = 0
     }
 
@@ -104,13 +106,13 @@ open class ByteBackedMutableBitString(
         require(size % 8 == 0)
         require(bits % 8 == 0)
 
-        val newBytes = expandByteArray(bytes, size + bits)
+        val newBytes = expandByteArray(data, size + bits)
         byteArray.copyInto(
             destination = newBytes,
             destinationOffset = size / Byte.SIZE_BITS,
             endIndex = bits / Byte.SIZE_BITS
         )
-        bytes = newBytes
+        data = newBytes
         size += bits
     }
 
@@ -119,7 +121,7 @@ open class ByteBackedMutableBitString(
         val shift = bits % 8
         require(shift != 0)
 
-        val newBytes = expandByteArray(bytes, size + bits)
+        val newBytes = expandByteArray(data, size + bits)
         byteArray.copyInto(
             destination = newBytes,
             destinationOffset = size / Byte.SIZE_BITS,
@@ -129,13 +131,13 @@ open class ByteBackedMutableBitString(
         lastByte = lastByte shr (8 - shift)
         lastByte = lastByte shl (8 - shift)
         newBytes[(size + bits) / Byte.SIZE_BITS] = lastByte.toByte()
-        bytes = newBytes
+        data = newBytes
         size += bits
     }
 
     private fun appendWithDoubleShifting(byteArray: ByteArray, bits: Int) {
         val selfShift = size % 8
-        val data = bytes.copyOf(size / 8 + byteArray.size + 1)
+        val data = data.copyOf(size / 8 + byteArray.size + 1)
         val lastIndex = size / 8
         val lastBits = data[lastIndex].toInt() shr (8 - selfShift)
         var y = lastBits
@@ -151,7 +153,7 @@ open class ByteBackedMutableBitString(
         val shift = newSize % 8
         if (shift == 0) {
             val newBytes = expandByteArray(data, newSize)
-            bytes = newBytes
+            this.data = newBytes
             size = newSize
         } else {
             val newBytes = expandByteArray(data, newSize)
@@ -159,12 +161,12 @@ open class ByteBackedMutableBitString(
             lastByte = lastByte shr (8 - shift)
             lastByte = lastByte shl (8 - shift)
             newBytes[newBytes.lastIndex] = lastByte.toByte()
-            bytes = newBytes
+            this.data = newBytes
             size = newSize
         }
     }
 
-    class BitStringMutableIterator(
+    internal class BitStringMutableIterator(
         override val bitString: MutableBitString,
         index: Int = 0
     ) : BitStringIterator(bitString, index), MutableListIterator<Boolean> {
@@ -181,23 +183,23 @@ open class ByteBackedMutableBitString(
         }
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(size: Int = 0): ByteBackedMutableBitString {
+        public fun of(size: Int = 0): ByteBackedMutableBitString {
             val bytes = constructByteArray(size)
-            return ByteBackedMutableBitString(bytes, size)
+            return ByteBackedMutableBitString(size, bytes)
         }
 
         @JvmStatic
-        fun of(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): ByteBackedMutableBitString {
+        public fun of(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): ByteBackedMutableBitString {
             val bytes = constructByteArray(byteArray, size)
-            return ByteBackedMutableBitString(bytes, size)
+            return ByteBackedMutableBitString(size, bytes)
         }
 
         @JvmStatic
-        fun of(bitString: BitString, size: Int = bitString.size): ByteBackedMutableBitString {
+        public fun of(bitString: BitString, size: Int = bitString.size): ByteBackedMutableBitString {
             return if (bitString is ByteBackedBitString) {
-                of(bitString.bytes, size)
+                of(bitString.data, size)
             } else {
                 val result = of(size)
                 bitString.forEachIndexed { index, bit ->

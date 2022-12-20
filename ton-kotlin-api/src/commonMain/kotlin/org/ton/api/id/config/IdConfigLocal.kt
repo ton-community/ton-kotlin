@@ -10,6 +10,6 @@ import org.ton.api.pk.PrivateKey
 @Serializable
 @SerialName("id.config.local")
 @JsonClassDiscriminator("@type")
-data class IdConfigLocal(
+public data class IdConfigLocal(
     val id: PrivateKey
 )

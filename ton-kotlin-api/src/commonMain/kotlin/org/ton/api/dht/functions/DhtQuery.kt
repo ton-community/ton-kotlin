@@ -4,32 +4,29 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.dht.DhtNode
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
-interface DhtQueryFunction {
-    fun query(node: DhtNode)
+public interface DhtQueryFunction {
+    public fun query(node: DhtNode)
 }
 
 @SerialName("dht.query")
 @Serializable
-data class DhtQuery(
+public data class DhtQuery(
     val node: DhtNode
 ) {
-    companion object : TlCodec<DhtQuery> by DhtQueryTlConstructor
+    public companion object : TlCodec<DhtQuery> by DhtQueryTlConstructor
 }
 
 private object DhtQueryTlConstructor : TlConstructor<DhtQuery>(
     schema = "dht.query node:dht.node = True"
 ) {
-    override fun decode(input: Input): DhtQuery {
-        val node = input.readTl(DhtNode)
+    override fun decode(reader: TlReader): DhtQuery {
+        val node = reader.read(DhtNode)
         return DhtQuery(node)
     }
 
-    override fun encode(output: Output, value: DhtQuery) {
-        output.writeTl(DhtNode, value.node)
+    override fun encode(writer: TlWriter, value: DhtQuery) {
+        writer.write(DhtNode, value.node)
     }
 }

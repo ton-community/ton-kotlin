@@ -1,28 +1,27 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class LiteServerDebugVerbosity(
+public data class LiteServerDebugVerbosity(
     val value: Int
 ) {
-    companion object : TlCodec<LiteServerDebugVerbosity> by LiteServerDebugVerbosityTlConstructor
+    public companion object : TlCodec<LiteServerDebugVerbosity> by LiteServerDebugVerbosityTlConstructor
 }
 
 private object LiteServerDebugVerbosityTlConstructor : TlConstructor<LiteServerDebugVerbosity>(
     schema = "liteServer.debug.verbosity value:int = liteServer.debug.Verbosity"
 ) {
-    override fun decode(input: Input): LiteServerDebugVerbosity {
-        val value = input.readIntTl()
+    override fun decode(reader: TlReader): LiteServerDebugVerbosity {
+        val value = reader.readInt()
         return LiteServerDebugVerbosity(value)
     }
 
-    override fun encode(output: Output, value: LiteServerDebugVerbosity) {
-        output.writeIntTl(value.value)
+    override fun encode(writer: TlWriter, value: LiteServerDebugVerbosity) {
+        writer.writeInt(value.value)
     }
 }

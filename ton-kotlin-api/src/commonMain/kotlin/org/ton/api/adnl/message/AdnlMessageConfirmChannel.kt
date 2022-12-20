@@ -3,36 +3,31 @@
 package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.crypto.base64.Base64ByteArraySerializer
-import org.ton.crypto.base64.base64
-import org.ton.tl.TlConstructor
-import kotlinx.datetime.Instant
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
 import org.ton.bitstring.BitString
+import org.ton.tl.Bits256
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.confirmChannel")
 @Serializable
-data class AdnlMessageConfirmChannel(
-    val key: BitString,
-    val peer_key: BitString,
+public data class AdnlMessageConfirmChannel(
+    val key: Bits256,
+    val peer_key: Bits256,
     val date: Int
 ) : AdnlMessage {
-    constructor(
-        key: BitString,
-        peerKey: BitString,
+    public constructor(
+        key: Bits256,
+        peerKey: Bits256,
         date: Instant
     ) : this(key, peerKey, date.epochSeconds.toInt())
 
-    init {
-        require(key.size == 256) { "Invalid key size. expected: 256, actual: ${key.size}" }
-        require(peer_key.size == 256) { "Invalid peer_key size. expected: 256, actual: ${peer_key.size}" }
-    }
 
-    fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
+    public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -50,24 +45,22 @@ data class AdnlMessageConfirmChannel(
         return result
     }
 
-    override fun toString(): String = JSON.encodeToString(this)
-
-    companion object : TlConstructor<AdnlMessageConfirmChannel>(
+    public companion object : TlConstructor<AdnlMessageConfirmChannel>(
         schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",
     ) {
-        const val SIZE_BYTES = Int256TlConstructor.SIZE_BYTES + Int256TlConstructor.SIZE_BYTES + IntTlConstructor.SIZE_BYTES
+        public const val SIZE_BYTES: Int = (256 / Byte.SIZE_BYTES) * 2 + Int.SIZE_BYTES
 
-        override fun encode(output: Output, value: AdnlMessageConfirmChannel) {
-            output.writeInt256Tl(value.key.toByteArray())
-            output.writeInt256Tl(value.peer_key.toByteArray())
-            output.writeIntTl(value.date)
+        override fun encode(output: TlWriter, value: AdnlMessageConfirmChannel) {
+            output.writeBits256(value.key)
+            output.writeBits256(value.peer_key)
+            output.writeInt(value.date)
         }
 
-        override fun decode(input: Input): AdnlMessageConfirmChannel {
-            val key = input.readInt256Tl()
-            val peerKey = input.readInt256Tl()
-            val date = input.readIntTl()
-            return AdnlMessageConfirmChannel(BitString(key), BitString(peerKey), date)
+        override fun decode(input: TlReader): AdnlMessageConfirmChannel {
+            val key = input.readBits256()
+            val peerKey = input.readBits256()
+            val date = input.readInt()
+            return AdnlMessageConfirmChannel(key, peerKey, date)
         }
     }
 }

@@ -2,21 +2,22 @@ package org.ton.bitstring
 
 import org.ton.bitstring.exception.BitStringOverflowException
 import org.ton.bitstring.exception.BitStringUnderflowException
-import org.ton.crypto.hex
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.experimental.xor
 import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
-open class ByteBackedBitString protected constructor(
+public open class ByteBackedBitString constructor(
     override val size: Int,
-    open val bytes: ByteArray
+    public open val data: ByteArray,
+    public open val offset: Int = 0,
+    public open val length: Int = data.size - offset
 ) : BitString {
     override operator fun get(index: Int): Boolean = getOrNull(index) ?: throw BitStringUnderflowException()
 
     override fun getOrNull(index: Int): Boolean? =
-        if (index in 0..size) get(bytes, index) else null
+        if (index in 0..size) get(data, index) else null
 
     override fun plus(bits: BooleanArray): BitString = toMutableBitString().plus(bits)
     override fun plus(bits: Iterable<Boolean>): BitString = toMutableBitString().plus(bits)
@@ -34,14 +35,14 @@ open class ByteBackedBitString protected constructor(
 
     override fun toByteArray(augment: Boolean): ByteArray =
         if (augment && (size % 8 != 0)) {
-            BitString.appendAugmentTag(bytes, size)
+            BitString.appendAugmentTag(data, size)
         } else {
-            bytes.copyOf()
+            data.copyOf()
         }
 
     override fun toBooleanArray(): BooleanArray = (this as List<Boolean>).toBooleanArray()
 
-    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes, size)
+    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(data, size)
 
     override fun contains(element: Boolean): Boolean = any { it == element }
     override fun containsAll(elements: Collection<Boolean>): Boolean = elements.all { contains(it) }
@@ -54,18 +55,19 @@ open class ByteBackedBitString protected constructor(
     override fun iterator(): Iterator<Boolean> = listIterator()
 
     override fun xor(other: BitString): BitString {
+        require(size == other.size) { "BitStrings must be of the same size" }
         return if (other !is ByteBackedBitString) {
-            val result = ByteBackedMutableBitString.of(maxOf(size, other.size))
-            for (i in 0 until min(size, other.size)) {
+            val result = ByteBackedMutableBitString.of(size)
+            for (i in 0 until size) {
                 result[i] = get(i) xor other[i]
             }
             result
         } else {
-            val result = ByteArray(maxOf(bytes.size, other.bytes.size))
-            for (i in 0 until min(bytes.size, other.bytes.size)) {
-                result[i] = bytes[i] xor other.bytes[i]
+            val result = ByteArray(data.size)
+            for (i in data.indices) {
+                result[i] = data[i] xor other.data[i]
             }
-            of(result, maxOf(size, other.size))
+            of(result, size)
         }
     }
 
@@ -77,9 +79,9 @@ open class ByteBackedBitString protected constructor(
             }
             result
         } else {
-            val result = ByteArray(maxOf(bytes.size, other.bytes.size))
-            for (i in 0 until min(bytes.size, other.bytes.size)) {
-                result[i] = bytes[i] or other.bytes[i]
+            val result = ByteArray(maxOf(data.size, other.data.size))
+            for (i in 0 until min(data.size, other.data.size)) {
+                result[i] = data[i] or other.data[i]
             }
             of(result, maxOf(size, other.size))
         }
@@ -87,8 +89,11 @@ open class ByteBackedBitString protected constructor(
 
     override fun toString(): String {
         if (size == 0) return ""
-        val data = appendTag(bytes, size)
-        val result = StringBuilder(hex(data))
+        val data = appendTag(data, size)
+        val result = StringBuilder()
+        for (i in offset until offset + length) {
+            result.append(data[i].toUByte().toString(16).uppercase())
+        }
         when (size % 8) {
             0 -> {
                 result.deleteAt(result.lastIndex)
@@ -102,7 +107,7 @@ open class ByteBackedBitString protected constructor(
             4 -> result.deleteAt(result.lastIndex)
             else -> result.append('_')
         }
-        return result.toString().uppercase()
+        return result.toString()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -110,7 +115,7 @@ open class ByteBackedBitString protected constructor(
         if (other !is BitString) return false
         if (size != other.size) return false
         if (other is ByteBackedBitString) {
-            if (!bytes.contentEquals(other.bytes)) return false
+            if (!data.contentEquals(other.data)) return false
         } else {
             if (!toBooleanArray().contentEquals(other.toBooleanArray())) return false
         }
@@ -119,11 +124,11 @@ open class ByteBackedBitString protected constructor(
 
     override fun hashCode(): Int {
         var result = size
-        result = 31 * result + bytes.contentHashCode()
+        result = 31 * result + data.contentHashCode()
         return result
     }
 
-    open class BitStringIterator(
+    internal open class BitStringIterator(
         open val bitString: BitString,
         var index: Int = 0
     ) : ListIterator<Boolean> {
@@ -156,12 +161,12 @@ open class ByteBackedBitString protected constructor(
         }
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(size))
+        public fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(size))
 
         @JvmStatic
-        fun of(
+        public fun of(
             bytes: ByteArray = ByteArray(0),
             size: Int = bytes.size * Byte.SIZE_BITS
         ): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(bytes, size))
@@ -189,7 +194,7 @@ open class ByteBackedBitString protected constructor(
         }
 
         @JvmStatic
-        protected fun checkSize(size: Int) = require(size in 0..BitString.MAX_LENGTH) {
+        protected fun checkSize(size: Int): Unit = require(size in 0..BitString.MAX_LENGTH) {
             throw BitStringOverflowException()
         }
 

@@ -4,9 +4,9 @@ import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
 import kotlin.math.min
 
-class CachedBagOfCells(
-    override val roots: List<Cell>
-) : BagOfCells {
+public class CachedBagOfCells(
+    override val roots: Collection<Cell>
+) : BagOfCells, Collection<Cell> by roots {
     private var cellCount = 0
     private var cellHashmap = HashMap<Cell, Int>()
     private var cellList = ArrayList<CellInfo>()

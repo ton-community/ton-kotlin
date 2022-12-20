@@ -8,8 +8,8 @@ import org.ton.api.validator.config.ValidatorConfigGlobal
 
 @SerialName("liteclient.config.global")
 @Serializable
-data class LiteClientConfigGlobal(
+public data class LiteClientConfigGlobal(
     val dht: DhtConfigGlobal = DhtConfigGlobal(),
-    val liteservers: List<LiteServerDesc> = emptyList(),
+    val liteservers: Collection<LiteServerDesc> = emptyList(),
     val validator: ValidatorConfigGlobal = ValidatorConfigGlobal()
 )

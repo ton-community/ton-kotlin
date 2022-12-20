@@ -1,10 +1,20 @@
+plugins {
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
+}
+
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        val commonMain  by getting  {
             dependencies {
                 api(libs.ktor.utils)
                 implementation(libs.curve25519)
                 implementation(libs.serialization.core)
+            }
+        }
+        val commonTest by getting  {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
         val jvmMain by getting {
@@ -12,9 +22,9 @@ kotlin {
                 implementation(libs.bouncycastle)
             }
         }
-        val commonTest by getting {
+        val nativeMain by getting {
             dependencies {
-                implementation(kotlin("test"))
+                api(libs.serialization.core)
             }
         }
     }

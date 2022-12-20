@@ -1,12 +1,21 @@
 package org.ton.adnl.network
 
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DisposableHandle
 
-interface TcpClient : CoroutineScope {
-    suspend fun connect(host: String, port: Int)
+public interface TcpClient : Closeable, DisposableHandle {
+    val input: ByteReadChannel
+    val output: ByteWriteChannel
 
-    suspend fun send(data: ByteReadPacket)
+    public suspend fun connect(host: String, port: Int)
 
-    suspend fun receive(size: Int): ByteReadPacket
+    override fun dispose() {
+        try {
+            close()
+        } catch (ignore: Throwable) {}
+    }
+
+    fun close(cause: Throwable?)
 }

@@ -1,42 +1,39 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBoolTl
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeBoolTl
-import org.ton.tl.constructors.writeVectorTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @Serializable
-data class LiteServerPartialBlockProof(
+public data class LiteServerPartialBlockProof(
     val complete: Boolean,
     val from: TonNodeBlockIdExt,
     val to: TonNodeBlockIdExt,
-    val steps: List<LiteServerBlockLink>
+    val steps: Collection<LiteServerBlockLink>
 ) {
-    companion object : TlCodec<LiteServerPartialBlockProof> by LiteServerPartialBlockProofTlConstructor
+
+    public companion object : TlCodec<LiteServerPartialBlockProof> by LiteServerPartialBlockProofTlConstructor
 }
 
 private object LiteServerPartialBlockProofTlConstructor : TlConstructor<LiteServerPartialBlockProof>(
     schema = "liteServer.partialBlockProof complete:Bool from:tonNode.blockIdExt to:tonNode.blockIdExt steps:(vector liteServer.BlockLink) = liteServer.PartialBlockProof"
 ) {
-    override fun decode(input: Input): LiteServerPartialBlockProof {
-        val complete = input.readBoolTl()
-        val from = input.readTl(TonNodeBlockIdExt)
-        val to = input.readTl(TonNodeBlockIdExt)
-        val steps = input.readVectorTl(LiteServerBlockLink)
+    override fun decode(reader: TlReader): LiteServerPartialBlockProof {
+        val complete = reader.readBoolean()
+        val from = reader.read(TonNodeBlockIdExt)
+        val to = reader.read(TonNodeBlockIdExt)
+        val steps = reader.readCollection {
+            read(LiteServerBlockLink)
+        }
         return LiteServerPartialBlockProof(complete, from, to, steps)
     }
 
-    override fun encode(output: Output, value: LiteServerPartialBlockProof) {
-        output.writeBoolTl(value.complete)
-        output.writeTl(TonNodeBlockIdExt, value.from)
-        output.writeTl(TonNodeBlockIdExt, value.to)
-        output.writeVectorTl(value.steps, LiteServerBlockLink)
+    override fun encode(writer: TlWriter, value: LiteServerPartialBlockProof) {
+        writer.writeBoolean(value.complete)
+        writer.write(TonNodeBlockIdExt, value.from)
+        writer.write(TonNodeBlockIdExt, value.to)
+        writer.writeCollection(value.steps) {
+            write(LiteServerBlockLink, it)
+        }
     }
 }

@@ -10,6 +10,6 @@ import org.ton.api.adnl.AdnlAddressList
 @Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
-data class ValidatorConfigRandomLocal(
+public data class ValidatorConfigRandomLocal(
     val addr_list: AdnlAddressList
 ) : ValidatorConfigLocal

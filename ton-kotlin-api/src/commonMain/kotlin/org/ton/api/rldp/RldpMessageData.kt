@@ -4,16 +4,16 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.message")
-data class RldpMessageData(
-    override val id: BitString,
+public data class RldpMessageData(
+    override val id: Bits256,
     override val data: ByteArray
 ) : RldpMessage {
+
     override fun tlCodec(): TlCodec<RldpMessageData> = Companion
 
     override fun equals(other: Any?): Boolean {
@@ -32,18 +32,18 @@ data class RldpMessageData(
         return result
     }
 
-    companion object : TlConstructor<RldpMessageData>(
+    public companion object : TlConstructor<RldpMessageData>(
         schema = "rldp.message id:int256 data:bytes = rldp.Message",
     ) {
-        override fun encode(output: Output, value: RldpMessageData) {
-            output.writeInt256Tl(value.id)
-            output.writeBytesTl(value.data)
+        override fun encode(output: TlWriter, value: RldpMessageData) {
+            output.writeBits256(value.id)
+            output.writeBytes(value.data)
         }
 
-        override fun decode(input: Input): RldpMessageData {
-            val id = input.readInt256Tl()
-            val data = input.readBytesTl()
-            return RldpMessageData(BitString(id), data)
+        override fun decode(input: TlReader): RldpMessageData {
+            val id = input.readBits256()
+            val data = input.readBytes()
+            return RldpMessageData(id, data)
         }
     }
 }

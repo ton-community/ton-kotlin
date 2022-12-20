@@ -2,6 +2,7 @@ package org.ton.dht
 
 import org.ton.api.dht.DhtNode
 import org.ton.bitstring.BitString
+import org.ton.tl.Bits256
 
 class DhtBucket(
     k: Int
@@ -9,18 +10,18 @@ class DhtBucket(
     private val activeNodes = ArrayList<DhtRemoteNode>(k)
     private val backupNodes = ArrayList<DhtRemoteNode>(k)
 
-    val activeCount get() = activeNodes.size
+    public val activeCount get() = activeNodes.size
 
-    fun getNearestNode(
-        id: BitString,
+    public fun getNearestNode(
+        id: Bits256,
         k: Int
     ): List<DhtNode> {
         if (activeNodes.size == 0) return emptyList()
 
-        val map = HashMap<BitString, Int>()
+        val map = HashMap<Bits256, Int>()
         for (i in activeNodes.indices) {
             val node = activeNodes[i]
-            val distance = id xor node.key
+            val distance = id xor node.key.id
             map[distance] = i
         }
 
@@ -31,8 +32,8 @@ class DhtBucket(
             .toList()
     }
 
-    companion object {
-        const val PING_TIMEOUT_MS = 60_000L
-        const val MAX_MISSED_PINGS = 3L
+    public companion object {
+        public const val PING_TIMEOUT_MS = 60_000L
+        public const val MAX_MISSED_PINGS = 3L
     }
 }

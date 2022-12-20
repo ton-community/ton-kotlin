@@ -1,10 +1,12 @@
 package org.ton.adnl.query
 
 import org.ton.bitstring.BitString
+import org.ton.tl.Bits128
+import org.ton.tl.Bits256
 import kotlin.jvm.JvmInline
 import kotlin.random.Random
 
 @JvmInline
-value class AdnlQueryId(
-    val value: BitString = BitString(Random.nextBytes(32))
+public value class AdnlQueryId(
+    public val value: Bits256 = Bits256(Random.nextBytes(32))
 )

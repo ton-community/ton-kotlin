@@ -1,67 +1,36 @@
 package org.ton.lite.api.liteserver
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.boc.BagOfCells
-import org.ton.crypto.encodeHex
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.lite.api.liteserver.internal.readBoc
+import org.ton.lite.api.liteserver.internal.writeBoc
+import org.ton.tl.*
 
 @Serializable
-data class LiteServerAllShardsInfo(
+public data class LiteServerAllShardsInfo(
     val id: TonNodeBlockIdExt,
-    val proof: ByteArray,
-    val data: ByteArray
+    val proof: BagOfCells,
+    val data: BagOfCells
 ) {
-    fun dataBagOfCells() = BagOfCells(data)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerAllShardsInfo) return false
-        if (id != other.id) return false
-        if (!proof.contentEquals(other.proof)) return false
-        if (!data.contentEquals(other.data)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + proof.contentHashCode()
-        result = 31 * result + data.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = buildString {
-        append("LiteServerAllShardsInfo(id=")
-        append(id)
-        append(", proof=")
-        append(proof.encodeHex())
-        append(", data=")
-        append(data.encodeHex())
-        append(")")
-    }
-
-    companion object : TlCodec<LiteServerAllShardsInfo> by LiteServerAllShardsInfoTlConstructor
+    public companion object : TlCodec<LiteServerAllShardsInfo> by LiteServerAllShardsInfoTlConstructor
 }
 
 private object LiteServerAllShardsInfoTlConstructor : TlConstructor<LiteServerAllShardsInfo>(
     schema = "liteServer.allShardsInfo id:tonNode.blockIdExt proof:bytes data:bytes = liteServer.AllShardsInfo"
 ) {
-    override fun decode(input: Input): LiteServerAllShardsInfo {
-        val id = input.readTl(TonNodeBlockIdExt)
-        val proof = input.readBytesTl()
-        val data = input.readBytesTl()
+    override fun decode(reader: TlReader): LiteServerAllShardsInfo {
+        val id = reader.read(TonNodeBlockIdExt)
+        val proof = reader.readBoc()
+        val data = reader.readBoc()
         return LiteServerAllShardsInfo(id, proof, data)
     }
 
-    override fun encode(output: Output, value: LiteServerAllShardsInfo) {
-        output.writeTl(TonNodeBlockIdExt, value.id)
-        output.writeBytesTl(value.proof)
-        output.writeBytesTl(value.data)
+    override fun encode(writer: TlWriter, value: LiteServerAllShardsInfo) {
+        writer.write(TonNodeBlockIdExt, value.id)
+        writer.writeBoc(value.proof)
+        writer.writeBoc(value.data)
     }
 }

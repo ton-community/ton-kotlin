@@ -1,15 +1,13 @@
 package org.ton.api.fec
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.IntTlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class FecRaptorQ(
+public data class FecRaptorQ(
     override val data_size: Int,
     override val symbol_size: Int,
     override val symbol_count: Int
@@ -20,19 +18,19 @@ data class FecRaptorQ(
 
     override fun tlCodec(): TlCodec<FecRaptorQ> = Companion
 
-    companion object : TlConstructor<FecRaptorQ>(
+    public companion object : TlConstructor<FecRaptorQ>(
         schema = "fec.raptorQ data_size:int symbol_size:int symbols_count:int = fec.Type",
     ) {
-        override fun encode(output: Output, value: FecRaptorQ) {
-            output.writeIntTl(value.data_size)
-            output.writeIntTl(value.symbol_size)
-            output.writeIntTl(value.symbol_count)
+        override fun encode(output: TlWriter, value: FecRaptorQ) {
+            output.writeInt(value.data_size)
+            output.writeInt(value.symbol_size)
+            output.writeInt(value.symbol_count)
         }
 
-        override fun decode(input: Input): FecRaptorQ {
-            val data_size = input.readIntTl()
-            val symbol_size = input.readIntTl()
-            val symbol_count = input.readIntTl()
+        override fun decode(input: TlReader): FecRaptorQ {
+            val data_size = input.readInt()
+            val symbol_size = input.readInt()
+            val symbol_count = input.readInt()
             return FecRaptorQ(data_size, symbol_size, symbol_count)
         }
     }

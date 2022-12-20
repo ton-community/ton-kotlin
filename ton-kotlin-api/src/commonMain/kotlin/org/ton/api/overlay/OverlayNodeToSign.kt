@@ -5,51 +5,29 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.tl.*
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
 
 @Serializable
 @SerialName("overlay.node.toSign")
-data class OverlayNodeToSign(
+public data class OverlayNodeToSign(
     val id: AdnlIdShort,
-    val overlay: ByteArray,
+    val overlay: Bits256,
     val version: Int
-) : TlObject<OverlayNodeToSign>{
+) : TlObject<OverlayNodeToSign> {
     override fun tlCodec(): TlCodec<OverlayNodeToSign> = Companion
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is OverlayNodeToSign) return false
-
-        if (version != other.version) return false
-        if (!overlay.contentEquals(other.overlay)) return false
-        if (id != other.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + overlay.contentHashCode()
-        result = 31 * result + version
-        return result
-    }
-
-    companion object : TlConstructor<OverlayNodeToSign>(
+    public companion object : TlConstructor<OverlayNodeToSign>(
         schema = "overlay.node.toSign id:adnl.id.short overlay:int256 version:int = overlay.node.ToSign",
     ) {
-        override fun encode(output: Output, value: OverlayNodeToSign) {
-            output.writeTl(AdnlIdShort, value.id)
-            output.writeInt256Tl(value.overlay)
-            output.writeIntTl(value.version)
+        override fun encode(writer: TlWriter, value: OverlayNodeToSign) {
+            writer.write(AdnlIdShort, value.id)
+            writer.writeBits256(value.overlay)
+            writer.writeInt(value.version)
         }
 
-        override fun decode(input: Input): OverlayNodeToSign {
-            val id = input.readTl(AdnlIdShort)
-            val overlay = input.readInt256Tl()
-            val version = input.readIntTl()
+        override fun decode(reader: TlReader): OverlayNodeToSign {
+            val id = reader.read(AdnlIdShort)
+            val overlay = reader.readBits256()
+            val version = reader.readInt()
             return OverlayNodeToSign(id, overlay, version)
         }
     }

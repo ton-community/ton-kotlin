@@ -4,20 +4,18 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import org.ton.api.JSON
 import org.ton.bitstring.BitString
-import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.hex
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import org.ton.tl.constructors.*
 
 @Polymorphic
 @SerialName("adnl.message.query")
 @Serializable
-data class AdnlMessageQuery(
-    val query_id: BitString,
-    @Serializable(HexByteArraySerializer::class)
+public data class AdnlMessageQuery(
+    val query_id: Bits256,
     val query: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
@@ -34,21 +32,21 @@ data class AdnlMessageQuery(
         return result
     }
 
-    companion object : TlConstructor<AdnlMessageQuery>(
+    public companion object : TlConstructor<AdnlMessageQuery>(
         schema = "adnl.message.query query_id:int256 query:bytes = adnl.Message",
     ) {
-        fun sizeOf(value: AdnlMessageQuery): Int =
-            Int256TlConstructor.SIZE_BYTES + BytesTlConstructor.sizeOf(value.query)
+        public fun sizeOf(value: AdnlMessageQuery): Int =
+            256 / Byte.SIZE_BYTES + BytesTlConstructor.sizeOf(value.query)
 
-        override fun encode(output: Output, value: AdnlMessageQuery) {
-            output.writeInt256Tl(value.query_id.toByteArray())
-            output.writeBytesTl(value.query)
+        override fun encode(output: TlWriter, value: AdnlMessageQuery) {
+            output.writeBits256(value.query_id)
+            output.writeBytes(value.query)
         }
 
-        override fun decode(input: Input): AdnlMessageQuery {
-            val queryId = input.readInt256Tl()
-            val query = input.readBytesTl()
-            return AdnlMessageQuery(BitString(queryId), query)
+        override fun decode(input: TlReader): AdnlMessageQuery {
+            val queryId = input.readBits256()
+            val query = input.readBytes()
+            return AdnlMessageQuery(queryId, query)
         }
     }
 }

@@ -9,11 +9,11 @@ import org.ton.crypto.Decryptor
 import org.ton.tl.TlCombinator
 
 @Serializable
-sealed interface PrivateKey : Decryptor {
-    fun publicKey(): PublicKey
-    fun toAdnlIdShort(): AdnlIdShort = publicKey().toAdnlIdShort()
+public sealed interface PrivateKey : Decryptor {
+    public fun publicKey(): PublicKey
+    public fun toAdnlIdShort(): AdnlIdShort = publicKey().toAdnlIdShort()
 
-    companion object : TlCombinator<PrivateKey>(
+    public companion object : TlCombinator<PrivateKey>(
         PrivateKey::class,
         PrivateKeyUnencrypted::class to PrivateKeyUnencrypted,
         PrivateKeyEd25519::class to PrivateKeyEd25519.tlConstructor(),

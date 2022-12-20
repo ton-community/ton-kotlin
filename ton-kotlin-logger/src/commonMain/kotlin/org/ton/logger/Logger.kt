@@ -2,17 +2,17 @@ package org.ton.logger
 
 import kotlin.jvm.JvmStatic
 
-interface Logger {
-    var level: Level
+public interface Logger {
+    public var level: Level
 
-    fun log(level: Level, message: () -> String)
-    fun trace(message: () -> String) = log(Level.TRACE, message)
-    fun debug(message: () -> String) = log(Level.DEBUG, message)
-    fun info(message: () -> String) = log(Level.INFO, message)
-    fun warn(message: () -> String) = log(Level.WARN, message)
-    fun fatal(message: () -> String) = log(Level.FATAL, message)
+    public fun log(level: Level, message: () -> String)
+    public fun trace(message: () -> String): Unit = log(Level.TRACE, message)
+    public fun debug(message: () -> String): Unit = log(Level.DEBUG, message)
+    public fun info(message: () -> String): Unit = log(Level.INFO, message)
+    public fun warn(message: () -> String): Unit = log(Level.WARN, message)
+    public fun fatal(message: () -> String): Unit = log(Level.FATAL, message)
 
-    enum class Level {
+    public enum class Level {
         TRACE,
         DEBUG,
         INFO,
@@ -20,8 +20,8 @@ interface Logger {
         FATAL;
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun println(name: String, level: Level = Level.INFO): Logger = PrintLnLogger(name, level)
+        public fun println(name: String, level: Level = Level.INFO): Logger = PrintLnLogger(name, level)
     }
 }

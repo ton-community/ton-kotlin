@@ -1,35 +1,22 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.crypto.sha256.sha256
+import org.ton.crypto.sha256
 
-interface TlEncoder<in T> {
-    fun encode(value: T): ByteArray = buildPacket {
-        encode(this, value)
-    }.readBytes()
+public interface TlEncoder<in T> {
+    public fun encode(output: Output, value: T): Unit = encode(TlWriter(output), value)
+    public fun encode(writer: TlWriter, value: T)
 
-    fun encode(output: Output, value: T)
-
-    fun encodeBoxed(output: Output, value: T)
-    fun encodeBoxed(value: T): ByteArray = buildPacket {
-        encodeBoxed(this, value)
-    }.readBytes()
-
-    fun hash(value: T): ByteArray = sha256(encodeBoxed(value))
-}
-
-fun <R : Any> Output.writeOptionalTl(flag: Int, index: Int, encoder: TlEncoder<R>, value: R?) {
-    if (value != null) {
-        writeOptionalTl(flag, index) {
-            encoder.encode(this, value)
-        }
+    public fun encodeBoxed(output: Output, value: T): Unit = encodeBoxed(TlWriter(output), value)
+    public fun encodeBoxed(writer: TlWriter, value: T)
+    public fun encodeToByteArray(value: T, boxed: Boolean = true): ByteArray {
+        val output = BytePacketBuilder()
+        if (boxed) encodeBoxed(output, value) else encode(output, value)
+        return output.build().readBytes()
     }
-}
 
-fun Output.writeOptionalTl(flag: Int, index: Int, block: Output.() -> Unit) {
-    if (flag and (1 shl index) != 0) {
-        block()
-    }
+    public fun hash(value: T): ByteArray =
+        sha256(encodeToByteArray(value))
 }
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")

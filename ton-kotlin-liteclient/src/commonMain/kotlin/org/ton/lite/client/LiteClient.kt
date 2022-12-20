@@ -2,67 +2,88 @@
 
 package org.ton.lite.client
 
-import io.ktor.client.network.sockets.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.ton.adnl.connection.AdnlClientImpl
+import org.ton.adnl.network.IPAddress
+import org.ton.adnl.network.IPAddress.*
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
+import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
+import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellType
-import org.ton.crypto.encodeHex
-import org.ton.crypto.sha256.sha256
-import org.ton.lite.api.LiteApi
-import org.ton.lite.api.liteserver.LiteServerAccountId
-import org.ton.lite.api.liteserver.LiteServerBlockData
-import org.ton.lite.api.liteserver.LiteServerMasterchainInfoExt
-import org.ton.lite.api.liteserver.LiteServerVersion
-import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
+import org.ton.crypto.sha256
+import org.ton.lite.api.LiteApiClient
+import org.ton.lite.api.liteserver.*
+import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
+import org.ton.tl.Bits256
+import org.ton.tl.TlCodec
 import org.ton.tlb.parse
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
 private const val BLOCK_ID_CACHE_SIZE = 100
 
-open class LiteClient(
-    private val liteClientConfigGlobal: LiteClientConfigGlobal,
-    private val logger: Logger = PrintLnLogger("TON LiteClient")
+public class LiteClient(
+    coroutineContext: CoroutineContext,
+    private val liteClientConfigGlobal: LiteClientConfigGlobal
 ) : Closeable, CoroutineScope {
-
-    override val coroutineContext: CoroutineContext = Dispatchers.Default + CoroutineName("lite-client")
-    val liteApi: LiteApi = LiteApi { query ->
-        TODO()
-    }
-
+    private val logger: Logger = PrintLnLogger("LiteClient")
+    override val coroutineContext: CoroutineContext = coroutineContext + CoroutineName("LiteClient")
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
-    private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(TonNodeBlockIdExt())
+    private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(
+        TonNodeBlockIdExt(
+            0, 0, 0
+        )
+    )
     private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
     private var zeroStateId: TonNodeZeroStateIdExt by atomic(
         TonNodeZeroStateIdExt(
-            liteClientConfigGlobal.validator.zero_state
+            liteClientConfigGlobal.validator.zeroState
         )
     )
-    private var lastBlock: LiteServerBlockData? by atomic(null)
-    var serverVersion: Int by atomic(0)
-        private set
-    var serverCapabilities: Long by atomic(0L)
-        private set
-    var serverTime: Instant by atomic(Clock.System.now())
-        private set
-    var serverTimeGotAt: Instant by atomic(Clock.System.now())
-        private set
+    private var serverVersion: Int by atomic(0)
+    private var serverCapabilities: Long by atomic(0L)
+    private var serverTime: Instant by atomic(Clock.System.now())
+    private var serverTimeGotAt: Instant by atomic(Clock.System.now())
+    private var serverList = liteClientConfigGlobal.liteservers.shuffled()
+    private var currentServer: Int = 0
 
-    fun latency(): Duration = serverTimeGotAt - serverTime
+    public val liteApi = object : LiteApiClient {
+        override suspend fun sendRawQuery(query: ByteReadPacket): ByteReadPacket {
+            var attempts = 0
+            var exception: Exception? = null
+            var liteServer: LiteServerDesc? = null
+            while (attempts < 10) {
+                try {
+                    liteServer = serverList[currentServer++ % serverList.size]
+                    val client = AdnlClientImpl(liteServer)
+                    return client.sendQuery(query, 10.seconds)
+                } catch (e: Exception) {
+                    exception = e
+                    attempts++
+                    delay(100)
+                }
+            }
+            throw RuntimeException("Failed to send query to lite server: $liteServer", exception)
+        }
+    }
+
+    public fun latency(): Duration = serverTimeGotAt - serverTime
 
     fun setServerVersion(version: Int, capabilities: Long) {
         if (serverVersion != version || serverCapabilities != capabilities) {
@@ -80,22 +101,18 @@ open class LiteClient(
         return latency
     }
 
-    override fun close() = runBlocking {
-        knownBlockIds.clear()
-    }
-
-    suspend fun getServerTime(): Instant {
+    public suspend fun getServerTime(): Instant {
         val time = try {
-            liteApi.getTime()
+            liteApi.invoke(LiteServerGetTime)
         } catch (e: Exception) {
             throw RuntimeException("Can't get server time", e)
         }
         return Instant.fromEpochSeconds(time.now.toLong())
     }
 
-    suspend fun getServerVersion(): LiteServerVersion {
+    public suspend fun getServerVersion(): LiteServerVersion {
         val version = try {
-            liteApi.getVersion()
+            liteApi.invoke(LiteServerGetVersion)
         } catch (e: Exception) {
             throw RuntimeException("Can't get server version and time", e)
         }
@@ -103,75 +120,87 @@ open class LiteClient(
         return version
     }
 
-    suspend fun getLastBlockId(mode: Int = if (serverCapabilities and 2 != 0L) 0 else -1): TonNodeBlockIdExt {
-        val masterchainInfo = try {
-            if (mode < 0) {
-                liteApi.getMasterchainInfo()
-            } else {
-                liteApi.getMasterchainInfoExt(mode)
-            }
-        } catch (e: Exception) {
-            throw RuntimeException("Can't get masterchain info from server", e)
-        }
-        val blockId = masterchainInfo.last
+    public suspend fun getLastBlockId(mode: Int = if (serverCapabilities and 2 != 0L) 0 else -1): TonNodeBlockIdExt {
+        val last: TonNodeBlockIdExt
+        val init: TonNodeZeroStateIdExt
+        val ext: LiteServerMasterchainInfoExt?
 
-        logger.debug { "last masterchain block is $blockId" }
+        if (mode < 0) {
+            val masterchainInfo = liteApi.sendQuery(
+                LiteServerGetMasterchainInfo,
+                LiteServerMasterchainInfo,
+                LiteServerGetMasterchainInfo
+            )
+            last = masterchainInfo.last
+            init = masterchainInfo.init
+            ext = null
+        } else {
+            ext = liteApi.sendQuery(
+                LiteServerGetMasterchainInfoExt,
+                LiteServerMasterchainInfoExt,
+                LiteServerGetMasterchainInfoExt(mode)
+            )
+            last = ext.last
+            init = ext.init
+        }
+
+        logger.debug { "last masterchain block is $last" }
 
         var createdAt: Instant? = null
-        if (masterchainInfo is LiteServerMasterchainInfoExt) {
-            setServerVersion(masterchainInfo.version, masterchainInfo.capabilities)
-            setServerTime(masterchainInfo.now)
-            val serverNow = Instant.fromEpochSeconds(masterchainInfo.now.toLong())
-            val lastUtime = Instant.fromEpochSeconds(masterchainInfo.last_utime.toLong())
+        if (ext != null) {
+            setServerVersion(ext.version, ext.capabilities)
+            setServerTime(ext.now)
+            val serverNow = Instant.fromEpochSeconds(ext.now.toLong())
+            val lastUtime = Instant.fromEpochSeconds(ext.lastUtime.toLong())
             createdAt = lastUtime
-            if (masterchainInfo.last_utime > masterchainInfo.now) {
+            if (lastUtime > serverNow) {
                 logger.warn {
-                    "server claims to have a masterchain block $blockId created at $lastUtime " + "(${lastUtime - serverNow} in future)"
+                    "server claims to have a masterchain block $last created at $lastUtime (${lastUtime - serverNow} in future)"
                 }
             } else if (lastUtime < serverNow - 60.seconds) {
                 logger.warn {
-                    "server appears to be out of sync: its newest masterchain block is $blockId" + " created at $lastUtime (${serverNow - lastUtime} ago according to the server's clock)"
+                    "server appears to be out of sync: its newest masterchain block is $last created at $lastUtime (${serverNow - lastUtime} ago according to the server's clock)"
                 }
             } else if (lastUtime < serverTimeGotAt - 60.seconds) {
                 logger.warn {
-                    "either the server is out of sync, or the local clock is set incorrectly: the newest masterchain " + "block known to server is $blockId created at $lastUtime " + "(${serverNow - serverTimeGotAt} ago according to the local clock)"
+                    "either the server is out of sync, or the local clock is set incorrectly: the newest masterchain block known to server is $last created at $lastUtime (${serverNow - serverTimeGotAt} ago according to the local clock)"
                 }
             }
         }
 
         val currentZeroStateId = zeroStateId
         if (!currentZeroStateId.isValid()) {
-            zeroStateId = masterchainInfo.init
-            logger.info { "zero state id set to ${masterchainInfo.init}" }
-        } else if (masterchainInfo.init != currentZeroStateId) {
+            zeroStateId = init
+            logger.info { "zero state id set to ${init}" }
+        } else if (init != currentZeroStateId) {
             use {
-                throw IllegalStateException("masterchain zero state id suddenly changed: expected $zeroStateId, actual ${masterchainInfo.init}")
+                throw IllegalStateException("masterchain zero state id suddenly changed: expected $zeroStateId, actual $init")
             }
         }
-        registerBlockId(blockId)
+        registerBlockId(last)
         registerBlockId(
             TonNodeBlockIdExt(
-                Workchain.MASTERCHAIN_ID, Shard.ID_ALL, 0, zeroStateId.root_hash, zeroStateId.file_hash
+                Workchain.MASTERCHAIN_ID, Shard.ID_ALL, 0, zeroStateId.rootHash, zeroStateId.fileHash
             )
         )
         if (!lastMasterchainBlockId.isValid()) {
-            lastMasterchainBlockId = blockId
+            lastMasterchainBlockId = last
             lastMasterchainBlockIdTime = Clock.System.now()
-        } else if (lastMasterchainBlockId.seqno < masterchainInfo.last.seqno) {
-            lastMasterchainBlockId = blockId
+        } else if (lastMasterchainBlockId.seqno < last.seqno) {
+            lastMasterchainBlockId = last
             lastMasterchainBlockIdTime = Clock.System.now()
         }
         logger.debug {
-            "latest masterchain block known to server is:\n$blockId${
+            "latest masterchain block known to server is:\n$last${
                 if (createdAt != null) {
                     "\n  created at $createdAt (${Clock.System.now() - createdAt} ago)"
                 } else ""
             }"
         }
-        return blockId
+        return last
     }
 
-    suspend fun lookupBlock(blockId: TonNodeBlockId, timeout: Duration) = withTimeoutOrNull(timeout) {
+    public suspend fun lookupBlock(blockId: TonNodeBlockId, timeout: Duration) = withTimeoutOrNull(timeout) {
         var result: TonNodeBlockIdExt? = null
         while (isActive && result == null) {
             result = lookupBlock(blockId)
@@ -182,7 +211,7 @@ open class LiteClient(
         result
     }
 
-    suspend fun lookupBlock(
+    public suspend fun lookupBlock(
         blockId: TonNodeBlockId,
         lt: Long? = null,
         time: Instant? = null
@@ -195,7 +224,7 @@ open class LiteClient(
             return knownBlockId
         }
         val blockHeader = try {
-            liteApi.lookupBlock(blockId, lt, time?.epochSeconds?.toInt())
+            liteApi(LiteServerLookupBlock(blockId, lt, time?.epochSeconds?.toInt()))
         } catch (e: TonNotReadyException) {
             return null
         } catch (e: Exception) {
@@ -206,24 +235,24 @@ open class LiteClient(
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
-            BagOfCells(blockHeader.header_proof).first()
+            BagOfCells(blockHeader.headerProof).first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't parse block proof", e)
         }
-        val actualRootHash = blockProofCell.refs.firstOrNull()?.hash(level = 0)
+        val actualRootHash = blockProofCell.refs.firstOrNull()?.hash(level = 0)?.toBitString()
         check(
             blockProofCell.type == CellType.MERKLE_PROOF &&
-                    blockHeader.id.root_hash.contentEquals(actualRootHash)
+                    blockHeader.id.rootHash.toBitString() == actualRootHash
         ) {
             "Root hash mismatch:" +
-                    "\n expected: ${blockHeader.id.root_hash.encodeHex()}" +
-                    "\n   actual: ${actualRootHash?.encodeHex()}"
+                    "\n expected: ${blockHeader.id.rootHash}" +
+                    "\n   actual: $actualRootHash"
         }
         registerBlockId(blockHeader.id)
         return blockHeader.id
     }
 
-    suspend fun getBlock(blockId: TonNodeBlockIdExt, timeout: Duration) = withTimeoutOrNull(timeout) {
+    public suspend fun getBlock(blockId: TonNodeBlockIdExt, timeout: Duration) = withTimeoutOrNull(timeout) {
         var result: Block? = null
         while (isActive && result == null) {
             result = getBlock(blockId)
@@ -236,30 +265,26 @@ open class LiteClient(
 
     suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
         val blockData = try {
-            liteApi.getBlock(blockId)
+            liteApi(LiteServerGetBlock(blockId))
         } catch (e: TonNotReadyException) {
             return null
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
         logger.debug { "got ${blockData.data.size} data bytes for block $blockId" }
-        val actualFileHash = sha256(blockData.data)
-        check(blockId.file_hash.contentEquals(actualFileHash)) {
-            "file hash mismatch for block $blockId, expected: ${
-                blockId.file_hash.encodeHex().uppercase()
-            } , actual: ${actualFileHash.encodeHex().uppercase()}"
+        val actualFileHash = sha256(blockData.data.toByteArray()).toBitString()
+        check(blockId.fileHash.toBitString() == actualFileHash) {
+            "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
         }
         registerBlockId(blockId)
         val root = try {
-            blockData.dataBagOfCells().first()
+            blockData.data.first()
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
-        val actualRootHash = root.hash()
-        check(blockId.root_hash.contentEquals(actualRootHash)) {
-            "block root hash mismatch, expected: ${
-                blockId.root_hash.encodeHex().uppercase()
-            } , actual: ${actualRootHash.encodeHex().uppercase()}"
+        val actualRootHash = root.hash().toBitString()
+        check(blockId.rootHash.toBitString() == actualRootHash) {
+            "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
         }
         val block = try {
             root.parse(Block)
@@ -274,10 +299,10 @@ open class LiteClient(
             prevSeqno = prev1.seq_no
             val prevBlockIdExt = TonNodeBlockIdExt(
                 shard.workchain_id,
-                (if (block.info.after_split) Shard.shardParent(shard.shard_prefix) else shard.shard_prefix).toLong(),
+                (if (block.info.after_split) Shard.shardParent(shard.shard_prefix.toLong()) else shard.shard_prefix.toLong()),
                 prev1.seq_no.toInt(),
-                prev1.root_hash,
-                prev1.file_hash
+                Bits256(prev1.root_hash),
+                Bits256(prev1.file_hash)
             )
             check(!block.info.after_split || prev1.seq_no != 0u) {
                 "shardchains cannot be split immediately after initial state"
@@ -292,17 +317,17 @@ open class LiteClient(
             prevs = listOf(
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix, true).toLong(),
+                    Shard.shardChild(shard.shard_prefix.toLong(), true).toLong(),
                     prev1.seq_no.toInt(),
-                    prev1.root_hash,
-                    prev1.file_hash
+                    Bits256(prev1.root_hash),
+                    Bits256(prev1.file_hash)
                 ),
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix, false).toLong(),
+                    Shard.shardChild(shard.shard_prefix.toLong(), false).toLong(),
                     prev2.seq_no.toInt(),
-                    prev2.root_hash,
-                    prev2.file_hash
+                    Bits256(prev2.root_hash),
+                    Bits256(prev2.file_hash)
                 ),
             )
             check(prev1.seq_no != 0u && prev2.seq_no != 0u) {
@@ -323,8 +348,8 @@ open class LiteClient(
                 Workchain.MASTERCHAIN_ID,
                 Shard.ID_ALL,
                 mcRef.seq_no.toInt(),
-                mcRef.root_hash,
-                mcRef.file_hash
+                Bits256(mcRef.root_hash),
+                Bits256(mcRef.file_hash)
             )
         }
         logger.debug { "reference masterchain block: $mcBlockId" }
@@ -342,32 +367,32 @@ open class LiteClient(
         return getAccount(address, getCachedLastMasterchainBlockId(), mode)
     }
 
-    suspend fun getAccount(
+    public suspend fun getAccount(
         address: String?, blockId: TonNodeBlockIdExt, mode: Int = 0
     ): AccountInfo? = getAccount(address?.let { parseAccountId(address) }, blockId, mode)
 
-    suspend fun getAccount(
+    public suspend fun getAccount(
         address: LiteServerAccountId?, blockId: TonNodeBlockIdExt, mode: Int = 0
     ): AccountInfo? {
         if (address == null) return null
         logger.debug {
             "requesting account state for ${address.workchain}:${
-                address.id.encodeHex().uppercase()
+                address.id
             } with respect to $blockId with mode $mode"
         }
-        val accountState = liteApi.getAccountState(blockId, address)
-        val shardBlock = accountState.shard_blk
+        val accountState = liteApi(LiteServerGetAccountState(blockId, address))
+        val shardBlock = accountState.shardBlock
         logger.debug {
             "got account state for ${address.workchain}:${
-                address.id.encodeHex().uppercase()
+                address.id
             } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
         }
         if (accountState.state.isEmpty()) return null
-        val stateBoc = accountState.stateBagOfCells()
-        return stateBoc.first().parse(Account) as? AccountInfo
+        val stateBoc = accountState.stateAsAccount()
+        return stateBoc.value as? AccountInfo
     }
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, methodName: String, vararg params: VmStackValue
     ): VmStack = coroutineScope {
         runSmcMethod(
@@ -375,29 +400,29 @@ open class LiteClient(
         )
     }
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, method: Long, vararg params: VmStackValue
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params.asIterable())
     }
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, methodName: String, params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params)
     }
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, method: Long, params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
         runSmcMethod(address, getCachedLastMasterchainBlockId(), method, params)
     }
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, vararg params: VmStackValue
     ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), *params)
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, params: Iterable<VmStackValue>
     ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), params)
 
@@ -409,7 +434,11 @@ open class LiteClient(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, params: Iterable<VmStackValue>
     ): VmStack {
         logger.debug { "run: $address - ${params.toList()}" }
-        val result = liteApi.runSmcMethod(0b100, blockId, address, method, params)
+        val result = liteApi(
+            LiteServerRunSmcMethod(
+                0b100, blockId, address, method, LiteServerRunSmcMethod.createParams(params)
+            )
+        )
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
@@ -425,6 +454,10 @@ open class LiteClient(
         }
     }
 
+    override fun close(): Unit = runBlocking {
+        knownBlockIds.clear()
+    }
+
     private suspend fun getCachedLastMasterchainBlockId(): TonNodeBlockIdExt {
         val cachedLastMasterchainBlockId = lastMasterchainBlockId
         if (!cachedLastMasterchainBlockId.isValid()) return getLastBlockId()
@@ -437,9 +470,9 @@ open class LiteClient(
 
     private fun parseBlockIdExt(string: String): TonNodeBlockIdExt {
         return if (string.endsWith(')')) {
-            TonNodeBlockIdExt(TonNodeBlockId(string))
+            TonNodeBlockIdExt(TonNodeBlockId.parse(string))
         } else {
-            TonNodeBlockIdExt(string)
+            TonNodeBlockIdExt.parse(string)
         }
     }
 
