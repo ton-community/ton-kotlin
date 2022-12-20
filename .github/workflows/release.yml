@@ -6,7 +6,7 @@ on:
       - 'v*'
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
       SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
