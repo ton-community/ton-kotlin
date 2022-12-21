@@ -63,7 +63,7 @@ abstract class NativeExtension(
     val mainSourceSet = kotlin.sourceSets.maybeCreate("${sourceSetName}Main")
     val testSourceSet = kotlin.sourceSets.maybeCreate("${sourceSetName}Test")
 
-    abstract fun target(name: String, configure: NativeExtension.() -> Unit = {})
+    abstract fun target(name: String, configure: NativeExtension.(target: KotlinNativeTarget) -> Unit = {})
     abstract fun common(name: String, configure: NativeExtension.() -> Unit = {})
 }
 
@@ -83,10 +83,10 @@ class IdeaNativeExtension(
         }
     private val registeredTargets = ArrayList<KotlinNativeTarget>()
 
-    override fun target(name: String, configure: NativeExtension.() -> Unit) {
+    override fun target(name: String, configure: NativeExtension.(target: KotlinNativeTarget) -> Unit) {
         if (name != hostPreset.name) return
         val target = kotlin.targetFromPreset(hostPreset, sourceSetName) {
-            configure()
+            configure(this)
         }
         registeredTargets.add(target)
         mainSourceSet.kotlin.srcDir("${hostPreset.name}Main/src")
@@ -112,11 +112,11 @@ class BuildNativeExtension(
 ) : NativeExtension(project, kotlin, sourceSetName) {
     private val nativePresets = kotlin.presets.filterIsInstance<AbstractKotlinNativeTargetPreset<*>>()
 
-    override fun target(name: String, configure: NativeExtension.() -> Unit) {
+    override fun target(name: String, configure: NativeExtension.(target: KotlinNativeTarget) -> Unit) {
         val preset = nativePresets.singleOrNull { it.name == name } ?: return
 
         val target = kotlin.targetFromPreset(preset) {
-            configure()
+            configure(this)
         }
 
         kotlin.sourceSets.getByName("${preset.name}Main").dependsOn(mainSourceSet)

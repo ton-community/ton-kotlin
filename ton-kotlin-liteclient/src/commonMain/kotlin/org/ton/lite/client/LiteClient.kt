@@ -26,7 +26,6 @@ import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tl.Bits256
-import org.ton.tl.TlCodec
 import org.ton.tlb.parse
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
@@ -235,7 +234,7 @@ public class LiteClient(
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
-            BagOfCells(blockHeader.headerProof).first()
+            blockHeader.headerProof.first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't parse block proof", e)
         }
@@ -271,7 +270,6 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
-        logger.debug { "got ${blockData.data.size} data bytes for block $blockId" }
         val actualFileHash = sha256(blockData.data.toByteArray()).toBitString()
         check(blockId.fileHash.toBitString() == actualFileHash) {
             "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
@@ -387,7 +385,7 @@ public class LiteClient(
                 address.id
             } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
         }
-        if (accountState.state.isEmpty()) return null
+        if (accountState.state.roots.isEmpty()) return null
         val stateBoc = accountState.stateAsAccount()
         return stateBoc.value as? AccountInfo
     }
@@ -442,11 +440,10 @@ public class LiteClient(
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
-        val resultBytes = checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
+        val boc = checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
         // TODO: check proofs
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
-        val boc = BagOfCells(resultBytes)
         return try {
             boc.first().parse(VmStack)
         } catch (e: Exception) {

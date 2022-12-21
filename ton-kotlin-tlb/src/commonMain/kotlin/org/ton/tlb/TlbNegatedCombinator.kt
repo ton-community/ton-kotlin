@@ -26,7 +26,7 @@ abstract class TlbNegatedCombinator<T : Any>(
     }
 
     override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, T> {
-        val preloadBits = cellSlice.loadBits(cellSlice.remainingBits)
+        val preloadBits = cellSlice.preloadBits(cellSlice.remainingBits)
         val constructor = findTlbLoaderOrNull(preloadBits) as? TlbNegatedConstructor<out T>
             ?: throw UnknownTlbConstructorException()
         cellSlice.skipBits(constructor.id.size)

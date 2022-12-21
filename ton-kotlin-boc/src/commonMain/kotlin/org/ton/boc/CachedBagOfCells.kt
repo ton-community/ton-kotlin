@@ -6,7 +6,7 @@ import kotlin.math.min
 
 public class CachedBagOfCells(
     override val roots: Collection<Cell>
-) : BagOfCells, Collection<Cell> by roots {
+) : BagOfCells, Iterable<Cell> {
     private var cellCount = 0
     private var cellHashmap = HashMap<Cell, Int>()
     private var cellList = ArrayList<CellInfo>()

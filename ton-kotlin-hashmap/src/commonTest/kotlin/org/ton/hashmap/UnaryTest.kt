@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 
 class UnaryTest {
     @Test
-    fun `test (de)serialization Unary`() {
+    fun `test serialization Unary`() {
         val codec = Unary.tlbCodec()
 
         testSerialization(codec, UnaryZero)

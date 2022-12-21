@@ -4,9 +4,8 @@ kotlin {
             dependencies {
                 api(projects.tonKotlinCrypto)
                 api(projects.tonKotlinBitstring)
-                implementation(libs.ktor.utils)
-                implementation(libs.serialization.json)
-                implementation(kotlin("reflect"))
+                api(libs.ktor.utils)
+                api(libs.serialization.json)
             }
         }
         val commonTest by getting {

@@ -1,7 +1,9 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.atomicfu") version "1.7.20"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
@@ -33,16 +35,14 @@ allprojects {
                 target("macosArm64")
                 target("iosX64")
                 target("iosArm64")
-                target("iosArm32")
                 target("iosSimulatorArm64")
-                target("watchosArm32")
-                target("watchosArm64")
-                target("watchosX86")
-                target("watchosX64")
-                target("watchosSimulatorArm64")
-                target("tvosArm64")
-                target("tvosX64")
-                target("tvosSimulatorArm64")
+//                target("watchosArm64")
+//                target("watchosX86")
+//                target("watchosX64")
+//                target("watchosSimulatorArm64")
+//                target("tvosArm64")
+//                target("tvosX64")
+//                target("tvosSimulatorArm64")
             }
             common("mingw") {
                 target("mingwX64")
@@ -63,6 +63,18 @@ allprojects {
 
     afterEvaluate {
         formatSourceSets()
+    }
+}
+
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                subprojects {
+                    api(this)
+                }
+            }
+        }
     }
 }
 

@@ -13,7 +13,6 @@ class VmStackTest {
         val cell = CellBuilder.createCell {
             storeTlb(VmStack.tlbCodec(), stack)
         }
-        println(cell)
         val stack2 = cell.parse {
             loadTlb(VmStack.tlbCodec())
         }
@@ -32,7 +31,6 @@ class VmStackTest {
         val cell = CellBuilder.createCell {
             storeTlb(VmStack.tlbCodec(), stack)
         }
-        println(cell)
         val stack2 = cell.parse {
             loadTlb(VmStack.tlbCodec())
         }
