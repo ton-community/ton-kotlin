@@ -17,7 +17,7 @@ class WordsTest {
     }
 
     @Test
-    fun `test word '+ '`() = testFift {
+    fun `test word plus`() = testFift {
         interpret("1 2 +")
         assertEquals(BigInt(3), stack.popInt())
         interpret("5 -10 +")
@@ -28,7 +28,7 @@ class WordsTest {
     }
 
     @Test
-    fun `test word '- '`() = testFift {
+    fun `test word minus`() = testFift {
         interpret("5 3 -")
         assertEquals(BigInt(2), stack.popInt())
         interpret("-10 -3 -")
@@ -39,7 +39,7 @@ class WordsTest {
     }
 
     @Test
-    fun `test word 'negate '`() = testFift {
+    fun `test word negate`() = testFift {
         interpret("53 negate")
         assertEquals(BigInt(-53), stack.popInt())
         interpret("-10 negate")
