@@ -22,10 +22,10 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Tests
+      - name: Setup gradle
         uses: gradle/gradle-build-action@v2
-        with:
-          arguments: jvmTest
+      - name: Run tests
+        run: ./gradlew jvmTest --stacktrace
       - name: Upload build reports
         uses: actions/upload-artifact@v3
         with:
