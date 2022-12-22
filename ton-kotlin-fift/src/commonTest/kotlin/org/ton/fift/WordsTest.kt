@@ -1,7 +1,6 @@
 package org.ton.fift
 
 import org.ton.bigint.BigInt
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

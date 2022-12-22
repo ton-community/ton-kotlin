@@ -22,8 +22,6 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Setup gradle
-        uses: gradle/gradle-build-action@v2
       - name: Run tests
         run: ./gradlew jvmTest --stacktrace
       - name: Upload build reports
