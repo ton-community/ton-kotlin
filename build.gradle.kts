@@ -7,7 +7,6 @@ plugins {
 }
 
 val isCI = System.getenv("CI") == "true"
-version = "0.2.0"
 
 //val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
 //if (isCI) {
@@ -17,6 +16,9 @@ version = "0.2.0"
 //}
 
 allprojects {
+    group = "org.ton"
+    version = "0.2.0"
+
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
 
