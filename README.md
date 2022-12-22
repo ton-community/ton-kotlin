@@ -11,7 +11,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.0")
+    implementation("org.ton:ton-kotlin:0.2.1")
 }
 ```
 
@@ -21,7 +21,8 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://search.maven.org/artifact/io.github.andreypfau/org.ton/ton-kotlin/0.1.0/pom
+[maven-central]: https://search.maven.org/artifact/io.github.andreypfau/org.ton/ton-kotlin/0.2.1/pom
+
 [license]: LICENSE
 [kotlin]: http://kotlinlang.org
 [ton]: https://ton.org

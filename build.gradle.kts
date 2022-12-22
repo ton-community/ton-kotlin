@@ -17,10 +17,12 @@ val isCI = System.getenv("CI") == "true"
 
 allprojects {
     group = "org.ton"
-    version = "0.2.0"
+    version = "0.2.1"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     repositories {
         mavenCentral()
@@ -73,6 +75,57 @@ allprojects {
     afterEvaluate {
         formatSourceSets()
     }
+
+    val javadocJar by tasks.registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+    }
+
+    publishing {
+        publications.withType<MavenPublication> {
+            artifact(javadocJar.get())
+            pom {
+                name.set("ton-kotlin")
+                description.set("Kotlin/Multiplatform SDK for The Open Network")
+                url.set("https://github.com/andreypfau/ton-kotlin")
+                licenses {
+                    license {
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("andreypfau")
+                        name.set("Andrey Pfau")
+                        email.set("andreypfau@ton.org")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/andreypfau/ton-kotlin.git")
+                    developerConnection.set("scm:git:ssh://github.com/andreypfau/ton-kotlin.git")
+                    url.set("https://github.com/andreypfau/ton-kotlin")
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/andreypfau/ton-kotlin")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+    }
+
+    signing {
+        val secretKey = project.findProperty("signing.secretKey") as? String ?: System.getenv("SIGNING_SECRET_KEY")
+        val password = project.findProperty("signing.password") as? String ?: System.getenv("SIGNING_PASSWORD")
+        isRequired = secretKey != null && password != null
+        useInMemoryPgpKeys(secretKey, password)
+        sign(publishing.publications)
+    }
 }
 
 kotlin {
@@ -85,57 +138,6 @@ kotlin {
             }
         }
     }
-}
-
-val javadocJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("javadoc")
-}
-
-publishing {
-    publications.withType<MavenPublication> {
-        artifact(javadocJar.get())
-        pom {
-            name.set("ton-kotlin")
-            description.set("Kotlin/Multiplatform SDK for The Open Network")
-            url.set("https://github.com/andreypfau/ton-kotlin")
-            licenses {
-                license {
-                    name.set("The Apache Software License, Version 2.0")
-                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                }
-            }
-            developers {
-                developer {
-                    id.set("andreypfau")
-                    name.set("Andrey Pfau")
-                    email.set("andreypfau@ton.org")
-                }
-            }
-            scm {
-                connection.set("scm:git:git://github.com/andreypfau/ton-kotlin.git")
-                developerConnection.set("scm:git:ssh://github.com/andreypfau/ton-kotlin.git")
-                url.set("https://github.com/andreypfau/ton-kotlin")
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/andreypfau/ton-kotlin")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
-
-signing {
-    val secretKey = project.findProperty("signing.secretKey") as? String ?: System.getenv("SIGNING_SECRET_KEY")
-    val password = project.findProperty("signing.password") as? String ?: System.getenv("SIGNING_PASSWORD")
-    isRequired = secretKey != null && password != null
-    useInMemoryPgpKeys(secretKey, password)
-    sign(publishing.publications)
 }
 
 nexusPublishing {
