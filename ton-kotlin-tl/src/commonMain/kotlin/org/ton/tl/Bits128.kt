@@ -8,7 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
+import org.ton.bitstring.toBitString
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -16,7 +16,7 @@ import kotlin.jvm.JvmInline
 public value class Bits128(
     public val value: BitString
 ) {
-    public constructor(value: ByteArray) : this(ByteBackedBitString(128, value))
+    public constructor(value: ByteArray) : this(value.toBitString())
 
     init {
         require(value.size == 128) { "Bits128 must be 128 bits long" }

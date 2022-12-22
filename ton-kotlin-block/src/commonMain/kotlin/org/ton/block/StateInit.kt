@@ -16,17 +16,17 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 data class StateInit(
-    val split_depth: Maybe<Int>,
+    val split_depth: Maybe<UInt>,
     val special: Maybe<TickTock>,
     val code: Maybe<Cell>,
     val data: Maybe<Cell>,
     val library: HashMapE<SimpleLib>
 ) {
-    constructor(
+    public constructor(
         code: Cell? = null,
         data: Cell? = null,
         library: HashMapE<SimpleLib> = HashMapE.of(),
-        splitDepth: Int? = null,
+        splitDepth: UInt? = null,
         special: TickTock? = null
     ) : this(
         splitDepth.toMaybe(), special.toMaybe(), code.toMaybe(), data.toMaybe(), library
@@ -34,9 +34,9 @@ data class StateInit(
 
     override fun toString(): String = "split_depth:$split_depth special:$special code:$code data:$data library:$library"
 
-    companion object : TlbCodec<StateInit> by StateInitTlbConstructor {
+    public companion object : TlbCodec<StateInit> by StateInitTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<StateInit> = StateInitTlbConstructor
+        public fun tlbCodec(): TlbConstructor<StateInit> = StateInitTlbConstructor
     }
 }
 

@@ -1,7 +1,7 @@
 package org.ton.bitstring.exception
 
-public class BitStringOverflowException(
+class BitStringOverflowException(
     override val message: String? = "BitString overflow"
 ) : RuntimeException()
 
-public class BitStringUnderflowException : RuntimeException("BitString underflow")
+class BitStringUnderflowException : RuntimeException("BitString underflow")

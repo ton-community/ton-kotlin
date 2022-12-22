@@ -1,6 +1,5 @@
 package org.ton.api.dht
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
@@ -11,18 +10,9 @@ import org.ton.tl.*
 public data class DhtValue(
     val key: DhtKeyDescription,
     val value: ByteArray,
-    @Serializable(with = InstantIntSerializer::class)
-    val ttl: Instant,
+    val ttl: Int,
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtValue> {
-    public constructor(
-        key: DhtKeyDescription,
-        value: ByteArray,
-        ttl: Int,
-        signature: ByteArray
-    ) : this(key, value, Instant.fromEpochSeconds(ttl.toUInt().toLong()), signature)
-
-    val ttlAsInt: Int get() = ttl.epochSeconds.toInt()
 
     override fun signed(privateKey: PrivateKey): DhtValue =
         copy(signature = privateKey.sign(tlCodec().encodeToByteArray(this)))
@@ -45,7 +35,7 @@ public data class DhtValue(
     override fun hashCode(): Int {
         var result = key.hashCode()
         result = 31 * result + value.contentHashCode()
-        result = 31 * result + ttlAsInt
+        result = 31 * result + ttl
         result = 31 * result + signature.contentHashCode()
         return result
     }
@@ -56,18 +46,18 @@ public data class DhtValue(
 private object DhtValueTlConstructor : TlConstructor<DhtValue>(
     schema = "dht.value key:dht.keyDescription value:bytes ttl:int signature:bytes = dht.Value"
 ) {
-    override fun encode(output: TlWriter, value: DhtValue) {
-        output.write(DhtKeyDescription, value.key)
-        output.writeBytes(value.value)
-        output.writeInt(value.ttlAsInt)
-        output.writeBytes(value.signature)
+    override fun encode(writer: TlWriter, value: DhtValue) {
+        writer.write(DhtKeyDescription, value.key)
+        writer.writeBytes(value.value)
+        writer.writeInt(value.ttl)
+        writer.writeBytes(value.signature)
     }
 
-    override fun decode(input: TlReader): DhtValue {
-        val key = input.read(DhtKeyDescription)
-        val value = input.readBytes()
-        val ttl = input.readInt()
-        val signature = input.readBytes()
+    override fun decode(reader: TlReader): DhtValue {
+        val key = reader.read(DhtKeyDescription)
+        val value = reader.readBytes()
+        val ttl = reader.readInt()
+        val signature = reader.readBytes()
         return DhtValue(key, value, ttl, signature)
     }
 }
