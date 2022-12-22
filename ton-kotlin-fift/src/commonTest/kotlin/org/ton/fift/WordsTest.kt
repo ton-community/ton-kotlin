@@ -1,24 +1,12 @@
 package org.ton.fift
 
-import io.ktor.utils.io.core.*
 import org.ton.bigint.BigInt
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-fun testFift(block: FiftInterpretator.() -> Unit) {
-    val fift = FiftInterpretator(output = {})
-    fift.apply(block)
-    assertTrue(fift.stack.isEmpty)
-}
-
-fun main() {
-    val a = buildPacket {
-
-    }
-    a.readByte()
-}
-
+@Ignore
 class WordsTest {
     @Test
     fun testBasicArithmetic() = testFift {
@@ -29,7 +17,6 @@ class WordsTest {
         assertEquals(BigInt(20), stack.popInt())
         assertEquals(BigInt(14), stack.popInt())
     }
-
 
     @Test
     fun `test word '+ '`() = testFift {
@@ -181,4 +168,10 @@ class WordsTest {
             stack.pop()
         }
     }
+}
+
+private fun testFift(block: FiftInterpretator.() -> Unit) {
+    val fift = FiftInterpretator(output = {})
+    fift.apply(block)
+    assertTrue(fift.stack.isEmpty)
 }
