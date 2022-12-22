@@ -25,7 +25,9 @@ allprojects {
     }
 
     kotlin {
-        explicitApiWarning()
+        if (!isCI) {
+            explicitApiWarning()
+        }
         jvm()
 
         nativeTargets(NativeState.ALL) {
