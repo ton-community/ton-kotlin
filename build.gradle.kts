@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -10,12 +7,14 @@ plugins {
 }
 
 val isCI = System.getenv("CI") == "true"
-val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
-if (isCI) {
-    checkNotNull(githubVersion) { "GITHUB_REF is not set" }
-    check(githubVersion.isNotEmpty()) { "GITHUB_REF is empty" }
-    check(githubVersion.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?"))) { "'$githubVersion' is not a valid version" }
-}
+version = "0.2.0-SNAPSHOT"
+
+//val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
+//if (isCI) {
+//    checkNotNull(githubVersion) { "GITHUB_REF is not set" }
+//    check(githubVersion.isNotEmpty()) { "GITHUB_REF is empty" }
+//    check(githubVersion.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?"))) { "'$githubVersion' is not a valid version" }
+//}
 
 allprojects {
     apply(plugin = "kotlin-multiplatform")

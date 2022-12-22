@@ -1,12 +1,12 @@
 [versions]
-coroutines = "1.6.4"
-datetime = "0.4.0"
-atomicfu = "0.18.5"
-benchmark = "0.4.2"
-serialization = "1.4.1"
-ktor = "2.2.1"
-bouncycastle = "1.70"
-curve25519 = "0.0.4"
+coroutines = "1.6.4" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+datetime = "0.4.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-datetime
+atomicfu = "0.18.5" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
+benchmark = "0.4.7" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-benchmark-runtime
+serialization = "1.4.1" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
+ktor = "2.2.1" # https://search.maven.org/artifact/io.ktor/ktor
+bouncycastle = "1.70" # https://search.maven.org/artifact/org.bouncycastle/bcprov-jdk15on
+curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
 mockk = "1.12.4"
 
 [libraries]
