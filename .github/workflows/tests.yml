@@ -17,15 +17,15 @@ jobs:
         with:
           distribution: liberica
           java-version: 18
-      - name: Cache konan
-        uses: actions/cache@v3
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan
+#      - name: Cache konan
+#        uses: actions/cache@v3
+#        with:
+#          path: ~/.konan
+#          key: ${{ runner.os }}-konan
       - name: Run tests
         run: ./gradlew jvmTest --stacktrace
-      - name: Upload build reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-reports
-          path: build/reports/
+#      - name: Upload build reports
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: build-reports
+#          path: build/reports/
