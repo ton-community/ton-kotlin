@@ -28,7 +28,13 @@ allprojects {
         if (!isCI) {
             explicitApiWarning()
         }
-        jvm()
+        jvm {
+            compilations.all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
+            }
+        }
 
         nativeTargets(NativeState.ALL) {
             common("darwin") {

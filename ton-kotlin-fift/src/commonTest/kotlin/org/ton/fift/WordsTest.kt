@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Ignore
 class WordsTest {
     @Test
     fun testBasicArithmetic() = testFift {
