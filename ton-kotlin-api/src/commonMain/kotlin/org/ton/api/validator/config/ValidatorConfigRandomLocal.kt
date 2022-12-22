@@ -11,5 +11,6 @@ import org.ton.api.adnl.AdnlAddressList
 @Serializable
 @JsonClassDiscriminator("@type")
 public data class ValidatorConfigRandomLocal(
-    val addr_list: AdnlAddressList
+    @SerialName("addr_list")
+    val addrList: AdnlAddressList
 ) : ValidatorConfigLocal

@@ -1,6 +1,7 @@
 package org.ton.api.dht
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.SignedTlObject
@@ -16,12 +17,13 @@ import org.ton.tl.*
 @JsonClassDiscriminator("@type")
 public data class DhtNode(
     val id: PublicKey,
-    val addr_list: AdnlAddressList,
+    @SerialName("addr_list")
+    val addrList: AdnlAddressList,
     val version: Int = 0,
     @Serializable(Base64ByteArraySerializer::class)
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtNode> {
-    public fun toAdnlNode(): AdnlNode = AdnlNode(id, addr_list)
+    public fun toAdnlNode(): AdnlNode = AdnlNode(id, addrList)
     public fun key(): AdnlIdShort = id.toAdnlIdShort()
 
     override fun signed(privateKey: PrivateKey): DhtNode =
@@ -36,7 +38,7 @@ public data class DhtNode(
         if (this === other) return true
         if (other !is DhtNode) return false
         if (id != other.id) return false
-        if (addr_list != other.addr_list) return false
+        if (addrList != other.addrList) return false
         if (version != other.version) return false
         if (!signature.contentEquals(other.signature)) return false
         return true
@@ -44,7 +46,7 @@ public data class DhtNode(
 
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + addr_list.hashCode()
+        result = 31 * result + addrList.hashCode()
         result = 31 * result + version
         result = 31 * result + signature.contentHashCode()
         return result
@@ -58,7 +60,7 @@ private object DhtNodeTlConstructor : TlConstructor<DhtNode>(
 ) {
     override fun encode(writer: TlWriter, value: DhtNode) {
         writer.write(PublicKey, value.id)
-        writer.write(AdnlAddressList, value.addr_list)
+        writer.write(AdnlAddressList, value.addrList)
         writer.writeInt(value.version)
         writer.writeBytes(value.signature)
     }

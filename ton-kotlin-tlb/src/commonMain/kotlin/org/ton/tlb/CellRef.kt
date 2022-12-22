@@ -34,7 +34,7 @@ private class CellRefImpl<T>(
     override val codec: TlbCodec<T>
 ) : CellRef<T> {
     override val value: T by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        cell.parse(codec)
+        codec.loadTlb(cell.beginParse())
     }
 }
 

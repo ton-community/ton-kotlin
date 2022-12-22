@@ -42,7 +42,7 @@ private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>(
     ShardDescr::class,
     ShardDescr::class to a,
     ShardDescr::class to b,
-)  {
+) {
     override fun findTlbStorerOrNull(value: ShardDescr) = a
 }
 

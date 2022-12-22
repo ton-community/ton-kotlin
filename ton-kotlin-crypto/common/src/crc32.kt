@@ -44,7 +44,13 @@ private fun crc32slicingTable(poly: Int): Array<IntArray> {
     return table
 }
 
-internal inline fun crc32update(crc: Int, table: IntArray, bytes: ByteArray, startIndex: Int = 0, endIndex: Int = bytes.size - startIndex): Int {
+internal inline fun crc32update(
+    crc: Int,
+    table: IntArray,
+    bytes: ByteArray,
+    startIndex: Int = 0,
+    endIndex: Int = bytes.size - startIndex
+): Int {
     var crc = crc.inv()
     for (i in startIndex until endIndex) {
         crc = table[(crc xor bytes[i].toInt()) and 0xff] xor (crc ushr 8)

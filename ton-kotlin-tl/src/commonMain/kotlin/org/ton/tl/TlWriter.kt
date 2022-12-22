@@ -1,8 +1,6 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
 import org.ton.tl.constructors.Bool
 import org.ton.tl.constructors.BoolTlCombinator
 
@@ -16,6 +14,7 @@ public class TlWriter(
     public fun writeInt(value: Int) {
         output.writeIntLittleEndian(value)
     }
+
     public fun writeLong(value: Long) {
         output.writeLongLittleEndian(value)
     }

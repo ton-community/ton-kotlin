@@ -1,9 +1,8 @@
 package org.ton.tlb
 
 import org.ton.bitstring.BitString
-import org.ton.cell.CellSlice
 
-class TlbConstructorTree<T>(
+internal class TlbConstructorTree<T>(
     var root: Node<T>? = null
 ) {
     fun add(key: BitString, value: T) {
@@ -12,7 +11,7 @@ class TlbConstructorTree<T>(
         }
     }
 
-    fun find(bits: BitString): Pair<BitString,T>? {
+    fun find(bits: BitString): Pair<BitString, T>? {
         return root?.get(bits)
     }
 

@@ -18,7 +18,8 @@ private object ProtoListNilTlbConstructor : org.ton.tlb.TlbConstructor<ProtoList
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: ProtoListNil
-    ) {}
+    ) {
+    }
 
     override fun loadTlb(
         cellSlice: CellSlice

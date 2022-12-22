@@ -1,6 +1,4 @@
-import io.ktor.util.*
 import org.ton.crypto.hex
-
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals

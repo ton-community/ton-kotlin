@@ -6,8 +6,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.block.AddrStd
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.tl.Bits256

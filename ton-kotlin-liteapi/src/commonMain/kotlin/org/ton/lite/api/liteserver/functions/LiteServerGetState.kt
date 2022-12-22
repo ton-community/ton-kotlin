@@ -13,7 +13,7 @@ public data class LiteServerGetState(
 
     override fun tlCodec(): TlCodec<LiteServerGetState> = LiteServerGetState
 
-    override fun resultTlCodec(): TlCodec<LiteServerBlockState>  = LiteServerBlockState
+    override fun resultTlCodec(): TlCodec<LiteServerBlockState> = LiteServerBlockState
 }
 
 private object LiteServerGetStateTlConstructor : TlConstructor<LiteServerGetState>(

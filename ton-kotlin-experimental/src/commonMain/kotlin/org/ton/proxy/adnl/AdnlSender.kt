@@ -24,7 +24,7 @@ interface AdnlSender {
     ): ByteArray
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun <Q : TLFunction<Q, A>, A: TlObject<A>> query(
+    suspend fun <Q : TLFunction<Q, A>, A : TlObject<A>> query(
         destination: AdnlIdShort,
         query: Q,
         timeout: Duration = 5.seconds,

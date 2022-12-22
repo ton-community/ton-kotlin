@@ -1,16 +1,16 @@
 package org.ton.fift
 
-class Dictionary(
-    val storage: MutableMap<String, WordDef> = HashMap(),
+public class Dictionary(
+    public val storage: MutableMap<String, WordDef> = HashMap(),
 ) : MutableMap<String, WordDef> by storage
 
-operator fun Dictionary.set(
+public operator fun Dictionary.set(
     name: String,
     isActive: Boolean = false,
     function: FiftInterpretator.() -> Unit,
-) = set(name, WordDef(name, isActive, function))
+): Unit = set(name, WordDef(name, isActive, function))
 
-data class WordList(
+public data class WordList(
     val list: MutableList<WordDef> = ArrayList(),
 ) : MutableList<WordDef> by list, WordDef {
     override val isActive: Boolean
@@ -27,13 +27,13 @@ data class WordList(
     }
 }
 
-interface WordDef {
-    val isActive: Boolean
+public interface WordDef {
+    public val isActive: Boolean
 
-    fun execute(fift: FiftInterpretator)
+    public fun execute(fift: FiftInterpretator)
 }
 
-object NopWordDef : NamedWordDef("nop ", false) {
+public object NopWordDef : NamedWordDef("nop ", false) {
     override fun execute(fift: FiftInterpretator) {
         fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
         // nop
@@ -41,10 +41,10 @@ object NopWordDef : NamedWordDef("nop ", false) {
     }
 }
 
-open class NamedWordDef(
-    val name: String,
+public open class NamedWordDef(
+    public val name: String,
     override val isActive: Boolean,
-    val function: FiftInterpretator.() -> Unit = {},
+    public val function: FiftInterpretator.() -> Unit = {},
 ) : WordDef {
     override fun execute(fift: FiftInterpretator) {
         fift.logger.debug { "${fift.debugExecutionDepthIndent()}BEGIN  execute WordDef: ${toString()}" }
@@ -57,7 +57,7 @@ open class NamedWordDef(
     override fun toString(): String = "WordDef($name)"
 }
 
-data class StackPushWordDef(
+public data class StackPushWordDef(
     val element: Any,
 ) : NamedWordDef(element.toString(), false) {
     override fun execute(fift: FiftInterpretator) {
@@ -71,7 +71,7 @@ data class StackPushWordDef(
     override fun toString(): String = "StackPushWordDef(${element.fiftFormat()})"
 }
 
-data class SequentialWordDef(
+public data class SequentialWordDef(
     val iterable: Iterable<WordDef>,
 ) : WordDef {
     override val isActive: Boolean = false
@@ -89,6 +89,6 @@ data class SequentialWordDef(
     override fun toString(): String = "WordDef(${iterable.joinToString(",")})"
 }
 
-fun WordDef(entry: Any) = StackPushWordDef(entry)
-fun WordDef(name: String, isActive: Boolean = false, block: FiftInterpretator.() -> Unit): WordDef =
+public fun WordDef(entry: Any) = StackPushWordDef(entry)
+public fun WordDef(name: String, isActive: Boolean = false, block: FiftInterpretator.() -> Unit): WordDef =
     NamedWordDef(name, isActive, block)

@@ -1,7 +1,6 @@
 package org.ton.block
 
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 
 sealed interface TextChunkRef {
     companion object {

@@ -25,7 +25,7 @@ private object DnsTextTlbConstructor : TlbConstructor<DnsText>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): DnsText {
-        val value =  cellSlice.loadTlb(Text)
+        val value = cellSlice.loadTlb(Text)
         return DnsText(value)
     }
 }

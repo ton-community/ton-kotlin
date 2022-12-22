@@ -12,18 +12,18 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("ahmn_fork")
 @Serializable
-data class AugDictionaryNodeFork< X,  Y>(
+public data class AugDictionaryNodeFork<X, Y>(
     val left: AugDictionaryEdge<X, Y>,
     val right: AugDictionaryEdge<X, Y>,
     override val extra: Y,
 ) : AugDictionaryNode<X, Y> {
     override fun toString(): String = "ahmn_fork(left:$left right:$right extra:$extra)"
 
-    fun nodes(): Sequence<Pair<X, Y>> = left.nodes() + right.nodes()
+    public fun nodes(): Sequence<Pair<X, Y>> = left.nodes() + right.nodes()
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>

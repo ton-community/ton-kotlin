@@ -15,8 +15,10 @@ public sealed interface IPAddress {
     public companion object {
         @JvmStatic
         public fun ipv4(host: String, port: Int): IPAddress = IPv4Address(host, port)
+
         @JvmStatic
         public fun ipv4(address: Int, port: Int): IPAddress = IPv4Address(address, port)
+
         @JvmStatic
         public fun ipv6(address: ByteArray, port: Int): IPAddress = IPv6Address(address, port)
     }

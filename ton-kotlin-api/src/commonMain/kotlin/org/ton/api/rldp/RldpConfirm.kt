@@ -9,17 +9,18 @@ import org.ton.tl.constructors.*
 @Serializable
 @SerialName("rldp.confirm")
 public data class RldpConfirm(
-    override val transfer_id: Bits256,
+    @SerialName("transfer_id")
+    override val transferId: Bits256,
     override val part: Int,
     val seqno: Int
 ) : RldpMessagePart {
-    override fun tlCodec(): TlCodec< RldpConfirm> = Companion
+    override fun tlCodec(): TlCodec<RldpConfirm> = Companion
 
     public companion object : TlConstructor<RldpConfirm>(
         schema = "rldp.confirm transfer_id:int256 part:int seqno:int = rldp.MessagePart",
     ) {
         override fun encode(output: TlWriter, value: RldpConfirm) {
-            output.writeBits256(value.transfer_id)
+            output.writeBits256(value.transferId)
             output.writeInt(value.part)
             output.writeInt(value.seqno)
         }

@@ -17,7 +17,8 @@ private object ProtoHttpTlbConstructor : TlbConstructor<ProtoHttp>(
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: ProtoHttp
-    ) {}
+    ) {
+    }
 
     override fun loadTlb(
         cellSlice: CellSlice

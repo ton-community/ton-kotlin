@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
-import org.ton.bitstring.BitString
 import org.ton.crypto.*
 import org.ton.tl.*
 
@@ -112,7 +111,7 @@ public data class PublicKeyOverlay(
         } catch (e: Exception) {
             return false
         }
-        if (result.update_rule != DhtUpdateRule.OVERLAY_NODES) return false
+        if (result.updateRule != DhtUpdateRule.OVERLAY_NODES) return false
         if (result.signature.isNotEmpty()) return false
         return true
     }

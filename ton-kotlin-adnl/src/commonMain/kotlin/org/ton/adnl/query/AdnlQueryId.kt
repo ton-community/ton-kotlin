@@ -1,7 +1,5 @@
 package org.ton.adnl.query
 
-import org.ton.bitstring.BitString
-import org.ton.tl.Bits128
 import org.ton.tl.Bits256
 import kotlin.jvm.JvmInline
 import kotlin.random.Random

@@ -4,10 +4,7 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")

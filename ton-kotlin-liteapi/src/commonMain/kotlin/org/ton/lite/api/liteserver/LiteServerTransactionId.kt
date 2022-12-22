@@ -42,7 +42,7 @@ private object LiteServerTransactionIdTlConstructor : TlConstructor<LiteServerTr
         val lt = reader.readNullable(mode, 1) {
             readLong()
         }
-        val hash = reader.readNullable(mode,2) {
+        val hash = reader.readNullable(mode, 2) {
             readBits256()
         }
         return LiteServerTransactionId(mode, account, lt, hash)
@@ -51,13 +51,13 @@ private object LiteServerTransactionIdTlConstructor : TlConstructor<LiteServerTr
     override fun encode(writer: TlWriter, value: LiteServerTransactionId) {
         writer.writeInt(value.mode)
         val mode = value.mode
-        writer.writeNullable(mode,0, value.account) {
+        writer.writeNullable(mode, 0, value.account) {
             writeBits256(it)
         }
-        writer.writeNullable(mode,1, value.lt) {
+        writer.writeNullable(mode, 1, value.lt) {
             writeLong(it)
         }
-        writer.writeNullable(mode,2, value.hash) {
+        writer.writeNullable(mode, 2, value.hash) {
             writeBits256(it)
         }
     }

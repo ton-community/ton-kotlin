@@ -1,7 +1,5 @@
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeTargetPreset
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget

@@ -12,9 +12,11 @@ import org.ton.tl.*
 public data class AdnlAddressList(
     val addrs: Collection<AdnlAddress> = emptyList(),
     val version: Int = 0,
-    val reinit_date: Int = 0,
+    @SerialName("reinit_date")
+    val reinitDate: Int = 0,
     val priority: Int = 0,
-    val expire_at: Int = 0
+    @SerialName("expire_at")
+    val expireAt: Int = 0
 ) : TlObject<AdnlAddressList>, Collection<AdnlAddress> by addrs {
     public constructor(vararg addrs: AdnlAddress) : this(addrs.toList())
 
@@ -28,9 +30,9 @@ public data class AdnlAddressList(
                 write(AdnlAddress, it)
             }
             writer.writeInt(value.version)
-            writer.writeInt(value.reinit_date)
+            writer.writeInt(value.reinitDate)
             writer.writeInt(value.priority)
-            writer.writeInt(value.expire_at)
+            writer.writeInt(value.expireAt)
         }
 
         override fun decode(reader: TlReader): AdnlAddressList {

@@ -7,7 +7,6 @@ import org.ton.cell.CellBuilder
 import org.ton.crypto.hex
 import org.ton.hashmap.EmptyHashMapE
 import org.ton.tlb.storeTlb
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

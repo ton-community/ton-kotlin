@@ -9,7 +9,6 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 import kotlin.jvm.JvmStatic
 

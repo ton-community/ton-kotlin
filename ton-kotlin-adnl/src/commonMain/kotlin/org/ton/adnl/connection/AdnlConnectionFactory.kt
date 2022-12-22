@@ -5,7 +5,7 @@ import org.ton.adnl.network.TcpClient
 import org.ton.adnl.network.TcpClientImpl
 import org.ton.api.liteserver.LiteServerDesc
 
-class AdnlConnectionFactory {
+public class AdnlConnectionFactory {
     public suspend fun connect(
         liteServerDesc: LiteServerDesc
     ): TcpClient {

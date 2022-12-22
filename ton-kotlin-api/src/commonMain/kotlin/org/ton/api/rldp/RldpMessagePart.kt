@@ -7,7 +7,7 @@ import org.ton.tl.TlObject
 
 @Serializable
 public sealed interface RldpMessagePart : TlObject<RldpMessagePart> {
-    public val transfer_id: Bits256
+    public val transferId: Bits256
     public val part: Int
 
     public companion object : TlCombinator<RldpMessagePart>(

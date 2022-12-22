@@ -11,11 +11,11 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapNode<out T> {
-    companion object {
+public sealed interface HashMapNode<out T> {
+    public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
+        public fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapNode<X>> =
             if (n == 0) {
                 HashMapNodeLeafTlbConstructor(x)
             } else {

@@ -28,7 +28,7 @@ private object DnsSmcAddressTlbConstructor : TlbConstructor<DnsSmcAddress>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): DnsSmcAddress {
-        val smc_address =  cellSlice.loadTlb(MsgAddressInt)
+        val smc_address = cellSlice.loadTlb(MsgAddressInt)
         val flags = cellSlice.loadBits(8)
         val cap_list = if (flags[0]) cellSlice.loadTlb(SmcCapList) else null
         return DnsSmcAddress(smc_address, flags, cap_list)

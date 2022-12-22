@@ -21,10 +21,10 @@ public inline fun BooleanArray.toBitString(): BitString = BitString(*this)
 public inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
 
 @Serializable(with = FiftHexBitStringSerializer::class)
-public interface BitString : List<Boolean>, Comparable<BitString> {
-    override val size: Int
+public interface BitString : Iterable<Boolean>, Comparable<BitString> {
+    public val size: Int
 
-    override operator fun get(index: Int): Boolean
+    public operator fun get(index: Int): Boolean
     public fun getOrNull(index: Int): Boolean?
 
     public operator fun plus(bits: BooleanArray): BitString
@@ -40,8 +40,6 @@ public interface BitString : List<Boolean>, Comparable<BitString> {
 
     public infix fun xor(other: BitString): BitString
     public infix fun or(other: BitString): BitString
-
-    override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
 
     override fun toString(): String
 

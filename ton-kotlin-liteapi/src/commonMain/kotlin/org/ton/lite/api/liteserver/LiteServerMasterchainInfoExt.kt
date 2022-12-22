@@ -3,7 +3,6 @@ package org.ton.lite.api.liteserver
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
-import org.ton.bitstring.BitString
 import org.ton.tl.*
 
 @Serializable

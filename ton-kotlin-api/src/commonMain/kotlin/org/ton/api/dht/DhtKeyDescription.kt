@@ -1,5 +1,6 @@
 package org.ton.api.dht
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
@@ -12,7 +13,8 @@ import kotlin.jvm.JvmStatic
 public data class DhtKeyDescription(
     val key: DhtKey,
     val id: PublicKey,
-    val update_rule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
+    @SerialName("update_rule")
+    val updateRule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtKeyDescription> {
     override fun signed(privateKey: PrivateKey): DhtKeyDescription =
@@ -32,7 +34,7 @@ public data class DhtKeyDescription(
         if (other !is DhtKeyDescription) return false
         if (key != other.key) return false
         if (id != other.id) return false
-        if (update_rule != other.update_rule) return false
+        if (updateRule != other.updateRule) return false
         if (!signature.contentEquals(other.signature)) return false
         return true
     }
@@ -40,7 +42,7 @@ public data class DhtKeyDescription(
     override fun hashCode(): Int {
         var result = key.hashCode()
         result = 31 * result + id.hashCode()
-        result = 31 * result + update_rule.hashCode()
+        result = 31 * result + updateRule.hashCode()
         result = 31 * result + signature.contentHashCode()
         return result
     }
@@ -51,7 +53,7 @@ public data class DhtKeyDescription(
         append(", id=")
         append(id)
         append(", updateRule=")
-        append(update_rule)
+        append(updateRule)
         append(", signature=")
         append(base64(signature))
         append(")")
@@ -75,7 +77,7 @@ private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>
     override fun encode(writer: TlWriter, value: DhtKeyDescription) {
         writer.write(DhtKey, value.key)
         writer.write(PublicKey, value.id)
-        writer.write(DhtUpdateRule, value.update_rule)
+        writer.write(DhtUpdateRule, value.updateRule)
         writer.writeBytes(value.signature)
     }
 

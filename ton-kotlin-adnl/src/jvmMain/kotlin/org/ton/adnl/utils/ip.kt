@@ -12,4 +12,5 @@ public fun InetSocketAddress.toAdnlUdpAddress(): AdnlAddressUdp {
         AdnlAddressUdp(0, port)
     }
 }
+
 public fun SocketAddress.toAdnlUdpAddress(): AdnlAddressUdp = (this as InetSocketAddress).toAdnlUdpAddress()

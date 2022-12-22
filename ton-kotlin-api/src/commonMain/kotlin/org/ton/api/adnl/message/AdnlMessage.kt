@@ -26,7 +26,7 @@ public sealed interface AdnlMessage : TlObject<AdnlMessage> {
         AdnlMessageReinit::class to AdnlMessageReinit,
         AdnlMessagePart::class to AdnlMessagePart.tlConstructor(),
     ) {
-        public fun sizeOf(message: AdnlMessage): Int = Int.SIZE_BYTES + when(message) {
+        public fun sizeOf(message: AdnlMessage): Int = Int.SIZE_BYTES + when (message) {
             is AdnlMessageQuery -> AdnlMessageQuery.sizeOf(message)
             is AdnlMessageAnswer -> AdnlMessageAnswer.sizeOf(message)
             is AdnlMessageCreateChannel -> AdnlMessageCreateChannel.SIZE_BYTES

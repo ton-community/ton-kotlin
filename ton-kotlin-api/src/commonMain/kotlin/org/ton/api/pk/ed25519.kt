@@ -8,8 +8,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorEd25519
 import org.ton.crypto.Ed25519

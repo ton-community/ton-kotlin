@@ -57,7 +57,7 @@ public class CachedBagOfCells(
     }
 
     private fun importCell(cell: Cell, depth: Int): Int {
-        check(depth <= MAX_DEPTH) { "error while importing a cell into a bag of cells: cell depth too large" }
+        check(depth <= Cell.MAX_DEPTH) { "error while importing a cell into a bag of cells: cell depth too large" }
 
         val currentIndex = cellHashmap[cell]
         if (currentIndex != null) {
@@ -211,8 +211,7 @@ public class CachedBagOfCells(
         var shouldCache: Boolean = false
     )
 
-    companion object {
-        const val MAX_DEPTH = 1024
-        const val MAX_CELL_WEIGHT = 64
+    public companion object {
+        public const val MAX_CELL_WEIGHT: Int = 64
     }
 }

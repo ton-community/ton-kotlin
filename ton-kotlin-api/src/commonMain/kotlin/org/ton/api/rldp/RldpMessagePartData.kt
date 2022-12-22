@@ -11,10 +11,12 @@ import org.ton.tl.constructors.*
 @Serializable
 @SerialName("rldp.messagePart")
 public data class RldpMessagePartData(
-    override val transfer_id: Bits256,
-    val fec_type: FecType,
+    override val transferId: Bits256,
+    @SerialName("fec_type")
+    val fecType: FecType,
     override val part: Int,
-    val total_size: Long,
+    @SerialName("total_size")
+    val totalSize: Long,
     val seqno: Int,
     val data: ByteArray
 ) : RldpMessagePart {
@@ -23,37 +25,37 @@ public data class RldpMessagePartData(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is RldpMessagePartData) return false
-        if (transfer_id != other.transfer_id) return false
+        if (transferId != other.transferId) return false
         if (part != other.part) return false
         if (seqno != other.seqno) return false
-        if (fec_type != other.fec_type) return false
-        if (total_size != other.total_size) return false
+        if (fecType != other.fecType) return false
+        if (totalSize != other.totalSize) return false
         if (!data.contentEquals(other.data)) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = transfer_id.hashCode()
-        result = 31 * result + fec_type.hashCode()
+        var result = transferId.hashCode()
+        result = 31 * result + fecType.hashCode()
         result = 31 * result + part
-        result = 31 * result + total_size.hashCode()
+        result = 31 * result + totalSize.hashCode()
         result = 31 * result + seqno
         result = 31 * result + data.contentHashCode()
         return result
     }
 
     override fun toString(): String {
-        return "RldpMessagePartData(transfer_id=$transfer_id, fec_type=$fec_type, part=$part, total_size=$total_size, seqno=$seqno, data=${data.encodeHex()})"
+        return "RldpMessagePartData(transfer_id=$transferId, fec_type=$fecType, part=$part, total_size=$totalSize, seqno=$seqno, data=${data.encodeHex()})"
     }
 
     public companion object : TlConstructor<RldpMessagePartData>(
         schema = "rldp.messagePart transfer_id:int256 fec_type:fec.Type part:int total_size:long seqno:int data:bytes = rldp.MessagePart",
     ) {
         override fun encode(output: TlWriter, value: RldpMessagePartData) {
-            output.writeBits256(value.transfer_id)
-            output.write(FecType, value.fec_type)
+            output.writeBits256(value.transferId)
+            output.write(FecType, value.fecType)
             output.writeInt(value.part)
-            output.writeLong(value.total_size)
+            output.writeLong(value.totalSize)
             output.writeInt(value.seqno)
             output.writeBytes(value.data)
         }

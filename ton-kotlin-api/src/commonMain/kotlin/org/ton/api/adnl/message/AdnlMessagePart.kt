@@ -11,7 +11,8 @@ import kotlin.jvm.JvmStatic
 @Serializable
 public data class AdnlMessagePart(
     val hash: Bits256,
-    val total_size: Int,
+    @SerialName("total_size")
+    val totalSize: Int,
     val offset: Int,
     val data: ByteArray
 ) : AdnlMessage {
@@ -26,7 +27,7 @@ public data class AdnlMessagePart(
         if (this === other) return true
         if (other !is AdnlMessagePart) return false
         if (hash != other.hash) return false
-        if (total_size != other.total_size) return false
+        if (totalSize != other.totalSize) return false
         if (offset != other.offset) return false
         if (!data.contentEquals(other.data)) return false
         return true
@@ -34,7 +35,7 @@ public data class AdnlMessagePart(
 
     override fun hashCode(): Int {
         var result = hash.hashCode()
-        result = 31 * result + total_size
+        result = 31 * result + totalSize
         result = 31 * result + offset
         result = 31 * result + data.contentHashCode()
         return result
@@ -86,7 +87,7 @@ private object AdnlMessagePartTlConstructor : TlConstructor<AdnlMessagePart>(
 
     override fun encode(writer: TlWriter, value: AdnlMessagePart) {
         writer.writeBits256(value.hash)
-        writer.writeInt(value.total_size)
+        writer.writeInt(value.totalSize)
         writer.writeInt(value.offset)
         writer.writeBytes(value.data)
     }

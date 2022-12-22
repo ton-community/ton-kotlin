@@ -5,8 +5,6 @@ package org.ton.lite.api.liteserver.functions
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionList

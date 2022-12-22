@@ -16,9 +16,9 @@ public actual fun Number.toBigInt(): BigInt = when (this) {
     else -> BigInteger.valueOf(this.toLong())
 }
 
-public actual val BigInt.bitLength get() = bitLength()
-public actual val BigInt.sign get() = signum()
-public actual val BigInt.isZero get() = this == BigInteger.ZERO
+public actual val BigInt.bitLength: Int get() = bitLength()
+public actual val BigInt.sign: Int get() = signum()
+public actual val BigInt.isZero: Boolean get() = this == BigInteger.ZERO
 
 public actual operator fun BigInt.plus(number: Number): BigInt = add(number.toBigInt())
 

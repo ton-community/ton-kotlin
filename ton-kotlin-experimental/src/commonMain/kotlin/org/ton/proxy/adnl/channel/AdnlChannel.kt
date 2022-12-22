@@ -54,10 +54,12 @@ interface AdnlChannel {
                     input = AdnlInputChannel(PrivateKeyAes(sharedKey))
                     output = AdnlOutputChannel(PublicKeyAes(reversedSharedKey))
                 }
+
                 1 -> {
                     input = AdnlInputChannel(PrivateKeyAes(reversedSharedKey))
                     output = AdnlOutputChannel(PublicKeyAes(sharedKey))
                 }
+
                 else -> {
                     input = AdnlInputChannel(PrivateKeyAes(sharedKey))
                     output = AdnlOutputChannel(PublicKeyAes(sharedKey))

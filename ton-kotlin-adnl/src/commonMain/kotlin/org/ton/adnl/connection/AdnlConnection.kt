@@ -12,15 +12,14 @@ import org.ton.adnl.network.TcpClient
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.crypto.AesCtr
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.seconds
 
-class AdnlConnection(
-    val liteServerDesc: LiteServerDesc,
+public class AdnlConnection(
+    public val liteServerDesc: LiteServerDesc,
     private val connectionFactory: AdnlConnectionFactory,
     override val coroutineContext: CoroutineContext,
     private val onDone: () -> Unit
@@ -119,7 +118,7 @@ class AdnlConnection(
         val scope = CoroutineScope(callContext + CoroutineName("Request body writer"))
         scope.launch {
             try {
-               writeRaw(output, cipher, ByteReadPacket(request.body))
+                writeRaw(output, cipher, ByteReadPacket(request.body))
             } catch (cause: Throwable) {
                 output.close(cause)
                 throw cause

@@ -3,14 +3,14 @@ package org.ton.api.rldp
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.complete")
 public data class RldpComplete(
-    override val transfer_id: Bits256,
+    @SerialName("transfer_id")
+    override val transferId: Bits256,
     override val part: Int,
 ) : RldpMessagePart {
 
@@ -20,7 +20,7 @@ public data class RldpComplete(
         schema = "rldp.complete transfer_id:int256 part:int = rldp.MessagePart",
     ) {
         override fun encode(output: TlWriter, value: RldpComplete) {
-            output.writeBits256(value.transfer_id)
+            output.writeBits256(value.transferId)
             output.writeInt(value.part)
         }
 

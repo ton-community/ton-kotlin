@@ -40,7 +40,7 @@ abstract class AbstractDhtStorage(
 
     override fun get(bitString: BitString): DhtValue? {
         val value = getUnchecked(bitString) ?: return null
-        return if(value.ttl() > Clock.System.now()) value else null
+        return if (value.ttl() > Clock.System.now()) value else null
     }
 
     fun putUnsigned(value: DhtValue): Boolean {

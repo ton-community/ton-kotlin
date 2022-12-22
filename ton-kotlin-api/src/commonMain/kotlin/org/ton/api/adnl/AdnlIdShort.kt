@@ -4,10 +4,10 @@ package org.ton.api.adnl
 
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.Serializable
 import org.ton.api.overlay.OverlayNode
 import org.ton.api.overlay.OverlayNodeToSign
 import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.tl.*
 import kotlin.jvm.JvmStatic
 
@@ -37,6 +37,7 @@ public interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
     }
 }
 
+@Serializable
 private data class AdnlIdShortImpl(
     override val id: Bits256
 ) : AdnlIdShort {

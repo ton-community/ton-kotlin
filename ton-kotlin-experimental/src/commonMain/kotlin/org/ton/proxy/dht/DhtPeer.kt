@@ -43,7 +43,7 @@ class DhtPeer private constructor(
 
     override fun hashCode(): Int = dhtNode.hashCode()
 
-    override fun toString(): String =  "[${dhtNode.id.toAdnlIdShort()}, ${ipv4(address.ip)}:${address.port}]"
+    override fun toString(): String = "[${dhtNode.id.toAdnlIdShort()}, ${ipv4(address.ip)}:${address.port}]"
 
     companion object {
         @JvmStatic

@@ -8,7 +8,6 @@ import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.adnl.connection.AdnlClientImpl
-import org.ton.adnl.network.IPAddress
 import org.ton.adnl.network.IPAddress.*
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
@@ -17,7 +16,6 @@ import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.bitstring.toBitString
 import org.ton.block.*
-import org.ton.boc.BagOfCells
 import org.ton.cell.CellType
 import org.ton.crypto.sha256
 import org.ton.lite.api.LiteApiClient
@@ -26,14 +24,11 @@ import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tl.Bits256
-import org.ton.tlb.parse
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
-import kotlin.time.measureTimedValue
 
 private const val BLOCK_ID_CACHE_SIZE = 100
 
@@ -59,10 +54,10 @@ public class LiteClient(
     private var serverCapabilities: Long by atomic(0L)
     private var serverTime: Instant by atomic(Clock.System.now())
     private var serverTimeGotAt: Instant by atomic(Clock.System.now())
-    private var serverList = liteClientConfigGlobal.liteservers.shuffled()
+    private var serverList = liteClientConfigGlobal.liteServers.shuffled()
     private var currentServer: Int = 0
 
-    public val liteApi = object : LiteApiClient {
+    public val liteApi: LiteApiClient = object : LiteApiClient {
         override suspend fun sendRawQuery(query: ByteReadPacket): ByteReadPacket {
             var attempts = 0
             var exception: Exception? = null
@@ -84,7 +79,7 @@ public class LiteClient(
 
     public fun latency(): Duration = serverTimeGotAt - serverTime
 
-    fun setServerVersion(version: Int, capabilities: Long) {
+    public fun setServerVersion(version: Int, capabilities: Long) {
         if (serverVersion != version || serverCapabilities != capabilities) {
             serverVersion = version
             serverCapabilities = capabilities
@@ -92,7 +87,7 @@ public class LiteClient(
         }
     }
 
-    fun setServerTime(time: Int): Duration {
+    public fun setServerTime(time: Int): Duration {
         serverTime = Instant.fromEpochSeconds(time.toLong())
         serverTimeGotAt = Clock.System.now()
         val latency = latency()
@@ -199,16 +194,17 @@ public class LiteClient(
         return last
     }
 
-    public suspend fun lookupBlock(blockId: TonNodeBlockId, timeout: Duration) = withTimeoutOrNull(timeout) {
-        var result: TonNodeBlockIdExt? = null
-        while (isActive && result == null) {
-            result = lookupBlock(blockId)
-            if (result == null) {
-                delay(1000)
+    public suspend fun lookupBlock(blockId: TonNodeBlockId, timeout: Duration): TonNodeBlockIdExt? =
+        withTimeoutOrNull(timeout) {
+            var result: TonNodeBlockIdExt? = null
+            while (isActive && result == null) {
+                result = lookupBlock(blockId)
+                if (result == null) {
+                    delay(1000)
+                }
             }
+            result
         }
-        result
-    }
 
     public suspend fun lookupBlock(
         blockId: TonNodeBlockId,
@@ -251,7 +247,7 @@ public class LiteClient(
         return blockHeader.id
     }
 
-    public suspend fun getBlock(blockId: TonNodeBlockIdExt, timeout: Duration) = withTimeoutOrNull(timeout) {
+    public suspend fun getBlock(blockId: TonNodeBlockIdExt, timeout: Duration): Block? = withTimeoutOrNull(timeout) {
         var result: Block? = null
         while (isActive && result == null) {
             result = getBlock(blockId)
@@ -262,7 +258,7 @@ public class LiteClient(
         result
     }
 
-    suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
+    public suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
         val blockData = try {
             liteApi(LiteServerGetBlock(blockId))
         } catch (e: TonNotReadyException) {
@@ -285,7 +281,7 @@ public class LiteClient(
             "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
         }
         val block = try {
-            root.parse(Block)
+            Block.loadTlb(root.beginParse())
         } catch (e: Exception) {
             throw RuntimeException("Can't parse block: $blockId", e)
         }
@@ -315,14 +311,14 @@ public class LiteClient(
             prevs = listOf(
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toLong(), true).toLong(),
+                    Shard.shardChild(shard.shard_prefix.toLong(), true),
                     prev1.seq_no.toInt(),
                     Bits256(prev1.root_hash),
                     Bits256(prev1.file_hash)
                 ),
                 TonNodeBlockIdExt(
                     shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toLong(), false).toLong(),
+                    Shard.shardChild(shard.shard_prefix.toLong(), false),
                     prev2.seq_no.toInt(),
                     Bits256(prev2.root_hash),
                     Bits256(prev2.file_hash)
@@ -355,11 +351,11 @@ public class LiteClient(
         return block
     }
 
-    suspend fun getAccount(
+    public suspend fun getAccount(
         address: String, mode: Int = 0
     ): AccountInfo? = getAccount(parseAccountId(address), mode)
 
-    suspend fun getAccount(
+    public suspend fun getAccount(
         address: LiteServerAccountId?, mode: Int = 0
     ): AccountInfo? {
         return getAccount(address, getCachedLastMasterchainBlockId(), mode)
@@ -418,17 +414,17 @@ public class LiteClient(
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, vararg params: VmStackValue
-    ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), *params)
+    ): VmStack = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), *params)
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, params: Iterable<VmStackValue>
-    ) = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), params)
+    ): VmStack = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), params)
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, vararg params: VmStackValue
-    ) = runSmcMethod(address, blockId, method, params.asIterable())
+    ): VmStack = runSmcMethod(address, blockId, method, params.asIterable())
 
-    suspend fun runSmcMethod(
+    public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, params: Iterable<VmStackValue>
     ): VmStack {
         logger.debug { "run: $address - ${params.toList()}" }
@@ -445,7 +441,7 @@ public class LiteClient(
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
         return try {
-            boc.first().parse(VmStack)
+            VmStack.tlbCodec().loadTlb(boc.first().beginParse())
         } catch (e: Exception) {
             throw RuntimeException("Can't parse result for $method@$address($params)", e)
         }

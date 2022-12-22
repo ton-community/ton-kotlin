@@ -5,14 +5,14 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonMain  by getting  {
+        val commonMain by getting {
             dependencies {
                 api(libs.ktor.utils)
                 implementation(libs.curve25519)
                 implementation(libs.serialization.core)
             }
         }
-        val commonTest by getting  {
+        val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }

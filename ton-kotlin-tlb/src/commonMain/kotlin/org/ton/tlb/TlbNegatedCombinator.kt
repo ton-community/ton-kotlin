@@ -5,7 +5,7 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.exception.UnknownTlbConstructorException
 import kotlin.reflect.KClass
 
-abstract class TlbNegatedCombinator<T : Any>(
+public abstract class TlbNegatedCombinator<T : Any>(
     baseClass: KClass<T>,
     vararg subClasses: Pair<KClass<out T>, TlbNegatedConstructor<out T>>
 ) : TlbCombinator<T>(

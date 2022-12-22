@@ -3,8 +3,6 @@ package org.ton.lite.api.liteserver
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.boc.BagOfCells
 import org.ton.lite.api.liteserver.internal.readBoc
 import org.ton.lite.api.liteserver.internal.writeBoc

@@ -1,15 +1,19 @@
 package org.ton.api.rldp
 
 import io.ktor.util.*
-import org.ton.bitstring.BitString
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.tl.*
 
+@SerialName("rldp.answer")
+@Serializable
 public data class RldpAnswer(
-    val query_id: Bits256,
+    @SerialName("query_id")
+    val queryId: Bits256,
     override val data: ByteArray
 ) : RldpMessage {
     override val id: Bits256
-        get() = query_id
+        get() = queryId
 
     override fun tlCodec(): TlCodec<RldpAnswer> = Companion
 
@@ -17,26 +21,26 @@ public data class RldpAnswer(
         if (this === other) return true
         if (other !is RldpAnswer) return false
 
-        if (query_id != other.query_id) return false
+        if (queryId != other.queryId) return false
         if (!data.contentEquals(other.data)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = query_id.hashCode()
+        var result = queryId.hashCode()
         result = 31 * result + data.contentHashCode()
         return result
     }
 
     override fun toString(): String =
-        "RldpAnswer(query_id=$query_id, data=[(${data.size} bytes) ${data.encodeBase64()}])"
+        "RldpAnswer(query_id=$queryId, data=[(${data.size} bytes) ${data.encodeBase64()}])"
 
     public companion object : TlConstructor<RldpAnswer>(
         schema = "rldp.answer query_id:int256 data:bytes = rldp.Message",
     ) {
         override fun encode(writer: TlWriter, value: RldpAnswer) {
-            writer.writeBits256(value.query_id)
+            writer.writeBits256(value.queryId)
             writer.writeBytes(value.data)
         }
 

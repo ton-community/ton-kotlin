@@ -7,7 +7,6 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbStorer
 import kotlin.jvm.JvmStatic
 
 @Serializable
@@ -44,9 +43,9 @@ private object AccountStatusTlbCombinator : TlbCombinator<AccountStatus>(
     AccountStatus::class to AccountStatusFrozenTlbConstructor,
     AccountStatus::class to AccountStatusActiveTlbConstructor,
     AccountStatus::class to AccountStatusNonExistTlbConstructor,
-)  {
+) {
     override fun findTlbStorerOrNull(value: AccountStatus): TlbConstructor<AccountStatus>? {
-        return when(value) {
+        return when (value) {
             AccountStatus.UNINIT -> AccountStatusUninitTlbConstructor
             AccountStatus.FROZEN -> AccountStatusFrozenTlbConstructor
             AccountStatus.ACTIVE -> AccountStatusActiveTlbConstructor

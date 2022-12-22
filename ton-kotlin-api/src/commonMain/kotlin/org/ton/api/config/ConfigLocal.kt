@@ -17,9 +17,11 @@ import org.ton.api.validator.config.ValidatorConfigLocal
 @SerialName("config.local")
 @JsonClassDiscriminator("@type")
 public data class ConfigLocal(
-    val local_ids: Collection<IdConfigLocal>,
+    @SerialName("local_ids")
+    val localIds: Collection<IdConfigLocal>,
     val dht: Collection<DhtConfigLocal>,
     val validators: Collection<ValidatorConfigLocal>,
-    val liteservers: Collection<LiteServerConfigLocal>,
+    @SerialName("liteservers")
+    val liteServers: Collection<LiteServerConfigLocal>,
     val control: Collection<ControlConfigLocal>
 )

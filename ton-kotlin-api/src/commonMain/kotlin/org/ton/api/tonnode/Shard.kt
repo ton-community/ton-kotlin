@@ -13,7 +13,7 @@ public object Shard {
     }
 
     public fun shardChild(shard: Long, left: Boolean): Long {
-        val x = lowerBits64(shard) ushr  1
+        val x = lowerBits64(shard) ushr 1
         return if (left) shard - x else shard + x
     }
 
@@ -26,6 +26,6 @@ public object Shard {
         require(block.isMasterchain() && block.isValidFull()) { "block must belong to the masterchain" }
     }
 
-   internal inline fun lowerBits64(x: Long) = x and bitsNegative64(x)
+    internal inline fun lowerBits64(x: Long) = x and bitsNegative64(x)
     internal inline fun bitsNegative64(x: Long) = x.inv() + 1
 }

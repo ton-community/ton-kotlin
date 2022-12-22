@@ -1,5 +1,6 @@
 package org.ton.api.http.server
 
+import kotlinx.serialization.SerialName
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.tl.*
 
@@ -7,7 +8,8 @@ public data class HttpServerHost(
     val domains: Collection<String>,
     val ip: Int,
     val port: Int,
-    val adnl_id: AdnlIdShort
+    @SerialName("adnl_id")
+    val adnlId: AdnlIdShort
 ) {
     public companion object : TlCodec<HttpServerHost> by HttpServerHostTlConstructor
 }
@@ -31,6 +33,6 @@ private object HttpServerHostTlConstructor : TlConstructor<HttpServerHost>(
         }
         output.writeInt(value.ip)
         output.writeInt(value.port)
-        output.write(AdnlIdShort, value.adnl_id)
+        output.write(AdnlIdShort, value.adnlId)
     }
 }

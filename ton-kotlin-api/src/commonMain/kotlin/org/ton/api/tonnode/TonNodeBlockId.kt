@@ -10,7 +10,12 @@ import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
 import kotlin.jvm.JvmStatic
 
-public inline fun TonNodeBlockId(workchain: Int = Workchain.INVALID_WORKCHAIN, shard: Long = 0, seqno: Int = 0): TonNodeBlockId = TonNodeBlockId.of(workchain, shard, seqno)
+public inline fun TonNodeBlockId(
+    workchain: Int = Workchain.INVALID_WORKCHAIN,
+    shard: Long = 0,
+    seqno: Int = 0
+): TonNodeBlockId = TonNodeBlockId.of(workchain, shard, seqno)
+
 public inline fun TonNodeBlockId(string: String): TonNodeBlockId = TonNodeBlockId.parse(string)
 
 public interface TonNodeBlockId {
@@ -33,7 +38,8 @@ public interface TonNodeBlockId {
 
     public companion object : TlCodec<TonNodeBlockId> by TonNodeBlockIdTlbConstructor {
         @JvmStatic
-        public fun of(workchain: Int, shard: Long, seqno: Int): TonNodeBlockId = TonNodeBlockIdImpl(workchain, shard, seqno)
+        public fun of(workchain: Int, shard: Long, seqno: Int): TonNodeBlockId =
+            TonNodeBlockIdImpl(workchain, shard, seqno)
 
         @JvmStatic
         public fun parse(string: String): TonNodeBlockId {

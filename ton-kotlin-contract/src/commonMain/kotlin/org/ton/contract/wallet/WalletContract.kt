@@ -10,7 +10,6 @@ import org.ton.contract.Contract
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
-import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb

@@ -2,8 +2,6 @@ package org.ton.lite.api.liteserver.functions
 
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.lite.api.liteserver.LiteServerValidatorStats
 import org.ton.tl.*
 

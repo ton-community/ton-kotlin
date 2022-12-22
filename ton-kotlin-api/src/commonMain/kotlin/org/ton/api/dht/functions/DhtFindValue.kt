@@ -2,8 +2,6 @@ package org.ton.api.dht.functions
 
 import org.ton.api.dht.DhtKey
 import org.ton.api.dht.DhtValueResult
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.tl.*
 
 public data class DhtFindValue(

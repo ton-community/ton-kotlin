@@ -5,9 +5,9 @@ import org.ton.cell.Cell
 import org.ton.crypto.encodeHex
 import kotlin.jvm.JvmStatic
 
-fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
-fun BagOfCells(roots: Collection<Cell>): BagOfCells = BagOfCells.of(roots)
-fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
+public fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
+public fun BagOfCells(roots: Collection<Cell>): BagOfCells = BagOfCells.of(roots)
+public fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
 
 public interface BagOfCells : Iterable<Cell> {
     public val roots: Collection<Cell>

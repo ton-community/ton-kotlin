@@ -3,7 +3,6 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
 import org.ton.tl.*
 
 @Serializable

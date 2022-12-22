@@ -5,7 +5,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
 
-object AnyTlbConstructor : TlbCodec<Cell> {
+public object AnyTlbConstructor : TlbCodec<Cell> {
     override fun storeTlb(cellBuilder: CellBuilder, value: Cell) {
         cellBuilder.storeBits(value.bits)
         cellBuilder.storeRefs(value.refs)

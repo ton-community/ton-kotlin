@@ -3,8 +3,6 @@ package org.ton.api.adnl
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader

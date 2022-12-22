@@ -10,7 +10,7 @@ import org.ton.lite.client.LiteClient
 fun liteClient() = LiteClient(
     GlobalScope.coroutineContext,
     LiteClientConfigGlobal(
-        liteservers = listOf(
+        liteServers = listOf(
             LiteServerDesc(
                 id = PublicKeyEd25519(base64("R1KsqYlNks2Zows+I9s4ywhilbSevs9dH1x2KF9MeSU=")),
                 ip = 1426768764,

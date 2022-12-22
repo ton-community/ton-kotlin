@@ -15,7 +15,7 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hme_root")
-data class RootHashMapE<out T>(
+public data class RootHashMapE<out T>(
     val root: HashMapEdge<T>
 ) : HashMapE<T> {
 
@@ -23,9 +23,9 @@ data class RootHashMapE<out T>(
 
     override fun toString(): String = "(hme_root\nroot:$root)"
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X> tlbConstructor(n: Int, x: TlbCodec<X>): TlbConstructor<RootHashMapE<X>> =
+        public fun <X> tlbConstructor(n: Int, x: TlbCodec<X>): TlbConstructor<RootHashMapE<X>> =
             RootHashMapETlbConstructor(n, x)
     }
 }

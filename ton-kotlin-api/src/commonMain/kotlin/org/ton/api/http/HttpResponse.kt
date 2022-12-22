@@ -9,11 +9,14 @@ import org.ton.tl.constructors.*
 @SerialName("http.response")
 @Serializable
 public data class HttpResponse(
-    val http_version: String,
-    val status_code: Int,
+    @SerialName("http_version")
+    val httpVersion: String,
+    @SerialName("status_code")
+    val statusCode: Int,
     val reason: String,
     val headers: Collection<HttpHeader>,
-    val no_payload: Boolean
+    @SerialName("no_payload")
+    val noPayload: Boolean
 ) : TlObject<HttpResponse> {
     override fun tlCodec(): TlCodec<HttpResponse> = Companion
 
@@ -35,12 +38,12 @@ private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
     }
 
     override fun encode(output: TlWriter, value: HttpResponse) {
-        output.writeString(value.http_version)
-        output.writeInt(value.status_code)
+        output.writeString(value.httpVersion)
+        output.writeInt(value.statusCode)
         output.writeString(value.reason)
         output.writeCollection(value.headers) {
             write(HttpHeader, it)
         }
-        output.writeBoolean(value.no_payload)
+        output.writeBoolean(value.noPayload)
     }
 }

@@ -1,7 +1,6 @@
 package org.ton.block
 
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 sealed interface DnsRecord {

@@ -8,7 +8,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
-import org.ton.bitstring.BitString
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.tl.*
 
@@ -16,7 +15,7 @@ public data class LiteServerMasterchainInfo(
     public val last: TonNodeBlockIdExt,
     public val stateRootHash: Bits256,
     public val init: TonNodeZeroStateIdExt
-)  {
+) {
 
     public companion object : TlCodec<LiteServerMasterchainInfo> by LiteServerMasterchainInfoTlbConstructor
 }

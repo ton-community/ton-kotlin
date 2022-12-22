@@ -14,16 +14,16 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("ahme_empty")
 @Serializable
-data class AugDictionaryEmpty<out X, out Y>(
+public data class AugDictionaryEmpty<out X, out Y>(
     override val extra: Y
 ) : AugDictionary<X, Y> {
     override fun toString(): String = "(ahme_empty\nextra:$extra)"
 
     override fun nodes(): Sequence<Pair<X, Y>> = emptySequence()
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             y: TlbCodec<Y>
         ): TlbConstructor<AugDictionaryEmpty<X, Y>> = AugDictionaryEmptyTlbConstructor(y)
     }

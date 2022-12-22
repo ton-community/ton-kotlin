@@ -39,19 +39,14 @@ public open class ByteBackedBitString constructor(
             bytes.copyOf()
         }
 
-    override fun toBooleanArray(): BooleanArray = (this as List<Boolean>).toBooleanArray()
+    override fun toBooleanArray(): BooleanArray = BooleanArray(size) { get(it) }
 
     override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes, size)
 
-    override fun contains(element: Boolean): Boolean = any { it == element }
-    override fun containsAll(elements: Collection<Boolean>): Boolean = elements.all { contains(it) }
-    override fun isEmpty(): Boolean = size == 0
-    override fun lastIndexOf(element: Boolean): Int = indexOfLast { it == element }
-    override fun listIterator(): ListIterator<Boolean> = BitStringIterator(this)
-    override fun listIterator(index: Int): ListIterator<Boolean> = BitStringIterator(this, index)
-    override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
-    override fun indexOf(element: Boolean): Int = indexOfFirst { it == element }
-    override fun iterator(): Iterator<Boolean> = listIterator()
+    public operator fun contains(element: Boolean): Boolean = any { it == element }
+    public fun isEmpty(): Boolean = size == 0
+
+    override fun iterator(): Iterator<Boolean> = BitStringIterator(this)
 
     override fun xor(other: BitString): BitString {
         return if (other !is ByteBackedBitString) {
@@ -123,9 +118,9 @@ public open class ByteBackedBitString constructor(
         return result
     }
 
-    open class BitStringIterator(
-        open val bitString: BitString,
-        var index: Int = 0
+    public open class BitStringIterator(
+        public open val bitString: BitString,
+        public var index: Int = 0
     ) : ListIterator<Boolean> {
         override fun hasNext(): Boolean = index < bitString.size
         override fun hasPrevious(): Boolean = index - 1 >= 0
@@ -156,12 +151,12 @@ public open class ByteBackedBitString constructor(
         }
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(size))
+        public fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(size))
 
         @JvmStatic
-        fun of(
+        public fun of(
             bytes: ByteArray = ByteArray(0),
             size: Int = bytes.size * Byte.SIZE_BITS
         ): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(bytes, size))
@@ -189,8 +184,10 @@ public open class ByteBackedBitString constructor(
         }
 
         @JvmStatic
-        protected fun checkSize(size: Int) = require(size in 0..BitString.MAX_LENGTH) {
-            throw BitStringOverflowException()
+        protected fun checkSize(size: Int) {
+            require(size in 0..BitString.MAX_LENGTH) {
+                throw BitStringOverflowException()
+            }
         }
 
         @JvmStatic

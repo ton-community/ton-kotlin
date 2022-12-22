@@ -1,33 +1,31 @@
-@file:Suppress("LocalVariableName")
-
 package org.ton.api.rldp
 
 import io.ktor.utils.io.core.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.query")
 public data class RldpQuery(
-    val query_id: Bits256,
-    val max_answer_size: Long,
+    @SerialName("query_id")
+    val queryId: Bits256,
+    @SerialName("max_answer_size")
+    val maxAnswerSize: Long,
     val timeout: Int,
     override val data: ByteArray
 ) : RldpMessage {
     public constructor(
-        query_id: ByteArray,
-        max_answer_size: Long,
+        queryId: ByteArray,
+        maxAnswerSize: Long,
         timeout: Instant,
         data: ByteArray
-    ) : this(Bits256(query_id), max_answer_size, timeout.epochSeconds.toInt(), data)
+    ) : this(Bits256(queryId), maxAnswerSize, timeout.epochSeconds.toInt(), data)
 
     override val id: Bits256
-        get() = query_id
+        get() = queryId
 
     override fun tlCodec(): TlCodec<RldpQuery> = Companion
 
@@ -35,8 +33,8 @@ public data class RldpQuery(
         if (this === other) return true
         if (other !is RldpQuery) return false
 
-        if (query_id != other.query_id) return false
-        if (max_answer_size != other.max_answer_size) return false
+        if (queryId != other.queryId) return false
+        if (maxAnswerSize != other.maxAnswerSize) return false
         if (timeout != other.timeout) return false
         if (!data.contentEquals(other.data)) return false
 
@@ -44,8 +42,8 @@ public data class RldpQuery(
     }
 
     override fun hashCode(): Int {
-        var result = query_id.hashCode()
-        result = 31 * result + max_answer_size.hashCode()
+        var result = queryId.hashCode()
+        result = 31 * result + maxAnswerSize.hashCode()
         result = 31 * result + timeout
         result = 31 * result + data.contentHashCode()
         return result
@@ -55,18 +53,18 @@ public data class RldpQuery(
         schema = "rldp.query query_id:int256 max_answer_size:long timeout:int data:bytes = rldp.Message",
     ) {
         override fun encode(writer: TlWriter, value: RldpQuery) {
-            writer.writeBits256(value.query_id)
-            writer.writeLong(value.max_answer_size)
+            writer.writeBits256(value.queryId)
+            writer.writeLong(value.maxAnswerSize)
             writer.writeInt(value.timeout)
             writer.writeBytes(value.data)
         }
 
         override fun decode(reader: TlReader): RldpQuery {
-            val query_id = reader.readBits256()
-            val max_answer_size = reader.readLong()
+            val queryId = reader.readBits256()
+            val maxAnswerSize = reader.readLong()
             val timeout = reader.readInt()
             val data = reader.readBytes()
-            return RldpQuery(query_id, max_answer_size, timeout, data)
+            return RldpQuery(queryId, maxAnswerSize, timeout, data)
         }
     }
 }

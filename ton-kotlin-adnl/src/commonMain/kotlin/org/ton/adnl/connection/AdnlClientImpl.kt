@@ -105,7 +105,7 @@ public class AdnlClientImpl(
 //        private val adnlDispatcher = newFixedThreadPoolContext(2, "adnl")
 //    }
 
-    companion object {
-        val connectionPool = AdnlConnectionPool()
+    public companion object {
+        private val connectionPool: AdnlConnectionPool = AdnlConnectionPool()
     }
 }

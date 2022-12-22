@@ -5,7 +5,7 @@ import io.ktor.utils.io.core.*
 import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 
-fun Dictionary.defineBasicWords() {
+public fun Dictionary.defineBasicWords() {
     this[". "] = { interpretDotSpace() }
     this["._ "] = { interpretDot() }
     this["x. "] = { interpretHexDotSpace() }
@@ -148,46 +148,46 @@ fun Dictionary.defineBasicWords() {
     this["hashB "] = { interpretHashB() }
 }
 
-fun Dictionary.defineFiftWords() {
+public fun Dictionary.defineFiftWords() {
     this[": ", true] = { interpretColon(0) }
     this[":: ", true] = { interpretColon(1) }
     this[":_ ", true] = { interpretColon(2) }
     this["::_ ", true] = { interpretColon(3) }
 }
 
-fun FiftInterpretator.interpretDotSpace() {
+public fun FiftInterpretator.interpretDotSpace() {
     output("${stack.popInt()} ")
 }
 
-fun FiftInterpretator.interpretDot() {
+public fun FiftInterpretator.interpretDot() {
     output("${stack.popInt()}")
 }
 
-fun FiftInterpretator.interpretBinaryDotSpace() {
+public fun FiftInterpretator.interpretBinaryDotSpace() {
     output("${stack.popInt().toString(2)} ")
 }
 
-fun FiftInterpretator.interpretBinaryDot() {
+public fun FiftInterpretator.interpretBinaryDot() {
     output(stack.popInt().toString(2))
 }
 
-fun FiftInterpretator.interpretHexDotSpace() {
+public fun FiftInterpretator.interpretHexDotSpace() {
     output("${stack.popInt().toString(16)} ")
 }
 
-fun FiftInterpretator.interpretHexDot() {
+public fun FiftInterpretator.interpretHexDot() {
     output(stack.popInt().toString(16))
 }
 
-fun FiftInterpretator.interpretUpperHexDotSpace() {
+public fun FiftInterpretator.interpretUpperHexDotSpace() {
     output("${stack.popInt().toString(16).uppercase()} ")
 }
 
-fun FiftInterpretator.interpretUpperHexDot() {
+public fun FiftInterpretator.interpretUpperHexDot() {
     output(stack.popInt().toString(16).uppercase())
 }
 
-fun FiftInterpretator.interpretDotStack() {
+public fun FiftInterpretator.interpretDotStack() {
     stack.forEach {
         output(it.toString())
         output(" ")
@@ -195,20 +195,20 @@ fun FiftInterpretator.interpretDotStack() {
     output("\n")
 }
 
-fun FiftInterpretator.interpretDrop() {
+public fun FiftInterpretator.interpretDrop() {
     stack.pop()
 }
 
-fun FiftInterpretator.interpret2Drop() {
+public fun FiftInterpretator.interpret2Drop() {
     stack.pop()
     stack.pop()
 }
 
-fun FiftInterpretator.interpretDup() {
+public fun FiftInterpretator.interpretDup() {
     stack.push(stack.get())
 }
 
-fun FiftInterpretator.interpret2Dup() {
+public fun FiftInterpretator.interpret2Dup() {
     stack.push(stack[1])
     stack.push(stack[1])
 }
@@ -217,58 +217,58 @@ fun FiftInterpretator.interpretOver() {
     stack.push(stack[1])
 }
 
-fun FiftInterpretator.interpret2Over() {
+public fun FiftInterpretator.interpret2Over() {
     stack.push(stack[3])
     stack.push(stack[3])
 }
 
-fun FiftInterpretator.interpretSwap() {
+public fun FiftInterpretator.interpretSwap() {
     stack.swap(0, 1)
 }
 
-fun FiftInterpretator.interpret2Swap() {
+public fun FiftInterpretator.interpret2Swap() {
     stack.swap(0, 2)
     stack.swap(1, 3)
 }
 
-fun FiftInterpretator.interpretTuck() {
+public fun FiftInterpretator.interpretTuck() {
     stack.swap(0, 1)
     stack.push(stack[1])
 }
 
-fun FiftInterpretator.interpretNip() {
+public fun FiftInterpretator.interpretNip() {
     stack.pop(1)
 }
 
-fun FiftInterpretator.interpretRot() {
+public fun FiftInterpretator.interpretRot() {
     stack.swap(1, 2)
     stack.swap(0, 1)
 }
 
-fun FiftInterpretator.interpretRotRev() {
+public fun FiftInterpretator.interpretRotRev() {
     stack.swap(0, 1)
     stack.swap(1, 2)
 }
 
-fun FiftInterpretator.interpretPick() {
+public fun FiftInterpretator.interpretPick() {
     stack.push(stack[stack.popInt().toInt()])
 }
 
-fun FiftInterpretator.interpretRoll() {
+public fun FiftInterpretator.interpretRoll() {
     val n = stack.popInt().toInt()
     for (i in n downTo 1) {
         stack.swap(i, i - 1)
     }
 }
 
-fun FiftInterpretator.interpretRollRev() {
+public fun FiftInterpretator.interpretRollRev() {
     val n = stack.popInt().toInt()
     for (i in 0 until n) {
         stack.swap(i, i + 1)
     }
 }
 
-fun FiftInterpretator.interpretReverse() {
+public fun FiftInterpretator.interpretReverse() {
     val m = stack.popInt().toInt()
     val n = stack.popInt().toInt()
     val s = 2 * m + n - 1
@@ -277,22 +277,22 @@ fun FiftInterpretator.interpretReverse() {
     }
 }
 
-fun FiftInterpretator.interpretExch() {
+public fun FiftInterpretator.interpretExch() {
     val n = stack.popInt().toInt()
     stack.swap(0, n)
 }
 
-fun FiftInterpretator.interpretExch2() {
+public fun FiftInterpretator.interpretExch2() {
     val m = stack.popInt().toInt()
     val n = stack.popInt().toInt()
     stack.swap(m, n)
 }
 
-fun FiftInterpretator.interpretDepth() {
+public fun FiftInterpretator.interpretDepth() {
     stack.push(stack.depth)
 }
 
-fun FiftInterpretator.interpretConditionalDup() {
+public fun FiftInterpretator.interpretConditionalDup() {
     val x = stack.popInt()
     if (x.sign != 0) {
         stack.push(x)
@@ -300,88 +300,88 @@ fun FiftInterpretator.interpretConditionalDup() {
     stack.push(x)
 }
 
-fun FiftInterpretator.interpretPlus(y: BigInt = stack.popInt()) {
+public fun FiftInterpretator.interpretPlus(y: BigInt = stack.popInt()) {
     stack.push(stack.popInt() + y)
 }
 
-fun FiftInterpretator.interpretMinus(y: BigInt = stack.popInt()) {
+public fun FiftInterpretator.interpretMinus(y: BigInt = stack.popInt()) {
     stack.push(stack.popInt() - y)
 }
 
-fun FiftInterpretator.interpretNegate() {
+public fun FiftInterpretator.interpretNegate() {
     stack.push(-stack.popInt())
 }
 
 // 0001
 // 1000
-fun FiftInterpretator.interpretTimes() {
+public fun FiftInterpretator.interpretTimes() {
     stack.push(stack.popInt() * stack.popInt())
 }
 
-fun FiftInterpretator.interpretDiv() {
+public fun FiftInterpretator.interpretDiv() {
     val y = stack.popInt()
     stack.push(stack.popInt() / y)
 }
 
-fun FiftInterpretator.interpretTimesDiv() {
+public fun FiftInterpretator.interpretTimesDiv() {
     val z = stack.popInt()
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x * y / z)
 }
 
-fun FiftInterpretator.interpretMod() {
+public fun FiftInterpretator.interpretMod() {
     val y = stack.popInt()
     stack.push(stack.popInt() % y)
 }
 
-fun FiftInterpretator.interpretDivMod() {
+public fun FiftInterpretator.interpretDivMod() {
     val y = stack.popInt()
     val (div, mod) = stack.popInt() divRem y
     stack.push(div)
     stack.push(mod)
 }
 
-fun FiftInterpretator.interpretShl(y: Int = stack.popInt().toInt()) {
+public fun FiftInterpretator.interpretShl(y: Int = stack.popInt().toInt()) {
     stack.push(stack.popInt() shl y)
 }
 
-fun FiftInterpretator.interpretShr(y: Int = stack.popInt().toInt()) {
+public fun FiftInterpretator.interpretShr(y: Int = stack.popInt().toInt()) {
     stack.push(stack.popInt() shr y)
 }
 
-fun FiftInterpretator.interpretAnd() {
+public fun FiftInterpretator.interpretAnd() {
     val y = stack.popInt()
     stack.push(stack.popInt() and y)
 }
 
-fun FiftInterpretator.interpretOr() {
+public fun FiftInterpretator.interpretOr() {
     val y = stack.popInt()
     stack.push(stack.popInt() or y)
 }
 
-fun FiftInterpretator.interpretXor() {
+public fun FiftInterpretator.interpretXor() {
     val y = stack.popInt()
     stack.push(stack.popInt() xor y)
 }
 
-fun FiftInterpretator.interpretNot() {
+public fun FiftInterpretator.interpretNot() {
     stack.push(stack.popInt().not())
 }
 
-fun FiftInterpretator.interpretLess() {
+public fun FiftInterpretator.interpretLess() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x < y)
 }
 
-fun FiftInterpretator.interpretGreater() {
+public fun FiftInterpretator.interpretGreater() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x > y)
 }
 
-fun FiftInterpretator.interpretEqual() {
+public fun FiftInterpretator.interpretEqual() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x == y)
@@ -393,60 +393,60 @@ fun FiftInterpretator.interpretNotEqual() {
     stack.push(x != y)
 }
 
-fun FiftInterpretator.interpretEqualZero() {
+public fun FiftInterpretator.interpretEqualZero() {
     val x = stack.popInt()
     stack.push(x.equals(0))
 }
 
-fun FiftInterpretator.interpretNotEqualZero() {
+public fun FiftInterpretator.interpretNotEqualZero() {
     val x = stack.popInt()
     stack.push(!x.equals(0))
 }
 
-fun FiftInterpretator.interpretLessOrEqualZero() {
+public fun FiftInterpretator.interpretLessOrEqualZero() {
     val x = stack.popInt()
     stack.push(x.sign == -1 || x.equals(0))
 }
 
-fun FiftInterpretator.interpretLessZero() {
+public fun FiftInterpretator.interpretLessZero() {
     val x = stack.popInt()
     stack.push(x.sign == -1)
 }
 
-fun FiftInterpretator.interpretGreaterOrEqualZero() {
+public fun FiftInterpretator.interpretGreaterOrEqualZero() {
     val x = stack.popInt()
     stack.push(x.sign == 1 || x.equals(0))
 }
 
-fun FiftInterpretator.interpretGreaterZero() {
+public fun FiftInterpretator.interpretGreaterZero() {
     val x = stack.popInt()
     stack.push(x.sign == 1)
 }
 
-fun FiftInterpretator.interpretLessOrEqual() {
+public fun FiftInterpretator.interpretLessOrEqual() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x <= y)
 }
 
-fun FiftInterpretator.interpretGreaterOrEqual() {
+public fun FiftInterpretator.interpretGreaterOrEqual() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x >= y)
 }
 
-fun FiftInterpretator.interpretCmp() {
+public fun FiftInterpretator.interpretCmp() {
     val y = stack.popInt()
     val x = stack.popInt()
     stack.push(x.compareTo(y))
 }
 
-fun FiftInterpretator.interpretExecute() {
+public fun FiftInterpretator.interpretExecute() {
     val wordDef = stack.popWordDef()
     interpret(wordDef)
 }
 
-fun FiftInterpretator.interpretExecuteTimes() {
+public fun FiftInterpretator.interpretExecuteTimes() {
     val times = stack.popInt().toInt()
     val wordDef = stack.popWordDef()
     when {
@@ -458,7 +458,7 @@ fun FiftInterpretator.interpretExecuteTimes() {
     }
 }
 
-fun FiftInterpretator.interpretExecuteIf() {
+public fun FiftInterpretator.interpretExecuteIf() {
     val wordDef = stack.popWordDef()
     val condition = stack.popInt()
     if (!condition.isZero) {
@@ -466,7 +466,7 @@ fun FiftInterpretator.interpretExecuteIf() {
     }
 }
 
-fun FiftInterpretator.interpretExecuteIfNot() {
+public fun FiftInterpretator.interpretExecuteIfNot() {
     val wordDef = stack.popWordDef()
     val condition = stack.popInt()
     if (condition.isZero) {
@@ -474,7 +474,7 @@ fun FiftInterpretator.interpretExecuteIfNot() {
     }
 }
 
-fun FiftInterpretator.interpretCondition() {
+public fun FiftInterpretator.interpretCondition() {
     val falseWorldDef = stack.popWordDef()
     val trueWorldDef = stack.popWordDef()
     val condition = stack.popInt()
@@ -485,7 +485,7 @@ fun FiftInterpretator.interpretCondition() {
     }
 }
 
-fun FiftInterpretator.interpretUntil() {
+public fun FiftInterpretator.interpretUntil() {
     val wordDef = stack.popWordDef()
     while (true) {
         interpret(wordDef)
@@ -495,7 +495,7 @@ fun FiftInterpretator.interpretUntil() {
     }
 }
 
-fun FiftInterpretator.interpretWhile() {
+public fun FiftInterpretator.interpretWhile() {
     val body = stack.popWordDef()
     val wordDef = stack.popWordDef()
     while (true) {
@@ -507,7 +507,7 @@ fun FiftInterpretator.interpretWhile() {
     }
 }
 
-fun FiftInterpretator.interpretOpenBracket() {
+public fun FiftInterpretator.interpretOpenBracket() {
     checkNotIntExec()
     interpretCompileOpenBracket()
     stack.pushArgCount(0)
@@ -515,7 +515,7 @@ fun FiftInterpretator.interpretOpenBracket() {
     state++
 }
 
-fun FiftInterpretator.interpretCloseBracket() {
+public fun FiftInterpretator.interpretCloseBracket() {
     checkCompile()
     interpretCompileCloseBracket()
     stack.pushArgCount(1)
@@ -523,17 +523,17 @@ fun FiftInterpretator.interpretCloseBracket() {
     state--
 }
 
-fun FiftInterpretator.interpretCompileOpenBracket() {
+public fun FiftInterpretator.interpretCompileOpenBracket() {
     stack.push(WordList())
 }
 
-fun FiftInterpretator.interpretCompileCloseBracket() {
+public fun FiftInterpretator.interpretCompileCloseBracket() {
     val wordList = stack.popWordList()
     val wordDef = SequentialWordDef(wordList)
     stack.push(wordDef)
 }
 
-fun FiftInterpretator.interpretExecuteInternal() {
+public fun FiftInterpretator.interpretExecuteInternal() {
     val wordDef = stack.popWordDef()
     val count = stack.popInt().toInt()
     if (stack.depth < count) {
@@ -544,7 +544,7 @@ fun FiftInterpretator.interpretExecuteInternal() {
     wordDef.execute(this)
 }
 
-fun FiftInterpretator.interpretCompileInternal() {
+public fun FiftInterpretator.interpretCompileInternal() {
     val wordDef = stack.popWordDef()
     val count = stack.popInt().toInt()
     doCompileLiterals(count)
@@ -553,7 +553,7 @@ fun FiftInterpretator.interpretCompileInternal() {
     }
 }
 
-fun FiftInterpretator.doCompile(wordDef: WordDef) {
+public fun FiftInterpretator.doCompile(wordDef: WordDef) {
     val wordList = stack.popWordList()
     if (wordDef != NopWordDef) {
         if (wordDef is WordList) {
@@ -565,7 +565,7 @@ fun FiftInterpretator.doCompile(wordDef: WordDef) {
     stack.push(wordList)
 }
 
-fun FiftInterpretator.doCompileLiterals(count: Int) {
+public fun FiftInterpretator.doCompileLiterals(count: Int) {
     check(count >= 0) { "cannot compile a negative number of literals" }
     val list = ArrayDeque<WordDef>()
     repeat(count) {
@@ -854,7 +854,7 @@ fun FiftInterpretator.interpretAppendCellSlice() {
     stack.push(builder)
 }
 
-fun FiftInterpretator.interpretHashB() {
+public fun FiftInterpretator.interpretHashB() {
     val cell = stack.popCell()
     val hash = cell.hash()
     stack.push(hash)

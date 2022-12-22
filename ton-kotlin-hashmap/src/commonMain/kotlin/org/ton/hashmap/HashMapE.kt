@@ -12,21 +12,21 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapE<out T> : Iterable<Pair<BitString, T>> {
+public sealed interface HashMapE<out T> : Iterable<Pair<BitString, T>> {
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
-    fun nodes(): Sequence<Pair<BitString, T>>
-    fun toMap(): Map<BitString, T> = nodes().toMap()
+    public fun nodes(): Sequence<Pair<BitString, T>>
+    public fun toMap(): Map<BitString, T> = nodes().toMap()
 
-    companion object {
+    public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <T> of(): HashMapE<T> = EmptyHashMapE()
+        public fun <T> of(): HashMapE<T> = EmptyHashMapE()
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X : Any> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapE<X>> {
-           return HashMapETlbCombinator(n, x) as TlbCodec<HashMapE<X>>
+        public fun <X : Any> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapE<X>> {
+            return HashMapETlbCombinator(n, x) as TlbCodec<HashMapE<X>>
         }
     }
 }

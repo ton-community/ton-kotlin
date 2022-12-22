@@ -1,5 +1,6 @@
 package org.ton.api.adnl
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.adnl.message.AdnlMessage
@@ -21,17 +22,24 @@ public data class AdnlPacketContents(
     val rand1: ByteArray,
     val flags: Int,
     val from: PublicKey?,
-    val from_short: AdnlIdShort?,
+    @SerialName("from_short")
+    val fromShort: AdnlIdShort?,
     val message: AdnlMessage?,
     val messages: Collection<AdnlMessage>?,
     val address: AdnlAddressList?,
-    val priority_address: AdnlAddressList?,
+    @SerialName("priority_address")
+    val priorityAddress: AdnlAddressList?,
     val seqno: Long?,
-    val confirm_seqno: Long?,
-    val recv_addr_list_version: Int?,
-    val recv_priority_addr_list_version: Int?,
-    val reinit_date: Int?,
-    val dst_reinit_date: Int?,
+    @SerialName("confirm_seqno")
+    val confirmSeqno: Long?,
+    @SerialName("recv_addr_list_version")
+    val recvAddrListVersion: Int?,
+    @SerialName("recv_priority_addr_list_version")
+    val recvPriorityAddrListVersion: Int?,
+    @SerialName("reinit_date")
+    val reinitDate: Int?,
+    @SerialName("dst_reinit_date")
+    val dstReinitDate: Int?,
     override val signature: ByteArray?,
     val rand2: ByteArray
 ) : SignedTlObject<AdnlPacketContents> {
@@ -87,13 +95,13 @@ public data class AdnlPacketContents(
         if (message != null && messages != null) {
             throw IllegalArgumentException("both fields `message` and `messages` set")
         }
-        if (from != null && from_short != null && from.toAdnlIdShort() != from_short) {
+        if (from != null && fromShort != null && from.toAdnlIdShort() != fromShort) {
             throw IllegalArgumentException("`from` and `from_short` mismatch")
         }
 //        if (address != null && address.addrs.isEmpty()) {
 //            throw IllegalArgumentException("`address` contains empty list")
 //        }
-        if (priority_address != null && priority_address.addrs.isEmpty()) {
+        if (priorityAddress != null && priorityAddress.addrs.isEmpty()) {
             throw IllegalArgumentException("`priority_address` contains empty list")
         }
     }
@@ -105,17 +113,17 @@ public data class AdnlPacketContents(
             AdnlPacketContents(
                 rand1 = rand1,
                 from = from,
-                from_short = from_short,
+                from_short = fromShort,
                 message = message,
                 messages = messages,
                 address = address,
-                priority_address = priority_address,
+                priority_address = priorityAddress,
                 seqno = seqno,
-                confirm_seqno = confirm_seqno,
-                recv_addr_list_version = recv_addr_list_version,
-                recv_priority_addr_list_version = recv_priority_addr_list_version,
-                reinit_date = reinit_date,
-                dst_reinit_date = dst_reinit_date,
+                confirm_seqno = confirmSeqno,
+                recv_addr_list_version = recvAddrListVersion,
+                recv_priority_addr_list_version = recvPriorityAddrListVersion,
+                reinit_date = reinitDate,
+                dst_reinit_date = dstReinitDate,
                 signature = null,
                 rand2 = rand2
             )
@@ -124,17 +132,17 @@ public data class AdnlPacketContents(
         return AdnlPacketContents(
             rand1 = rand1,
             from = from,
-            from_short = from_short,
+            from_short = fromShort,
             message = message,
             messages = messages,
             address = address,
-            priority_address = priority_address,
+            priority_address = priorityAddress,
             seqno = seqno,
-            confirm_seqno = confirm_seqno,
-            recv_addr_list_version = recv_addr_list_version,
-            recv_priority_addr_list_version = recv_priority_addr_list_version,
-            reinit_date = reinit_date,
-            dst_reinit_date = dst_reinit_date,
+            confirm_seqno = confirmSeqno,
+            recv_addr_list_version = recvAddrListVersion,
+            recv_priority_addr_list_version = recvPriorityAddrListVersion,
+            reinit_date = reinitDate,
+            dst_reinit_date = dstReinitDate,
             signature = signature,
             rand2 = rand2
         )
@@ -145,17 +153,17 @@ public data class AdnlPacketContents(
             AdnlPacketContents(
                 rand1 = rand1,
                 from = from,
-                from_short = from_short,
+                from_short = fromShort,
                 message = message,
                 messages = messages,
                 address = address,
-                priority_address = priority_address,
+                priority_address = priorityAddress,
                 seqno = seqno,
-                confirm_seqno = confirm_seqno,
-                recv_addr_list_version = recv_addr_list_version,
-                recv_priority_addr_list_version = recv_priority_addr_list_version,
-                reinit_date = reinit_date,
-                dst_reinit_date = dst_reinit_date,
+                confirm_seqno = confirmSeqno,
+                recv_addr_list_version = recvAddrListVersion,
+                recv_priority_addr_list_version = recvPriorityAddrListVersion,
+                reinit_date = reinitDate,
+                dst_reinit_date = dstReinitDate,
                 signature = null,
                 rand2 = rand2
             )
@@ -263,7 +271,7 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
         writer.writeInt(value.flags)
         val flags = value.flags
         writer.writeNullable(flags, 0, value.from) { write(PublicKey, it) }
-        writer.writeNullable(flags, 1, value.from_short) { write(AdnlIdShort, it) }
+        writer.writeNullable(flags, 1, value.fromShort) { write(AdnlIdShort, it) }
         writer.writeNullable(flags, 2, value.message) { write(AdnlMessage, it) }
         writer.writeNullable(flags, 3, value.messages) { list ->
             writeCollection(list) { element ->
@@ -271,13 +279,13 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
             }
         }
         writer.writeNullable(flags, 4, value.address) { write(AdnlAddressList, it) }
-        writer.writeNullable(flags, 5, value.priority_address) { write(AdnlAddressList, it) }
+        writer.writeNullable(flags, 5, value.priorityAddress) { write(AdnlAddressList, it) }
         writer.writeNullable(flags, 6, value.seqno) { writeLong(it) }
-        writer.writeNullable(flags, 7, value.confirm_seqno) { writeLong(it) }
-        writer.writeNullable(flags, 8, value.recv_addr_list_version) { writeInt(it) }
-        writer.writeNullable(flags, 9, value.recv_priority_addr_list_version) { writeInt(it) }
-        writer.writeNullable(flags, 10, value.reinit_date) { writeInt(it) }
-        writer.writeNullable(flags, 10, value.dst_reinit_date) { writeInt(it) }
+        writer.writeNullable(flags, 7, value.confirmSeqno) { writeLong(it) }
+        writer.writeNullable(flags, 8, value.recvAddrListVersion) { writeInt(it) }
+        writer.writeNullable(flags, 9, value.recvPriorityAddrListVersion) { writeInt(it) }
+        writer.writeNullable(flags, 10, value.reinitDate) { writeInt(it) }
+        writer.writeNullable(flags, 10, value.dstReinitDate) { writeInt(it) }
         writer.writeNullable(flags, 11, value.signature) { writeBytes(it) }
         writer.writeBytes(value.rand2)
     }

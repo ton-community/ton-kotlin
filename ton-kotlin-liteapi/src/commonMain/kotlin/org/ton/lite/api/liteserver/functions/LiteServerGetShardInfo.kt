@@ -1,10 +1,8 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerShardInfo
 import org.ton.tl.*
-import org.ton.tl.constructors.*
 
 public data class LiteServerGetShardInfo(
     val id: TonNodeBlockIdExt,
@@ -14,7 +12,7 @@ public data class LiteServerGetShardInfo(
 ) : TLFunction<LiteServerGetShardInfo, LiteServerShardInfo> {
     override fun tlCodec(): TlCodec<LiteServerGetShardInfo> = LiteServerGetShardInfo
 
-    override fun resultTlCodec(): TlCodec<LiteServerShardInfo>  = LiteServerShardInfo
+    override fun resultTlCodec(): TlCodec<LiteServerShardInfo> = LiteServerShardInfo
 
     public companion object : TlCodec<LiteServerGetShardInfo> by LiteServerGetShardInfoTlConstructor
 }

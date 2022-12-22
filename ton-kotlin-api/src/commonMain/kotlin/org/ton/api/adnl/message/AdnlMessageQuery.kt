@@ -4,7 +4,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
 import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
@@ -15,19 +14,20 @@ import org.ton.tl.constructors.*
 @SerialName("adnl.message.query")
 @Serializable
 public data class AdnlMessageQuery(
-    val query_id: Bits256,
+    @SerialName("query_id")
+    val queryId: Bits256,
     val query: ByteArray
 ) : AdnlMessage {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AdnlMessageQuery) return false
-        if (query_id != other.query_id) return false
+        if (queryId != other.queryId) return false
         if (!query.contentEquals(other.query)) return false
         return true
     }
 
     override fun hashCode(): Int {
-        var result = query_id.hashCode()
+        var result = queryId.hashCode()
         result = 31 * result + query.contentHashCode()
         return result
     }
@@ -39,7 +39,7 @@ public data class AdnlMessageQuery(
             256 / Byte.SIZE_BYTES + BytesTlConstructor.sizeOf(value.query)
 
         override fun encode(output: TlWriter, value: AdnlMessageQuery) {
-            output.writeBits256(value.query_id)
+            output.writeBits256(value.queryId)
             output.writeBytes(value.query)
         }
 

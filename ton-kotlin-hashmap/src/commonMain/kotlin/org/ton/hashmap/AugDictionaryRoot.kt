@@ -12,7 +12,7 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("ahme_root")
 @Serializable
-data class AugDictionaryRoot<X, Y>(
+public data class AugDictionaryRoot<X, Y>(
     val root: AugDictionaryEdge<X, Y>,
     override val extra: Y
 ) : AugDictionary<X, Y> {
@@ -20,9 +20,9 @@ data class AugDictionaryRoot<X, Y>(
 
     override fun nodes(): Sequence<Pair<X, Y>> = root.nodes()
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>

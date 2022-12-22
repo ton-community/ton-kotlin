@@ -54,7 +54,7 @@ internal actual class UdpServerImpl actual constructor(
         val addr = nativeHeap.alloc<sockaddr>()
         try {
             for ((ip, packet) in outputChannel) {
-               val sizeOf =  when (ip) {
+                val sizeOf = when (ip) {
                     is IPv4Address -> {
                         addr.sa_family = AF_INET.convert()
                         val addr4 = addr.reinterpret<sockaddr_in>()
@@ -62,6 +62,7 @@ internal actual class UdpServerImpl actual constructor(
                         addr4.sin_port = ip.port.toUShort()
                         sizeOf<sockaddr_in>()
                     }
+
                     is IPv6Address -> {
                         addr.sa_family = AF_INET6.convert()
                         val addr6 = addr.reinterpret<sockaddr_in6>()

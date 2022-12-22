@@ -10,7 +10,7 @@ import org.ton.tl.*
 public data class AdnlNode(
     val id: PublicKey,
     @SerialName("addr_list")
-    val addr_list: AdnlAddressList
+    val addrList: AdnlAddressList
 ) {
     public constructor(
         id: PublicKey,
@@ -22,13 +22,13 @@ public data class AdnlNode(
     ) {
         override fun encode(writer: TlWriter, value: AdnlNode) {
             writer.write(PublicKey, value.id)
-            writer.write(AdnlAddressList, value.addr_list)
+            writer.write(AdnlAddressList, value.addrList)
         }
 
         override fun decode(reader: TlReader): AdnlNode {
             val id = reader.read(PublicKey)
-            val addr_list = reader.read(AdnlAddressList)
-            return AdnlNode(id, addr_list)
+            val addrList = reader.read(AdnlAddressList)
+            return AdnlNode(id, addrList)
         }
     }
 }

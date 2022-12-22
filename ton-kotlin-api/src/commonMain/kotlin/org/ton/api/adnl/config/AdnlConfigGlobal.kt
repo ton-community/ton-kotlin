@@ -9,7 +9,8 @@ import org.ton.tl.*
 @SerialName("adnl.config.global")
 @Serializable
 public data class AdnlConfigGlobal(
-    val static_nodes: AdnlNodes = AdnlNodes()
+    @SerialName("static_nodes")
+    val staticNodes: AdnlNodes = AdnlNodes()
 ) {
     public companion object : TlCodec<AdnlConfigGlobal> by AdnlConfigGlobalTlConstructor
 }
@@ -18,7 +19,7 @@ private object AdnlConfigGlobalTlConstructor : TlConstructor<AdnlConfigGlobal>(
     schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
 ) {
     override fun encode(writer: TlWriter, value: AdnlConfigGlobal) = writer {
-        write(AdnlNodes, value.static_nodes)
+        write(AdnlNodes, value.staticNodes)
     }
 
     override fun decode(reader: TlReader): AdnlConfigGlobal = reader {

@@ -9,14 +9,14 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
-inline fun Unary(depth: Int): Unary = Unary.of(depth)
+public inline fun Unary(depth: Int): Unary = Unary.of(depth)
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed class Unary {
-    companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
+public sealed class Unary {
+    public companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
         @JvmStatic
-        fun of(depth: Int): Unary {
+        public fun of(depth: Int): Unary {
             var unary: Unary = UnaryZero
             repeat(depth) {
                 unary = UnarySuccess(unary)
@@ -25,7 +25,7 @@ sealed class Unary {
         }
 
         @JvmStatic
-        fun tlbCodec(): TlbNegatedCodec<Unary> = UnaryTlbCombinator
+        public fun tlbCodec(): TlbNegatedCodec<Unary> = UnaryTlbCombinator
     }
 }
 

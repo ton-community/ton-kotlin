@@ -37,7 +37,7 @@ private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>(
     AccStatusChange::class to AccStatusChangeDeletedTlbConstructor,
 ) {
     override fun findTlbStorerOrNull(value: AccStatusChange): TlbStorer<AccStatusChange>? {
-        return when(value) {
+        return when (value) {
             AccStatusChange.UNCHANGED -> AccStatusChangeUnchangedTlbConstructor
             AccStatusChange.FROZEN -> AccStatusChangeFrozenTlbConstructor
             AccStatusChange.DELETED -> AccStatusChangeDeletedTlbConstructor

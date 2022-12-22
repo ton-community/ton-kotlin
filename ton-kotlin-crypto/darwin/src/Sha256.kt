@@ -1,7 +1,6 @@
 package org.ton.crypto
 
 import kotlinx.cinterop.*
-import kotlinx.cinterop.nativeHeap.free
 import platform.CoreCrypto.CC_SHA256_CTX
 import platform.CoreCrypto.CC_SHA256_Final
 import platform.CoreCrypto.CC_SHA256_Init
@@ -12,6 +11,7 @@ public actual class Sha256 {
     private val sha256Ctx = nativeHeap.alloc<CC_SHA256_CTX>().also {
         CC_SHA256_Init(it.ptr)
     }
+
     @OptIn(ExperimentalStdlibApi::class)
     private val cleaner = createCleaner(sha256Ctx) {
         nativeHeap.free(it)

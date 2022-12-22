@@ -7,7 +7,7 @@ import org.ton.tlb.exception.UnknownTlbConstructorException
 import org.ton.tlb.providers.TlbCombinatorProvider
 import kotlin.reflect.KClass
 
-abstract class TlbCombinator<T : Any>(
+public abstract class TlbCombinator<T : Any>(
     override val baseClass: KClass<T>,
     vararg subClasses: Pair<KClass<out T>, TlbCodec<out T>>
 ) : AbstractTlbCombinator<T>(), TlbCombinatorProvider<T> {
@@ -21,7 +21,7 @@ abstract class TlbCombinator<T : Any>(
                 constructorTree.add(constructor.id, constructor)
             }
             if (constructor is TlbCombinator<out T>) {
-                constructor.constructorTree.values().forEach { (key,value) ->
+                constructor.constructorTree.values().forEach { (key, value) ->
                     constructorTree.add(key, value)
                 }
                 class2codec.putAll(constructor.class2codec)
@@ -60,7 +60,6 @@ abstract class TlbCombinator<T : Any>(
 
     @Suppress("UNCHECKED_CAST")
     protected open fun findTlbStorerOrNull(value: T): TlbStorer<T>? {
-//        println("value: ${value::class} - ${class2codec.keys}")
         val constructor = class2codec[value::class]
             ?: return null
         return constructor as TlbStorer<T>

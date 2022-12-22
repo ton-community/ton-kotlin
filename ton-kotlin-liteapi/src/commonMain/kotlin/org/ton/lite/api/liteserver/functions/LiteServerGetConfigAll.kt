@@ -1,6 +1,5 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerConfigInfo

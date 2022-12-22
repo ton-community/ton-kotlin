@@ -9,7 +9,8 @@ import org.ton.tl.*
 @SerialName("dht.ping")
 @Serializable
 public data class DhtPing(
-    val random_id: Long
+    @SerialName("random_id")
+    val randomId: Long
 ) : TLFunction<DhtPing, DhtPong> {
     override fun tlCodec(): TlCodec<DhtPing> = DhtPing
     override fun resultTlCodec(): TlCodec<DhtPong> = DhtPong
@@ -26,6 +27,6 @@ private object DhtPingTlConstructor : TlConstructor<DhtPing>(
     }
 
     override fun encode(output: TlWriter, value: DhtPing) {
-        output.writeLong(value.random_id)
+        output.writeLong(value.randomId)
     }
 }

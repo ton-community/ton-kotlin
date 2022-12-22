@@ -26,7 +26,7 @@ public actual class TcpClientImpl actual constructor(
                 result = recv(socket, buffer.refTo(0), buffer.size.convert(), 0)
                 check(result >= 0) { "recv failed with error: ${WSAGetLastError()}" }
                 input.writeFully(buffer, 0, result.convert())
-            } while(result > 0)
+            } while (result > 0)
             close()
         } catch (e: Throwable) {
             close(e)

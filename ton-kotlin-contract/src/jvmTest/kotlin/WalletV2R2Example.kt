@@ -1,7 +1,6 @@
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.contract.wallet.liteClient
 import org.ton.contract.wallet.v2.ContractV2R2
-import org.ton.crypto.hex
 
 private val privateKey = PrivateKeyEd25519(ByteArray(32))
 

@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import kotlin.jvm.JvmStatic
 
 @Serializable

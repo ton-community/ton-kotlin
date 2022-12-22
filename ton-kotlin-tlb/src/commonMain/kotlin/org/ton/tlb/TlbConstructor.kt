@@ -5,19 +5,22 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.ParseTlbException
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
 
-abstract class AbstractTlbConstructor<T>(
-    val schema: String,
+public abstract class AbstractTlbConstructor<T>(
+    public val schema: String,
     id: BitString? = null,
 ) {
-    val id by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    public val id: BitString by lazy(LazyThreadSafetyMode.PUBLICATION) {
         id ?: calculateId(formatSchema(schema))
     }
+
     override fun toString(): String = schema
 
-    companion object {
-        fun calculateId(schema: String): BitString {
+    public companion object {
+        @JvmStatic
+        public fun calculateId(schema: String): BitString {
             if (schema.isEmpty()) return BitString(0)
             try {
                 val prefix = schema.split(" ").first()
@@ -38,33 +41,34 @@ abstract class AbstractTlbConstructor<T>(
             }
         }
 
-        fun formatSchema(schema: String): String {
+        public fun formatSchema(schema: String): String {
             return schema.replace(Regex("\\s+"), " ").trim()
-                .replace("(","")
-                .replace(")","")
-                .replace(";","")
+                .replace("(", "")
+                .replace(")", "")
+                .replace(";", "")
         }
     }
 }
 
-abstract class TlbConstructor<T : Any>(
+public abstract class TlbConstructor<T : Any>(
     schema: String,
     id: BitString? = null,
 ) : AbstractTlbConstructor<T>(schema, id), TlbCodec<T>, TlbConstructorProvider<T> {
     override fun tlbConstructor(): TlbConstructor<T> = this
 }
 
-class ObjectTlbConstructor<T : Any>(
-    val instance: T,
+public class ObjectTlbConstructor<T : Any>(
+    public val instance: T,
     schema: String,
     id: BitString? = null,
 ) : TlbConstructor<T>(schema, id) {
     override fun storeTlb(cellBuilder: CellBuilder, value: T) {
     }
+
     override fun loadTlb(cellSlice: CellSlice): T = instance
 }
 
-abstract class TlbNegatedConstructor<T : Any>(
+public abstract class TlbNegatedConstructor<T : Any>(
     schema: String,
     id: BitString? = null
 ) : TlbConstructor<T>(schema, id), TlbNegatedCodec<T> {
@@ -75,9 +79,9 @@ abstract class TlbNegatedConstructor<T : Any>(
     override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
 }
 
-inline fun <reified T:Any>TlbConstructor<T>.asTlbCombinator() = asTlbCombinator(T::class)
+public inline fun <reified T : Any> TlbConstructor<T>.asTlbCombinator(): TlbCombinator<T> = asTlbCombinator(T::class)
 
-fun <T:Any> TlbConstructor<T>.asTlbCombinator(clazz: KClass<T>): TlbCombinator<T> = object : TlbCombinator<T>(
+public fun <T : Any> TlbConstructor<T>.asTlbCombinator(clazz: KClass<T>): TlbCombinator<T> = object : TlbCombinator<T>(
     clazz,
     clazz to this@asTlbCombinator
 ) {

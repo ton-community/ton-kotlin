@@ -3,10 +3,8 @@ package org.ton.api.dht
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
-import org.ton.api.internal.InstantIntSerializer
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.base64
 import org.ton.tl.*
 
 @Serializable

@@ -1,8 +1,6 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
 import org.ton.tl.constructors.BoolTlCombinator
 
 public class TlReader(

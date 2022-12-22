@@ -10,16 +10,16 @@ import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface AugDictionary<out X, out Y> : Iterable<Pair<X, Y>> {
-    val extra: Y
+public sealed interface AugDictionary<out X, out Y> : Iterable<Pair<X, Y>> {
+    public val extra: Y
 
     override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
-    fun nodes(): Sequence<Pair<X, Y>>
+    public fun nodes(): Sequence<Pair<X, Y>>
 
-    companion object {
+    public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>

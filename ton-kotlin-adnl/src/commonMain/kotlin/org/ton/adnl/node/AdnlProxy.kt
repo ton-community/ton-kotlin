@@ -1,6 +1,5 @@
 package org.ton.adnl.node
 
-import org.ton.bitstring.BitString
 import org.ton.tl.Bits256
 import org.ton.api.adnl.AdnlProxy as AdnlProxyType
 

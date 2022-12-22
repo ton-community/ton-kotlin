@@ -4,7 +4,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.http.HttpPayloadPart
-import org.ton.bitstring.BitString
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
@@ -13,7 +12,8 @@ import org.ton.tl.constructors.*
 public data class HttpGetNextPayloadPart(
     val id: Bits256,
     val seqno: Int,
-    val max_chunk_size: Int
+    @SerialName("max_chunk_size")
+    val maxChunkSize: Int
 ) : TLFunction<HttpGetNextPayloadPart, HttpPayloadPart> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -21,7 +21,7 @@ public data class HttpGetNextPayloadPart(
 
         if (id != other.id) return false
         if (seqno != other.seqno) return false
-        if (max_chunk_size != other.max_chunk_size) return false
+        if (maxChunkSize != other.maxChunkSize) return false
 
         return true
     }
@@ -29,7 +29,7 @@ public data class HttpGetNextPayloadPart(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + seqno
-        result = 31 * result + max_chunk_size
+        result = 31 * result + maxChunkSize
         return result
     }
 
@@ -52,6 +52,6 @@ private object HttpGetNextPayloadPartTlConstructor : TlConstructor<HttpGetNextPa
     override fun encode(output: TlWriter, value: HttpGetNextPayloadPart) {
         output.writeBits256(value.id)
         output.writeInt(value.seqno)
-        output.writeInt(value.max_chunk_size)
+        output.writeInt(value.maxChunkSize)
     }
 }

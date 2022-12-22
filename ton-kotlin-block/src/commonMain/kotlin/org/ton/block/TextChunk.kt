@@ -21,7 +21,7 @@ private class TextChunkTlbConstructor(
     n: Int
 ) : TlbConstructor<TextChunk>(
     schema = "text_chunk\$_ {n:#} len:(## 8) data:(bits (len * 8)) next:(TextChunkRef n) = TextChunks (n + 1);"
-){
+) {
     val next = TextChunkRef.tlbCombinator(n - 1)
 
     override fun storeTlb(cellBuilder: CellBuilder, value: TextChunk) {

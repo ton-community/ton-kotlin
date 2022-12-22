@@ -8,7 +8,7 @@ sealed class LiteServerException constructor(
 ) : RuntimeException() {
     companion object {
         @JvmStatic
-        fun create(code: Int, message: String): LiteServerException = when(code) {
+        fun create(code: Int, message: String): LiteServerException = when (code) {
             LiteServerCancelledException.ERROR_CODE -> LiteServerCancelledException(message)
             LiteServerFailureException.ERROR_CODE -> LiteServerFailureException(message)
             LiteServerErrorException.ERROR_CODE -> LiteServerErrorException(message)

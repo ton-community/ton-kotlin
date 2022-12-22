@@ -14,7 +14,8 @@ import org.ton.tl.*
 @SerialName("dht.config.global")
 @JsonClassDiscriminator("@type")
 public data class DhtConfigGlobal(
-    val static_nodes: DhtNodes = DhtNodes(),
+    @SerialName("static_nodes")
+    val staticNodes: DhtNodes = DhtNodes(),
     val k: Int = 0,
     val a: Int = 0
 ) : TlObject<DhtConfigGlobal> {
@@ -30,7 +31,7 @@ public data class DhtConfigGlobal(
         schema = "dht.config.global static_nodes:dht.nodes k:int a:int = dht.config.Global"
     ) {
         override fun encode(output: TlWriter, value: DhtConfigGlobal) {
-            output.write(DhtNodes, value.static_nodes)
+            output.write(DhtNodes, value.staticNodes)
             output.writeInt(value.k)
             output.writeInt(value.a)
         }

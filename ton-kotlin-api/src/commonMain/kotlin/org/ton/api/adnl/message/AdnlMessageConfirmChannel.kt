@@ -6,7 +6,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
 import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
@@ -17,7 +16,8 @@ import org.ton.tl.constructors.*
 @Serializable
 public data class AdnlMessageConfirmChannel(
     val key: Bits256,
-    val peer_key: Bits256,
+    @SerialName("peer_key")
+    val peerKey: Bits256,
     val date: Int
 ) : AdnlMessage {
     public constructor(
@@ -33,14 +33,14 @@ public data class AdnlMessageConfirmChannel(
         if (this === other) return true
         if (other !is AdnlMessageConfirmChannel) return false
         if (key != other.key) return false
-        if (peer_key != other.peer_key) return false
+        if (peerKey != other.peerKey) return false
         if (date != other.date) return false
         return true
     }
 
     override fun hashCode(): Int {
         var result = key.hashCode()
-        result = 31 * result + peer_key.hashCode()
+        result = 31 * result + peerKey.hashCode()
         result = 31 * result + date
         return result
     }
@@ -52,7 +52,7 @@ public data class AdnlMessageConfirmChannel(
 
         override fun encode(output: TlWriter, value: AdnlMessageConfirmChannel) {
             output.writeBits256(value.key)
-            output.writeBits256(value.peer_key)
+            output.writeBits256(value.peerKey)
             output.writeInt(value.date)
         }
 
