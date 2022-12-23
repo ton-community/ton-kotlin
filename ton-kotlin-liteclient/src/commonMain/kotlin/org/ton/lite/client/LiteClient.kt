@@ -62,11 +62,12 @@ public class LiteClient(
             var attempts = 0
             var exception: Exception? = null
             var liteServer: LiteServerDesc? = null
-            while (attempts < 10) {
+            val bytes = query.readBytes()
+            while (attempts < maxOf(5, serverList.size)) {
                 try {
                     liteServer = serverList[currentServer++ % serverList.size]
                     val client = AdnlClientImpl(liteServer)
-                    return client.sendQuery(query, 10.seconds)
+                    return client.sendQuery(ByteReadPacket(bytes), 10.seconds)
                 } catch (e: Exception) {
                     exception = e
                     attempts++

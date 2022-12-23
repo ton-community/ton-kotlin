@@ -17,13 +17,14 @@ public class AdnlClientImpl(
         val adnlConnection = connectionPool.selectConnection(liteServerDesc)
         val queryId = Bits256(Random.nextBytes(32))
         val context = SupervisorJob()
+        val queryData = data.readBytes()
         try {
             return withTimeout(timeout) {
                 val response = adnlConnection.execute(
                     AdnlRequestData(
                         buildPacket {
                             AdnlMessageQuery.encodeBoxed(
-                                this, AdnlMessageQuery(queryId, data.readBytes())
+                                this, AdnlMessageQuery(queryId, queryData)
                             )
                         }.readBytes(),
                         context
