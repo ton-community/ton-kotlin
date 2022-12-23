@@ -36,6 +36,20 @@ public class LiteClient(
     coroutineContext: CoroutineContext,
     private val liteClientConfigGlobal: LiteClientConfigGlobal
 ) : Closeable, CoroutineScope {
+    public constructor(
+        coroutineContext: CoroutineContext,
+        liteServers: List<LiteServerDesc>
+    ) : this(coroutineContext, LiteClientConfigGlobal(liteServers = liteServers))
+
+    public constructor(
+        coroutineContext: CoroutineContext,
+        vararg liteServer: LiteServerDesc
+    ) : this(coroutineContext, liteServer.toList())
+
+    init {
+        require(liteClientConfigGlobal.liteServers.isNotEmpty()) { "No lite servers provided" }
+    }
+
     private val logger: Logger = PrintLnLogger("LiteClient")
     override val coroutineContext: CoroutineContext = coroutineContext + CoroutineName("LiteClient")
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
