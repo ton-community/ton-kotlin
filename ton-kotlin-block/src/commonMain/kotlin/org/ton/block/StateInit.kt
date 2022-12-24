@@ -22,13 +22,17 @@ public data class StateInit(
     val library: HashMapE<SimpleLib>
 ) {
     public constructor(
-        code: CellRef<Cell>? = null,
-        data: CellRef<Cell>? = null,
+        code: Cell? = null,
+        data: Cell? = null,
         library: HashMapE<SimpleLib> = HashMapE.of(),
         splitDepth: UInt? = null,
         special: TickTock? = null
     ) : this(
-        splitDepth.toMaybe(), special.toMaybe(), code.toMaybe(), data.toMaybe(), library
+        splitDepth.toMaybe(),
+        special.toMaybe(),
+        code?.let { CellRef(cell = it, AnyTlbConstructor) }.toMaybe(),
+        data?.let { CellRef(cell = it, AnyTlbConstructor) }.toMaybe(),
+        library
     )
 
     override fun toString(): String = "split_depth:$splitDepth special:$special code:$code data:$data library:$library"
