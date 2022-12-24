@@ -12,14 +12,15 @@ import org.ton.tlb.storeTlb
 
 @SerialName("account_storage")
 @Serializable
-data class AccountStorage(
-    val last_trans_lt: ULong,
+public data class AccountStorage(
+    @SerialName("last_trans_lt")
+    val lastTransLt: ULong,
     val balance: CurrencyCollection,
     val state: AccountState
 ) {
-    override fun toString(): String = "(account_storage\nlast_trans_lt:$last_trans_lt balance:$balance state:$state)"
+    override fun toString(): String = "(account_storage\nlast_trans_lt:$lastTransLt balance:$balance state:$state)"
 
-    companion object : TlbConstructorProvider<AccountStorage> by AccountStorageTlbConstructor
+    public companion object : TlbConstructorProvider<AccountStorage> by AccountStorageTlbConstructor
 }
 
 private object AccountStorageTlbConstructor : TlbConstructor<AccountStorage>(
@@ -30,7 +31,7 @@ private object AccountStorageTlbConstructor : TlbConstructor<AccountStorage>(
         cellBuilder: CellBuilder,
         value: AccountStorage
     ) = cellBuilder {
-        storeUInt64(value.last_trans_lt)
+        storeUInt64(value.lastTransLt)
         storeTlb(CurrencyCollection, value.balance)
         storeTlb(AccountState, value.state)
     }

@@ -23,10 +23,10 @@ public data class HashMapEdge<out T>(
             is HashMapNodeLeaf -> sequenceOf(BitString.empty() to node.value)
             is HashMapNodeFork -> {
                 // Note: left and right branches implicitly contain prefixes '0' and '1' respectively
-                val left = node.left.nodes().map { (label, value) ->
+                val left = node.leftCellRef.value.nodes().map { (label, value) ->
                     (BitString(false) + label) to value
                 }
-                val right = node.right.nodes().map { (label, value) ->
+                val right = node.rightCellRef.value.nodes().map { (label, value) ->
                     (BitString(true) + label) to value
                 }
                 left + right

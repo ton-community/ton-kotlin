@@ -9,8 +9,8 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface Account {
-    companion object : TlbCombinatorProvider<Account> by AccountTlbCombinator
+public sealed interface Account {
+    public companion object : TlbCombinatorProvider<Account> by AccountTlbCombinator
 }
 
 private object AccountTlbCombinator : TlbCombinator<Account>(

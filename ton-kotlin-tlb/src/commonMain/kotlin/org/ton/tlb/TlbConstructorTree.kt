@@ -17,6 +17,10 @@ internal class TlbConstructorTree<T>(
 
     fun values() = root?.values() ?: emptySequence()
 
+    override fun toString(): String {
+        return "TlbConstructorTree(root=$root)"
+    }
+
     class Node<T>(
         val key: BitString,
         val value: T,
@@ -61,6 +65,10 @@ internal class TlbConstructorTree<T>(
                 }
             }
             return result
+        }
+
+        override fun toString(): String {
+            return "Node(key=$key, value=$value, left=$left, right=$right)"
         }
     }
 }

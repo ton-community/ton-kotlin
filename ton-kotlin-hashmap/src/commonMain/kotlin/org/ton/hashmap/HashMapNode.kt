@@ -52,29 +52,21 @@ private class HashMapNodeForkTlbConstructor<X>(
     schema = "hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X) right:^(Hashmap n X) = HashmapNode (n + 1) X;",
     id = BitString.empty()
 ) {
-    private val hashmapConstructor = HashMapEdge.tlbCodec(n - 1, x)
+    private val hashmapConstructor = CellRef.tlbCodec(HashMapEdge.tlbCodec(n - 1, x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: HashMapNodeFork<X>
     ) = cellBuilder {
-        storeRef {
-            storeTlb(hashmapConstructor, value.left)
-        }
-        storeRef {
-            storeTlb(hashmapConstructor, value.right)
-        }
+        storeTlb(hashmapConstructor, value.leftCellRef)
+        storeTlb(hashmapConstructor, value.rightCellRef)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): HashMapNodeFork<X> = cellSlice {
-        val left = loadRef {
-            loadTlb(hashmapConstructor)
-        }
-        val right = loadRef {
-            loadTlb(hashmapConstructor)
-        }
+        val left = loadTlb(hashmapConstructor)
+        val right = loadTlb(hashmapConstructor)
         HashMapNodeFork(left, right)
     }
 }

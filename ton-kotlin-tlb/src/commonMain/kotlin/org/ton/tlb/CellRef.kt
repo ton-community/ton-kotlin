@@ -34,8 +34,12 @@ private class CellRefImpl<T>(
     override val codec: TlbCodec<T>
 ) : CellRef<T> {
     override val value: T by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        codec.loadTlb(cell.beginParse())
+        cell.parse {
+            codec.loadTlb(this)
+        }
     }
+
+    override fun toString(): String = "CellRef($cell)"
 }
 
 private class CellRefValue<T>(
@@ -47,6 +51,8 @@ private class CellRefValue<T>(
             storeTlb(codec, value)
         }
     }
+
+    override fun toString(): String = "CellRef($value)"
 }
 
 private class CellRefTlbConstructor<T>(

@@ -85,7 +85,7 @@ public class LiteClient(
                 } catch (e: Exception) {
                     exception = e
                     attempts++
-                    delay(100)
+                    delay(100L * attempts)
                 }
             }
             throw RuntimeException("Failed to send query to lite server: $liteServer", exception)
@@ -368,22 +368,21 @@ public class LiteClient(
 
     public suspend fun getAccount(
         address: String, mode: Int = 0
-    ): AccountInfo? = getAccount(parseAccountId(address), mode)
+    ): Account? = getAccount(parseAccountId(address), mode)
 
     public suspend fun getAccount(
-        address: LiteServerAccountId?, mode: Int = 0
-    ): AccountInfo? {
+        address: LiteServerAccountId, mode: Int = 0
+    ): Account? {
         return getAccount(address, getCachedLastMasterchainBlockId(), mode)
     }
 
     public suspend fun getAccount(
-        address: String?, blockId: TonNodeBlockIdExt, mode: Int = 0
-    ): AccountInfo? = getAccount(address?.let { parseAccountId(address) }, blockId, mode)
+        address: String, blockId: TonNodeBlockIdExt, mode: Int = 0
+    ): Account? = getAccount(parseAccountId(address), blockId, mode)
 
     public suspend fun getAccount(
-        address: LiteServerAccountId?, blockId: TonNodeBlockIdExt, mode: Int = 0
+        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, mode: Int = 0
     ): AccountInfo? {
-        if (address == null) return null
         logger.debug {
             "requesting account state for ${address.workchain}:${
                 address.id
@@ -396,7 +395,6 @@ public class LiteClient(
                 address.id
             } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
         }
-        if (accountState.state.roots.isEmpty()) return null
         val stateBoc = accountState.stateAsAccount()
         return stateBoc.value as? AccountInfo
     }

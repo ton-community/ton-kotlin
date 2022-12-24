@@ -32,11 +32,9 @@ public interface LiteApiClient : LiteApi {
             null
         }
         if (liteServerError != null) {
-//            println("got error from lite server: $liteServerError")
             throw LiteServerException.create(liteServerError.code, liteServerError.message)
         }
         val answer = answerCodec.decodeBoxed(result)
-//        println("got result from lite server: $answer")
         return answer
     }
 

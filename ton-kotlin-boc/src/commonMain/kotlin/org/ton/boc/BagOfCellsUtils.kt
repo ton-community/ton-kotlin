@@ -43,7 +43,7 @@ internal fun Input.readBagOfCell(): BagOfCells {
 //            sizeBytes = readByte().toInt()
         }
 
-        else -> throw IllegalArgumentException("Unknown magic prefix: ${prefix.toString(16)}")
+        else -> throw IllegalArgumentException("Unknown magic prefix: ${prefix.toUInt().toString(16)}")
     }
 
     // Counters

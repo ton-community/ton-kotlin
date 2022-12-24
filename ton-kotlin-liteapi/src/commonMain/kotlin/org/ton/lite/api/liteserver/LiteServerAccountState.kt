@@ -48,12 +48,12 @@ public data class LiteServerAccountState(
             return LiteServerAccountState(id, shardBlk, shardProof, proof, state)
         }
 
-        override fun encode(output: TlWriter, value: LiteServerAccountState) {
-            output.write(TonNodeBlockIdExt, value.id)
-            output.write(TonNodeBlockIdExt, value.shardBlock)
-            output.writeBoc(value.shardProof)
-            output.writeBoc(value.proof)
-            output.writeBoc(value.state)
+        override fun encode(writer: TlWriter, value: LiteServerAccountState) {
+            writer.write(TonNodeBlockIdExt, value.id)
+            writer.write(TonNodeBlockIdExt, value.shardBlock)
+            writer.writeBoc(value.shardProof)
+            writer.writeBoc(value.proof)
+            writer.writeBoc(value.state)
         }
     }
 }

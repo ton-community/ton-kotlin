@@ -5,6 +5,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.exception.UnknownTlbConstructorException
 import org.ton.tlb.providers.TlbCombinatorProvider
+import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.reflect.KClass
 
 public abstract class TlbCombinator<T : Any>(
@@ -16,23 +17,34 @@ public abstract class TlbCombinator<T : Any>(
 
     init {
         class2codec = subClasses.toMap().toMutableMap()
+
         subClasses.forEach { (_, constructor) ->
-            if (constructor is TlbConstructor<out T>) {
-                constructorTree.add(constructor.id, constructor)
-            }
-            if (constructor is TlbCombinator<out T>) {
-                constructor.constructorTree.values().forEach { (key, value) ->
-                    constructorTree.add(key, value)
-                }
-                class2codec.putAll(constructor.class2codec)
+            when (constructor) {
+                is TlbConstructor<out T> -> addConstructor(constructor)
+                is TlbConstructorProvider<out T> -> addConstructor(constructor.tlbConstructor())
+                is TlbCombinator<out T> -> addCombinator(constructor)
+                is TlbCombinatorProvider<out T> -> addCombinator(constructor.tlbCombinator())
             }
         }
+    }
+
+    private fun addConstructor(constructor: TlbConstructor<out T>) {
+        constructorTree.add(constructor.id, constructor)
+    }
+
+    private fun addCombinator(combinator: TlbCombinator<out T>) {
+        combinator.constructorTree.values().forEach { (key, value) ->
+            constructorTree.add(key, value)
+        }
+        class2codec.putAll(combinator.class2codec)
     }
 
     override fun tlbCombinator(): TlbCombinator<T> = this
 
     override fun loadTlb(cellSlice: CellSlice): T {
-        val constructor = findTlbLoaderOrNull(cellSlice) ?: throw UnknownTlbConstructorException()
+        val constructor = findTlbLoaderOrNull(cellSlice) ?: throw UnknownTlbConstructorException(
+            cellSlice.preloadBits(32)
+        )
         if (constructor is TlbConstructor<*>) {
             cellSlice.skipBits(constructor.id.size)
         }

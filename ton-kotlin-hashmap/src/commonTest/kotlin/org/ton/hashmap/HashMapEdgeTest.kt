@@ -31,27 +31,27 @@ class HashMapEdgeTest {
         val e = HashMapEdge(
             label = HashMapLabelShort(UnaryZero, BitString()),
             node = HashMapNodeFork(
-                left = HashMapEdge(
+                leftCellRef = HashMapEdge(
                     label = HashMapLabelLong(
                         255,
                         BitString("C20BAD98ED5E80064BD29AB119CA237CB7FB76E7686FB8A3D948722FAF487C7B_")
                     ),
                     node = HashMapNodeLeaf(Cell.of("69696969"))
                 ),
-                right = HashMapEdge(
+                rightCellRef = HashMapEdge(
                     label = HashMapLabelShort(UnaryZero, BitString()),
                     node = HashMapNodeFork(
-                        left = HashMapEdge(
+                        leftCellRef = HashMapEdge(
                             label = HashMapLabelShort(UnaryZero, BitString()),
                             node = HashMapNodeFork(
-                                left = HashMapEdge(
+                                leftCellRef = HashMapEdge(
                                     label = HashMapLabelLong(
                                         253,
                                         BitString("151A9BFF86DE73F761AEB4F6E1D0C4F7378BEC179A9D2A9FCD54B6585F1E744C_")
                                     ),
                                     node = HashMapNodeLeaf(Cell.of("42424242"))
                                 ),
-                                right = HashMapEdge(
+                                rightCellRef = HashMapEdge(
                                     label = HashMapLabelLong(
                                         253,
                                         BitString("BB53E50A9E12338B2C19ADDE844A31A87FE310FD0E28B7389184AEA7FEAE2C0C_")
@@ -60,7 +60,7 @@ class HashMapEdgeTest {
                                 )
                             )
                         ),
-                        right = HashMapEdge(
+                        rightCellRef = HashMapEdge(
                             label = HashMapLabelLong(
                                 254,
                                 BitString("2411BDE8DEB43A9F3B9CCD56613E950A260BE2CDF23DEF3B247DEB1C69F34412_")

@@ -74,7 +74,7 @@ public class AdnlConnection(
             val now = Clock.System.now()
             readResponse(now, connection.input, cipher.input, callContext)
 
-            writeRequest(request, callContext, connection.output, cipher.output)
+            writeRequest(request, callContext, connection.output, cipher.output, false)
             return readResponse(now, connection.input, cipher.input, callContext)
         } catch (cause: Throwable) {
             throw cause

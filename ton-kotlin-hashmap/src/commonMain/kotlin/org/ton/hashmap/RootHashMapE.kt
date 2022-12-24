@@ -3,25 +3,25 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.loadRef
-import org.ton.cell.storeRef
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hme_root")
-public data class RootHashMapE<out T>(
-    val root: HashMapEdge<T>
+public data class RootHashMapE<T>(
+    val rootCellRef: CellRef<HashMapEdge<T>>
 ) : HashMapE<T> {
+    public constructor(root: Cell, tlbCodec: TlbCodec<HashMapEdge<T>>) : this(CellRef(root, tlbCodec))
+    public constructor(root: HashMapEdge<T>, tlbCodec: TlbCodec<HashMapEdge<T>>) : this(CellRef(root, tlbCodec))
 
-    override fun nodes(): Sequence<Pair<BitString, T>> = root.nodes()
+    val root: HashMapEdge<T> by rootCellRef
 
-    override fun toString(): String = "(hme_root\nroot:$root)"
+    override fun nodes(): Sequence<Pair<BitString, T>> = rootCellRef.value.nodes()
+
+    override fun toString(): String = "(hme_root\nroot:$rootCellRef)"
 
     public companion object {
         @JvmStatic
@@ -37,23 +37,19 @@ private class RootHashMapETlbConstructor<X>(
     schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;",
     id = ID
 ) {
-    private val hashmapConstructor = HashMapEdge.tlbCodec(n, x)
+    private val cellRef = CellRef.tlbCodec(HashMapEdge.tlbCodec(n, x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: RootHashMapE<X>
     ) {
-        cellBuilder.storeRef {
-            storeTlb(hashmapConstructor, value.root)
-        }
+        cellBuilder.storeTlb(cellRef, value.rootCellRef)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): RootHashMapE<X> {
-        val root = cellSlice.loadRef {
-            loadTlb(hashmapConstructor)
-        }
+        val root = cellSlice.loadTlb(cellRef)
         return RootHashMapE(root)
     }
 
