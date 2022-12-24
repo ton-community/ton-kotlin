@@ -10,7 +10,7 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hm_edge")
-public data class HashMapEdge<out T>(
+public data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>> {
@@ -23,10 +23,10 @@ public data class HashMapEdge<out T>(
             is HashMapNodeLeaf -> sequenceOf(BitString.empty() to node.value)
             is HashMapNodeFork -> {
                 // Note: left and right branches implicitly contain prefixes '0' and '1' respectively
-                val left = node.leftCellRef.value.nodes().map { (label, value) ->
+                val left = node.left.nodes().map { (label, value) ->
                     (BitString(false) + label) to value
                 }
-                val right = node.rightCellRef.value.nodes().map { (label, value) ->
+                val right = node.right.nodes().map { (label, value) ->
                     (BitString(true) + label) to value
                 }
                 left + right

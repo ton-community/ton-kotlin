@@ -15,7 +15,7 @@ public data class RootHashMapE<T>(
     val rootCellRef: CellRef<HashMapEdge<T>>
 ) : HashMapE<T> {
     public constructor(root: Cell, tlbCodec: TlbCodec<HashMapEdge<T>>) : this(CellRef(root, tlbCodec))
-    public constructor(root: HashMapEdge<T>, tlbCodec: TlbCodec<HashMapEdge<T>>) : this(CellRef(root, tlbCodec))
+    public constructor(root: HashMapEdge<T>) : this(CellRef(root))
 
     val root: HashMapEdge<T> by rootCellRef
 

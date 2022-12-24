@@ -24,10 +24,9 @@ public data class HashMapNodeFork<T>(
     public constructor(
         left: HashMapEdge<T>,
         right: HashMapEdge<T>,
-        codec: TlbCodec<HashMapEdge<T>>
     ) : this(
-        leftCellRef = CellRef(left, codec),
-        rightCellRef = CellRef(right, codec)
+        leftCellRef = CellRef(left),
+        rightCellRef = CellRef(right)
     )
 
     val left: HashMapEdge<T> by leftCellRef

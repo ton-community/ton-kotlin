@@ -15,12 +15,12 @@ data class Block(
     val stateUpdateCell: CellRef<MerkleUpdate<ShardState>>,
     val extraCell: CellRef<BlockExtra>
 ) {
-    val info by infoCell
-    val valueFlow by valueFlowCell
-    val stateUpdate by stateUpdateCell
-    val extra by extraCell
+    val info: BlockInfo by infoCell
+    val valueFlow: ValueFlow by valueFlowCell
+    val stateUpdate: MerkleUpdate<ShardState> by stateUpdateCell
+    val extra: BlockExtra by extraCell
 
-    companion object : TlbCombinatorProvider<Block> by TlbConstructor.asTlbCombinator()
+    public companion object : TlbCombinatorProvider<Block> by TlbConstructor.asTlbCombinator()
 
     private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
         schema = "block#11ef55aa global_id:int32 " +
@@ -35,10 +35,10 @@ data class Block(
             value: Block
         ) = cellBuilder {
             storeInt(value.global_id, 32)
-            storeRef(value.infoCell.cell)
-            storeRef(value.valueFlowCell.cell)
-            storeRef(value.stateUpdateCell.cell)
-            storeRef(value.extraCell.cell)
+            storeRef(value.infoCell.toCell(BlockInfo))
+            storeRef(value.valueFlowCell.toCell(ValueFlow))
+            storeRef(value.stateUpdateCell.toCell(merkleUpdate))
+            storeRef(value.extraCell.toCell(BlockExtra))
         }
 
         override fun loadTlb(

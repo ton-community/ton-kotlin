@@ -93,7 +93,7 @@ private open class CellSliceImpl(
     override var refsPosition: Int = 0
 ) : CellSlice {
     override fun endParse() =
-        check(bitsPosition == bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
+        check(bitsPosition >= bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
 
     override fun loadRef(): Cell {
         checkRefsOverflow()

@@ -16,8 +16,8 @@ import org.ton.tlb.constructor.AnyTlbConstructor
 public data class LiteServerSendMessage(
     val body: BagOfCells
 ) {
-    public constructor(body: CellRef<Message<Cell>>) : this(BagOfCells(body.cell))
-    public constructor(body: Message<Cell>) : this(CellRef(body, Message.tlbCodec(AnyTlbConstructor)))
+    public constructor(body: CellRef<Message<Cell>>) : this(BagOfCells(body.toCell(Message.tlbCodec(AnyTlbConstructor))))
+    public constructor(body: Message<Cell>) : this(CellRef(body))
 
     public fun parseBody(): CellRef<Message<Cell>> = CellRef(body.first(), Message.tlbCodec(AnyTlbConstructor))
 
