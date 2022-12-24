@@ -1,8 +1,5 @@
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
@@ -12,6 +9,9 @@ import org.ton.block.AccountNone
 import org.ton.block.AccountUninit
 import org.ton.crypto.base64
 import org.ton.lite.client.LiteClient
+import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 
 class LiteClientTest2 {
