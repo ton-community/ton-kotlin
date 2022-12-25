@@ -6,11 +6,11 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("hml_short")
-data class HashMapLabelShort(
+public data class HashMapLabelShort(
     val len: Unary,
     override val s: BitString
 ) : HashMapLabel {
-    constructor(s: BitString) : this(Unary(s.size), s)
+    public constructor(s: BitString) : this(Unary(s.size), s)
 
-    override fun toString() = "(hml_short len:$len s:$s)"
+    override fun toString(): String = "(hml_short len:$len s:$s)"
 }

@@ -12,6 +12,7 @@ import org.ton.cell.invoke
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.asTlbCombinator
 
 @Serializable
 @SerialName("update_hashes")

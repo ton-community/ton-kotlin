@@ -7,15 +7,16 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
-inline fun Unary(depth: Int): Unary = Unary.of(depth)
+public inline fun Unary(depth: Int): Unary = Unary.of(depth)
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed class Unary {
-    companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
+public sealed class Unary {
+    public companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
         @JvmStatic
-        fun of(depth: Int): Unary {
+        public fun of(depth: Int): Unary {
             var unary: Unary = UnaryZero
             repeat(depth) {
                 unary = UnarySuccess(unary)
@@ -24,19 +25,15 @@ sealed class Unary {
         }
 
         @JvmStatic
-        fun tlbCodec(): TlbNegatedCodec<Unary> = UnaryTlbCombinator
+        public fun tlbCodec(): TlbNegatedCodec<Unary> = UnaryTlbCombinator
     }
 }
 
-private object UnaryTlbCombinator : TlbNegatedCombinator<Unary>() {
-    override val constructors: List<TlbNegatedConstructor<out Unary>> =
-        listOf(UnarySuccessTlbConstructor, UnaryZeroTlbConstructor)
-
-    override fun getConstructor(value: Unary): TlbNegatedConstructor<out Unary> = when (value) {
-        is UnarySuccess -> UnarySuccessTlbConstructor
-        is UnaryZero -> UnaryZeroTlbConstructor
-    }
-}
+private object UnaryTlbCombinator : TlbNegatedCombinator<Unary>(
+    Unary::class,
+    UnaryZero::class to UnaryZeroTlbConstructor,
+    UnarySuccess::class to UnarySuccessTlbConstructor,
+)
 
 private object UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(
     schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"

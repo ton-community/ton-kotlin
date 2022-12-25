@@ -8,6 +8,7 @@ import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
@@ -30,12 +31,6 @@ data class TrPhaseComputeVm(
     init {
         require(vm_init_state_hash.size == 256) { "required: vm_init_state_hash.size == 256, actual: ${vm_init_state_hash.size}" }
         require(vm_final_state_hash.size == 256) { "required: vm_final_state_hash.size == 256, actual: ${vm_final_state_hash.size}" }
-    }
-
-
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TrPhaseComputeVm> = TrPhaseComputeVmTlbConstructor
     }
 
     override fun toString(): String = buildString {
@@ -67,6 +62,8 @@ data class TrPhaseComputeVm(
         append(vm_final_state_hash)
         append(")")
     }
+
+    companion object : TlbConstructorProvider<TrPhaseComputeVm> by TrPhaseComputeVmTlbConstructor
 }
 
 private object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>(

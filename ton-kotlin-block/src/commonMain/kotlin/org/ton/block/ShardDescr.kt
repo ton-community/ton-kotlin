@@ -2,14 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.intellij.lang.annotations.Language
 import org.ton.bitstring.BitString
 import org.ton.cell.*
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("shard_descr")
@@ -42,9 +38,16 @@ data class ShardDescr(
     companion object : TlbCombinatorProvider<ShardDescr> by ShardDescrTlbCombinator
 }
 
-private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>() {
-    val a = ShardDescrTlbConstructor(
-        "shard_descr_new#a seq_no:uint32 reg_mc_seqno:uint32 " +
+private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>(
+    ShardDescr::class,
+    ShardDescr::class to a,
+    ShardDescr::class to b,
+) {
+    override fun findTlbStorerOrNull(value: ShardDescr) = a
+}
+
+private val a = ShardDescrTlbConstructor(
+    "shard_descr_new#a seq_no:uint32 reg_mc_seqno:uint32 " +
             "  start_lt:uint64 end_lt:uint64 " +
             "  root_hash:bits256 file_hash:bits256 " +
             "  before_split:Bool before_merge:Bool " +
@@ -55,9 +58,9 @@ private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>() {
             "  split_merge_at:FutureSplitMerge " +
             "  ^[ fees_collected:CurrencyCollection " +
             "     funds_created:CurrencyCollection ] = ShardDescr;"
-    )
-    val b = ShardDescrTlbConstructor(
-        "shard_descr#b seq_no:uint32 reg_mc_seqno:uint32 " +
+)
+private val b = ShardDescrTlbConstructor(
+    "shard_descr#b seq_no:uint32 reg_mc_seqno:uint32 " +
             "  start_lt:uint64 end_lt:uint64 " +
             "  root_hash:bits256 file_hash:bits256 " +
             "  before_split:Bool before_merge:Bool " +
@@ -68,16 +71,9 @@ private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>() {
             "  split_merge_at:FutureSplitMerge " +
             "  fees_collected:CurrencyCollection " +
             "  funds_created:CurrencyCollection = ShardDescr;"
-    )
+)
 
-    override val constructors: List<TlbConstructor<out ShardDescr>> = listOf(
-        a, b
-    )
-
-    override fun getConstructor(value: ShardDescr): TlbConstructor<out ShardDescr> = a
-}
-
-private class ShardDescrTlbConstructor(@Language("TL-B") schema: String) : TlbConstructor<ShardDescr>(
+private class ShardDescrTlbConstructor(schema: String) : TlbConstructor<ShardDescr>(
     schema
 ) {
     val referencedCurrencyCollection = id == BitString("a")

@@ -7,10 +7,11 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @SerialName("ahm_edge")
 @Serializable
-data class AugDictionaryEdge<X, Y>(
+public data class AugDictionaryEdge<X, Y>(
     val label: HashMapLabel,
     val node: AugDictionaryNode<X, Y>
 ) : Iterable<Pair<X, Y>> {
@@ -18,14 +19,14 @@ data class AugDictionaryEdge<X, Y>(
 
     override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
 
-    fun nodes(): Sequence<Pair<X, Y>> = when (node) {
+    public fun nodes(): Sequence<Pair<X, Y>> = when (node) {
         is AugDictionaryNodeFork -> node.nodes()
         is AugDictionaryNodeLeaf -> sequenceOf(node.value to node.extra)
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             n: Int,
             x: TlbCodec<X>,
             y: TlbCodec<Y>

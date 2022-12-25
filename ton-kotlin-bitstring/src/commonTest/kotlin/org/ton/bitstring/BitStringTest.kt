@@ -104,7 +104,7 @@ class BitStringTest {
     }
 
     @Test
-    fun `toString() on a zero number`() {
+    fun `toString on a zero number`() {
         assertEquals("0", BitString(List(4) { false }).toString())
         assertEquals("00000000", BitString(List(32) { false }).toString())
         assertEquals("0000000000000000", BitString(List(64) { false }).toString())

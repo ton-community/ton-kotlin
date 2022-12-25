@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("unary_succ")
-data class UnarySuccess(
+public data class UnarySuccess(
     val x: Unary
 ) : Unary() {
-    override fun toString() = "(unary_succ\nx:$x)"
+    override fun toString(): String = "(unary_succ\nx:$x)"
 }

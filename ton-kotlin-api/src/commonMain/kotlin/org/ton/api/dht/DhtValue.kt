@@ -1,50 +1,34 @@
 package org.ton.api.dht
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeIntTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @Serializable
-data class DhtValue(
+public data class DhtValue(
     val key: DhtKeyDescription,
-    @Serializable(Base64ByteArraySerializer::class)
     val value: ByteArray,
     val ttl: Int,
-    @Serializable(Base64ByteArraySerializer::class)
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtValue> {
 
     override fun signed(privateKey: PrivateKey): DhtValue =
-        copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))
+        copy(signature = privateKey.sign(tlCodec().encodeToByteArray(this)))
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeBoxed(copy(signature = ByteArray(0))), signature)
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0))), signature)
 
     override fun tlCodec(): TlCodec<DhtValue> = DhtValue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtValue
-
+        if (other !is DhtValue) return false
         if (key != other.key) return false
         if (!value.contentEquals(other.value)) return false
         if (ttl != other.ttl) return false
         if (!signature.contentEquals(other.signature)) return false
-
         return true
     }
 
@@ -56,47 +40,24 @@ data class DhtValue(
         return result
     }
 
-    override fun toString(): String = buildString {
-        append("DhtValue(key=")
-        append(key)
-        append(", value=")
-        append(base64(value))
-        append(", ttl=")
-        append(ttl)
-        append(", signature=")
-        append(base64(signature))
-        append(")")
-    }
-
-    companion object : TlCodec<DhtValue> by DhtValueTlConstructor {
-        @JvmStatic
-        fun signed(name: String, value: ByteArray, key: PrivateKey, ttl: Int = Int.MAX_VALUE): DhtValue {
-            val dhtValue = DhtValue(
-                key = DhtKeyDescription.signed(name, key),
-                ttl = ttl,
-                value = value
-            )
-            return dhtValue.signed(key)
-        }
-    }
+    public companion object : TlCodec<DhtValue> by DhtValueTlConstructor
 }
 
 private object DhtValueTlConstructor : TlConstructor<DhtValue>(
-    type = DhtValue::class,
     schema = "dht.value key:dht.keyDescription value:bytes ttl:int signature:bytes = dht.Value"
 ) {
-    override fun encode(output: Output, value: DhtValue) {
-        output.writeTl(DhtKeyDescription, value.key)
-        output.writeBytesTl(value.value)
-        output.writeIntTl(value.ttl)
-        output.writeBytesTl(value.signature)
+    override fun encode(writer: TlWriter, value: DhtValue) {
+        writer.write(DhtKeyDescription, value.key)
+        writer.writeBytes(value.value)
+        writer.writeInt(value.ttl)
+        writer.writeBytes(value.signature)
     }
 
-    override fun decode(input: Input): DhtValue {
-        val key = input.readTl(DhtKeyDescription)
-        val value = input.readBytesTl()
-        val ttl = input.readIntTl()
-        val signature = input.readBytesTl()
+    override fun decode(reader: TlReader): DhtValue {
+        val key = reader.read(DhtKeyDescription)
+        val value = reader.readBytes()
+        val ttl = reader.readInt()
+        val signature = reader.readBytes()
         return DhtValue(key, value, ttl, signature)
     }
 }

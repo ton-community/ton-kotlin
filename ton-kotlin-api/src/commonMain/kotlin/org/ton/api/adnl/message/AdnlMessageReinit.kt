@@ -4,24 +4,25 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @SerialName("adnl.message.reinit")
 @Serializable
-data class AdnlMessageReinit(
+public data class AdnlMessageReinit(
     val date: Int
 ) : AdnlMessage {
-    companion object : TlConstructor<AdnlMessageReinit>(
-        type = AdnlMessageReinit::class,
-        schema = "adnl.message.reinit date:int = adnl.Message"
+    public companion object : TlConstructor<AdnlMessageReinit>(
+        schema = "adnl.message.reinit date:int = adnl.Message",
     ) {
-        override fun encode(output: Output, value: AdnlMessageReinit) {
-            output.writeIntTl(value.date)
+        public const val SIZE_BYTES: Int = Int.SIZE_BYTES
+
+        override fun encode(writer: TlWriter, value: AdnlMessageReinit) {
+            writer.writeInt(value.date)
         }
 
-        override fun decode(input: Input): AdnlMessageReinit {
-            val date = input.readIntTl()
+        override fun decode(reader: TlReader): AdnlMessageReinit {
+            val date = reader.readInt()
             return AdnlMessageReinit(date)
         }
     }

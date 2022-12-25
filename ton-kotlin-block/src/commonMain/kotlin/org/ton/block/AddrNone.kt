@@ -5,14 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("addr_none")
 @Serializable
-object AddrNone : MsgAddressExt {
+object AddrNone : MsgAddressExt, TlbConstructorProvider<AddrNone> by AddrNoneTlbConstructor {
     override fun toString(): String = "addr_none"
-
-    @JvmStatic
-    fun tlbCodec(): TlbConstructor<AddrNone> = AddrNoneTlbConstructor
 }
 
 private object AddrNoneTlbConstructor : TlbConstructor<AddrNone>(

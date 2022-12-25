@@ -1,33 +1,29 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.readStringTl
-import org.ton.tl.constructors.writeIntTl
-import org.ton.tl.constructors.writeStringTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class LiteServerError(
+public data class LiteServerError(
     val code: Int,
     val message: String
 ) {
     override fun toString(): String = "[$code] $message"
 
-    companion object : TlConstructor<LiteServerError>(
-        type = LiteServerError::class,
+    public companion object : TlConstructor<LiteServerError>(
         schema = "liteServer.error code:int message:string = liteServer.Error"
     ) {
-        override fun decode(input: Input): LiteServerError {
-            val code = input.readIntTl()
-            val message = input.readStringTl()
+        override fun decode(reader: TlReader): LiteServerError {
+            val code = reader.readInt()
+            val message = reader.readString()
             return LiteServerError(code, message)
         }
 
-        override fun encode(output: Output, value: LiteServerError) {
-            output.writeIntTl(value.code)
-            output.writeStringTl(value.message)
+        override fun encode(writer: TlWriter, value: LiteServerError) {
+            writer.writeInt(value.code)
+            writer.writeString(value.message)
         }
     }
 }

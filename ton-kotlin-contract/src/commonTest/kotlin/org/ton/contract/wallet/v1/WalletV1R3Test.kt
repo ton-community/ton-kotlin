@@ -9,6 +9,7 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.liteClient
+import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
@@ -23,14 +24,14 @@ class WalletV1R3Test {
 
     @Test
     fun `test private key`() {
-        val actual = hex(privateKey.key)
+        val actual = hex(privateKey.key.toByteArray())
         val expected = "0000000000000000000000000000000000000000000000000000000000000000"
         assertEquals(expected, actual)
     }
 
     @Test
     fun `test public key`() {
-        val actual = hex(privateKey.publicKey().key)
+        val actual = hex(privateKey.publicKey().key.toByteArray())
         val expected = "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
         assertEquals(expected, actual)
     }
@@ -54,7 +55,7 @@ class WalletV1R3Test {
         val wallet = wallet()
         val address = wallet.address()
         val actual = address.toString(userFriendly = false, testOnly = true)
-        val expected = "0:41d1632383c5c5337cbb2d32200e7035a83d03bf1721370e075ce86fe22de3d6"
+        val expected = "0:41D1632383C5C5337CBB2D32200E7035A83D03BF1721370E075CE86FE22DE3D6"
         assertEquals(expected, actual)
     }
 
@@ -94,16 +95,27 @@ class WalletV1R3Test {
     fun `test deploy BOC`() {
         val wallet = wallet()
         val message = wallet.createExternalInitMessage()
-        val actual =
+        val actualBoc =
             BagOfCells(CellBuilder.createCell {
                 storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
-            }).toByteArray()
+            })
         // TODO: crc32c check
-//        val expected =
-//            hex("b5ee9c724101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da296d304c45")
         val expected =
-            hex("b5ee9c720101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29")
-        assertContentEquals(expected, actual)
+            hex("b5ee9c724101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da296d304c45")
+//        val expected = "b5ee9c720101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29".uppercase()
+
+        val expectedBoc =
+            BagOfCells(hex("b5ee9c720101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"))
+        assertEquals(expectedBoc, actualBoc)
+
+
+        println("---")
+        println(actualBoc)
+
+        println("---")
+        println(actualBoc.toByteArray().encodeHex())
+
+//        assertEquals(expected, hex(actual).uppercase())
     }
 
     private fun ContractV1R3.exampleTransferMessage(comment: String) = createTransferMessage(

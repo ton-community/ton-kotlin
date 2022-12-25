@@ -2,8 +2,6 @@ package org.ton.tl
 
 import io.ktor.utils.io.core.*
 import org.ton.crypto.hex
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -35,11 +33,11 @@ class BytesTlConstructorTest {
         val serializedBytes = hex(data.replace(" ", ""))
         val expectedBytes = hex(expected.replace(" ", ""))
         val reader = ByteReadPacket(serializedBytes)
-        val actualReadBytes = reader.readBytesTl()
+        val actualReadBytes = TlReader(reader).readBytes()
         assertContentEquals(expectedBytes, actualReadBytes)
         assertTrue(reader.isEmpty)
         val actualWriteBytes = buildPacket {
-            writeBytesTl(expectedBytes)
+            TlWriter(this).writeBytes(expectedBytes)
         }.readBytes()
         assertTrue(actualWriteBytes.size % 4 == 0)
         assertContentEquals(serializedBytes, actualWriteBytes)
@@ -47,10 +45,10 @@ class BytesTlConstructorTest {
 
     fun assertEncoding(data: ByteArray) {
         val serializedBytes = buildPacket {
-            writeBytesTl(data)
+            TlWriter(this).writeBytes(data)
         }
         assertTrue(serializedBytes.remaining % 4 == 0L)
-        val deserializedBytes = serializedBytes.readBytesTl()
+        val deserializedBytes = TlReader(serializedBytes).readBytes()
         assertTrue(serializedBytes.isEmpty)
         assertContentEquals(data, deserializedBytes)
     }

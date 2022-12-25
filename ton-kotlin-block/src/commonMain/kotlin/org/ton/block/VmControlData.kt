@@ -11,16 +11,17 @@ import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("vm_ctl_data")
 @Serializable
 class VmControlData(
-    val nargs: Maybe<Int>,
+    val nargs: Maybe<UInt>,
     val stack: Maybe<VmStack>,
     val save: VmSaveList,
     val cp: Maybe<Int>
 ) {
-    constructor(nargs: Int?, stack: VmStack?, save: VmSaveList, cp: Int?) : this(
+    constructor(nargs: UInt?, stack: VmStack?, save: VmSaveList, cp: Int?) : this(
         nargs.toMaybe(),
         stack.toMaybe(),
         save,

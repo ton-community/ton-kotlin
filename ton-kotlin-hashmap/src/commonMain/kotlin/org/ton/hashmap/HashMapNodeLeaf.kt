@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("hmn_leaf")
-data class HashMapNodeLeaf<T>(
+public data class HashMapNodeLeaf<out T>(
     val value: T
 ) : HashMapNode<T> {
-    override fun toString() = "(hmn_leaf value:$value)"
+    override fun toString(): String = "(hmn_leaf value:$value)"
 }

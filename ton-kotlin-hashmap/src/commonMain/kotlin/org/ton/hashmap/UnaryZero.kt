@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("unary_zero")
-object UnaryZero : Unary() {
-    override fun toString() = "unary_zero"
+public object UnaryZero : Unary() {
+    override fun toString(): String = "unary_zero"
 }

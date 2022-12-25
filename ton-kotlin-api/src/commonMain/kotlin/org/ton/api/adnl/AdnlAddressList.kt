@@ -1,45 +1,48 @@
 package org.ton.api.adnl
 
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeIntTl
-import org.ton.tl.constructors.writeVectorTl
+import org.ton.tl.*
 
 @SerialName("adnl.addressList")
-@Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
-data class AdnlAddressList(
-    val addrs: List<AdnlAddress> = emptyList(),
+public data class AdnlAddressList(
+    val addrs: Collection<AdnlAddress> = emptyList(),
     val version: Int = 0,
-    val reinit_date: Int = 0,
+    @SerialName("reinit_date")
+    val reinitDate: Int = 0,
     val priority: Int = 0,
-    val expire_at: Int = 0
-) : List<AdnlAddress> by addrs {
-    companion object : TlConstructor<AdnlAddressList>(
-        type = AdnlAddressList::class,
+    @SerialName("expire_at")
+    val expireAt: Int = 0
+) : TlObject<AdnlAddressList>, Collection<AdnlAddress> by addrs {
+    public constructor(vararg addrs: AdnlAddress) : this(addrs.toList())
+
+    override fun tlCodec(): TlCodec<AdnlAddressList> = Companion
+
+    public companion object : TlConstructor<AdnlAddressList>(
         schema = "adnl.addressList addrs:(vector adnl.Address) version:int reinit_date:int priority:int expire_at:int = adnl.AddressList"
     ) {
-        override fun encode(output: Output, value: AdnlAddressList) {
-            output.writeVectorTl(value.addrs, AdnlAddress)
-            output.writeIntTl(value.version)
-            output.writeIntTl(value.reinit_date)
-            output.writeIntTl(value.priority)
-            output.writeIntTl(value.expire_at)
+        override fun encode(writer: TlWriter, value: AdnlAddressList) {
+            writer.writeCollection(value.addrs) {
+                write(AdnlAddress, it)
+            }
+            writer.writeInt(value.version)
+            writer.writeInt(value.reinitDate)
+            writer.writeInt(value.priority)
+            writer.writeInt(value.expireAt)
         }
 
-        override fun decode(input: Input): AdnlAddressList {
-            val addrs = input.readVectorTl(AdnlAddress)
-            val version = input.readIntTl()
-            val reinitDate = input.readIntTl()
-            val priority = input.readIntTl()
-            val expireAt = input.readIntTl()
+        override fun decode(reader: TlReader): AdnlAddressList {
+            val addrs = reader.readCollection {
+                read(AdnlAddress)
+            }
+            val version = reader.readInt()
+            val reinitDate = reader.readInt()
+            val priority = reader.readInt()
+            val expireAt = reader.readInt()
             return AdnlAddressList(addrs, version, reinitDate, priority, expireAt)
         }
     }

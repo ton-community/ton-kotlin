@@ -6,68 +6,39 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.api.tonnode.Workchain
-import org.ton.bitstring.BitString
 import org.ton.block.AddrStd
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.crypto.encodeHex
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class LiteServerAccountId(
+public data class LiteServerAccountId(
     val workchain: Int,
-    @Serializable(Base64ByteArraySerializer::class)
-    val id: ByteArray
+    val id: Bits256
 ) {
-    constructor(workchain: Int, id: BitString) : this(workchain, id.toByteArray())
-    constructor() : this(Workchain.INVALID_WORKCHAIN, ByteArray(32))
-    constructor(string: String) : this(AddrStd(string))
+    public constructor() : this(Workchain.INVALID_WORKCHAIN, Bits256())
+    public constructor(workchain: Int, id: ByteArray) : this(workchain, Bits256(id))
+    public constructor(string: String) : this(AddrStd(string))
+    public constructor(addrStd: AddrStd) : this(addrStd.workchain_id, Bits256(addrStd.address))
 
-    init {
-        check(id.size == 32)
-    }
+    public fun toMsgAddressIntStd(): AddrStd = AddrStd(workchain, id.toBitString())
 
-    constructor(addrStd: AddrStd) : this(addrStd.workchain_id, addrStd.address.toByteArray())
+    override fun toString(): String = "$workchain:$id"
 
-    fun toMsgAddressIntStd(): AddrStd = AddrStd(workchain, id)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerAccountId
-
-        if (workchain != other.workchain) return false
-        if (!id.contentEquals(other.id)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = workchain
-        result = 31 * result + id.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = "$workchain:${id.encodeHex().uppercase()}"
-
-    companion object : TlConstructor<LiteServerAccountId>(
-        type = LiteServerAccountId::class,
+    public companion object : TlConstructor<LiteServerAccountId>(
         schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
     ) {
-        override fun decode(input: Input): LiteServerAccountId {
-            val workchain = input.readIntTl()
-            val id = input.readBytesTl()
+        override fun decode(reader: TlReader): LiteServerAccountId {
+            val workchain = reader.readInt()
+            val id = reader.readBits256()
             return LiteServerAccountId(workchain, id)
         }
 
-        override fun encode(output: Output, value: LiteServerAccountId) {
-            output.writeIntTl(value.workchain)
-            output.writeInt256Tl(value.id)
+        override fun encode(writer: TlWriter, value: LiteServerAccountId) {
+            writer.writeInt(value.workchain)
+            writer.writeBits256(value.id)
         }
     }
 }

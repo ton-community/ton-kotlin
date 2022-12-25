@@ -1,14 +1,14 @@
 package org.ton.api.dht
 
-import io.ktor.utils.io.core.*
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 
-object DhtStored : TlConstructor<DhtStored>(
-    type = DhtStored::class,
+public object DhtStored : TlConstructor<DhtStored>(
     schema = "dht.stored = dht.Stored"
-) {
-    override fun encode(output: Output, value: DhtStored) {
+), TlObject<DhtStored> {
+    override fun tlCodec(): TlCodec<DhtStored> = this
+
+    override fun encode(writer: TlWriter, value: DhtStored) {
     }
 
-    override fun decode(input: Input): DhtStored = DhtStored
+    override fun decode(reader: TlReader): DhtStored = DhtStored
 }

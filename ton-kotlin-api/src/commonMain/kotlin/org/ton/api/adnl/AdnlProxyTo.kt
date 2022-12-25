@@ -3,82 +3,46 @@ package org.ton.api.adnl
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class AdnlProxyTo(
+public data class AdnlProxyTo(
     val ip: Int,
     val port: Int,
     val date: Int,
     @SerialName("date_hash")
-    @Serializable(Base64ByteArraySerializer::class)
-    val dateHash: ByteArray,
+    val dateHash: Bits256,
     @SerialName("shared_secret")
-    @Serializable(Base64ByteArraySerializer::class)
-    val sharedSecret: ByteArray
+    val sharedSecret: Bits256
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    public constructor(
+        ip: Int,
+        port: Int,
+        date: Int,
+        dateHash: ByteArray,
+        sharedSecret: ByteArray
+    ) : this(ip, port, date, Bits256(dateHash), Bits256(sharedSecret))
 
-        other as AdnlProxyTo
-
-        if (ip != other.ip) return false
-        if (port != other.port) return false
-        if (date != other.date) return false
-        if (!dateHash.contentEquals(other.dateHash)) return false
-        if (!sharedSecret.contentEquals(other.sharedSecret)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = ip
-        result = 31 * result + port
-        result = 31 * result + date
-        result = 31 * result + dateHash.contentHashCode()
-        result = 31 * result + sharedSecret.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = buildString {
-        append("AdnlProxyTo(ip=")
-        append(ip)
-        append(", port=")
-        append(port)
-        append(", date=")
-        append(date)
-        append(", dateHash=")
-        append(base64(dateHash))
-        append(", sharedSecret=")
-        append(base64(sharedSecret))
-        append(")")
-    }
-
-    companion object : TlConstructor<AdnlProxyTo>(
-        type = AdnlProxyTo::class,
+    public companion object : TlConstructor<AdnlProxyTo>(
         schema = "adnl.proxyToFastHash ip:int port:int date:int data_hash:int256 shared_secret:int256 = adnl.ProxyTo"
     ) {
-        override fun encode(output: Output, value: AdnlProxyTo) {
-            output.writeIntTl(value.ip)
-            output.writeIntTl(value.port)
-            output.writeIntTl(value.date)
-            output.writeInt256Tl(value.dateHash)
-            output.writeInt256Tl(value.sharedSecret)
+        override fun encode(writer: TlWriter, value: AdnlProxyTo) {
+            writer.writeInt(value.ip)
+            writer.writeInt(value.port)
+            writer.writeInt(value.date)
+            writer.writeBits256(value.dateHash)
+            writer.writeBits256(value.sharedSecret)
         }
 
-        override fun decode(input: Input): AdnlProxyTo {
-            val ip = input.readIntTl()
-            val port = input.readIntTl()
-            val date = input.readIntTl()
-            val dateHash = input.readInt256Tl()
-            val sharedSecret = input.readInt256Tl()
+        override fun decode(reader: TlReader): AdnlProxyTo {
+            val ip = reader.readInt()
+            val port = reader.readInt()
+            val date = reader.readInt()
+            val dateHash = reader.readBits256()
+            val sharedSecret = reader.readBits256()
             return AdnlProxyTo(ip, port, date, dateHash, sharedSecret)
         }
     }

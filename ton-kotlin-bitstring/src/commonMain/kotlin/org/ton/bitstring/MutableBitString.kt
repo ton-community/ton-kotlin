@@ -1,7 +1,9 @@
 package org.ton.bitstring
 
-interface MutableBitString : BitString, MutableList<Boolean> {
-    operator fun set(index: Int, bit: Int)
+import kotlin.jvm.JvmStatic
+
+public interface MutableBitString : BitString, MutableList<Boolean> {
+    public operator fun set(index: Int, bit: Int)
     override operator fun set(index: Int, element: Boolean): Boolean
 
     override operator fun plus(bits: BooleanArray): MutableBitString
@@ -11,4 +13,9 @@ interface MutableBitString : BitString, MutableList<Boolean> {
     override fun plus(bytes: ByteArray, bits: Int): MutableBitString
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableBitString
+
+    public companion object {
+        @JvmStatic
+        public fun of(size: Int): MutableBitString = ByteBackedMutableBitString.of(size)
+    }
 }

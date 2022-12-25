@@ -3,30 +3,27 @@ package org.ton.api.dht
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlObject
+import org.ton.tl.*
 
 @Serializable
-data class DhtPong(
+public data class DhtPong(
     @SerialName("random_id")
     val randomId: Long
 ) : TlObject<DhtPong> {
     override fun tlCodec(): TlCodec<DhtPong> = DhtPongTlConstructor
 
-    companion object : TlCodec<DhtPong> by DhtPongTlConstructor
+    public companion object : TlCodec<DhtPong> by DhtPongTlConstructor
 }
 
 private object DhtPongTlConstructor : TlConstructor<DhtPong>(
-    type = DhtPong::class,
     schema = "dht.pong random_id:long = dht.Pong"
 ) {
-    override fun encode(output: Output, value: DhtPong) {
-        output.writeLongLittleEndian(value.randomId)
+    override fun encode(writer: TlWriter, value: DhtPong) {
+        writer.writeLong(value.randomId)
     }
 
-    override fun decode(input: Input): DhtPong {
-        val randomId = input.readLongLittleEndian()
+    override fun decode(input: TlReader): DhtPong {
+        val randomId = input.readLong()
         return DhtPong(randomId)
     }
 }

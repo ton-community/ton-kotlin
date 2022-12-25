@@ -1,70 +1,65 @@
+@file:Suppress("PropertyName")
+
 package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
+import org.ton.tl.Bits256
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeInt256Tl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
+import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.confirmChannel")
 @Serializable
-data class AdnlMessageConfirmChannel(
-    @Serializable(Base64ByteArraySerializer::class)
-    val key: ByteArray,
+public data class AdnlMessageConfirmChannel(
+    val key: Bits256,
     @SerialName("peer_key")
-    @Serializable(Base64ByteArraySerializer::class)
-    val peerKey: ByteArray,
+    val peerKey: Bits256,
     val date: Int
 ) : AdnlMessage {
+    public constructor(
+        key: Bits256,
+        peerKey: Bits256,
+        date: Instant
+    ) : this(key, peerKey, date.epochSeconds.toInt())
+
+
+    public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlMessageConfirmChannel
-
-        if (!key.contentEquals(other.key)) return false
-        if (!peerKey.contentEquals(other.peerKey)) return false
+        if (other !is AdnlMessageConfirmChannel) return false
+        if (key != other.key) return false
+        if (peerKey != other.peerKey) return false
         if (date != other.date) return false
-
         return true
     }
 
     override fun hashCode(): Int {
-        var result = key.contentHashCode()
-        result = 31 * result + peerKey.contentHashCode()
+        var result = key.hashCode()
+        result = 31 * result + peerKey.hashCode()
         result = 31 * result + date
         return result
     }
 
-    override fun toString(): String = buildString {
-        append("AdnlMessageConfirmChannel(key=")
-        append(base64(key))
-        append(", peerKey=")
-        append(base64(peerKey))
-        append(", date=")
-        append(date)
-        append(")")
-    }
-
-    companion object : TlConstructor<AdnlMessageConfirmChannel>(
-        type = AdnlMessageConfirmChannel::class,
-        schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message"
+    public companion object : TlConstructor<AdnlMessageConfirmChannel>(
+        schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",
     ) {
-        override fun encode(output: Output, value: AdnlMessageConfirmChannel) {
-            output.writeInt256Tl(value.key)
-            output.writeInt256Tl(value.peerKey)
-            output.writeIntTl(value.date)
+        public const val SIZE_BYTES: Int = (256 / Byte.SIZE_BYTES) * 2 + Int.SIZE_BYTES
+
+        override fun encode(output: TlWriter, value: AdnlMessageConfirmChannel) {
+            output.writeBits256(value.key)
+            output.writeBits256(value.peerKey)
+            output.writeInt(value.date)
         }
 
-        override fun decode(input: Input): AdnlMessageConfirmChannel {
-            val key = input.readInt256Tl()
-            val peerKey = input.readInt256Tl()
-            val date = input.readIntTl()
+        override fun decode(input: TlReader): AdnlMessageConfirmChannel {
+            val key = input.readBits256()
+            val peerKey = input.readBits256()
+            val date = input.readInt()
             return AdnlMessageConfirmChannel(key, peerKey, date)
         }
     }

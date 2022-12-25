@@ -29,6 +29,10 @@ internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
 
     override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString(ByteArray(1), 0)
 
+    override fun xor(other: BitString): BitString = other
+
+    override fun or(other: BitString): BitString = other
+
     override fun toString(): String = ""
 
     override fun equals(other: Any?): Boolean {

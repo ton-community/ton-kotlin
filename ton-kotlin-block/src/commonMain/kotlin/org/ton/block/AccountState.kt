@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
@@ -17,19 +17,9 @@ sealed interface AccountState {
     }
 }
 
-private object AccountStateTlbCombinator : TlbCombinator<AccountState>() {
-    val uninit = AccountUninit.tlbCodec()
-    val active = AccountActive.tlbCodec()
-    val frozen = AccountFrozen.tlbCodec()
-
-    override val constructors: List<TlbConstructor<out AccountState>> =
-        listOf(uninit, active, frozen)
-
-    override fun getConstructor(
-        value: AccountState
-    ): TlbConstructor<out AccountState> = when (value) {
-        is AccountUninit -> uninit
-        is AccountActive -> active
-        is AccountFrozen -> frozen
-    }
-}
+private object AccountStateTlbCombinator : TlbCombinator<AccountState>(
+    AccountState::class,
+    AccountUninit::class to AccountUninit.tlbCodec(),
+    AccountActive::class to AccountActive.tlbCodec(),
+    AccountFrozen::class to AccountFrozen.tlbCodec()
+)

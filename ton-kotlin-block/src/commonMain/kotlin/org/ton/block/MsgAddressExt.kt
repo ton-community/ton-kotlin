@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
+import kotlin.jvm.JvmStatic
 
 inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt.of(externalAddress)
 inline fun MsgAddressExt(externalAddress: ByteArray): MsgAddressExt = MsgAddressExt.of(externalAddress)
@@ -33,16 +33,8 @@ sealed interface MsgAddressExt : MsgAddress {
     }
 }
 
-private object MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>() {
-    private val addrNoneConstructor = AddrNone.tlbCodec()
-    private val addrExternConstructor = AddrExtern.tlbCodec()
-
-    override val constructors: List<TlbConstructor<out MsgAddressExt>> by lazy {
-        listOf(addrNoneConstructor, addrExternConstructor)
-    }
-
-    override fun getConstructor(value: MsgAddressExt): TlbConstructor<out MsgAddressExt> = when (value) {
-        is AddrNone -> addrNoneConstructor
-        is AddrExtern -> addrExternConstructor
-    }
-}
+private object MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
+    MsgAddressExt::class,
+    AddrNone::class to AddrNone.tlbConstructor(),
+    AddrExtern::class to AddrExtern.tlbConstructor(),
+)

@@ -13,6 +13,7 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 inline fun VmStack(depth: Int, stack: VmStackList): VmStack = VmStackImpl(depth, stack)
 inline fun VmStack(stack: VmStackList): VmStack = VmStackImpl(stack)
@@ -39,7 +40,7 @@ interface VmStack : Collection<VmStackValue> {
                 return vmStackValue
             }
         }
-        throw ArrayIndexOutOfBoundsException()
+        throw IllegalArgumentException("index: $index")
     }
 
     companion object : TlbCodec<VmStack> by VmStackTlbConstructor {

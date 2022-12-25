@@ -2,8 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.BigInt
-import org.ton.bigint.times
+import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -12,7 +11,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
-import java.math.BigInteger
+import kotlin.jvm.JvmStatic
 import kotlin.math.pow
 
 @SerialName("nanocoins")
@@ -32,8 +31,8 @@ data class Coins(
     operator fun times(other: Coins): Coins = Coins(amount * other.amount)
     operator fun div(other: Coins): Coins = Coins(amount / other.amount)
     operator fun rem(other: Coins): Coins = Coins(amount % other.amount)
-    operator fun inc(): Coins = Coins(amount + VarUInteger(1, BigInteger.ONE))
-    operator fun dec(): Coins = Coins(amount - VarUInteger(1, BigInteger.ONE))
+    operator fun inc(): Coins = Coins(amount + VarUInteger(1, 1.toBigInt()))
+    operator fun dec(): Coins = Coins(amount - VarUInteger(1, 1.toBigInt()))
 
     companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
         private val DECIMALS = 9

@@ -1,60 +1,51 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockTransactions
 import org.ton.lite.api.liteserver.LiteServerTransactionId3
 import org.ton.tl.*
-import org.ton.tl.constructors.readBoolTl
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeBoolTl
-import org.ton.tl.constructors.writeIntTl
-
-interface LiteServerListBlockTransactionsFunction : LiteServerQueryFunction {
-    suspend fun query(query: LiteServerListBlockTransactions) =
-        query(query, LiteServerListBlockTransactions, LiteServerBlockTransactions)
-
-    suspend fun listBlockTransactions(
-        id: TonNodeBlockIdExt,
-        mode: Int,
-        count: Int,
-        after: LiteServerTransactionId3?
-    ) = query(LiteServerListBlockTransactions(id, mode, count, after))
-}
 
 @Serializable
-data class LiteServerListBlockTransactions(
+public data class LiteServerListBlockTransactions(
     val id: TonNodeBlockIdExt,
     val mode: Int,
     val count: Int,
     val after: LiteServerTransactionId3?,
-    val reverse_order: Boolean? = true,
-    val want_proof: Boolean? = true
-) {
-    companion object : TlCodec<LiteServerListBlockTransactions> by LiteServerListBlockTransactionsTlConstructor
+    val reverseOrder: Boolean = true,
+    val wantProof: Boolean = true
+) : TLFunction<LiteServerListBlockTransactions, LiteServerBlockTransactions> {
+    public companion object : TlCodec<LiteServerListBlockTransactions> by LiteServerListBlockTransactionsTlConstructor
+
+    override fun tlCodec(): TlCodec<LiteServerListBlockTransactions> = LiteServerListBlockTransactions
+    override fun resultTlCodec(): TlCodec<LiteServerBlockTransactions> = LiteServerBlockTransactions
 }
 
 private object LiteServerListBlockTransactionsTlConstructor : TlConstructor<LiteServerListBlockTransactions>(
-    type = LiteServerListBlockTransactions::class,
     schema = "liteServer.listBlockTransactions id:tonNode.blockIdExt mode:# count:# after:mode.7?liteServer.transactionId3 reverse_order:mode.6?true want_proof:mode.5?true = liteServer.BlockTransactions"
 ) {
-    override fun decode(input: Input): LiteServerListBlockTransactions {
-        val id = input.readTl(TonNodeBlockIdExt)
-        val mode = input.readIntTl()
-        val count = input.readIntTl()
-        val after = input.readFlagTl(mode, 7, LiteServerTransactionId3)
-        val reverseOrder = input.readFlagTl(mode, 6) { input.readBoolTl() }
-        val wantProof = input.readFlagTl(mode, 5) { input.readBoolTl() }
+    override fun decode(reader: TlReader): LiteServerListBlockTransactions {
+        val id = reader.read(TonNodeBlockIdExt)
+        val mode = reader.readInt()
+        val count = reader.readInt()
+        val after = reader.readNullable(mode, 7) {
+            read(LiteServerTransactionId3)
+        }
+        val reverseOrder = reader.readNullable(mode, 6) { true } ?: false
+        val wantProof = reader.readNullable(mode, 5) { true } ?: false
         return LiteServerListBlockTransactions(id, mode, count, after, reverseOrder, wantProof)
     }
 
-    override fun encode(output: Output, value: LiteServerListBlockTransactions) {
-        output.writeTl(TonNodeBlockIdExt, value.id)
-        output.writeIntTl(value.mode)
-        output.writeIntTl(value.count)
-        output.writeOptionalTl(value.mode, 7, LiteServerTransactionId3, value.after)
-        output.writeOptionalTl(value.mode, 6) { output.writeBoolTl(true) }
-        output.writeOptionalTl(value.mode, 5) { output.writeBoolTl(true) }
+    override fun encode(writer: TlWriter, value: LiteServerListBlockTransactions) {
+        writer.write(TonNodeBlockIdExt, value.id)
+        writer.writeInt(value.mode)
+        writer.writeInt(value.count)
+        writer.writeNullable(value.mode, 7, value.after) {
+            write(LiteServerTransactionId3, it)
+        }
+        writer.writeNullable(value.mode, 6, value.reverseOrder) {
+        }
+        writer.writeNullable(value.mode, 5, value.wantProof) {
+        }
     }
 }

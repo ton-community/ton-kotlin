@@ -10,20 +10,22 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmStatic
 
 @SerialName("ahmn_leaf")
 @Serializable
-data class AugDictionaryNodeLeaf<X, Y>(
-    override val extra: Y, val value: X
+public data class AugDictionaryNodeLeaf<X, Y>(
+    override val extra: Y,
+    val value: X
 ) : AugDictionaryNode<X, Y> {
     override fun toString(): String = "(ahmn_leaf\nextra:$extra value:$value)"
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X, Y> tlbCodec(
+        public fun <X, Y> tlbCodec(
             x: TlbCodec<X>,
             y: TlbCodec<Y>
-        ): TlbConstructor<AugDictionaryNodeLeaf<X, Y>> = AugDictionaryNodeLeafTlbConstructor(x, y)
+        ): TlbCodec<AugDictionaryNodeLeaf<X, Y>> = AugDictionaryNodeLeafTlbConstructor(x, y)
     }
 }
 

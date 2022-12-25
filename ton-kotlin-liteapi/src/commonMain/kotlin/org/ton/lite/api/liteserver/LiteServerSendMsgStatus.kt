@@ -1,26 +1,24 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readIntTl
-import org.ton.tl.constructors.writeIntTl
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
-data class LiteServerSendMsgStatus(
+public data class LiteServerSendMsgStatus(
     val status: Int
 ) {
-    companion object : TlConstructor<LiteServerSendMsgStatus>(
-        type = LiteServerSendMsgStatus::class,
+    public companion object : TlConstructor<LiteServerSendMsgStatus>(
         schema = "liteServer.sendMsgStatus status:int = liteServer.SendMsgStatus"
     ) {
-        override fun decode(input: Input): LiteServerSendMsgStatus {
-            val status = input.readIntTl()
+        override fun decode(input: TlReader): LiteServerSendMsgStatus {
+            val status = input.readInt()
             return LiteServerSendMsgStatus(status)
         }
 
-        override fun encode(output: Output, value: LiteServerSendMsgStatus) {
-            output.writeIntTl(value.status)
+        override fun encode(output: TlWriter, value: LiteServerSendMsgStatus) {
+            output.writeInt(value.status)
         }
     }
 }

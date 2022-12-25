@@ -3,6 +3,7 @@ package org.ton.bitstring
 import kotlin.experimental.and
 import kotlin.experimental.inv
 import kotlin.experimental.or
+import kotlin.jvm.JvmStatic
 
 open class ByteBackedMutableBitString(
     override var bytes: ByteArray,

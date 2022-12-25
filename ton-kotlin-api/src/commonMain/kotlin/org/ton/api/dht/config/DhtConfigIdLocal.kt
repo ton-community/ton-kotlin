@@ -2,16 +2,26 @@
 
 package org.ton.api.dht.config
 
-import kotlinx.serialization.Polymorphic
+import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlIdShort
+import org.ton.tl.*
 
 @SerialName("dht.config.local")
-@Polymorphic
-@Serializable
-@JsonClassDiscriminator("@type")
-data class DhtConfigIdLocal(
+public data class DhtConfigIdLocal(
     val id: AdnlIdShort
-) : DhtConfigLocal
+) : DhtConfigLocal {
+
+    public companion object : TlConstructor<DhtConfigIdLocal>(
+        schema = "dht.config.local id:adnl.id_short = dht.config.Local"
+    ) {
+        override fun encode(output: TlWriter, value: DhtConfigIdLocal) {
+            output.write(AdnlIdShort, value.id)
+        }
+
+        override fun decode(input: TlReader): DhtConfigIdLocal {
+            val id = input.read(AdnlIdShort)
+            return DhtConfigIdLocal(id)
+        }
+    }
+}

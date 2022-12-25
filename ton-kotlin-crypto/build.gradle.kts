@@ -1,6 +1,6 @@
 plugins {
-    java
-    id("org.jetbrains.kotlinx.benchmark")
+    kotlin("multiplatform")
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -9,8 +9,12 @@ kotlin {
             dependencies {
                 api(libs.ktor.utils)
                 implementation(libs.curve25519)
-                implementation(libs.kotlinio.base64)
-                compileOnly(libs.serialization.core)
+                implementation(libs.serialization.core)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
         val jvmMain by getting {
@@ -18,26 +22,10 @@ kotlin {
                 implementation(libs.bouncycastle)
             }
         }
-        val commonTest by getting {
+        val nativeMain by getting {
             dependencies {
-                implementation(kotlin("test"))
-                implementation(libs.benchmark.runtime)
+                api(libs.serialization.core)
             }
-        }
-    }
-}
-
-benchmark {
-    configurations {
-        targets {
-            // This one matches compilation base name, e.g. 'jvm', 'jvmTest', etc
-            register("jvm")
-        }
-
-        val main by getting {
-            iterations = 5 // number of iterations
-            iterationTime = 1000
-            iterationTimeUnit = "ms"
         }
     }
 }

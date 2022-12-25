@@ -8,12 +8,11 @@ import kotlin.test.assertEquals
 
 class VmStackTest {
     @Test
-    fun `test VmStack (de)serialization with VmStackList-Nil`() {
+    fun `test VmStack serialization with VmStackList-Nil`() {
         val stack = VmStack(VmStackList.Nil)
         val cell = CellBuilder.createCell {
             storeTlb(VmStack.tlbCodec(), stack)
         }
-        println(cell)
         val stack2 = cell.parse {
             loadTlb(VmStack.tlbCodec())
         }
@@ -21,7 +20,7 @@ class VmStackTest {
     }
 
     @Test
-    fun `test VmStack (de)serialization with VmStackList-Single`() {
+    fun `test VmStack serialization with VmStackList-Single`() {
         val stack = VmStack(
             VmStackList.Cons(
                 VmStackList.Cons(
@@ -32,7 +31,6 @@ class VmStackTest {
         val cell = CellBuilder.createCell {
             storeTlb(VmStack.tlbCodec(), stack)
         }
-        println(cell)
         val stack2 = cell.parse {
             loadTlb(VmStack.tlbCodec())
         }

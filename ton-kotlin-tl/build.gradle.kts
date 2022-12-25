@@ -3,9 +3,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(projects.tonKotlinCrypto)
-                implementation(libs.ktor.utils)
-                implementation(libs.serialization.json)
-                implementation(kotlin("reflect"))
+                api(projects.tonKotlinBitstring)
+                api(libs.ktor.utils)
+                api(libs.serialization.json)
             }
         }
         val commonTest by getting {

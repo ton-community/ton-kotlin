@@ -2,20 +2,18 @@ package org.ton.api.adnl.message
 
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
-
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @SerialName("adnl.message.nop")
-@Serializable
-class AdnlMessageNop : AdnlMessage {
-    companion object : TlConstructor<AdnlMessageNop>(
-        type = AdnlMessageNop::class,
-        schema = "adnl.message.nop = adnl.Message"
-    ) {
-        override fun encode(output: Output, value: AdnlMessageNop) {
-        }
+public object AdnlMessageNop : AdnlMessage, TlConstructor<AdnlMessageNop>(
+    schema = "adnl.message.nop = adnl.Message"
+) {
+    public const val SIZE_BYTES: Int = 0
 
-        override fun decode(input: Input): AdnlMessageNop = AdnlMessageNop()
+    override fun decode(reader: TlReader): AdnlMessageNop = this
+
+    override fun encode(writer: TlWriter, value: AdnlMessageNop) {
     }
 }

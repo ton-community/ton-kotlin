@@ -4,43 +4,48 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
+import kotlin.jvm.JvmStatic
 
-fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
+public inline fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
     Cell.of(BitString(hex), refs = refs.toList(), isExotic)
 
-fun Cell(hex: String, refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false): Cell =
+public inline fun Cell(hex: String, refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false): Cell =
     Cell.of(BitString(hex), refs, isExotic)
 
-fun Cell(bits: BitString = BitString.empty(), refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false) =
+public inline fun Cell(
+    bits: BitString = BitString.empty(),
+    refs: Iterable<Cell> = emptyList(),
+    isExotic: Boolean = false
+): Cell =
     Cell.of(bits, refs, isExotic)
 
-fun Cell(bits: BitString, vararg refs: Cell, isExotic: Boolean = false): Cell =
+public inline fun Cell(bits: BitString, vararg refs: Cell, isExotic: Boolean = false): Cell =
     Cell.of(bits, refs = refs, isExotic)
 
 @JsonClassDiscriminator("@type")
-interface Cell {
-    val bits: BitString
-    val refs: List<Cell>
-    val type: CellType
+public interface Cell {
+    public val bits: BitString
+    public val refs: List<Cell>
+    public val type: CellType
 
-    val isExotic: Boolean get() = type.isExotic
-    val isMerkle: Boolean get() = type.isMerkle
-    val isPruned: Boolean get() = type.isPruned
-    val levelMask: LevelMask
+    public val isExotic: Boolean get() = type.isExotic
+    public val isMerkle: Boolean get() = type.isMerkle
+    public val isPruned: Boolean get() = type.isPruned
+    public val levelMask: LevelMask
 
-    fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
+    public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    fun hash(level: Int = MAX_LEVEL): ByteArray
-    fun depth(level: Int = MAX_LEVEL): Int
+    public fun hash(level: Int = MAX_LEVEL): ByteArray
+    public fun depth(level: Int = MAX_LEVEL): Int
 
-    fun treeWalk(): Sequence<Cell> = sequence {
+    public fun treeWalk(): Sequence<Cell> = sequence {
         yieldAll(refs)
         refs.forEach { reference ->
             yieldAll(reference.treeWalk())
         }
     }
 
-    fun loadCell(): Cell =
+    public fun loadCell(): Cell =
         when (type) {
             CellType.ORDINARY -> this
             CellType.PRUNED_BRANCH -> error("Can't load pruned branch cell")
@@ -49,66 +54,63 @@ interface Cell {
             CellType.MERKLE_UPDATE -> refs[1]
         }
 
-    fun beginParse(): CellSlice = CellSlice.beginParse(this)
+    public fun beginParse(): CellSlice = CellSlice.beginParse(this)
 
-    fun <T> parse(block: CellSlice.() -> T): T {
+    public fun <T> parse(block: CellSlice.() -> T): T {
         val slice = beginParse()
         val result = block(slice)
         slice.endParse()
         return result
     }
 
-    fun toPrunedBranch(newLevel: Int, virtualizationLevel: Int = MAX_LEVEL): Cell =
+    public fun toPrunedBranch(newLevel: Int, virtualizationLevel: Int = MAX_LEVEL): Cell =
         CellBuilder.createPrunedBranch(this, newLevel, virtualizationLevel)
 
-    fun toMerkleProof(): Cell =
+    public fun toMerkleProof(): Cell =
         CellBuilder.createMerkleProof(this)
 
-    fun toMerkleUpdate(toProof: Cell): Cell =
+    public fun toMerkleUpdate(toProof: Cell): Cell =
         CellBuilder.createMerkleUpdate(this, toProof)
 
-    fun descriptors(): ByteArray = byteArrayOf(getRefsDescriptor(), getBitsDescriptor())
-    fun getBitsDescriptor(): Byte = Companion.getBitsDescriptor(bits)
-    fun getRefsDescriptor(): Byte = Companion.getRefsDescriptor(refs.size, isExotic, levelMask)
+    public fun descriptors(): ByteArray = byteArrayOf(getRefsDescriptor(), getBitsDescriptor())
+    public fun getBitsDescriptor(): Byte = Companion.getBitsDescriptor(bits)
+    public fun getRefsDescriptor(): Byte = Companion.getRefsDescriptor(refs.size, isExotic, levelMask)
 
     override fun toString(): String
 
-    companion object {
-        const val HASH_BYTES = 32
-        const val HASH_BITS = HASH_BYTES * Byte.SIZE_BITS
-        const val DEPTH_BYTES = 2
-        const val DEPTH_BITS = DEPTH_BYTES * Byte.SIZE_BITS
-        const val MAX_LEVEL = 3
-        const val MAX_DEPTH = 1024
+    public companion object {
+        public const val HASH_BYTES: Int = 32
+        public const val HASH_BITS: Int = HASH_BYTES * Byte.SIZE_BITS
+        public const val DEPTH_BYTES: Int = 2
+        public const val DEPTH_BITS: Int = DEPTH_BYTES * Byte.SIZE_BITS
+        public const val MAX_LEVEL: Int = 3
+        public const val MAX_DEPTH: Int = 1024
 
         @JvmStatic
-        fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
+        public fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
             CellImpl.of(BitString(hex), refs.toList(), isExotic)
 
         @JvmStatic
-        fun of(
+        public fun of(
             bits: BitString = BitString(),
             refs: Iterable<Cell> = emptyList(),
             isExotic: Boolean = false
         ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
-        fun of(
+        public fun of(
             bits: BitString,
             vararg refs: Cell,
             isExotic: Boolean = false
         ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
-        fun empty(): Cell = of()
-
-        @JvmStatic
-        fun toString(cell: Cell) = buildString {
+        public fun toString(cell: Cell): String = buildString {
             toString(cell, this)
         }
 
         @JvmStatic
-        fun toString(
+        public fun toString(
             cell: Cell,
             appendable: Appendable,
             indent: String = ""
@@ -128,12 +130,12 @@ interface Cell {
         }
 
         @JvmStatic
-        fun getRefsDescriptor(refs: Int, isExotic: Boolean, levelMask: LevelMask): Byte {
+        public fun getRefsDescriptor(refs: Int, isExotic: Boolean, levelMask: LevelMask): Byte {
             return (refs + ((if (isExotic) 1 else 0) * 8) + (levelMask.mask * 32)).toByte()
         }
 
         @JvmStatic
-        fun getBitsDescriptor(bits: BitString): Byte {
+        public fun getBitsDescriptor(bits: BitString): Byte {
             val result = (bits.size / 8) * 2
             if ((bits.size and 7) != 0) {
                 return (result + 1).toByte()
@@ -142,4 +144,3 @@ interface Cell {
         }
     }
 }
-

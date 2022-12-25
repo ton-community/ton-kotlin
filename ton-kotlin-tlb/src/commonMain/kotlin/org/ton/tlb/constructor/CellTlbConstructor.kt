@@ -7,8 +7,8 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-fun Cell.Companion.tlbCodec(): TlbCodec<Cell> = CellTlbConstructor
-fun <T : Any> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellReferencedTlbConstructor(type)
+public fun Cell.Companion.tlbCodec(): TlbCodec<Cell> = CellTlbConstructor
+public fun <T : Any> Cell.Companion.tlbCodec(type: TlbCodec<T>): TlbCodec<T> = CellReferencedTlbConstructor(type)
 
 private object CellTlbConstructor : TlbConstructor<Cell>(
     schema = "_ _:Cell = Cell;",

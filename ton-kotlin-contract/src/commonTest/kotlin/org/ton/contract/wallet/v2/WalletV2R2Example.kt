@@ -13,7 +13,7 @@ suspend fun main() {
     println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")
     println("Bounceable address (for later access): ${address.toString(bounceable = true, testOnly = true)}")
-    println("Corresponding public key is ${hex(wallet.privateKey.publicKey().key).uppercase()}")
+    println("Corresponding public key is ${hex(wallet.privateKey.publicKey().key.toByteArray()).uppercase()}")
 
     val block = liteClient.getLastBlockId()
 

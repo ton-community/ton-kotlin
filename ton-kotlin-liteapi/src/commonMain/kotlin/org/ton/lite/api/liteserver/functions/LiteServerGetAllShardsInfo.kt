@@ -1,36 +1,27 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerAllShardsInfo
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
-interface LiteServerGetAllShardsInfoFunction : LiteServerQueryFunction {
-    suspend fun query(query: LiteServerGetAllShardsInfo) =
-        query(query, LiteServerGetAllShardsInfo, LiteServerAllShardsInfo)
-
-    suspend fun getAllShardsInfo(id: TonNodeBlockIdExt) = query(LiteServerGetAllShardsInfo(id))
-}
-
-data class LiteServerGetAllShardsInfo(
+public data class LiteServerGetAllShardsInfo(
     val id: TonNodeBlockIdExt
-) {
-    companion object : TlCodec<LiteServerGetAllShardsInfo> by LiteServerGetAllShardsInfoTlConstructor
+) : TLFunction<LiteServerGetAllShardsInfo, LiteServerAllShardsInfo> {
+    override fun tlCodec(): TlCodec<LiteServerGetAllShardsInfo> = Companion
+    override fun resultTlCodec(): TlCodec<LiteServerAllShardsInfo> = LiteServerAllShardsInfo
+
+    public companion object : TlCodec<LiteServerGetAllShardsInfo> by LiteServerGetAllShardsInfoTlConstructor
 }
 
 private object LiteServerGetAllShardsInfoTlConstructor : TlConstructor<LiteServerGetAllShardsInfo>(
-    type = LiteServerGetAllShardsInfo::class,
     schema = "liteServer.getAllShardsInfo id:tonNode.blockIdExt = liteServer.AllShardsInfo"
 ) {
-    override fun decode(input: Input): LiteServerGetAllShardsInfo {
-        val id = input.readTl(TonNodeBlockIdExt)
+    override fun decode(reader: TlReader): LiteServerGetAllShardsInfo {
+        val id = reader.read(TonNodeBlockIdExt)
         return LiteServerGetAllShardsInfo(id)
     }
 
-    override fun encode(output: Output, value: LiteServerGetAllShardsInfo) {
-        output.writeTl(TonNodeBlockIdExt, value.id)
+    override fun encode(writer: TlWriter, value: LiteServerGetAllShardsInfo) {
+        writer.write(TonNodeBlockIdExt, value.id)
     }
 }

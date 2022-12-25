@@ -1,53 +1,48 @@
 package org.ton.api.dht
 
-import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.Base64ByteArraySerializer
 import org.ton.crypto.base64
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
-data class DhtKeyDescription(
+public data class DhtKeyDescription(
     val key: DhtKey,
     val id: PublicKey,
-    val update_rule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
-    @Serializable(Base64ByteArraySerializer::class)
+    @SerialName("update_rule")
+    val updateRule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<DhtKeyDescription> {
-    override fun signed(privateKey: PrivateKey) =
-        copy(signature = privateKey.sign(tlCodec().encodeBoxed(this)))
+    override fun signed(privateKey: PrivateKey): DhtKeyDescription =
+        copy(
+            signature = privateKey.sign(
+                copy(signature = ByteArray(0)).toByteArray()
+            )
+        )
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeBoxed(copy(signature = ByteArray(0))), signature)
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0))), signature)
 
     override fun tlCodec(): TlCodec<DhtKeyDescription> = DhtKeyDescriptionTlConstructor
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DhtKeyDescription
-
+        if (other !is DhtKeyDescription) return false
         if (key != other.key) return false
         if (id != other.id) return false
-        if (update_rule != other.update_rule) return false
+        if (updateRule != other.updateRule) return false
         if (!signature.contentEquals(other.signature)) return false
-
         return true
     }
 
     override fun hashCode(): Int {
         var result = key.hashCode()
         result = 31 * result + id.hashCode()
-        result = 31 * result + update_rule.hashCode()
+        result = 31 * result + updateRule.hashCode()
         result = 31 * result + signature.contentHashCode()
         return result
     }
@@ -58,15 +53,15 @@ data class DhtKeyDescription(
         append(", id=")
         append(id)
         append(", updateRule=")
-        append(update_rule)
+        append(updateRule)
         append(", signature=")
         append(base64(signature))
         append(")")
     }
 
-    companion object : TlCodec<DhtKeyDescription> by DhtKeyDescriptionTlConstructor {
+    public companion object : TlCodec<DhtKeyDescription> by DhtKeyDescriptionTlConstructor {
         @JvmStatic
-        fun signed(name: String, key: PrivateKey): DhtKeyDescription {
+        public fun signed(name: String, key: PrivateKey): DhtKeyDescription {
             val keyDescription = DhtKeyDescription(
                 id = key.publicKey(),
                 key = DhtKey(key.publicKey().toAdnlIdShort(), name)
@@ -77,21 +72,20 @@ data class DhtKeyDescription(
 }
 
 private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>(
-    type = DhtKeyDescription::class,
     schema = "dht.keyDescription key:dht.key id:PublicKey update_rule:dht.UpdateRule signature:bytes = dht.KeyDescription"
 ) {
-    override fun encode(output: Output, value: DhtKeyDescription) {
-        output.writeTl(DhtKey, value.key)
-        output.writeTl(PublicKey, value.id)
-        output.writeTl(DhtUpdateRule, value.update_rule)
-        output.writeBytesTl(value.signature)
+    override fun encode(writer: TlWriter, value: DhtKeyDescription) {
+        writer.write(DhtKey, value.key)
+        writer.write(PublicKey, value.id)
+        writer.write(DhtUpdateRule, value.updateRule)
+        writer.writeBytes(value.signature)
     }
 
-    override fun decode(input: Input): DhtKeyDescription {
-        val key = input.readTl(DhtKey)
-        val id = input.readTl(PublicKey)
-        val updateRule = input.readTl(DhtUpdateRule)
-        val signature = input.readBytesTl()
+    override fun decode(reader: TlReader): DhtKeyDescription {
+        val key = reader.read(DhtKey)
+        val id = reader.read(PublicKey)
+        val updateRule = reader.read(DhtUpdateRule)
+        val signature = reader.readBytes()
         return DhtKeyDescription(key, id, updateRule, signature)
     }
 }

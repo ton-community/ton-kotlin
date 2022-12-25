@@ -7,6 +7,7 @@ import org.ton.cell.Cell.Companion.getBitsDescriptor
 import org.ton.cell.Cell.Companion.getRefsDescriptor
 import org.ton.crypto.encodeHex
 import org.ton.crypto.sha256
+import kotlin.jvm.JvmStatic
 import kotlin.math.max
 
 internal class CellImpl(

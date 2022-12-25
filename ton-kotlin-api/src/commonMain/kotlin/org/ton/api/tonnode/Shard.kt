@@ -3,29 +3,29 @@
 package org.ton.api.tonnode
 
 import org.ton.cell.Cell
-import org.ton.crypto.bitsNegative64
-import org.ton.crypto.lowerBits64
-import org.ton.crypto.toBoolean
 
-object Shard {
-    const val ID_ALL = 1L shl 63
+public object Shard {
+    public const val ID_ALL: Long = 1L shl 63
 
-    fun contains(parent: ULong, child: ULong): Boolean {
+    public fun contains(parent: Long, child: Long): Boolean {
         val x = lowerBits64(parent)
-        return !((parent xor child) and (bitsNegative64(x) shl 1)).toBoolean()
+        return ((parent xor child) and (bitsNegative64(x) shl 1)) == 0L
     }
 
-    fun shardChild(shard: ULong, left: Boolean): ULong {
-        val x = lowerBits64(shard) shr 1
+    public fun shardChild(shard: Long, left: Boolean): Long {
+        val x = lowerBits64(shard) ushr 1
         return if (left) shard - x else shard + x
     }
 
-    fun shardParent(shard: ULong): ULong {
+    public fun shardParent(shard: Long): Long {
         val x = lowerBits64(shard)
         return (shard - x) or (x shl 1)
     }
 
-    fun check(block: TonNodeBlockIdExt, shardBlock: TonNodeBlockIdExt, shardProof: Cell) {
+    public fun check(block: TonNodeBlockIdExt, shardBlock: TonNodeBlockIdExt, shardProof: Cell) {
         require(block.isMasterchain() && block.isValidFull()) { "block must belong to the masterchain" }
     }
+
+    internal inline fun lowerBits64(x: Long) = x and bitsNegative64(x)
+    internal inline fun bitsNegative64(x: Long) = x.inv() + 1
 }

@@ -2,9 +2,9 @@
 
 package org.ton.block
 
+import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
@@ -20,29 +20,30 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.experimental.and
 import kotlin.experimental.or
+import kotlin.jvm.JvmStatic
 
-inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
+public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 
 @Serializable
 @SerialName("addr_std")
-data class AddrStd(
+public data class AddrStd(
     val anycast: Maybe<Anycast>,
     override val workchain_id: Int,
     val address: BitString
 ) : MsgAddressInt {
     init {
-        require(address.size == 256) { "address.size expected: 256 actual: ${address.size}" }
+        require(address.size == 256) { "invalid 'address' size, expected: 256, actual: ${address.size}" }
     }
 
-    constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
-    constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
-    constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
+    public constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
+    public constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
+    public constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
         anycast.toMaybe(),
         workchainId,
         address.toBitString()
     )
 
-    constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
+    public constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
         anycast.toMaybe(),
         workchainId,
         address
@@ -50,19 +51,19 @@ data class AddrStd(
 
     override fun toString(): String = "addr_std(anycast:$anycast workchain_id:$workchain_id address:$address)"
 
-    fun toString(
+    public fun toString(
         userFriendly: Boolean = true,
         urlSafe: Boolean = true,
         testOnly: Boolean = false,
         bounceable: Boolean = true
     ): String = toString(this, userFriendly, urlSafe, testOnly, bounceable)
 
-    companion object : TlbCodec<AddrStd> by AddrStdTlbConstructor {
+    public companion object : TlbCodec<AddrStd> by AddrStdTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
+        public fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
 
         @JvmStatic
-        fun toString(
+        public fun toString(
             address: AddrStd,
             userFriendly: Boolean = true,
             urlSafe: Boolean = true,
@@ -70,21 +71,30 @@ data class AddrStd(
             bounceable: Boolean = true
         ): String {
             return if (userFriendly) {
-                val raw = byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()) +
-                    address.address.toByteArray() + crc(address, testOnly, bounceable).toShort().toBigInt()
-                    .toByteArray()
+                val tag = tag(testOnly, bounceable)
+                val workchain = address.workchain_id
+                val rawAddress = address.address.toByteArray()
+                val checksum = checksum(tag, workchain, rawAddress)
+
+                val data = buildPacket {
+                    writeByte(tag)
+                    writeByte(workchain.toByte())
+                    writeFully(rawAddress)
+                    writeShort(checksum.toShort())
+                }.readBytes()
+
                 if (urlSafe) {
-                    base64url(raw)
+                    base64url(data)
                 } else {
-                    base64(raw)
+                    base64(data)
                 }
             } else {
-                address.workchain_id.toString() + ":" + hex(address.address.toByteArray())
+                "${address.workchain_id}:${address.address}"
             }
         }
 
         @JvmStatic
-        fun parse(address: String): AddrStd = try {
+        public fun parse(address: String): AddrStd = try {
             if (address.contains(':')) {
                 parseRaw(address)
             } else {
@@ -95,7 +105,7 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parseRaw(address: String): AddrStd {
+        public fun parseRaw(address: String): AddrStd {
             require(address.contains(':'))
             // 32 bytes, each represented as 2 characters
             require(address.substringAfter(':').length == 32 * 2)
@@ -107,29 +117,36 @@ data class AddrStd(
         }
 
         @JvmStatic
-        fun parseUserFriendly(address: String): AddrStd {
-            val raw = try {
-                base64url(address)
-            } catch (E: Exception) {
-                base64(address)
-            }
+        public fun parseUserFriendly(address: String): AddrStd {
+            val packet = ByteReadPacket(
+                try {
+                    base64url(address)
+                } catch (e: Exception) {
+                    try {
+                        base64(address)
+                    } catch (e: Exception) {
+                        throw IllegalArgumentException("Can't parse address: $address", e)
+                    }
+                }
+            )
 
-            require(raw.size == 36) { "invalid byte-array size expected: 36, actual: ${raw.size}" }
+            require(packet.remaining == 36L) { "invalid byte-array size expected: 36, actual: ${packet.remaining}" }
             // not 0x80 = 0x7F; here we clean the test only flag to only check proper bounce flags
-            val cleanTestOnly = raw[0] and 0x7F.toByte()
+            val tag = packet.readByte()
+            val workchain = packet.readByte().toInt()
+            val rawAddress = packet.readBytes(32)
+            val cleanTestOnly = tag and 0x7F.toByte()
             check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
                 "unknown address tag"
             }
 
             val addrStd = AddrStd(
-                workchainId = raw[1].toInt(),
-                address = raw.sliceArray(2..33)
+                workchainId = workchain,
+                address = rawAddress
             )
 
-            val testOnly = raw[0] and 0x80.toByte() != 0.toByte()
-            val bounceable = cleanTestOnly == 0x11.toByte()
-            val expectedChecksum = raw[34].toUByte().toInt() * 256 + raw[35].toUByte().toInt()
-            val actualChecksum = crc(addrStd, testOnly, bounceable)
+            val expectedChecksum = packet.readUShort().toInt()
+            val actualChecksum = checksum(tag, workchain, rawAddress)
             check(expectedChecksum == actualChecksum) {
                 "CRC check failed"
             }
@@ -137,16 +154,13 @@ data class AddrStd(
             return addrStd
         }
 
-        private fun crc(address: AddrStd, testOnly: Boolean, bounceable: Boolean): Int =
-            crc16(
-                byteArrayOf(tag(testOnly, bounceable), address.workchain_id.toByte()),
-                address.address.toByteArray()
-            )
+        private fun checksum(tag: Byte, workchainId: Int, address: ByteArray): Int =
+            crc16(byteArrayOf(tag, workchainId.toByte()), address)
 
         // Get the tag byte based on set flags
         private fun tag(testOnly: Boolean, bounceable: Boolean): Byte =
             (if (testOnly) 0x80.toByte() else 0.toByte()) or
-                (if (bounceable) 0x11.toByte() else 0x51.toByte())
+                    (if (bounceable) 0x11.toByte() else 0x51.toByte())
     }
 }
 

@@ -1,62 +1,33 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.crypto.hex
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.readVectorTl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeVectorTl
+import org.ton.boc.BagOfCells
+import org.ton.lite.api.liteserver.internal.readBoc
+import org.ton.lite.api.liteserver.internal.writeBoc
+import org.ton.tl.*
 
-data class LiteServerTransactionList(
-    val ids: List<TonNodeBlockIdExt>,
-    val transactions: ByteArray
+public data class LiteServerTransactionList(
+    val ids: Collection<TonNodeBlockIdExt>,
+    val transactions: BagOfCells
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LiteServerTransactionList
-
-        if (ids != other.ids) return false
-        if (!transactions.contentEquals(other.transactions)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = ids.hashCode()
-        result = 31 * result + transactions.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = buildString {
-        append("(")
-        append("ids:")
-        append(ids)
-        append(" transactions:")
-        append(hex(transactions).uppercase())
-        append(")")
-    }
-
-    companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
+    public companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
 }
 
 private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServerTransactionList>(
-    type = LiteServerTransactionList::class,
     schema = "liteServer.transactionList ids:(vector tonNode.blockIdExt) transactions:bytes = liteServer.TransactionList",
-    id = 1864812043
 ) {
-    override fun decode(input: Input): LiteServerTransactionList {
-        val ids = input.readVectorTl(TonNodeBlockIdExt)
-        val transactions = input.readBytesTl()
+    override fun decode(reader: TlReader): LiteServerTransactionList {
+        val ids = reader.readCollection {
+            read(TonNodeBlockIdExt)
+        }
+        val transactions = reader.readBoc()
         return LiteServerTransactionList(ids, transactions)
     }
 
-    override fun encode(output: Output, value: LiteServerTransactionList) {
-        output.writeVectorTl(value.ids, TonNodeBlockIdExt)
-        output.writeBytesTl(value.transactions)
+    override fun encode(output: TlWriter, value: LiteServerTransactionList) {
+        output.writeCollection(value.ids) {
+            write(TonNodeBlockIdExt, it)
+        }
+        output.writeBoc(value.transactions)
     }
 }

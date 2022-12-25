@@ -8,94 +8,89 @@ import org.ton.cell.exception.CellOverflowException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.jvm.JvmStatic
 
-interface CellBuilder {
-    var bits: MutableBitString
-    var refs: MutableList<Cell>
+public interface CellBuilder {
+    public var bits: MutableBitString
+    public var refs: MutableList<Cell>
 
-    val bitsPosition: Int
+    public val bitsPosition: Int
 
     /**
      * Converts a builder into an ordinary cell.
      */
-    fun endCell(): Cell
+    public fun endCell(): Cell
 
-    fun storeBit(bit: Boolean): CellBuilder
-    fun storeBits(vararg bits: Boolean): CellBuilder
-    fun storeBits(bits: Iterable<Boolean>): CellBuilder
-    fun storeBits(bits: Collection<Boolean>): CellBuilder
+    public fun storeBit(bit: Boolean): CellBuilder
+    public fun storeBits(vararg bits: Boolean): CellBuilder
+    public fun storeBits(bits: Iterable<Boolean>): CellBuilder
+    public fun storeBits(bits: Collection<Boolean>): CellBuilder
 
-    fun storeBytes(byteArray: ByteArray): CellBuilder
+    public fun storeBytes(byteArray: ByteArray): CellBuilder
 
     /**
      * Stores a reference to cell into builder.
      */
-    fun storeRef(ref: Cell): CellBuilder
+    public fun storeRef(ref: Cell): CellBuilder
 
-    fun storeRefs(vararg refs: Cell): CellBuilder
-    fun storeRefs(refs: Iterable<Cell>): CellBuilder
-    fun storeRefs(refs: Collection<Cell>): CellBuilder
+    public fun storeRefs(vararg refs: Cell): CellBuilder
+    public fun storeRefs(refs: Iterable<Cell>): CellBuilder
+    public fun storeRefs(refs: Collection<Cell>): CellBuilder
 
     /**
      * Stores an unsigned [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 256.
      */
-    fun storeUInt(value: BigInt, length: Int): CellBuilder
-    fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    fun storeUInt(value: UByte, length: Int): CellBuilder = storeUInt(BigInt(value.toLong()), length)
-    fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    fun storeUInt(value: UShort, length: Int): CellBuilder = storeUInt(BigInt(value.toLong()), length)
-    fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    fun storeUInt(value: UInt, length: Int): CellBuilder = storeUInt(BigInt(value.toLong()), length)
-    fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    fun storeUInt(value: ULong, length: Int): CellBuilder = storeUInt(BigInt(value.toString()), length)
+    public fun storeUInt(value: BigInt, length: Int): CellBuilder
+    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(BigInt(value), length)
+    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(BigInt(value), length)
+    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(BigInt(value), length)
+    public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(BigInt(value), length)
 
-    fun storeUInt32(value: UInt) = storeInt(value.toInt(), 32)
-    fun storeUInt64(value: ULong) = storeInt(value.toLong(), 64)
+    public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
+    public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
+    public fun storeUInt32(value: UInt): CellBuilder = storeInt(value.toInt(), 32)
+    public fun storeUInt64(value: ULong): CellBuilder = storeInt(value.toLong(), 64)
 
-    fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
-    fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    fun storeUIntLeq(value: UByte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value.toShort()), BigInt(max))
-    fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    fun storeUIntLeq(value: UShort, max: Short): CellBuilder = storeUIntLeq(BigInt(value.toInt()), BigInt(max))
-    fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    fun storeUIntLeq(value: UInt, max: Int): CellBuilder = storeUIntLeq(BigInt(value.toLong()), BigInt(max))
-    fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    fun storeUIntLeq(value: ULong, max: Long): CellBuilder = storeUIntLeq(BigInt(value.toString()), BigInt(max))
+    public fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
+    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    public fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    public fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
 
-    fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
-    fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    public fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
+    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    public fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
 
     /**
      * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
      */
-    fun storeInt(value: BigInt, length: Int): CellBuilder
-    fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    fun storeInt(value: Short, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    fun storeInt(value: Int, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    fun storeInt(value: Long, length: Int): CellBuilder = storeInt(BigInt(value), length)
+    public fun storeInt(value: BigInt, length: Int): CellBuilder
+    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(BigInt(value), length)
+    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(BigInt(value), length)
+    public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(BigInt(value), length)
+    public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(BigInt(value), length)
 
     /**
      * Stores [slice] into builder.
      */
-    fun storeSlice(slice: CellSlice): CellBuilder
+    public fun storeSlice(slice: CellSlice): CellBuilder
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(cell: Cell): CellBuilder =
+        public fun of(cell: Cell): CellBuilder =
             CellBuilderImpl(BitString.MAX_LENGTH, cell.bits.toMutableBitString(), cell.refs.toMutableList())
 
         @JvmStatic
-        fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
+        public fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
 
         @JvmStatic
-        fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
+        public fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
             CellBuilderImpl(maxLength).apply(builder).endCell()
 
         @JvmStatic
-        fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
+        public fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
             createCell {
                 val levelMask = cell.levelMask.apply(virtualizationLevel)
                 val level = levelMask.level
@@ -116,7 +111,7 @@ interface CellBuilder {
             }
 
         @JvmStatic
-        fun createMerkleProof(cellProof: Cell): Cell = createCell {
+        public fun createMerkleProof(cellProof: Cell): Cell = createCell {
             storeUInt(CellType.MERKLE_PROOF.value, 8)
             storeBytes(cellProof.hash(level = 0))
             storeUInt(cellProof.depth(level = 0), Cell.DEPTH_BITS)
@@ -124,7 +119,7 @@ interface CellBuilder {
         }
 
         @JvmStatic
-        fun createMerkleUpdate(fromProof: Cell, toProof: Cell) = createCell {
+        public fun createMerkleUpdate(fromProof: Cell, toProof: Cell): Cell = createCell {
             storeUInt(CellType.MERKLE_UPDATE.value, 8)
             storeBytes(fromProof.hash(level = 0))
             storeBytes(toProof.hash(level = 0))
@@ -135,25 +130,25 @@ interface CellBuilder {
         }
     }
 
-    fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
+    public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
 }
 
-inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
+public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
 }
 
-inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
+public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
     val cellBuilder = CellBuilder.beginCell()
     cellBuilder.apply(refBuilder)
     val cell = cellBuilder.endCell()
     storeRef(cell)
 }
 
-fun CellBuilder(cell: Cell): CellBuilder =
+public fun CellBuilder(cell: Cell): CellBuilder =
     CellBuilder.of(cell)
 
 @OptIn(ExperimentalContracts::class)
-fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder {
+public fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder {
     contract {
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }

@@ -6,11 +6,11 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("hml_long")
-data class HashMapLabelLong(
+public data class HashMapLabelLong(
     val n: Int,
     override val s: BitString
 ) : HashMapLabel {
-    constructor(s: BitString) : this(s.size, s)
+    public constructor(s: BitString) : this(s.size, s)
 
-    override fun toString() = "(hml_long\nn:$n s:$s)"
+    override fun toString(): String = "(hml_long\nn:$n s:$s)"
 }

@@ -3,22 +3,23 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hml_same")
-data class HashMapLabelSame(
+public data class HashMapLabelSame(
     val v: Boolean,
     val n: Int
 ) : HashMapLabel {
-    constructor(v: Int, n: Int) : this(v != 0, n)
+    public constructor(v: Int, n: Int) : this(v != 0, n)
 
     override val s: BitString get() = BitString(*BooleanArray(n) { v })
 
-    override fun toString() = "(hml_same\nv:$v n:$n)"
+    override fun toString(): String = "(hml_same\nv:$v n:$n)"
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(key: BitString, length: Int = key.size): HashMapLabelSame? {
+        public fun of(key: BitString, length: Int = key.size): HashMapLabelSame? {
             var zeroBitFound = false
             var oneBitFound = false
             key.forEach { bit ->

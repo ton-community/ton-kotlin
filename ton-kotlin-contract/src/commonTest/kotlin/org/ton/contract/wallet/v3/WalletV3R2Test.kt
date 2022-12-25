@@ -21,14 +21,14 @@ class WalletV3R2Test {
 
     @Test
     fun `test private key`() {
-        val actual = hex(privateKey.key)
+        val actual = hex(privateKey.key.toByteArray())
         val expected = "0000000000000000000000000000000000000000000000000000000000000000"
         assertEquals(expected, actual)
     }
 
     @Test
     fun `test public key`() {
-        val actual = hex(privateKey.publicKey().key)
+        val actual = hex(privateKey.publicKey().key.toByteArray())
         val expected = "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
         assertEquals(expected, actual)
     }
@@ -53,7 +53,7 @@ class WalletV3R2Test {
         val wallet = wallet()
         val address = wallet.address()
         val actual = address.toString(userFriendly = false, testOnly = true)
-        val expected = "0:0a3404cb320cff55c5dcd4fabe3f3c9841b1d57d0e77990094bb1116ee508e3f"
+        val expected = "0:0A3404CB320CFF55C5DCD4FABE3F3C9841B1D57D0E77990094BB1116EE508E3F"
         assertEquals(expected, actual)
     }
 

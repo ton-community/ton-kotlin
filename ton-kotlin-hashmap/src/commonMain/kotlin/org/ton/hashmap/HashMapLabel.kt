@@ -9,17 +9,18 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
-inline fun HashMapLabel(key: BitString, max: Int = key.size): HashMapLabel = HashMapLabel.of(key, max)
+public inline fun HashMapLabel(key: BitString, max: Int = key.size): HashMapLabel = HashMapLabel.of(key, max)
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface HashMapLabel {
-    val s: BitString
+public sealed interface HashMapLabel {
+    public val s: BitString
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(key: BitString, max: Int = key.size): HashMapLabel {
+        public fun of(key: BitString, max: Int = key.size): HashMapLabel {
             val len = 16 - max.toShort().countLeadingZeroBits()
             val longLength = 2 + len + key.size
             val shortLength = 1 + 2 * key.size + 1
@@ -38,26 +39,18 @@ sealed interface HashMapLabel {
         }
 
         @JvmStatic
-        fun tlbCodec(m: Int): TlbNegatedCodec<HashMapLabel> = HashMapLabelTlbCombinator(m)
+        public fun tlbCodec(m: Int): TlbNegatedCodec<HashMapLabel> = HashMapLabelTlbCombinator(m)
     }
 }
 
 private class HashMapLabelTlbCombinator(
     m: Int,
-) : TlbNegatedCombinator<HashMapLabel>() {
-    private val shortConstructor = HashMapLabelShortTlbConstructor
-    private val sameConstructor = HashMapLabelSameTlbConstructor(m)
-    private val longConstructor = HashMapLabelLongTlbConstructor(m)
-
-    override val constructors: List<TlbNegatedConstructor<out HashMapLabel>> =
-        listOf(shortConstructor, sameConstructor, longConstructor)
-
-    override fun getConstructor(value: HashMapLabel): TlbNegatedConstructor<out HashMapLabel> = when (value) {
-        is HashMapLabelShort -> shortConstructor
-        is HashMapLabelSame -> sameConstructor
-        is HashMapLabelLong -> longConstructor
-    }
-
+) : TlbNegatedCombinator<HashMapLabel>(
+    HashMapLabel::class,
+    HashMapLabelLong::class to HashMapLabelLongTlbConstructor(m),
+    HashMapLabelShort::class to HashMapLabelShortTlbConstructor,
+    HashMapLabelSame::class to HashMapLabelSameTlbConstructor(m),
+) {
     private object HashMapLabelShortTlbConstructor : TlbNegatedConstructor<HashMapLabelShort>(
         schema = "hml_short\$0 {m:#} {n:#} len:(Unary ~n) s:(n * Bit) = HmLabel ~n m;",
         id = BitString(false)

@@ -17,14 +17,7 @@ bit$_ (## 1) = Bit;
  *   FROM hashmap.tlb
  *
  */
-// ordinary Hashmap / HashmapE, with fixed length keys
-//
-hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n)
-          {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;
 
-hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;
-hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X)
-           right:^(Hashmap n X) = HashmapNode (n + 1) X;
 
 hml_short$0 {m:#} {n:#} len:(Unary ~n) {n <= m} s:(n * Bit) = HmLabel ~n m;
 hml_long$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;
@@ -33,8 +26,7 @@ hml_same$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;
 unary_zero$0 = Unary ~0;
 unary_succ$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);
 
-hme_empty$0 {n:#} {X:Type} = HashmapE n X;
-hme_root$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;
+
 
 // true#_ = True;
 _ {n:#} _:(Hashmap n True) = BitstringSet n;
@@ -89,6 +81,19 @@ phmn_fork$1 {n:#} {X:Type} left:^(PfxHashmap n X)
 phme_empty$0 {n:#} {X:Type} = PfxHashmapE n X;
 phme_root$1 {n:#} {X:Type} root:^(PfxHashmap n X)
             = PfxHashmapE n X;
+
+// ordinary Hashmap / HashmapE, with fixed length keys
+//
+hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n)
+          {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;
+
+hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;
+hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X)
+           right:^(Hashmap n X) = HashmapNode (n + 1) X;
+
+hme_empty$0 {n:#} {X:Type} = HashmapE n X;
+hme_root$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;
+
 /*
  *
  *  END hashmap.tlb
@@ -129,10 +134,18 @@ ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt
 ext_out_msg_info$11 src:MsgAddressInt dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfo;
 
-int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
-  src:MsgAddress dest:MsgAddressInt
-  value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins
-  created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+int_msg_info$0
+ihr_disabled:Bool
+bounce:Bool
+bounced:Bool
+  src:MsgAddress
+  dest:MsgAddressInt
+  value:CurrencyCollection
+   ihr_fee:Coins
+   fwd_fee:Coins
+  created_lt:uint64
+  created_at:uint32
+   = CommonMsgInfoRelaxed;
 ext_out_msg_info$11 src:MsgAddress dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
 
@@ -816,7 +829,7 @@ vmc_pushint$1111 value:int32 next:^VmCont = VmCont;
 //
 //  DNS RECORDS
 //
-_ (HashmapE 16 ^DNSRecord) = DNS_RecordSet;
+_ (HashmapE 256 ^DNSRecord) = DNS_RecordSet;
 
 chunk_ref$_ {n:#} ref:^(TextChunks (n + 1)) = TextChunkRef (n + 1);
 chunk_ref_empty$_ = TextChunkRef 0;

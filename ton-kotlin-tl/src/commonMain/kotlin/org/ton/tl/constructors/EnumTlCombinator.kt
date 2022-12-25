@@ -1,41 +1,34 @@
 package org.ton.tl.constructors
 
-import io.ktor.utils.io.core.*
-import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
+import org.ton.tl.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createType
 
-open class EnumTlCombinator<T : Enum<T>>(
-    val enumConstructors: Map<T, TlConstructor<out T>>
-) : TlCombinator<T>(enumConstructors.values.toList()) {
+public open class EnumTlCombinator<T : Enum<T>>(
+    override val baseClass: KClass<T>,
+    values: List<Pair<T, String>>
+) : AbstractTlCombinator<T>() {
+    public constructor(baseClass: KClass<T>, vararg values: Pair<T, String>) : this(baseClass, values.toList())
 
-    constructor(type: KClass<T>, vararg constructors: Pair<T, String>) : this(
-        constructors.associate { (enum, schema) ->
-            enum to EnumTlConstructor(enum, type, schema)
-        }
-    )
+    private val enum2Constructor: Map<T, TlCodec<out T>>
+    private val constructor2Enum: Map<Int, TlCodec<out T>>
 
-    @Suppress("UNCHECKED_CAST")
-    fun findConstructor(enum: T) = requireNotNull(
-        enumConstructors[enum]
-    ) {
-        "Invalid Enum. actual: $enum"
-    } as TlConstructor<T>
-
-    override fun encodeBoxed(output: Output, value: T) {
-        val constructor = findConstructor(value)
-        constructor.encodeBoxed(output, value)
+    init {
+        enum2Constructor = values.asSequence().map {
+            it.first to EnumConstructor(it.first, it.second)
+        }.toMap()
+        constructor2Enum = enum2Constructor.values.associateBy { it.id }
     }
 
-    private class EnumTlConstructor<T : Enum<T>>(
+    private class EnumConstructor<T : Enum<T>>(
         val enum: T,
-        type: KClass<T>,
         schema: String
-    ) : TlConstructor<T>(type.createType(), schema) {
-        override fun encode(output: Output, value: T) {
-        }
+    ) : TlConstructor<T>(schema) {
+        override fun decode(reader: TlReader): T = enum
 
-        override fun decode(input: Input): T = enum
+        override fun encode(writer: TlWriter, value: T) = Unit
     }
+
+    override fun findConstructorOrNull(id: Int): TlDecoder<out T>? = constructor2Enum[id]
+
+    override fun findConstructorOrNull(value: T): TlEncoder<T>? = enum2Constructor[value]?.cast()
 }

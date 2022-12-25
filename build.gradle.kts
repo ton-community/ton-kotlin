@@ -1,32 +1,23 @@
-import java.util.*
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlinx.benchmark")
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     `maven-publish`
     signing
 }
 
-val localPropsFile = project.rootProject.file("local.properties")
-if (localPropsFile.exists()) {
-    val p = Properties()
-    localPropsFile.inputStream().use { p.load(it) }
-    p.forEach { name, value -> ext.set(name.toString(), value) }
-}
-
 val isCI = System.getenv("CI") == "true"
-val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
-if (isCI) {
-    checkNotNull(githubVersion) { "GITHUB_REF is not set" }
-    check(githubVersion.isNotEmpty()) { "GITHUB_REF is empty" }
-    check(githubVersion.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?"))) { "'$githubVersion' is not a valid version" }
-}
+
+//val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
+//if (isCI) {
+//    checkNotNull(githubVersion) { "GITHUB_REF is not set" }
+//    check(githubVersion.isNotEmpty()) { "GITHUB_REF is empty" }
+//    check(githubVersion.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9]+)?"))) { "'$githubVersion' is not a valid version" }
+//}
 
 allprojects {
     group = "org.ton"
-    version = if (isCI && githubVersion != null) githubVersion else "1.0-SNAPSHOT"
+    version = "0.2.4"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -35,49 +26,54 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven("https://jitpack.io")
     }
 
     kotlin {
-        jvm {
-            withJava()
-            compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
-            }
-            testRuns["test"].executionTask.configure {
-                useJUnitPlatform()
-            }
+        if (!isCI) {
+            explicitApiWarning()
         }
-//        linuxX64()
-//        macosX64()
-//        js {
-//            useCommonJs()
-//            browser()
-//        }
-        sourceSets {
-            val commonMain by getting {
-                dependencies {
-                    subprojects {
-                        api(this)
-                    }
+        jvm {
+            compilations.all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
                 }
             }
+        }
+
+        nativeTargets(NativeState.ALL) {
+            common("darwin") {
+                target("macosX64")
+                target("macosArm64")
+                target("iosX64")
+                target("iosArm64")
+                target("iosSimulatorArm64")
+//                target("watchosArm64")
+//                target("watchosX86")
+//                target("watchosX64")
+//                target("watchosSimulatorArm64")
+//                target("tvosArm64")
+//                target("tvosX64")
+//                target("tvosSimulatorArm64")
+            }
+            common("mingw") {
+                target("mingwX64")
+            }
+            common("linux") {
+                target("linuxX64")
+            }
+        }
+
+        sourceSets {
             val commonTest by getting {
                 dependencies {
-                    implementation("io.mockk:mockk:1.12.4")
                     implementation(kotlin("test"))
-                }
-            }
-            val jvmMain by getting {
-
-            }
-            val jvmTest by getting {
-                dependencies {
-                    implementation(kotlin("test"))
-                    implementation("junit:junit:4.13.1")
                 }
             }
         }
+    }
+
+    afterEvaluate {
+        formatSourceSets()
     }
 
     val javadocJar by tasks.registering(Jar::class) {
@@ -93,8 +89,8 @@ allprojects {
                 url.set("https://github.com/andreypfau/ton-kotlin")
                 licenses {
                     license {
-                        name.set("GNU General Public License v3.0")
-                        url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                        name.set("The Apache Software License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
@@ -111,16 +107,16 @@ allprojects {
                 }
             }
         }
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/andreypfau/ton-kotlin")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
-        }
+//        repositories {
+//            maven {
+//                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/andreypfau/ton-kotlin")
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
+//        }
     }
 
     signing {
@@ -129,6 +125,18 @@ allprojects {
         isRequired = secretKey != null && password != null
         useInMemoryPgpKeys(secretKey, password)
         sign(publishing.publications)
+    }
+}
+
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                subprojects {
+                    api(this)
+                }
+            }
+        }
     }
 }
 

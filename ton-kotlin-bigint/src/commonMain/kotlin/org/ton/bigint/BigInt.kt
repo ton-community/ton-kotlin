@@ -8,41 +8,41 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Suppress("ConvertSecondaryConstructorToPrimary")
-expect class BigInt : Number, Comparable<BigInt> {
+public expect class BigInt : Number, Comparable<BigInt> {
 
-    constructor(string: String)
-    constructor(string: String, radix: Int)
-    constructor(byteArray: ByteArray)
+    public constructor(string: String)
+    public constructor(string: String, radix: Int)
+    public constructor(byteArray: ByteArray)
 
-    fun toByteArray(): ByteArray
-    fun toString(radix: Int): String
+    public fun toByteArray(): ByteArray
+    public fun toString(radix: Int): String
 
-    fun not(): BigInt
+    public fun not(): BigInt
 }
 
-expect fun Number.toBigInt(): BigInt
-fun BigInt.toUByte(): UByte = toLong().toUByte()
-fun BigInt.toUShort(): UShort = toLong().toUShort()
-fun BigInt.toUInt(): UInt = toLong().toUInt()
-fun BigInt.toULong(): ULong = toLong().toULong()
+public expect fun Int.toBigInt(): BigInt
+public expect fun Long.toBigInt(): BigInt
+public expect fun Number.toBigInt(): BigInt
 
-expect operator fun BigInt.plus(number: Number): BigInt
-expect operator fun BigInt.minus(number: Number): BigInt
-expect operator fun BigInt.times(number: Number): BigInt
-expect operator fun BigInt.div(number: Number): BigInt
-expect operator fun BigInt.unaryMinus(): BigInt
-expect infix fun BigInt.shr(shr: Int): BigInt
-expect infix fun BigInt.shl(shl: Int): BigInt
-expect infix fun BigInt.and(and: BigInt): BigInt
-expect infix fun BigInt.mod(mod: BigInt): BigInt
-expect infix fun BigInt.or(mod: BigInt): BigInt
-expect infix fun BigInt.xor(mod: BigInt): BigInt
-expect infix fun BigInt.divRem(value: BigInt): Array<BigInt>
-expect infix fun BigInt.pow(pow: Int): BigInt
+public expect operator fun BigInt.plus(number: Number): BigInt
+public expect operator fun BigInt.minus(number: Number): BigInt
+public expect operator fun BigInt.times(number: Number): BigInt
+public expect operator fun BigInt.div(number: Number): BigInt
+public expect operator fun BigInt.unaryMinus(): BigInt
+public expect operator fun BigInt.rem(mod: BigInt): BigInt
+public expect infix fun BigInt.shr(shr: Int): BigInt
+public expect infix fun BigInt.shl(shl: Int): BigInt
+public expect infix fun BigInt.and(and: BigInt): BigInt
+public expect infix fun BigInt.or(mod: BigInt): BigInt
+public expect infix fun BigInt.xor(mod: BigInt): BigInt
+public expect infix fun BigInt.divRem(value: BigInt): Array<BigInt>
+public expect infix fun BigInt.pow(pow: Int): BigInt
+public expect operator fun BigInt.compareTo(other: Int): Int
+public expect operator fun BigInt.compareTo(other: Long): Int
 
-fun BigInt(number: Number): BigInt = number.toBigInt()
+public fun BigInt(number: Number): BigInt = number.toBigInt()
 
-object BigIntSerializer : KSerializer<BigInt> {
+public object BigIntSerializer : KSerializer<BigInt> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BigInt", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): BigInt {
@@ -54,7 +54,6 @@ object BigIntSerializer : KSerializer<BigInt> {
     }
 }
 
-expect val BigInt.bitLength: Int
-expect val BigInt.sign: Int
-expect val BigInt.isZero: Boolean
-
+public expect val BigInt.bitLength: Int
+public expect val BigInt.sign: Int
+public expect val BigInt.isZero: Boolean

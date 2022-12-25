@@ -6,15 +6,15 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 
-class IntTlbConstructor(
-    val length: Int
+public class IntTlbConstructor(
+    public val length: Int
 ) : TlbConstructor<BigInt>(
     schema = "int\$_ = int;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BigInt
-    ) = cellBuilder {
+    ): Unit = cellBuilder {
         storeInt(value, length)
     }
 
@@ -24,20 +24,20 @@ class IntTlbConstructor(
         loadInt(length)
     }
 
-    companion object {
-        fun byte(length: Int = Byte.SIZE_BITS) =
+    public companion object {
+        public fun byte(length: Int = Byte.SIZE_BITS): TlbConstructor<Byte> =
             number(encode = { storeInt(it, length) }, decode = { loadInt(length).toByte() })
 
-        fun short(length: Int = Short.SIZE_BITS) =
+        public fun short(length: Int = Short.SIZE_BITS): TlbConstructor<Short> =
             number(encode = { storeInt(it, length) }, decode = { loadInt(length).toShort() })
 
-        fun int(length: Int = Int.SIZE_BITS) =
+        public fun int(length: Int = Int.SIZE_BITS): TlbConstructor<Int> =
             number(encode = { storeInt(it, length) }, decode = { loadInt(length).toInt() })
 
-        fun long(length: Int = Long.SIZE_BITS) =
+        public fun long(length: Int = Long.SIZE_BITS): TlbConstructor<Long> =
             number(encode = { storeInt(it, length) }, decode = { loadInt(length).toLong() })
 
-        fun <T : Number> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
+        private fun <T : Number> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T): TlbConstructor<T> =
             object : TlbConstructor<T>("") {
                 override fun storeTlb(
                     cellBuilder: CellBuilder,
@@ -54,4 +54,3 @@ class IntTlbConstructor(
             }
     }
 }
-

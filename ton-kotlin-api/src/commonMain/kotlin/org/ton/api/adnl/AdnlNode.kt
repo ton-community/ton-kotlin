@@ -4,28 +4,30 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKey
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @Serializable
-data class AdnlNode(
+public data class AdnlNode(
     val id: PublicKey,
     @SerialName("addr_list")
-    val addr_list: AdnlAddressList
+    val addrList: AdnlAddressList
 ) {
-    companion object : TlConstructor<AdnlNode>(
-        type = AdnlNode::class,
+    public constructor(
+        id: PublicKey,
+        addrList: Collection<AdnlAddress>
+    ) : this(id, AdnlAddressList(addrList))
+
+    public companion object : TlConstructor<AdnlNode>(
         schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
     ) {
-        override fun encode(output: Output, value: AdnlNode) {
-            output.writeTl(PublicKey, value.id)
-            output.writeTl(AdnlAddressList, value.addr_list)
+        override fun encode(writer: TlWriter, value: AdnlNode) {
+            writer.write(PublicKey, value.id)
+            writer.write(AdnlAddressList, value.addrList)
         }
 
-        override fun decode(input: Input): AdnlNode {
-            val id = input.readTl(PublicKey)
-            val addrList = input.readTl(AdnlAddressList)
+        override fun decode(reader: TlReader): AdnlNode {
+            val id = reader.read(PublicKey)
+            val addrList = reader.read(AdnlAddressList)
             return AdnlNode(id, addrList)
         }
     }

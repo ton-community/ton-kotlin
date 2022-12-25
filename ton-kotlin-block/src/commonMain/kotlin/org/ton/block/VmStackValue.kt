@@ -9,8 +9,8 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
+import kotlin.jvm.JvmStatic
 
 inline fun VmStackValue(): VmStackValue = VmStackValue.of()
 inline fun VmStackValue(byte: Byte): VmStackTinyInt = VmStackValue.of(byte)
@@ -71,33 +71,15 @@ sealed interface VmStackValue {
     }
 }
 
-private object VmStackValueTlbCombinator : TlbCombinator<VmStackValue>() {
-    private val nullConstructor = VmStackNull.tlbConstructor()
-    private val tinyIntConstructor = VmStackTinyInt.tlbConstructor()
-    private val intConstructor = VmStackInt.tlbConstructor()
-    private val nanConstructor = VmStackNan.tlbConstructor()
-    private val cellConstructor = VmStackCell.tlbConstructor()
-    private val sliceConstructor = VmCellSlice.tlbConstructor()
-    private val builderConstructor = VmStackBuilder.tlbConstructor()
-    private val contConstructor = VmStackCont.tlbConstructor()
-    private val tupleConstructor = VmStackTuple.tlbConstructor()
-
-    override val constructors: List<TlbConstructor<out VmStackValue>> =
-        listOf(
-            nullConstructor, tinyIntConstructor, intConstructor, nanConstructor, cellConstructor, sliceConstructor,
-            builderConstructor, contConstructor, tupleConstructor
-        )
-
-    override fun getConstructor(value: VmStackValue): TlbConstructor<out VmStackValue> = when (value) {
-        is VmStackNull -> nullConstructor
-        is VmStackTinyInt -> tinyIntConstructor
-        is VmStackInt -> intConstructor
-        is VmStackNan -> nanConstructor
-        is VmStackCell -> cellConstructor
-        is VmCellSlice -> sliceConstructor
-        is VmStackBuilder -> builderConstructor
-        is VmStackCont -> contConstructor
-        is VmStackTuple -> tupleConstructor
-    }
-}
-
+private object VmStackValueTlbCombinator : TlbCombinator<VmStackValue>(
+    VmStackValue::class,
+    VmStackNull::class to VmStackNull.tlbConstructor(),
+    VmStackTinyInt::class to VmStackTinyInt.tlbConstructor(),
+    VmStackInt::class to VmStackInt.tlbConstructor(),
+    VmStackNan::class to VmStackNan.tlbConstructor(),
+    VmStackCell::class to VmStackCell.tlbConstructor(),
+    VmCellSlice::class to VmCellSlice.tlbConstructor(),
+    VmStackBuilder::class to VmStackBuilder.tlbConstructor(),
+    VmStackCont::class to VmStackCont.tlbConstructor(),
+    VmStackTuple::class to VmStackTuple.tlbConstructor()
+)

@@ -1,55 +1,31 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSupertypeOf
 
-abstract class TlCombinator<T : Any>(
-    val constructors: List<TlConstructor<out T>>
-) : TlCodec<T> {
-    constructor(vararg constructors: TlConstructor<out T>) : this(constructors.toList())
+public abstract class TlCombinator<T : Any> private constructor(
+    override val baseClass: KClass<T>,
+    constructors: List<Pair<KClass<out T>, TlConstructor<out T>>>
+) : AbstractTlCombinator<T>() {
+    public constructor(baseClass: KClass<T>, vararg constructors: Pair<KClass<out T>, TlConstructor<out T>>) : this(
+        baseClass,
+        constructors.toList()
+    )
 
-    fun findConstructor(id: Int): TlConstructor<out T> {
-        val constructor = checkNotNull(
-            constructors.find { it.id == id }
-        ) {
-            "Invalid ID. actual: $id"
-        }
-        return constructor
+    private val class2Constructor: Map<KClass<out T>, TlCodec<out T>>
+    private val id2Constructor: Map<Int, TlCodec<out T>>
+
+    init {
+        class2Constructor = constructors.toMap()
+        id2Constructor = class2Constructor.entries.groupingBy { it.value.id }
+            .aggregate<Map.Entry<KClass<out T>, TlConstructor<out T>>, Int, Map.Entry<KClass<*>, TlConstructor<out T>>> { _, accumulator, element, _ ->
+                if (accumulator != null) {
+                    throw IllegalArgumentException("Duplicate ID: ${element.key}")
+                }
+                element
+            }.mapValues { it.value.value }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun findConstructor(type: KClass<out T>): TlConstructor<T> = findConstructor(type.createType())
+    override fun findConstructorOrNull(id: Int): TlDecoder<out T>? = id2Constructor[id]
 
-    @Suppress("UNCHECKED_CAST")
-    fun findConstructor(type: KType): TlConstructor<T> {
-        val constructor = checkNotNull(
-            constructors.find { constructor ->
-                constructor.type.isSupertypeOf(type)
-            }
-        ) {
-            "Invalid type. actual: $type"
-        }
-        return constructor as TlConstructor<T>
-    }
-
-    override fun decode(input: Input): T = decode(input)
-
-    override fun decodeBoxed(input: Input): T {
-        val id = input.readIntLittleEndian()
-        val constructor = findConstructor(id)
-        return constructor.decode(input)
-    }
-
-    override fun encode(output: Output, value: T) = encodeBoxed(output, value)
-
-    override fun encodeBoxed(output: Output, value: T) {
-        val type = value::class
-        val constructor = findConstructor(type)
-        constructor.encodeBoxed(output, value)
-    }
-
-    override fun toString(): String = constructors.joinToString("\n")
+    override fun findConstructorOrNull(value: T): TlEncoder<T>? = class2Constructor[value::class]?.cast()
 }

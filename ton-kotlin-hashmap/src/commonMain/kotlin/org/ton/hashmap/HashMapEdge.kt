@@ -6,10 +6,11 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hm_edge")
-data class HashMapEdge<T>(
+public data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>> {
@@ -17,7 +18,7 @@ data class HashMapEdge<T>(
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
 
-    fun nodes(): Sequence<Pair<BitString, T>> {
+    public fun nodes(): Sequence<Pair<BitString, T>> {
         return when (node) {
             is HashMapNodeLeaf -> sequenceOf(BitString.empty() to node.value)
             is HashMapNodeFork -> {
@@ -35,9 +36,9 @@ data class HashMapEdge<T>(
         }
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
+        public fun <X> tlbCodec(n: Int, x: TlbCodec<X>): TlbCodec<HashMapEdge<X>> =
             HashMapEdgeTlbConstructor(n, x)
     }
 }

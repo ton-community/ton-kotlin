@@ -5,7 +5,6 @@ kotlin {
                 api(projects.tonKotlinBigint)
                 api(projects.tonKotlinTl)
                 api(projects.tonKotlinTlb)
-                implementation(libs.serialization.json)
                 api(libs.datetime)
             }
         }

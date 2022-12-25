@@ -2,10 +2,12 @@ package org.ton.api.dht
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.tl.TlCodec
+import org.ton.tl.TlObject
 import org.ton.tl.constructors.EnumTlCombinator
 
 @Serializable
-enum class DhtUpdateRule {
+public enum class DhtUpdateRule : TlObject<DhtUpdateRule> {
     @SerialName("dht.updateRule.signature")
     SIGNATURE,
 
@@ -15,7 +17,9 @@ enum class DhtUpdateRule {
     @SerialName("dht.updateRule.overlayNodes")
     OVERLAY_NODES;
 
-    companion object : EnumTlCombinator<DhtUpdateRule>(
+    override fun tlCodec(): TlCodec<DhtUpdateRule> = Companion
+
+    public companion object : EnumTlCombinator<DhtUpdateRule>(
         DhtUpdateRule::class,
         SIGNATURE to "dht.updateRule.signature = dht.UpdateRule",
         ANYBODY to "dht.updateRule.anybody = dht.UpdateRule",

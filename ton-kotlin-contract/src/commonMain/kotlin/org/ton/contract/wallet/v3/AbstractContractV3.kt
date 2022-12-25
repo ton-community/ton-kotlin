@@ -20,7 +20,7 @@ abstract class AbstractContractV3(
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
         storeUInt(subwalletId, 32)
-        storeBytes(privateKey.publicKey().key)
+        storeBits(privateKey.publicKey().key)
     }
 
     override fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit): Cell = CellBuilder.createCell {

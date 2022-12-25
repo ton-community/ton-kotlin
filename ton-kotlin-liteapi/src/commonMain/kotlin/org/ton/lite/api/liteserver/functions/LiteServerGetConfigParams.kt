@@ -1,49 +1,39 @@
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerConfigInfo
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.*
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
-
-interface LiteServerGetConfigParamsFunction : LiteServerQueryFunction {
-    suspend fun query(query: LiteServerGetConfigParams) =
-        query(query, LiteServerGetConfigParams, LiteServerConfigInfo)
-
-    suspend fun getConfigParams(
-        mode: Int,
-        id: TonNodeBlockIdExt,
-        param_list: List<Int>
-    ) = query(LiteServerGetConfigParams(mode, id, param_list))
-}
+import org.ton.tl.*
 
 @Serializable
-data class LiteServerGetConfigParams(
+public data class LiteServerGetConfigParams(
     val mode: Int,
     val id: TonNodeBlockIdExt,
-    val param_list: List<Int>
-) {
-    companion object : TlCodec<LiteServerGetConfigParams> by LiteServerGetConfigParamsTlConstructor
+    val paramList: Collection<Int>
+) : TLFunction<LiteServerGetConfigParams, LiteServerConfigInfo> {
+    override fun tlCodec(): TlCodec<LiteServerGetConfigParams> = LiteServerGetConfigParams
+    override fun resultTlCodec(): TlCodec<LiteServerConfigInfo> = LiteServerConfigInfo
+
+    public companion object : TlCodec<LiteServerGetConfigParams> by LiteServerGetConfigParamsTlConstructor
 }
 
 private object LiteServerGetConfigParamsTlConstructor : TlConstructor<LiteServerGetConfigParams>(
-    type = LiteServerGetConfigParams::class,
     schema = "liteServer.getConfigParams mode:# id:tonNode.blockIdExt param_list:(vector int) = liteServer.ConfigInfo"
 ) {
-    override fun decode(input: Input): LiteServerGetConfigParams {
-        val mode = input.readIntTl()
-        val id = input.readTl(TonNodeBlockIdExt)
-        val paramList = input.readVectorTl(IntTlConstructor)
+    override fun decode(reader: TlReader): LiteServerGetConfigParams {
+        val mode = reader.readInt()
+        val id = reader.read(TonNodeBlockIdExt)
+        val paramList = reader.readCollection {
+            readInt()
+        }
         return LiteServerGetConfigParams(mode, id, paramList)
     }
 
-    override fun encode(output: Output, value: LiteServerGetConfigParams) {
-        output.writeIntTl(value.mode)
-        output.writeTl(TonNodeBlockIdExt, value.id)
-        output.writeVectorTl(value.param_list, IntTlConstructor)
+    override fun encode(writer: TlWriter, value: LiteServerGetConfigParams) {
+        writer.writeInt(value.mode)
+        writer.write(TonNodeBlockIdExt, value.id)
+        writer.writeCollection(value.paramList) {
+            writeInt(it)
+        }
     }
 }

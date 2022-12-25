@@ -4,27 +4,26 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlNodes
-import org.ton.tl.TlConstructor
-import org.ton.tl.readTl
-import org.ton.tl.writeTl
+import org.ton.tl.*
 
 @SerialName("adnl.config.global")
 @Serializable
-data class AdnlConfigGlobal(
+public data class AdnlConfigGlobal(
     @SerialName("static_nodes")
-    val staticNodes: AdnlNodes
+    val staticNodes: AdnlNodes = AdnlNodes()
 ) {
-    companion object : TlConstructor<AdnlConfigGlobal>(
-        type = AdnlConfigGlobal::class,
-        schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
-    ) {
-        override fun encode(output: Output, value: AdnlConfigGlobal) {
-            output.writeTl(AdnlNodes, value.staticNodes)
-        }
+    public companion object : TlCodec<AdnlConfigGlobal> by AdnlConfigGlobalTlConstructor
+}
 
-        override fun decode(input: Input): AdnlConfigGlobal {
-            val staticNodes = input.readTl(AdnlNodes)
-            return AdnlConfigGlobal(staticNodes)
-        }
+private object AdnlConfigGlobalTlConstructor : TlConstructor<AdnlConfigGlobal>(
+    schema = "adnl.config.global static_nodes:adnl.nodes = adnl.config.Global"
+) {
+    override fun encode(writer: TlWriter, value: AdnlConfigGlobal) = writer {
+        write(AdnlNodes, value.staticNodes)
+    }
+
+    override fun decode(reader: TlReader): AdnlConfigGlobal = reader {
+        val staticNodes = read(AdnlNodes)
+        AdnlConfigGlobal(staticNodes)
     }
 }

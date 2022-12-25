@@ -7,68 +7,71 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.cell.exception.CellUnderflowException
+import kotlin.jvm.JvmStatic
 
-inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()) = CellSlice.of(bits, refs)
+public inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()): CellSlice = CellSlice.of(bits, refs)
 
-interface CellSlice {
-    val bits: BitString
-    val refs: List<Cell>
-    var bitsPosition: Int
-    var refsPosition: Int
+public interface CellSlice {
+    public val bits: BitString
+    public val refs: List<Cell>
+    public var bitsPosition: Int
+    public var refsPosition: Int
+    public val remainingBits: Int get() = bits.size - bitsPosition
 
     /**
      * Checks if slice is empty. If not, throws an exception.
      */
-    fun endParse()
+    public fun endParse()
 
     /**
      * Loads the first reference from the slice.
      */
-    fun loadRef(): Cell
-    fun loadRefs(count: Int): List<Cell>
+    public fun loadRef(): Cell
+    public fun loadRefs(count: Int): List<Cell>
 
-    fun preloadRef(): Cell
-    fun preloadRefs(count: Int): List<Cell>
-    fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
+    public fun preloadRef(): Cell
+    public fun preloadRefs(count: Int): List<Cell>
+    public fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
 
-    fun loadBit(): Boolean
-    fun preloadBit(): Boolean
+    public fun loadBit(): Boolean
+    public fun preloadBit(): Boolean
 
-    fun skipBits(length: Int): CellSlice
+    public fun skipBits(length: Int): CellSlice
 
-    fun loadBits(length: Int): BitString
-    fun preloadBits(length: Int): BitString
+    public fun loadBits(length: Int): BitString
+    public fun preloadBits(length: Int): BitString
 
-    fun loadInt(length: Int): BigInt
-    fun preloadInt(length: Int): BigInt
+    public fun loadInt(length: Int): BigInt
+    public fun preloadInt(length: Int): BigInt
 
-    fun loadUInt(length: Int): BigInt
-    fun preloadUInt(length: Int): BigInt
+    public fun loadUInt(length: Int): BigInt
+    public fun preloadUInt(length: Int): BigInt
 
-    fun loadUInt32(): UInt = loadTinyInt(32).toUInt()
-    fun loadUInt64(): ULong = loadTinyInt(64).toULong()
+    public fun loadUInt8(): UByte = loadTinyInt(8).toUByte()
+    public fun loadUInt16(): UShort = loadTinyInt(16).toUShort()
+    public fun loadUInt32(): UInt = loadTinyInt(32).toUInt()
+    public fun loadUInt64(): ULong = loadTinyInt(64).toULong()
 
-    fun loadTinyInt(length: Int): Long = loadInt(length).toLong()
-    fun preloadTinyInt(length: Int): Long = preloadInt(length).toLong()
+    public fun loadTinyInt(length: Int): Long = loadInt(length).toLong()
+    public fun preloadTinyInt(length: Int): Long = preloadInt(length).toLong()
 
-    fun loadUIntLeq(max: Int) = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
-    fun preloadUIntLeq(max: Int) = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
+    public fun loadUIntLeq(max: Int): BigInt = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
+    public fun preloadUIntLeq(max: Int): BigInt = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
 
-    fun loadUIntLes(max: Int) = loadUIntLeq(max - 1)
-    fun preloadUIntLes(max: Int) = loadUIntLeq(max - 1)
+    public fun loadUIntLes(max: Int): BigInt = loadUIntLeq(max - 1)
+    public fun preloadUIntLes(max: Int): BigInt = loadUIntLeq(max - 1)
 
-    fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
+    public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    operator fun component1(): BitString = bits
-    operator fun component2(): List<Cell> = refs
+    public operator fun component1(): BitString = bits
+    public operator fun component2(): List<Cell> = refs
 
-
-    companion object {
+    public companion object {
         @JvmStatic
-        fun beginParse(cell: Cell): CellSlice = of(cell.bits, cell.refs)
+        public fun beginParse(cell: Cell): CellSlice = of(cell.bits, cell.refs)
 
         @JvmStatic
-        fun of(bits: BitString, refs: List<Cell> = emptyList()): CellSlice {
+        public fun of(bits: BitString, refs: List<Cell> = emptyList()): CellSlice {
             return if (bits is ByteBackedBitString) {
                 CellSliceByteBackedBitString(bits, refs)
             } else {
@@ -78,9 +81,9 @@ interface CellSlice {
     }
 }
 
-inline operator fun <T> CellSlice.invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
+public inline operator fun <T> CellSlice.invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
 
-inline fun <T> CellSlice.loadRef(cellSlice: CellSlice.() -> T): T =
+public inline fun <T> CellSlice.loadRef(cellSlice: CellSlice.() -> T): T =
     cellSlice(loadRef().beginParse())
 
 private open class CellSliceImpl(
@@ -90,7 +93,7 @@ private open class CellSliceImpl(
     override var refsPosition: Int = 0
 ) : CellSlice {
     override fun endParse() =
-        check(bitsPosition == bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
+        check(bitsPosition >= bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
 
     override fun loadRef(): Cell {
         checkRefsOverflow()

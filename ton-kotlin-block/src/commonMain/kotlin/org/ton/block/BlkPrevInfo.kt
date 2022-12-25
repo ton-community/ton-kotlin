@@ -4,48 +4,22 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbCodec
+import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
 sealed interface BlkPrevInfo {
     companion object {
+        @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun tlbCodec(multiple: Boolean): TlbCombinator<BlkPrevInfo> =
-            BlkPrevInfoTlbCombinator(multiple)
+        fun tlbCodec(multiple: Boolean): TlbCodec<BlkPrevInfo> =
+            (if (multiple) PrevBlksInfo.tlbCodec() else PrevBlkInfo.tlbCodec()) as TlbCodec<BlkPrevInfo>
 
         @JvmStatic
-        fun tlbCodec(multiple: Number): TlbCombinator<BlkPrevInfo> =
-            BlkPrevInfoTlbCombinator(multiple != 0)
+        fun tlbCodec(multiple: Int): TlbCodec<BlkPrevInfo> =
+            tlbCodec(multiple != 0)
     }
 
     fun prevs(): List<ExtBlkRef>
-}
-
-private class BlkPrevInfoTlbCombinator(
-    val multiple: Boolean
-) : TlbCombinator<BlkPrevInfo>() {
-    val prevBlkInfo by lazy { PrevBlkInfo.tlbCodec() }
-    val prevBlksInfo by lazy { PrevBlksInfo.tlbCodec() }
-
-    override val constructors: List<TlbConstructor<out BlkPrevInfo>> by lazy {
-        listOf(prevBlkInfo, prevBlksInfo)
-    }
-
-    override fun getConstructor(
-        value: BlkPrevInfo
-    ): TlbConstructor<out BlkPrevInfo> = when (value) {
-        is PrevBlkInfo -> prevBlkInfo
-        is PrevBlksInfo -> prevBlksInfo
-    }
-
-    override fun loadTlb(cellSlice: CellSlice): BlkPrevInfo {
-        return if (multiple) {
-            prevBlksInfo.loadTlb(cellSlice)
-        } else {
-            prevBlkInfo.loadTlb(cellSlice)
-        }
-    }
 }

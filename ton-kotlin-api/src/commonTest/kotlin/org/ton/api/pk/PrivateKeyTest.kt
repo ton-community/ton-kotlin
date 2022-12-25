@@ -12,7 +12,7 @@ class PrivateKeyTest {
         val publicKeyEd25519 = privateKeyEd25519.publicKey()
         assertContentEquals(
             hex("4745ede03eb4ef607843359c1f206d061a5632f68caa6f63021aa23b400950fd"),
-            publicKeyEd25519.key
+            publicKeyEd25519.key.toByteArray()
         )
     }
 }

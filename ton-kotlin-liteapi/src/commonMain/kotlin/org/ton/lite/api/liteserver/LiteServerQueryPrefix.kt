@@ -1,12 +1,12 @@
 package org.ton.lite.api.liteserver
 
-import io.ktor.utils.io.core.*
 import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
-object LiteServerQueryPrefix : TlConstructor<LiteServerQueryPrefix>(
-    type = LiteServerQueryPrefix::class,
+public object LiteServerQueryPrefix : TlConstructor<LiteServerQueryPrefix>(
     schema = "liteServer.queryPrefix = Object"
 ) {
-    override fun decode(input: Input): LiteServerQueryPrefix = LiteServerQueryPrefix
-    override fun encode(output: Output, value: LiteServerQueryPrefix) = Unit
+    override fun decode(reader: TlReader): LiteServerQueryPrefix = LiteServerQueryPrefix
+    override fun encode(writer: TlWriter, value: LiteServerQueryPrefix) {}
 }

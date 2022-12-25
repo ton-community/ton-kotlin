@@ -7,4 +7,4 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 @Polymorphic
 @JsonClassDiscriminator("@type")
-sealed interface LiteServerConfigLocal
+public sealed interface LiteServerConfigLocal

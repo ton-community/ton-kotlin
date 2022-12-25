@@ -8,6 +8,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import kotlin.jvm.JvmStatic
 
 @SerialName("anycast_info")
 @Serializable
@@ -49,4 +50,3 @@ private object AnycastTlbConstructor : TlbConstructor<Anycast>(
         Anycast(depth, rewritePfx)
     }
 }
-

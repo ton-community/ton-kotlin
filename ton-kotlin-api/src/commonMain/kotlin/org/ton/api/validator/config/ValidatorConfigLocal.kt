@@ -9,4 +9,4 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @Serializable
 @Polymorphic
 @JsonClassDiscriminator("@type")
-sealed interface ValidatorConfigLocal
+public sealed interface ValidatorConfigLocal

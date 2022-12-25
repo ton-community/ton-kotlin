@@ -5,29 +5,23 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.loadRef
 import org.ton.cell.storeRef
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 sealed interface SnakeData {
     companion object : TlbCombinatorProvider<SnakeData> by SnakeDataTlbCombinator
 
-    private object SnakeDataTlbCombinator : TlbCombinator<SnakeData>() {
-        override val constructors = listOf(SnakeDataCons.tlbConstructor(), SnakeDataTail.tlbConstructor())
-
-        override fun getConstructor(value: SnakeData): TlbConstructor<out SnakeData> = when (value) {
-            is SnakeDataTail -> SnakeDataTail.tlbConstructor()
-            is SnakeDataCons -> SnakeDataCons.tlbConstructor()
-        }
-
-        override fun loadTlb(cellSlice: CellSlice): SnakeData {
+    private object SnakeDataTlbCombinator : TlbCombinator<SnakeData>(
+        SnakeData::class,
+        SnakeDataTail::class to SnakeDataTail,
+        SnakeDataCons::class to SnakeDataCons
+    ) {
+        override fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out SnakeData> {
             return if (cellSlice.refs.lastIndex >= cellSlice.refsPosition) {
-                cellSlice.loadTlb(SnakeDataCons) // More references available, this is a cons
+                SnakeDataCons // More references available, this is a cons
             } else {
-                cellSlice.loadTlb(SnakeDataTail) // No more refs, this has to be a tail
+                SnakeDataTail // No more refs, this has to be a tail
             }
         }
     }

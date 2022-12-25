@@ -1,14 +1,13 @@
 [versions]
-coroutines = "1.6.3"
-datetime = "0.3.3"
-atomicfu = "0.18.0"
-benchmark = "0.4.2"
-serialization = "1.3.3"
-ktor = "2.0.2"
-bouncycastle = "1.70"
-curve25519 = "0.0.4"
+coroutines = "1.6.4" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+datetime = "0.4.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-datetime
+atomicfu = "0.18.5" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
+benchmark = "0.4.7" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-benchmark-runtime
+serialization = "1.4.1" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
+ktor = "2.2.1" # https://search.maven.org/artifact/io.ktor/ktor
+bouncycastle = "1.70" # https://search.maven.org/artifact/org.bouncycastle/bcprov-jdk15on
+curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
 mockk = "1.12.4"
-kotlinio = "db57f3e429"
 
 [libraries]
 coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
@@ -29,4 +28,3 @@ ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bouncycastle" }
 curve25519 = { module = "io.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-kotlinio-base64 = { module = "com.github.andreypfau.kotlinio:kotlinio-base64", version.ref = "kotlinio" }

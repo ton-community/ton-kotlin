@@ -1,7 +1,9 @@
 package org.ton.cell
 
-enum class CellType(
-    val value: Int
+import kotlin.jvm.JvmStatic
+
+public enum class CellType(
+    public val value: Int
 ) {
     /**
      * Contains up to 1023 bits of data and up to four cell references.
@@ -65,11 +67,16 @@ enum class CellType(
      */
     MERKLE_UPDATE(4);
 
-    val isExotic: Boolean get() = this != ORDINARY
-    val isMerkle: Boolean get() = this == MERKLE_PROOF || this == MERKLE_UPDATE
-    val isPruned: Boolean get() = this == PRUNED_BRANCH
+    public val isExotic: Boolean get() = this != ORDINARY
+    public val isMerkle: Boolean get() = this == MERKLE_PROOF || this == MERKLE_UPDATE
+    public val isPruned: Boolean get() = this == PRUNED_BRANCH
 
-    companion object {
-        operator fun get(index: Int) = values()[index]
+    public companion object {
+        private val values by lazy(LazyThreadSafetyMode.PUBLICATION) {
+            values()
+        }
+
+        @JvmStatic
+        public operator fun get(index: Int): CellType = values[index]
     }
 }

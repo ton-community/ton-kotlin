@@ -3,6 +3,7 @@
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmStatic
 import kotlin.math.min
 
 inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
@@ -34,6 +35,9 @@ interface BitString : List<Boolean>, Comparable<BitString> {
     fun toByteArray(augment: Boolean = false): ByteArray
     fun toBooleanArray(): BooleanArray
     fun toMutableBitString(): MutableBitString
+
+    infix fun xor(other: BitString): BitString
+    infix fun or(other: BitString): BitString
 
     override fun subList(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
 

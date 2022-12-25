@@ -7,7 +7,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object FiftHexBitStringSerializer : KSerializer<BitString> {
+public object FiftHexBitStringSerializer : KSerializer<BitString> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BitString", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): BitString {

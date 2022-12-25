@@ -5,6 +5,5 @@ kotlin {
                 implementation(projects.tonKotlinCrypto)
             }
         }
-        val commonTest by getting
     }
 }

@@ -7,8 +7,8 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 
-open class UIntTlbConstructor(
-    val length: Int
+public open class UIntTlbConstructor(
+    public val length: Int
 ) : TlbConstructor<BigInt>(
     schema = "uint\$_ = uint;",
     id = BitString.empty()
@@ -16,8 +16,8 @@ open class UIntTlbConstructor(
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BigInt
-    ) = cellBuilder {
-        storeUInt(value, length)
+    ) {
+        cellBuilder.storeUInt(value, length)
     }
 
     override fun loadTlb(
@@ -26,26 +26,20 @@ open class UIntTlbConstructor(
         loadUInt(length)
     }
 
-    companion object {
-        fun byte(length: Int = Byte.SIZE_BITS) =
-            number(encode = { storeUInt(it, length) }, decode = { loadUInt(length).toByte() })
+    public companion object {
+        public fun byte(length: Int = Byte.SIZE_BITS): TlbConstructor<UByte> =
+            number(encode = { storeUInt(it.toByte(), length) }, decode = { loadUInt(length).toByte().toUByte() })
 
-        fun short(length: Int = Short.SIZE_BITS) =
-            number(encode = { storeUInt(it, length) }, decode = { loadUInt(length).toShort() })
+        public fun short(length: Int = Short.SIZE_BITS): TlbConstructor<UShort> =
+            number(encode = { storeUInt(it.toShort(), length) }, decode = { loadUInt(length).toShort().toUShort() })
 
-        fun int(length: Int = Int.SIZE_BITS) =
-            number(encode = { storeUInt(it, length) }, decode = { loadUInt(length).toInt() })
+        public fun int(length: Int = Int.SIZE_BITS): TlbConstructor<UInt> =
+            number(encode = { storeUInt(it.toInt(), length) }, decode = { loadUInt(length).toInt().toUInt() })
 
-        fun long(length: Int = Long.SIZE_BITS) =
-            number(encode = { storeUInt(it, length) }, decode = { loadUInt(length).toLong() })
+        public fun long(length: Int = Long.SIZE_BITS): TlbConstructor<ULong> =
+            number(encode = { storeUInt(it.toLong(), length) }, decode = { loadUInt(length).toLong().toULong() })
 
-        fun uint32() =
-            number(encode = { storeUInt32(it) }, decode = { loadUInt32() })
-
-        fun uint64() =
-            number(encode = { storeUInt64(it) }, decode = { loadUInt64() })
-
-        fun <T : Any> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
+        private fun <T : Any> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
             object : TlbConstructor<T>("") {
                 override fun storeTlb(
                     cellBuilder: CellBuilder,
@@ -63,5 +57,5 @@ open class UIntTlbConstructor(
     }
 }
 
-fun UInt.Companion.tlbConstructor() = UIntTlbConstructor.uint32()
-fun ULong.Companion.tlbConstructor() = UIntTlbConstructor.uint64()
+public fun UInt.Companion.tlbConstructor(): TlbConstructor<UInt> = UIntTlbConstructor.int()
+public fun ULong.Companion.tlbConstructor(): TlbConstructor<ULong> = UIntTlbConstructor.long()

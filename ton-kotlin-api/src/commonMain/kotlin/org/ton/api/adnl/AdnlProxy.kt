@@ -7,59 +7,33 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.crypto.base64
-import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
-import org.ton.tl.constructors.readBytesTl
-import org.ton.tl.constructors.readInt256Tl
-import org.ton.tl.constructors.writeBytesTl
-import org.ton.tl.constructors.writeInt256Tl
+import org.ton.tl.*
 
 @JsonClassDiscriminator("@type")
-interface AdnlProxy {
-    companion object : TlCombinator<AdnlProxy>(
-        AdnlProxyNone,
-        AdnlProxyFast
+public interface AdnlProxy {
+    public val id: Bits256
+
+    public companion object : TlCombinator<AdnlProxy>(
+        AdnlProxy::class,
+        AdnlProxyNone::class to AdnlProxyNone,
+        AdnlProxyFast::class to AdnlProxyFast
     )
 }
 
 @SerialName("adnl.proxy.none")
 @Serializable
-data class AdnlProxyNone(
-    @Serializable(Base64ByteArraySerializer::class)
-    val id: ByteArray
+public data class AdnlProxyNone(
+    override val id: Bits256
 ) : AdnlProxy {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AdnlProxyNone
-
-        if (!id.contentEquals(other.id)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id.contentHashCode()
-    }
-
-    override fun toString(): String = buildString {
-        append("AdnlProxyNone(id=")
-        append(base64(id))
-        append(")")
-    }
-
-    companion object : TlConstructor<AdnlProxyNone>(
-        type = AdnlProxyNone::class,
+    public companion object : TlConstructor<AdnlProxyNone>(
         schema = "adnl.proxy.none id:int256 = adnl.Proxy"
     ) {
-        override fun encode(output: Output, value: AdnlProxyNone) {
-            output.writeInt256Tl(value.id)
+        override fun encode(writer: TlWriter, value: AdnlProxyNone) {
+            writer.writeBits256(value.id)
         }
 
-        override fun decode(input: Input): AdnlProxyNone {
-            val id = input.readInt256Tl()
+        override fun decode(reader: TlReader): AdnlProxyNone {
+            val id = reader.readBits256()
             return AdnlProxyNone(id)
         }
     }
@@ -67,52 +41,40 @@ data class AdnlProxyNone(
 
 @SerialName("adnl.proxy.fast")
 @Serializable
-data class AdnlProxyFast(
-    @Serializable(Base64ByteArraySerializer::class)
-    val id: ByteArray,
+public data class AdnlProxyFast(
+    override val id: Bits256,
     @SerialName("shared_secret")
     @Serializable(Base64ByteArraySerializer::class)
     val sharedSecret: ByteArray
 ) : AdnlProxy {
+    public companion object : TlConstructor<AdnlProxyFast>(
+        schema = "adnl.proxy.fast id:int256 shared_secret:bytes = adnl.Proxy"
+    ) {
+        override fun encode(writer: TlWriter, value: AdnlProxyFast) {
+            writer.writeBits256(value.id)
+            writer.writeBytes(value.sharedSecret)
+        }
+
+        override fun decode(reader: TlReader): AdnlProxyFast {
+            val id = reader.readBits256()
+            val sharedSecret = reader.readBytes()
+            return AdnlProxyFast(id, sharedSecret)
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is AdnlProxyFast) return false
 
-        other as AdnlProxyFast
-
-        if (!id.contentEquals(other.id)) return false
+        if (id != other.id) return false
         if (!sharedSecret.contentEquals(other.sharedSecret)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = id.contentHashCode()
+        var result = id.hashCode()
         result = 31 * result + sharedSecret.contentHashCode()
         return result
-    }
-
-    override fun toString(): String = buildString {
-        append("AdnlProxyFast(id=")
-        append(base64(id))
-        append(", sharedSecret=")
-        append(base64(sharedSecret))
-        append(")")
-    }
-
-    companion object : TlConstructor<AdnlProxyFast>(
-        type = AdnlProxyFast::class,
-        schema = "adnl.proxy.fast id:int256 shared_secret:bytes = adnl.Proxy"
-    ) {
-        override fun encode(output: Output, value: AdnlProxyFast) {
-            output.writeInt256Tl(value.id)
-            output.writeBytesTl(value.sharedSecret)
-        }
-
-        override fun decode(input: Input): AdnlProxyFast {
-            val id = input.readInt256Tl()
-            val sharedSecret = input.readBytesTl()
-            return AdnlProxyFast(id, sharedSecret)
-        }
     }
 }
