@@ -1,9 +1,9 @@
 package org.ton.asm.tuple
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -27,9 +27,9 @@ private object INDEX3TlbConstructor : TlbConstructor<INDEX3>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): INDEX3 {
-        val i = cellSlice.loadUInt(2).toUByte()
-        val j = cellSlice.loadUInt(2).toUByte()
-        val k = cellSlice.loadUInt(2).toUByte()
+        val i = cellSlice.loadTinyInt(2).toUByte()
+        val j = cellSlice.loadTinyInt(2).toUByte()
+        val k = cellSlice.loadTinyInt(2).toUByte()
         return INDEX3(i, j, k)
     }
 }

@@ -1,10 +1,11 @@
 package org.ton.asm.contstack
 
 import org.ton.asm.AsmInstruction
+import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
-import org.ton.bigint.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class SETCONTARGS(

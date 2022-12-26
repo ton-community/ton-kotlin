@@ -12,7 +12,7 @@ import kotlin.jvm.JvmStatic
 @SerialName("vmc_envelope")
 @Serializable
 data class VmContEnvelope(
-    val cdata: VmControlData,
+    override val cdata: VmControlData,
     val next: CellRef<VmCont>
 ) : VmCont {
     companion object {

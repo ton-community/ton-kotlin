@@ -41,10 +41,10 @@ public interface CellBuilder {
      * Stores an unsigned [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 256.
      */
     public fun storeUInt(value: BigInt, length: Int): CellBuilder
-    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(BigInt(value), length)
-    public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(BigInt(value), length)
+    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(value.toLong(), length)
+    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(value.toLong(), length)
+    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(value.toLong(), length)
+    public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
 
     public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
     public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
@@ -52,25 +52,25 @@ public interface CellBuilder {
     public fun storeUInt64(value: ULong): CellBuilder = storeInt(value.toLong(), 64)
 
     public fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
-    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    public fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
-    public fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(BigInt(value), BigInt(max))
+    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
 
     public fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
-    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
-    public fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(BigInt(value), BigInt(max))
+    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
 
     /**
      * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
      */
     public fun storeInt(value: BigInt, length: Int): CellBuilder
-    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(BigInt(value), length)
-    public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(BigInt(value), length)
+    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+    public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+    public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
 
     /**
      * Stores [slice] into builder.
@@ -132,6 +132,12 @@ public interface CellBuilder {
 
     public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
 }
+
+public inline fun CellBuilder.storeUInt(value: UByte, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
+public inline fun CellBuilder.storeUInt(value: UShort, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
+public inline fun CellBuilder.storeUInt(value: UInt, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
+public inline fun CellBuilder.storeUInt(value: ULong, bits: Int): CellBuilder =
+    storeUInt(BigInt(value.toString()), bits)
 
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
@@ -220,14 +226,14 @@ private class CellBuilderImpl(
     }
 
     override fun storeInt(value: BigInt, length: Int): CellBuilder = apply {
-        val intBits = BigInt(1) shl (length - 1)
+        val intBits = 1.toBigInt() shl (length - 1)
         require(value >= -intBits && value < intBits) { "Can't store an Int, because its value allocates more space than provided." }
         storeNumber(value, length)
     }
 
     private fun storeNumber(value: BigInt, length: Int): CellBuilder = apply {
         val bits = BooleanArray(length) { index ->
-            ((value shr index) and BigInt(1)).toInt() == 1
+            ((value shr index) and 1.toBigInt()).toInt() == 1
         }.reversedArray()
         storeBits(*bits)
     }

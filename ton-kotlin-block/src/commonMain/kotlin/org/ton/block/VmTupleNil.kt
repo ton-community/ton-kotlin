@@ -9,7 +9,8 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_tuple_nil")
 @Serializable
-object VmTupleNil : VmTuple, TlbConstructorProvider<VmTupleNil> by VmTupleNilTlbConstructor {
+public object VmTupleNil : VmTuple, Sequence<VmStackValue> by emptySequence(),
+    TlbConstructorProvider<VmTupleNil> by VmTupleNilTlbConstructor {
     override fun depth(): Int = 0
 
     override fun toString(): String = "vm_tuple_nil"

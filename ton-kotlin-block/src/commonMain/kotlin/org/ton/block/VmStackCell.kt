@@ -13,7 +13,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @SerialName("vm_stk_cell")
 data class VmStackCell(
     val cell: Cell
-) : VmStackValue {
+) : VmStackValue, Cell by cell {
     override fun toString(): String = "(vm_stk_cell cont:$cell)"
 
     companion object : TlbConstructorProvider<VmStackCell> by VmStackValueCellConstructor

@@ -5,17 +5,14 @@ import org.ton.cell.CellSlice
 
 sealed interface VmStackSlice : VmStackValue {
     val cell: Cell
-    val st_bits: Int
-    val end_bits: Int
-    val st_ref: Int
-    val end_ref: Int
+    val stBits: Int
+    val endBits: Int
+    val stRef: Int
+    val endRef: Int
 
-    fun toCellSlice(): CellSlice = cell.beginParse().run {
-        skipBits(st_bits)
-        loadRefs(st_ref)
-        CellSlice.of(
-            loadBits(end_bits - st_bits),
-            loadRefs(end_ref - st_ref)
+    fun toCellSlice(): CellSlice =
+        CellSlice(
+            bits = cell.bits.slice(stBits until endBits),
+            refs = cell.refs.slice(stRef until endRef)
         )
-    }
 }

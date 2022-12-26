@@ -13,8 +13,19 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 data class VmSaveList(
-    val cregs: HashMapE<VmStackValue>
+    val cregs: HashMapE<VmStackValue> = HashMapE.of()
 ) {
+    private val entries by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        cregs.nodes().map {
+            CellSlice(it.first).loadTinyInt(4).toInt() to it.second
+        }.toMap()
+    }
+
+    val c7: VmStackTuple get() = get(7) as VmStackTuple
+    val c4: VmStackCell get() = (get(4) as VmStackCell)
+
+    public operator fun get(index: Int): VmStackValue? = entries[index]
+
     companion object : TlbCodec<VmSaveList> by VmSaveListTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<VmSaveList> = VmSaveListTlbConstructor

@@ -15,7 +15,7 @@ inline fun VmTupleRef(ref: VmTuple): VmTupleRef = VmTupleRef.of(ref)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface VmTupleRef {
+sealed interface VmTupleRef : Sequence<VmStackValue> {
     fun depth(): Int
 
     companion object {
@@ -40,7 +40,7 @@ sealed interface VmTupleRef {
 
 @SerialName("vm_tupref_nil")
 @Serializable
-object VmTupleRefNil : VmTupleRef {
+object VmTupleRefNil : VmTupleRef, Sequence<VmStackValue> by emptySequence() {
     override fun depth(): Int = 0
 
     override fun toString(): String = "vm_tupref_nil"
@@ -50,7 +50,7 @@ object VmTupleRefNil : VmTupleRef {
 @Serializable
 data class VmTupleRefSingle(
     val entry: VmStackValue
-) : VmTupleRef {
+) : VmTupleRef, Sequence<VmStackValue> by sequenceOf(entry) {
     override fun depth(): Int = 1
 
     override fun toString(): String = "(vm_tupref_single entry:$entry)"
@@ -60,7 +60,7 @@ data class VmTupleRefSingle(
 @Serializable
 data class VmTupleRefAny(
     val ref: VmTuple
-) : VmTupleRef {
+) : VmTupleRef, Sequence<VmStackValue> by ref {
     override fun depth(): Int = ref.depth()
 
     override fun toString(): String = "(vm_tupref_any ref:$ref)"

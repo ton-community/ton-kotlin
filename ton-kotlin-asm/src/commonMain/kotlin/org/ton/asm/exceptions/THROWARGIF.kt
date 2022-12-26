@@ -4,6 +4,7 @@ import org.ton.asm.AsmInstruction
 import org.ton.bigint.toUShort
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 

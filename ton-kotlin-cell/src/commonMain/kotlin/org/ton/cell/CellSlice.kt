@@ -10,6 +10,7 @@ import org.ton.cell.exception.CellUnderflowException
 import kotlin.jvm.JvmStatic
 
 public inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()): CellSlice = CellSlice.of(bits, refs)
+public inline fun CellSlice(cell: Cell): CellSlice = CellSlice.of(cell.bits, cell.refs)
 
 public interface CellSlice {
     public val bits: BitString

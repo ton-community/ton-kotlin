@@ -50,7 +50,7 @@ interface VmStack : Collection<VmStackValue> {
 }
 
 interface MutableVmStack : VmStack {
-    fun pop(): VmStackValue
+    fun pop(index: Int = 0): VmStackValue
     fun popNull() = pop() as VmStackNull
     fun popTinyInt() = popNumber().toLong()
     fun popBool() = popTinyInt() != 0L
@@ -113,10 +113,12 @@ class MutableVmStackImpl(
     override val stack: VmStackList get() = VmStackList(_stack)
     override fun get(index: Int): VmStackValue = _stack[index]
 
-    override fun pop(): VmStackValue = _stack.removeLast()
+    override fun pop(index: Int): VmStackValue {
+        return _stack.removeAt(index)
+    }
 
     override fun push(stackValue: VmStackValue) {
-        _stack.addLast(stackValue)
+        _stack.addFirst(stackValue)
     }
 
     override fun toMutableVmStack(): MutableVmStack = this

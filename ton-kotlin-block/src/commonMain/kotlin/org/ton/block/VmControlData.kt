@@ -15,17 +15,17 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("vm_ctl_data")
 @Serializable
-class VmControlData(
-    val nargs: Maybe<UInt>,
-    val stack: Maybe<VmStack>,
-    val save: VmSaveList,
-    val cp: Maybe<Int>
+public data class VmControlData(
+    public val nargs: Maybe<UInt>,
+    public val stack: Maybe<VmStack>,
+    public val save: VmSaveList,
+    public val cp: Maybe<Int>
 ) {
-    constructor(nargs: UInt?, stack: VmStack?, save: VmSaveList, cp: Int?) : this(
-        nargs.toMaybe(),
-        stack.toMaybe(),
-        save,
-        cp.toMaybe()
+    public constructor(nargs: UInt? = null, stack: VmStack? = null, save: VmSaveList? = null, cp: Int? = null) : this(
+        nargs = nargs.toMaybe(),
+        stack = stack.toMaybe(),
+        save = save ?: VmSaveList(),
+        cp = cp.toMaybe()
     )
 
     companion object : TlbCodec<VmControlData> by VmControlDataTlbConstructor {

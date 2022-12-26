@@ -1,10 +1,10 @@
 package org.ton.asm.contstack
 
 import org.ton.asm.AsmInstruction
+import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
-import org.ton.bigint.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class SETNUMARGS(
@@ -23,7 +23,7 @@ private object SETNUMARGSTlbConstructor : TlbConstructor<SETNUMARGS>(
     schema = "asm_setnumargs#ec0 n:(#<= 14) = SETNUMARGS;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETNUMARGS) {
-        cellBuilder.storeUIntLeq(value.n, 14)
+        cellBuilder.storeUIntLeq(value.n.toInt(), 14)
     }
 
     override fun loadTlb(cellSlice: CellSlice): SETNUMARGS {

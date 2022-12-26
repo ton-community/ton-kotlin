@@ -20,6 +20,11 @@ data class VmTupleTcons(
 
     override fun toString(): String = "(vm_tuple_tcons head:$head tail:$tail)"
 
+    override fun iterator(): Iterator<VmStackValue> = iterator {
+        yieldAll(head)
+        yield(tail)
+    }
+
     companion object {
         @JvmStatic
         fun tlbCodec(n: Int): TlbConstructor<VmTupleTcons> = VmTupleTconsTlbConstructor(n)

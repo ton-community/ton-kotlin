@@ -20,7 +20,7 @@ private object SETCPTlbConstructor : TlbConstructor<SETCP>(
     schema = "asm_setcp#ff nn:(#<= 239) = SETCP;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: SETCP) {
-        cellBuilder.storeUIntLeq(value.nn, 239.toByte())
+        cellBuilder.storeUIntLeq(value.nn.toByte(), 239.toByte())
     }
 
     override fun loadTlb(cellSlice: CellSlice): SETCP {

@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -42,7 +43,7 @@ private object PUSHSLICE_LONGTlbConstructor : TlbConstructor<PUSHSLICE_LONG>(
     schema = "asm_pushslice_long#8d r:(#<= 4) xx:(## 7) c:(r * ^Cell) ssss:((8 * xx + 6) * Bit) = PUSHSLICE_LONG;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: PUSHSLICE_LONG) {
-        cellBuilder.storeUIntLeq(value.r, 4)
+        cellBuilder.storeUIntLeq(value.r.toInt(), 4)
         cellBuilder.storeUInt(value.xx, 7)
         value.c.forEach { cell ->
             cellBuilder.storeRef(cell)

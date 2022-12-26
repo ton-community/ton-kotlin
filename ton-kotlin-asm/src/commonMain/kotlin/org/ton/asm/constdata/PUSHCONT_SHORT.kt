@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -21,7 +22,7 @@ data class PUSHCONT_SHORT(
 }
 
 private object PUSHCONT_SHORTTlbConstructor : TlbConstructor<PUSHCONT_SHORT>(
-    schema = "asm_pushcont_short#8d x:(## 4) ssss:((8 * x) * Bit) = PUSHCONT_SHORT;"
+    schema = "asm_pushcont_short#9 x:(## 4) ssss:((8 * x) * Bit) = PUSHCONT_SHORT;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: PUSHCONT_SHORT) {
         cellBuilder.storeUInt(value.x, 4)

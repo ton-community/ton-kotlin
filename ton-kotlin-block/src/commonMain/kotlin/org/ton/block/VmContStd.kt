@@ -14,9 +14,17 @@ import kotlin.jvm.JvmStatic
 @SerialName("vmc_std")
 @Serializable
 data class VmContStd(
-    val cdata: VmControlData,
+    override val cdata: VmControlData,
     val code: VmCellSlice
 ) : VmCont {
+    constructor(
+        code: CellSlice,
+        cp: Int
+    ) : this(
+        cdata = VmControlData(cp = cp),
+        code = VmCellSlice(code)
+    )
+
     companion object : TlbCodec<VmContStd> by VmContStdTlbConstructor {
         @JvmStatic
         fun tlbCodec(): TlbConstructor<VmContStd> = VmContStdTlbConstructor

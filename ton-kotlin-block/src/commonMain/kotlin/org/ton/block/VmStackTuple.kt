@@ -15,7 +15,7 @@ import org.ton.tlb.storeTlb
 class VmStackTuple(
     val len: Int,
     val data: VmTuple
-) : VmStackValue {
+) : VmStackValue, Sequence<VmStackValue> by data {
     constructor(data: VmTuple) : this(data.depth(), data)
 
     override fun toString(): String = "(vm_stk_tuple len:$len data:$data)"

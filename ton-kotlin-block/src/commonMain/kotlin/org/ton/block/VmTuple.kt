@@ -9,7 +9,7 @@ import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface VmTuple {
+public sealed interface VmTuple : Sequence<VmStackValue> {
     fun depth(): Int
 
     companion object {

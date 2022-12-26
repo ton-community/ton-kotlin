@@ -7,7 +7,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 object ZERO : AsmInstruction, TlbConstructorProvider<ZERO> by ZEROTlbConstructor {
-    override fun toString(): String = "ZERO"
+    override fun toString(): String = "0 PUSHINT"
 }
 
 private object ZEROTlbConstructor : TlbConstructor<ZERO>(

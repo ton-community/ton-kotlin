@@ -8,8 +8,20 @@ import kotlinx.serialization.Serializable
 @SerialName("gas_limits")
 @Serializable
 data class VmGasLimits(
-    val remaining: Long,
-    val max_limit: Long,
-    val cur_limit: Long,
-    val credit: Long
-)
+    val remaining: Long = Long.MAX_VALUE,
+    val maxLimit: Long = Long.MAX_VALUE,
+    val curLimit: Long = Long.MAX_VALUE,
+    val credit: Long = Long.MAX_VALUE
+) {
+    public fun consume(amount: Int): VmGasLimits = consume(amount.toLong())
+    public fun consume(amount: Long): VmGasLimits = copy(
+        remaining = remaining - amount,
+    )
+
+    public fun consumeOrNull(amount: Int): VmGasLimits? = consumeOrNull(amount.toLong())
+    public fun consumeOrNull(amount: Long): VmGasLimits? = if (amount <= remaining) {
+        consume(amount)
+    } else {
+        null
+    }
+}

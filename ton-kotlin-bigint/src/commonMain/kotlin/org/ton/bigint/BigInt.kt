@@ -57,3 +57,8 @@ public object BigIntSerializer : KSerializer<BigInt> {
 public expect val BigInt.bitLength: Int
 public expect val BigInt.sign: Int
 public expect val BigInt.isZero: Boolean
+
+public fun BigInt.toUByte(): UByte = toByte().toUByte()
+public fun BigInt.toUShort(): UShort = toShort().toUShort()
+public fun BigInt.toUInt(): UInt = toInt().toUInt()
+public fun BigInt.toULong(): ULong = toLong().toULong()

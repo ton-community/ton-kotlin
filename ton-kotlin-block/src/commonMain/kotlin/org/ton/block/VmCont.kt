@@ -13,6 +13,10 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 @Serializable
 sealed interface VmCont {
 
+    public val cdata: VmControlData? get() = null
+
+    public fun hasC0(): Boolean = cdata?.save?.get(0) != null
+
     @SerialName("vmc_until")
     @Serializable
     data class Until(

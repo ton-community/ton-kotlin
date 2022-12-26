@@ -13,21 +13,21 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @Serializable
 data class VmCellSlice(
     override val cell: Cell,
-    override val st_bits: Int,
-    override val end_bits: Int,
-    override val st_ref: Int,
-    override val end_ref: Int
+    override val stBits: Int,
+    override val endBits: Int,
+    override val stRef: Int,
+    override val endRef: Int
 ) : VmStackSlice {
     constructor(cellSlice: CellSlice) : this(
         cell = Cell(cellSlice.bits, cellSlice.refs),
-        st_bits = cellSlice.bitsPosition,
-        end_bits = cellSlice.bits.size,
-        st_ref = cellSlice.refsPosition,
-        end_ref = cellSlice.refs.size
+        stBits = cellSlice.bitsPosition,
+        endBits = cellSlice.bits.size,
+        stRef = cellSlice.refsPosition,
+        endRef = cellSlice.refs.size
     )
 
     override fun toString(): String =
-        "(vm_stk_slice cell:${if (st_ref == 0 && end_ref == 0) cell.bits.toString() else cell.toString()} st_bits:$st_bits end_bits:$end_bits st_ref:$st_ref end_ref:$end_ref)"
+        "(vm_stk_slice cell:${if (stRef == 0 && endRef == 0) cell.bits.toString() else cell.toString()} st_bits:$stBits end_bits:$endBits st_ref:$stRef end_ref:$endRef)"
 
     companion object : TlbConstructorProvider<VmCellSlice> by VmCellSliceTlbConstructor
 }
@@ -41,10 +41,10 @@ private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(
         value: VmCellSlice
     ) = cellBuilder {
         storeRef(value.cell)
-        storeUInt(value.st_bits, 10)
-        storeUInt(value.end_bits, 10)
-        storeUIntLeq(value.st_ref, 4)
-        storeUIntLeq(value.end_ref, 4)
+        storeUInt(value.stBits, 10)
+        storeUInt(value.endBits, 10)
+        storeUIntLeq(value.stRef, 4)
+        storeUIntLeq(value.endRef, 4)
     }
 
     override fun loadTlb(
