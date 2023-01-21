@@ -23,6 +23,8 @@ import org.ton.cell.CellType
 import org.ton.crypto.crc16
 import org.ton.crypto.sha256
 import org.ton.lite.api.LiteApiClient
+import org.ton.lite.api.exception.LiteServerNotReadyException
+import org.ton.lite.api.exception.LiteServerUnknownException
 import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
@@ -241,15 +243,30 @@ public class LiteClient(
         if (knownBlockId != null) {
             return knownBlockId
         }
+        val mode = when {
+            time != null -> LiteServerLookupBlock.UTIME_MASK
+            lt != null -> LiteServerLookupBlock.LT_MASK
+            else -> LiteServerLookupBlock.ID_MASK
+        }
         val blockHeader = try {
-            liteApi(LiteServerLookupBlock(blockId, lt, time?.epochSeconds?.toInt()))
-        } catch (e: TonNotReadyException) {
+            liteApi(LiteServerLookupBlock(mode, blockId, lt, time?.epochSeconds?.toInt()))
+        } catch (e: LiteServerNotReadyException) {
             return null
+        } catch (e: LiteServerUnknownException) {
+            if (e.message == "block is not applied") {
+                return null
+            } else {
+                throw e
+            }
         } catch (e: Exception) {
             throw RuntimeException("Can't lookup block header for $blockId from server", e)
         }
         val actualBlockId = blockHeader.id
-        check((!blockId.isValid()) || blockId == actualBlockId) {
+        check(
+            blockId.workchain == actualBlockId.workchain &&
+                    blockId.shard == actualBlockId.shard &&
+                    blockId.seqno == actualBlockId.seqno
+        ) {
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
