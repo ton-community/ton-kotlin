@@ -18,7 +18,7 @@ private object HttpServerHostTlConstructor : TlConstructor<HttpServerHost>(
     schema = "http.server.host domains:(vector string) ip:int32 port:int32 adnl_id:adnl.id.short = http.server.Host"
 ) {
     override fun decode(input: TlReader): HttpServerHost {
-        val domains = input.readCollection {
+        val domains = input.readVector {
             readString()
         }
         val ip = input.readInt()
@@ -28,7 +28,7 @@ private object HttpServerHostTlConstructor : TlConstructor<HttpServerHost>(
     }
 
     override fun encode(output: TlWriter, value: HttpServerHost) {
-        output.writeCollection(value.domains) {
+        output.writeVector(value.domains) {
             writeString(it)
         }
         output.writeInt(value.ip)

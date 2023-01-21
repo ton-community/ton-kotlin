@@ -5,14 +5,14 @@ import org.ton.block.Message
 import org.ton.block.StateInit
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
-import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
+import org.ton.lite.client.LiteClient
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
 interface Contract {
-    val liteApi: LiteApi
+    val liteClient: LiteClient
     val workchainId: Int
     val name: String
     val code: Cell

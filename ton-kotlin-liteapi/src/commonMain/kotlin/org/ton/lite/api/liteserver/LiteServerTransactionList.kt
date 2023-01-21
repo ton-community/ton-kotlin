@@ -1,15 +1,32 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.boc.BagOfCells
-import org.ton.lite.api.liteserver.internal.readBoc
-import org.ton.lite.api.liteserver.internal.writeBoc
 import org.ton.tl.*
 
+@Serializable
+@SerialName("liteServer.transactionList")
 public data class LiteServerTransactionList(
     val ids: Collection<TonNodeBlockIdExt>,
-    val transactions: BagOfCells
+    val transactions: ByteArray
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LiteServerTransactionList) return false
+
+        if (ids != other.ids) return false
+        if (!transactions.contentEquals(other.transactions)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ids.hashCode()
+        result = 31 * result + transactions.contentHashCode()
+        return result
+    }
+
     public companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
 }
 
@@ -17,17 +34,17 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
     schema = "liteServer.transactionList ids:(vector tonNode.blockIdExt) transactions:bytes = liteServer.TransactionList",
 ) {
     override fun decode(reader: TlReader): LiteServerTransactionList {
-        val ids = reader.readCollection {
+        val ids = reader.readVector {
             read(TonNodeBlockIdExt)
         }
-        val transactions = reader.readBoc()
+        val transactions = reader.readBytes()
         return LiteServerTransactionList(ids, transactions)
     }
 
     override fun encode(output: TlWriter, value: LiteServerTransactionList) {
-        output.writeCollection(value.ids) {
+        output.writeVector(value.ids) {
             write(TonNodeBlockIdExt, it)
         }
-        output.writeBoc(value.transactions)
+        output.writeBytes(value.transactions)
     }
 }

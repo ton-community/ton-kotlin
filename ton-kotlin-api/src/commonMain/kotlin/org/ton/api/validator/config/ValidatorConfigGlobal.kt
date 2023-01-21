@@ -29,7 +29,7 @@ private object ValidatorConfigGlobalTlConstructor : TlConstructor<ValidatorConfi
     override fun encode(writer: TlWriter, value: ValidatorConfigGlobal) = writer {
         writer.write(TonNodeBlockIdExt, value.zeroState)
         writer.write(TonNodeBlockIdExt, value.initBlock)
-        writer.writeCollection(value.hardforks) {
+        writer.writeVector(value.hardforks) {
             writer.write(TonNodeBlockIdExt, it)
         }
     }
@@ -37,7 +37,7 @@ private object ValidatorConfigGlobalTlConstructor : TlConstructor<ValidatorConfi
     override fun decode(reader: TlReader): ValidatorConfigGlobal = reader {
         val zeroState = read(TonNodeBlockIdExt)
         val initBlock = read(TonNodeBlockIdExt)
-        val hardforks = readCollection {
+        val hardforks = readVector {
             read(TonNodeBlockIdExt)
         }
         ValidatorConfigGlobal(zeroState, initBlock, hardforks)

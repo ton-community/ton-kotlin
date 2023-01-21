@@ -45,7 +45,7 @@ private object HttpPayloadPartTlConstructor : TlConstructor<HttpPayloadPart>(
 ) {
     override fun decode(reader: TlReader): HttpPayloadPart {
         val data = reader.readBytes()
-        val trailer = reader.readCollection {
+        val trailer = reader.readVector {
             read(HttpHeader)
         }
         val last = reader.readBoolean()
@@ -54,7 +54,7 @@ private object HttpPayloadPartTlConstructor : TlConstructor<HttpPayloadPart>(
 
     override fun encode(writer: TlWriter, value: HttpPayloadPart) {
         writer.writeBytes(value.data)
-        writer.writeCollection(value.trailer) {
+        writer.writeVector(value.trailer) {
             write(HttpHeader, it)
         }
         writer.writeBoolean(value.last)

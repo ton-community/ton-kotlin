@@ -16,7 +16,11 @@ import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.bitstring.toBitString
 import org.ton.block.*
+import org.ton.boc.BagOfCells
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
+import org.ton.crypto.crc16
 import org.ton.crypto.sha256
 import org.ton.lite.api.LiteApiClient
 import org.ton.lite.api.liteserver.*
@@ -24,6 +28,10 @@ import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tl.Bits256
+import org.ton.tlb.CellRef
+import org.ton.tlb.constructor.AnyTlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.time.Duration
@@ -245,7 +253,7 @@ public class LiteClient(
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
-            blockHeader.headerProof.first()
+            BagOfCells(blockHeader.headerProof).first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't parse block proof", e)
         }
@@ -281,13 +289,13 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
-        val actualFileHash = sha256(blockData.data.toByteArray()).toBitString()
-        check(blockId.fileHash.toBitString() == actualFileHash) {
+        val actualFileHash = Bits256(sha256(blockData.data))
+        check(blockId.fileHash == actualFileHash) {
             "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
         }
         registerBlockId(blockId)
         val root = try {
-            blockData.data.first()
+            BagOfCells(blockData.data).first()
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
@@ -368,7 +376,9 @@ public class LiteClient(
 
     public suspend fun getAccount(
         address: String, mode: Int = 0
-    ): Account? = getAccount(parseAccountId(address), mode)
+    ): Account? {
+        return getAccount(parseAccountId(address) ?: return null, mode)
+    }
 
     public suspend fun getAccount(
         address: LiteServerAccountId, mode: Int = 0
@@ -378,7 +388,9 @@ public class LiteClient(
 
     public suspend fun getAccount(
         address: String, blockId: TonNodeBlockIdExt, mode: Int = 0
-    ): Account? = getAccount(parseAccountId(address), blockId, mode)
+    ): Account? {
+        return getAccount(parseAccountId(address) ?: return null, blockId, mode)
+    }
 
     public suspend fun getAccount(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, mode: Int = 0
@@ -395,15 +407,16 @@ public class LiteClient(
                 address.id
             } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
         }
-        val stateBoc = accountState.stateAsAccount()
-        return stateBoc.value as? AccountInfo
+        val stateBoc = BagOfCells(accountState.state)
+        val account = stateBoc.first().parse { loadTlb(Account) }
+        return account as? AccountInfo
     }
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, methodName: String, vararg params: VmStackValue
     ): VmStack = coroutineScope {
         runSmcMethod(
-            address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params.asIterable()
+            address, getCachedLastMasterchainBlockId(), smcMethodId(methodName), params.asIterable()
         )
     }
 
@@ -416,7 +429,7 @@ public class LiteClient(
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, methodName: String, params: Iterable<VmStackValue>
     ): VmStack = coroutineScope {
-        runSmcMethod(address, getCachedLastMasterchainBlockId(), LiteServerRunSmcMethod.methodId(methodName), params)
+        runSmcMethod(address, getCachedLastMasterchainBlockId(), smcMethodId(methodName), params)
     }
 
     public suspend fun runSmcMethod(
@@ -427,11 +440,11 @@ public class LiteClient(
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, vararg params: VmStackValue
-    ): VmStack = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), *params)
+    ): VmStack = runSmcMethod(address, blockId, smcMethodId(methodName), *params)
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, methodName: String, params: Iterable<VmStackValue>
-    ): VmStack = runSmcMethod(address, blockId, LiteServerRunSmcMethod.methodId(methodName), params)
+    ): VmStack = runSmcMethod(address, blockId, smcMethodId(methodName), params)
 
     public suspend fun runSmcMethod(
         address: LiteServerAccountId, blockId: TonNodeBlockIdExt, method: Long, vararg params: VmStackValue
@@ -443,13 +456,15 @@ public class LiteClient(
         logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi(
             LiteServerRunSmcMethod(
-                0b100, blockId, address, method, LiteServerRunSmcMethod.createParams(params)
+                0b100, blockId, address, method, smcCreateParams(params).toByteArray()
             )
         )
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
-        val boc = checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
+        val boc = BagOfCells(
+            checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
+        )
         // TODO: check proofs
         val exitCode = result.exitCode
         if (exitCode != 0) throw TvmException(exitCode)
@@ -459,6 +474,34 @@ public class LiteClient(
             throw RuntimeException("Can't parse result for $method@$address($params)", e)
         }
     }
+
+
+    public suspend fun sendMessage(body: Message<Cell>): LiteServerSendMsgStatus = sendMessage(CellRef(body))
+    public suspend fun sendMessage(body: CellRef<Message<Cell>>): LiteServerSendMsgStatus =
+        sendMessage(body.toCell(Message.tlbCodec(AnyTlbConstructor)))
+
+    public suspend fun sendMessage(cell: Cell): LiteServerSendMsgStatus = sendMessage(BagOfCells(cell))
+    public suspend fun sendMessage(boc: BagOfCells): LiteServerSendMsgStatus {
+        return liteApi(LiteServerSendMessage(boc.toByteArray()))
+    }
+
+    private fun smcMethodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
+
+    private fun smcCreateParams(
+        vmStack: VmStack
+    ): BagOfCells = BagOfCells(
+        CellBuilder.createCell {
+            storeTlb(VmStack, vmStack)
+        }
+    )
+
+    private fun smcCreateParams(
+        params: Iterable<VmStackValue>
+    ): BagOfCells = smcCreateParams(VmStack(VmStackList(params.asIterable())))
+
+    private fun smcCreateParams(
+        vararg params: VmStackValue
+    ): BagOfCells = smcCreateParams(params.asIterable())
 
     override fun close(): Unit = runBlocking {
         knownBlockIds.clear()
@@ -483,11 +526,14 @@ public class LiteClient(
     }
 
     private fun parseAccountId(string: String) = when (string) {
-        "none", "root" -> LiteServerAccountId()
+        "none", "root" -> null
         "config" -> TODO()
         "elector" -> TODO()
         "dnsroot" -> TODO()
-        else -> LiteServerAccountId(AddrStd(string))
+        else -> {
+            val addrStd = AddrStd(string)
+            LiteServerAccountId(addrStd.workchain_id, addrStd.address.toByteArray())
+        }
     }
 
     private fun registerBlockId(blockIdExt: TonNodeBlockIdExt) {
@@ -497,4 +543,5 @@ public class LiteClient(
         }
         knownBlockIds.addLast(blockIdExt)
     }
+
 }

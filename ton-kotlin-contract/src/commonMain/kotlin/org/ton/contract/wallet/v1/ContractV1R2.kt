@@ -3,7 +3,7 @@ package org.ton.contract.wallet.v1
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.cell.Cell
 import org.ton.contract.wallet.SeqnoContract
-import org.ton.lite.api.LiteApi
+import org.ton.lite.client.LiteClient
 
 /**
  * Wallet v1 revision 2
@@ -13,10 +13,10 @@ import org.ton.lite.api.LiteApi
  * [Fift-ASM source-code](https://github.com/ton-blockchain/ton/blob/47814dca3d4d7d253f0dcbb2ef176f45aafc6871/crypto/smartcont/new-wallet.fif)
  */
 class ContractV1R2(
-    liteApi: LiteApi,
+    liteClient: LiteClient,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0
-) : AbstractWalletV1(liteApi, privateKey, workchainId), SeqnoContract {
+) : AbstractWalletV1(liteClient, privateKey, workchainId), SeqnoContract {
     override val name: String = "v1r2"
     override val code: Cell = CODE
 

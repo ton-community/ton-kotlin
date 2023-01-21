@@ -14,13 +14,13 @@ private object AdnlNodesTlConstructor : TlConstructor<AdnlNodes>(
     schema = "adnl.nodes nodes:(vector adnl.node) = adnl.Nodes"
 ) {
     override fun encode(writer: TlWriter, value: AdnlNodes) = writer {
-        writeCollection(value.nodes) {
+        writeVector(value.nodes) {
             write(AdnlNode, it)
         }
     }
 
     override fun decode(reader: TlReader): AdnlNodes = reader {
-        val nodes = readCollection {
+        val nodes = readVector {
             read(AdnlNode)
         }
         AdnlNodes(nodes)

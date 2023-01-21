@@ -13,10 +13,9 @@ import kotlin.jvm.JvmStatic
 
 public inline fun AdnlIdShort(byteArray: ByteArray): AdnlIdShort = AdnlIdShort.of(byteArray)
 public inline fun AdnlIdShort(bitString: BitString): AdnlIdShort = AdnlIdShort.of(bitString)
-public inline fun AdnlIdShort(bitString: Bits256): AdnlIdShort = AdnlIdShort.of(bitString)
 
 public interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
-    public val id: Bits256
+    public val id: ByteArray
 
     public fun verify(node: OverlayNode): Boolean
 
@@ -27,19 +26,16 @@ public interface AdnlIdShort : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
         public fun tlConstructor(): TlConstructor<AdnlIdShort> = AdnlIdShortTlConstructor
 
         @JvmStatic
-        public fun of(byteArray: ByteArray): AdnlIdShort = of(Bits256(byteArray))
+        public fun of(byteArray: ByteArray): AdnlIdShort = AdnlIdShortImpl(byteArray)
 
         @JvmStatic
-        public fun of(bitString: BitString): AdnlIdShort = of(Bits256(bitString))
-
-        @JvmStatic
-        public fun of(bitString: Bits256): AdnlIdShort = AdnlIdShortImpl(bitString)
+        public fun of(bitString: BitString): AdnlIdShort = AdnlIdShortImpl(bitString.toByteArray())
     }
 }
 
 @Serializable
 private data class AdnlIdShortImpl(
-    override val id: Bits256
+    override val id: ByteArray
 ) : AdnlIdShort {
     private val _hashCode by lazy(LazyThreadSafetyMode.PUBLICATION) {
         id.hashCode()
@@ -51,7 +47,7 @@ private data class AdnlIdShortImpl(
     override fun tlCodec() = AdnlIdShort.tlConstructor()
 
     override fun verify(node: OverlayNode): Boolean {
-        if (node.overlay != (id)) return false
+        if (!node.overlay.contentEquals((id))) return false
         val key = node.id
         val peerId = key.toAdnlIdShort()
         val nodeToSign = OverlayNodeToSign(
@@ -62,7 +58,16 @@ private data class AdnlIdShortImpl(
         return key.verify(nodeToSign.toByteArray(), node.signature)
     }
 
-    override fun compareTo(other: AdnlIdShort): Int = id.compareTo(other.id)
+    override fun compareTo(other: AdnlIdShort): Int {
+        for (i in 0 until 32) {
+            val a = id[i].toInt() and 0xFF
+            val b = other.id[i].toInt() and 0xFF
+            if (a != b) {
+                return a - b
+            }
+        }
+        return 0
+    }
 
     override fun hashCode(): Int = _hashCode
 
@@ -80,11 +85,11 @@ private object AdnlIdShortTlConstructor : TlConstructor<AdnlIdShort>(
     schema = "adnl.id.short id:int256 = adnl.id.Short"
 ) {
     override fun decode(reader: TlReader): AdnlIdShort {
-        val id = reader.readBits256()
+        val id = reader.readRaw(32)
         return AdnlIdShortImpl(id)
     }
 
     override fun encode(writer: TlWriter, value: AdnlIdShort) {
-        writer.writeBits256(value.id)
+        writer.writeRaw(value.id)
     }
 }

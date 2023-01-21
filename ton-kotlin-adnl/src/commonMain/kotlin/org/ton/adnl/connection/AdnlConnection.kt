@@ -65,7 +65,7 @@ public class AdnlConnection(
             }
 
             connection.output.writePacket {
-                writeFully(liteServerDesc.id.toAdnlIdShort().id.toByteArray())
+                writeFully(liteServerDesc.id.toAdnlIdShort().id)
                 writeFully(liteServerDesc.id.encrypt(nonce))
             }
             connection.output.flush()

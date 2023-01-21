@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockTransactions
@@ -7,12 +8,15 @@ import org.ton.lite.api.liteserver.LiteServerTransactionId3
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.listBlockTransactions")
 public data class LiteServerListBlockTransactions(
     val id: TonNodeBlockIdExt,
     val mode: Int,
     val count: Int,
     val after: LiteServerTransactionId3?,
+    @SerialName("reverse_order")
     val reverseOrder: Boolean = true,
+    @SerialName("want_proof")
     val wantProof: Boolean = true
 ) : TLFunction<LiteServerListBlockTransactions, LiteServerBlockTransactions> {
     public companion object : TlCodec<LiteServerListBlockTransactions> by LiteServerListBlockTransactionsTlConstructor

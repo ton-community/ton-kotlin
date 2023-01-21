@@ -5,18 +5,18 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.contract.wallet.GetPublicKeyContract
 import org.ton.crypto.hex
-import org.ton.lite.api.LiteApi
+import org.ton.lite.client.LiteClient
 
 /**
  * Wallet v4 revision 1
  */
 class ContractV4R2(
-    liteApi: LiteApi,
+    liteClient: LiteClient,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     subwalletId: Int = DEFAULT_WALLET_ID + workchainId,
     timeout: Long = 60
-) : AbstractContractV4(liteApi, privateKey, workchainId, subwalletId, timeout), GetPublicKeyContract {
+) : AbstractContractV4(liteClient, privateKey, workchainId, subwalletId, timeout), GetPublicKeyContract {
     override val name: String = "v4r2"
     override val code: Cell = CODE
 

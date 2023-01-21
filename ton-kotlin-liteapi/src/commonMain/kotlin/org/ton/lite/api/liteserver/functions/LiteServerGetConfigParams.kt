@@ -23,7 +23,7 @@ private object LiteServerGetConfigParamsTlConstructor : TlConstructor<LiteServer
     override fun decode(reader: TlReader): LiteServerGetConfigParams {
         val mode = reader.readInt()
         val id = reader.read(TonNodeBlockIdExt)
-        val paramList = reader.readCollection {
+        val paramList = reader.readVector {
             readInt()
         }
         return LiteServerGetConfigParams(mode, id, paramList)
@@ -32,7 +32,7 @@ private object LiteServerGetConfigParamsTlConstructor : TlConstructor<LiteServer
     override fun encode(writer: TlWriter, value: LiteServerGetConfigParams) {
         writer.writeInt(value.mode)
         writer.write(TonNodeBlockIdExt, value.id)
-        writer.writeCollection(value.paramList) {
+        writer.writeVector(value.paramList) {
             writeInt(it)
         }
     }

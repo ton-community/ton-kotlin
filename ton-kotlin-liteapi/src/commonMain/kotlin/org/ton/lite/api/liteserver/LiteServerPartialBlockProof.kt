@@ -1,17 +1,18 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.partialBlockProof")
 public data class LiteServerPartialBlockProof(
     val complete: Boolean,
     val from: TonNodeBlockIdExt,
     val to: TonNodeBlockIdExt,
-    val steps: Collection<LiteServerBlockLink>
+    val steps: List<LiteServerBlockLink>
 ) {
-
     public companion object : TlCodec<LiteServerPartialBlockProof> by LiteServerPartialBlockProofTlConstructor
 }
 
@@ -22,7 +23,7 @@ private object LiteServerPartialBlockProofTlConstructor : TlConstructor<LiteServ
         val complete = reader.readBoolean()
         val from = reader.read(TonNodeBlockIdExt)
         val to = reader.read(TonNodeBlockIdExt)
-        val steps = reader.readCollection {
+        val steps = reader.readVector {
             read(LiteServerBlockLink)
         }
         return LiteServerPartialBlockProof(complete, from, to, steps)
@@ -32,7 +33,7 @@ private object LiteServerPartialBlockProofTlConstructor : TlConstructor<LiteServ
         writer.writeBoolean(value.complete)
         writer.write(TonNodeBlockIdExt, value.from)
         writer.write(TonNodeBlockIdExt, value.to)
-        writer.writeCollection(value.steps) {
+        writer.writeVector(value.steps) {
             write(LiteServerBlockLink, it)
         }
     }

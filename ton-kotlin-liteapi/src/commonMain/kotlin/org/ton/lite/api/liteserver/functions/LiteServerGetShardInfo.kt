@@ -1,9 +1,13 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerShardInfo
 import org.ton.tl.*
 
+@Serializable
+@SerialName("liteServer.getShardInfo")
 public data class LiteServerGetShardInfo(
     val id: TonNodeBlockIdExt,
     val workchain: Int,
