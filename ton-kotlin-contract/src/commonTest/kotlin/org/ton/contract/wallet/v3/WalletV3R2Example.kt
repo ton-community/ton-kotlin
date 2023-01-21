@@ -8,7 +8,7 @@ private val privateKey = PrivateKeyEd25519(ByteArray(32))
 
 suspend fun main() {
     val liteClient = liteClient()
-    val wallet = ContractV3R2(liteClient.liteApi, privateKey)
+    val wallet = ContractV3R2(liteClient, privateKey)
     val address = wallet.address()
     println("Source wallet address = ${address.toString(userFriendly = false)}")
     println("Non-bounceable address (for init only): ${address.toString(bounceable = false, testOnly = true)}")

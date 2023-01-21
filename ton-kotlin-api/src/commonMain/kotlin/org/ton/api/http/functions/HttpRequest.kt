@@ -29,7 +29,7 @@ public data class HttpRequest(
             val method = input.readString()
             val url = input.readString()
             val http_version = input.readString()
-            val headers = input.readCollection {
+            val headers = input.readVector {
                 HttpHeader.decode(input)
             }
             return HttpRequest(id, method, url, http_version, headers)
@@ -40,7 +40,7 @@ public data class HttpRequest(
             output.writeString(value.method)
             output.writeString(value.url)
             output.writeString(value.http_version)
-            output.writeCollection(value.headers) {
+            output.writeVector(value.headers) {
                 write(HttpHeader, it)
             }
         }

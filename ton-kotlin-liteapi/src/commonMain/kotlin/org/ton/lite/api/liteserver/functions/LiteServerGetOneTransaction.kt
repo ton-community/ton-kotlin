@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerAccountId
@@ -7,6 +8,7 @@ import org.ton.lite.api.liteserver.LiteServerTransactionInfo
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getOneTransaction")
 public data class LiteServerGetOneTransaction(
     val id: TonNodeBlockIdExt,
     val account: LiteServerAccountId,

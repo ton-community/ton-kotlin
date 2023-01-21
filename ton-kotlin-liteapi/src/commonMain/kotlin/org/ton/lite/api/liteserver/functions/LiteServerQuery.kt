@@ -3,16 +3,14 @@
 package org.ton.lite.api.liteserver.functions
 
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.tl.*
 
-public interface LiteServerQueryFunction {
-
-}
-
 @Serializable
+@SerialName("liteServer.query")
 public data class LiteServerQuery(
     val data: ByteArray
 ) {

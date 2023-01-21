@@ -16,12 +16,12 @@ import kotlin.jvm.JvmInline
 @Serializable(with = Bits256.Companion::class)
 public value class Bits256(
     public val value: BitString = BitString(256)
-) : BitString by value {
-    public constructor(value: ByteArray) : this(value.toBitString())
-
+) {
     init {
         require(value.size == 256) { "Bits256 must be 256 bits long" }
     }
+
+    public constructor(value: ByteArray) : this(value.toBitString())
 
     public inline fun toByteArray(): ByteArray = value.toByteArray()
     public inline fun toBitString(): BitString = value
@@ -30,8 +30,6 @@ public value class Bits256(
 
     public fun hex(): String = value.toString()
     public fun base64(): String = value.toByteArray().encodeBase64()
-
-    override fun xor(other: BitString): Bits256 = Bits256(value xor other)
 
     public companion object : KSerializer<Bits256> by Bits256Serializer
 }

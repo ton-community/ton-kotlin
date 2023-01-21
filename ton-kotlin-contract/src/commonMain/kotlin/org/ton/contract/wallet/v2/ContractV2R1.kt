@@ -2,7 +2,7 @@ package org.ton.contract.wallet.v2
 
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.cell.Cell
-import org.ton.lite.api.LiteApi
+import org.ton.lite.client.LiteClient
 
 /**
  * Wallet v2 revision 1
@@ -12,11 +12,11 @@ import org.ton.lite.api.LiteApi
  * [Fift-ASM source-code](https://github.com/ton-blockchain/ton/blob/fd7a8de9708c9ece8d802890519735b55bc99a8e/crypto/smartcont/new-wallet-v2.fif)
  */
 class ContractV2R1(
-    liteApi: LiteApi,
+    liteClient: LiteClient,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     timeout: Long = 60
-) : AbstractContractV2(liteApi, privateKey, workchainId, timeout) {
+) : AbstractContractV2(liteClient, privateKey, workchainId, timeout) {
     override val name: String = "v2R1"
     override val code: Cell = CODE
 

@@ -7,15 +7,14 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.exception.CellOverflowException
 import org.ton.cell.storeRef
 import org.ton.contract.Contract
-import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
-import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
+import org.ton.lite.client.LiteClient
 import org.ton.logger.Logger
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 
 abstract class WalletContract(
-    override val liteApi: LiteApi,
+    override val liteClient: LiteClient,
     val privateKey: PrivateKeyEd25519,
     override val workchainId: Int = 0
 ) : Contract {
@@ -26,7 +25,7 @@ abstract class WalletContract(
     override suspend fun deploy(): LiteServerSendMsgStatus {
         val initMessage = createExternalInitMessage()
         logger.info { "Deploy: $initMessage" }
-        return liteApi(LiteServerSendMessage(initMessage))
+        return liteClient.sendMessage(initMessage)
     }
 
     suspend fun transfer(
@@ -48,12 +47,12 @@ abstract class WalletContract(
         val transferMessage =
             createTransferMessage(dest, bounce, coins, seqno, payload, destinationStateInit = destinationStateInit)
         logger.info { "Transfer: $transferMessage" }
-        return liteApi(LiteServerSendMessage(transferMessage))
+        return liteClient.sendMessage(transferMessage)
     }
 
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
-        storeBits(privateKey.publicKey().key)
+        storeBits(privateKey.publicKey().key.toBitString())
     }
 
     open fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell {

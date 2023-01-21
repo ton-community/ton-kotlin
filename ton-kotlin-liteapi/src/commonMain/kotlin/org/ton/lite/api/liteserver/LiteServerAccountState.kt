@@ -7,33 +7,41 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.api.tonnode.Shard
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.Account
-import org.ton.boc.BagOfCells
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.lite.api.liteserver.internal.readBoc
-import org.ton.lite.api.liteserver.internal.writeBoc
 import org.ton.tl.*
-import org.ton.tlb.CellRef
 
 @Serializable
+@SerialName("liteServer.accountState")
 public data class LiteServerAccountState(
     val id: TonNodeBlockIdExt,
     @SerialName("shardblk")
     val shardBlock: TonNodeBlockIdExt,
     @SerialName("shard_proof")
-    val shardProof: BagOfCells,
-    val proof: BagOfCells,
-    val state: BagOfCells
+    val shardProof: ByteArray,
+    val proof: ByteArray,
+    val state: ByteArray
 ) {
-    public fun stateAsAccount(): CellRef<Account> = CellRef(state.first(), Account)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LiteServerAccountState) return false
 
-    public fun check(blockIdExt: TonNodeBlockIdExt, liteServerAccountId: LiteServerAccountId) {
-        check(id != blockIdExt && blockIdExt.seqno != 0.inv()) { "invalid block_id, expected: $blockIdExt, actual: $id" }
-        check(shardBlock.isValidFull()) { "invalid shard_blk: $shardBlock" }
-        Shard.check(id, shardBlock, shardProof.first())
-        // TODO: check shard
+        if (id != other.id) return false
+        if (shardBlock != other.shardBlock) return false
+        if (!shardProof.contentEquals(other.shardProof)) return false
+        if (!proof.contentEquals(other.proof)) return false
+        if (!state.contentEquals(other.state)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + shardBlock.hashCode()
+        result = 31 * result + shardProof.contentHashCode()
+        result = 31 * result + proof.contentHashCode()
+        result = 31 * result + state.contentHashCode()
+        return result
     }
 
     public companion object : TlConstructor<LiteServerAccountState>(
@@ -42,18 +50,18 @@ public data class LiteServerAccountState(
         override fun decode(reader: TlReader): LiteServerAccountState {
             val id = reader.read(TonNodeBlockIdExt)
             val shardBlk = reader.read(TonNodeBlockIdExt)
-            val shardProof = reader.readBoc()
-            val proof = reader.readBoc()
-            val state = reader.readBoc()
+            val shardProof = reader.readBytes()
+            val proof = reader.readBytes()
+            val state = reader.readBytes()
             return LiteServerAccountState(id, shardBlk, shardProof, proof, state)
         }
 
         override fun encode(writer: TlWriter, value: LiteServerAccountState) {
             writer.write(TonNodeBlockIdExt, value.id)
             writer.write(TonNodeBlockIdExt, value.shardBlock)
-            writer.writeBoc(value.shardProof)
-            writer.writeBoc(value.proof)
-            writer.writeBoc(value.state)
+            writer.writeBytes(value.shardProof)
+            writer.writeBytes(value.proof)
+            writer.writeBytes(value.state)
         }
     }
 }

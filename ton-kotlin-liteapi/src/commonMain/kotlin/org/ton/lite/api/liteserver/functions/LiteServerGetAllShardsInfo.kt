@@ -1,13 +1,17 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerAllShardsInfo
 import org.ton.tl.*
 
+@Serializable
+@SerialName("liteServer.getAllShardsInfo")
 public data class LiteServerGetAllShardsInfo(
     val id: TonNodeBlockIdExt
 ) : TLFunction<LiteServerGetAllShardsInfo, LiteServerAllShardsInfo> {
-    override fun tlCodec(): TlCodec<LiteServerGetAllShardsInfo> = Companion
+    override fun tlCodec(): TlCodec<LiteServerGetAllShardsInfo> = LiteServerGetAllShardsInfoTlConstructor
     override fun resultTlCodec(): TlCodec<LiteServerAllShardsInfo> = LiteServerAllShardsInfo
 
     public companion object : TlCodec<LiteServerGetAllShardsInfo> by LiteServerGetAllShardsInfoTlConstructor

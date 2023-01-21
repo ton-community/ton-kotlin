@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -7,8 +8,10 @@ import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
 
 @Serializable
+@SerialName("liteServer.waitMasterchainSeqno")
 public data class LiteServerWaitMasterchainSeqno(
     val seqno: Int,
+    @SerialName("timeout_ms")
     val timeoutMs: Int
 ) {
     public companion object : TlCodec<LiteServerWaitMasterchainSeqno> by LiteServerWaitMasterchainSeqnoTlConstructor

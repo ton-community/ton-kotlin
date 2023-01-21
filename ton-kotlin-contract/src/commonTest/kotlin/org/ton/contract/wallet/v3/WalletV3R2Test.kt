@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 class WalletV3R2Test {
     private val privateKey = PrivateKeyEd25519(ByteArray(32))
 
-    private fun wallet() = ContractV3R2(liteClient().liteApi, privateKey)
+    private fun wallet() = ContractV3R2(liteClient(), privateKey)
 
     @Test
     fun `test private key`() {

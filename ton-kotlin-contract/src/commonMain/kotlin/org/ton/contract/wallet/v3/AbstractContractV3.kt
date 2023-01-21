@@ -7,20 +7,20 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.SeqnoContract
 import org.ton.contract.wallet.WalletContract
-import org.ton.lite.api.LiteApi
+import org.ton.lite.client.LiteClient
 
 abstract class AbstractContractV3(
-    liteApi: LiteApi,
+    liteClient: LiteClient,
     privateKey: PrivateKeyEd25519,
     workchainId: Int = 0,
     val subwalletId: Int = DEFAULT_WALLET_ID + workchainId,
     private val timeout: Long = 60
-) : WalletContract(liteApi, privateKey, workchainId), SeqnoContract {
+) : WalletContract(liteClient, privateKey, workchainId), SeqnoContract {
 
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
         storeUInt(subwalletId, 32)
-        storeBits(privateKey.publicKey().key)
+        storeBits(privateKey.publicKey().key.toBitString())
     }
 
     override fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit): Cell = CellBuilder.createCell {

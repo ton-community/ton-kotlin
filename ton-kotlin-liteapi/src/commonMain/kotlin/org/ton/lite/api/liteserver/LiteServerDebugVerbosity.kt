@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -7,6 +8,7 @@ import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
 
 @Serializable
+@SerialName("liteServer.debug.verbosity")
 public data class LiteServerDebugVerbosity(
     val value: Int
 ) {

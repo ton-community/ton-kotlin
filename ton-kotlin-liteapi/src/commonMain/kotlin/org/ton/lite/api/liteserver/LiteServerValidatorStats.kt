@@ -4,23 +4,45 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.boc.BagOfCells
-import org.ton.lite.api.liteserver.internal.readBoc
-import org.ton.lite.api.liteserver.internal.writeBoc
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
 @Serializable
+@SerialName("liteServer.validatorStats")
 public data class LiteServerValidatorStats(
     val mode: Int,
     val id: TonNodeBlockIdExt,
     val count: Int,
     val complete: Boolean,
     @SerialName("state_proof")
-    val stateProofBoc: BagOfCells,
+    val stateProof: ByteArray,
     @SerialName("data_proof")
-    val dataProofBoc: BagOfCells
+    val dataProof: ByteArray
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LiteServerValidatorStats) return false
+
+        if (mode != other.mode) return false
+        if (id != other.id) return false
+        if (count != other.count) return false
+        if (complete != other.complete) return false
+        if (!stateProof.contentEquals(other.stateProof)) return false
+        if (!dataProof.contentEquals(other.dataProof)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = mode
+        result = 31 * result + id.hashCode()
+        result = 31 * result + count
+        result = 31 * result + complete.hashCode()
+        result = 31 * result + stateProof.contentHashCode()
+        result = 31 * result + dataProof.contentHashCode()
+        return result
+    }
+
     public companion object : TlCodec<LiteServerValidatorStats> by LiteServerValidatorStatsTlConstructor
 }
 
@@ -32,8 +54,8 @@ private object LiteServerValidatorStatsTlConstructor : TlConstructor<LiteServerV
         val id = reader.read(TonNodeBlockIdExt)
         val count = reader.readInt()
         val complete = reader.readBoolean()
-        val stateProofBoc = reader.readBoc()
-        val dataProofBoc = reader.readBoc()
+        val stateProofBoc = reader.readBytes()
+        val dataProofBoc = reader.readBytes()
         return LiteServerValidatorStats(mode, id, count, complete, stateProofBoc, dataProofBoc)
     }
 
@@ -42,7 +64,7 @@ private object LiteServerValidatorStatsTlConstructor : TlConstructor<LiteServerV
         writer.write(TonNodeBlockIdExt, value.id)
         writer.writeInt(value.count)
         writer.writeBoolean(value.complete)
-        writer.writeBoc(value.stateProofBoc)
-        writer.writeBoc(value.dataProofBoc)
+        writer.writeBytes(value.stateProof)
+        writer.writeBytes(value.dataProof)
     }
 }

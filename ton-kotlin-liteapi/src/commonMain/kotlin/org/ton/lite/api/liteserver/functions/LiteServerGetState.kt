@@ -1,11 +1,13 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockState
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getState")
 public data class LiteServerGetState(
     val id: TonNodeBlockIdExt,
 ) : TLFunction<LiteServerGetState, LiteServerBlockState> {
