@@ -4,7 +4,6 @@ import org.junit.Test
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.api.tonnode.TonNodeBlockId
 import org.ton.block.AccountActive
 import org.ton.block.AccountInfo
 import org.ton.crypto.base64
@@ -13,7 +12,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class LiteClientTest2 {
-
     private fun getClient() = LiteClient(
         liteClientConfigGlobal = LiteClientConfigGlobal(
             liteServers = listOf(
