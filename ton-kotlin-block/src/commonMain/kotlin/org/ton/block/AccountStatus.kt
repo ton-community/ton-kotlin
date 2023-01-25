@@ -4,13 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
-enum class AccountStatus {
+public enum class AccountStatus {
     @SerialName("acc_state_uninit")
     UNINIT {
         override fun toString(): String = "acc_state_uninit"
@@ -31,10 +30,7 @@ enum class AccountStatus {
         override fun toString(): String = "acc_state_nonexist"
     };
 
-    companion object : TlbCodec<AccountStatus> by AccountStatusTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<AccountStatus> = AccountStatusTlbCombinator
-    }
+    public companion object : TlbCombinatorProvider<AccountStatus> by AccountStatusTlbCombinator
 }
 
 private object AccountStatusTlbCombinator : TlbCombinator<AccountStatus>(

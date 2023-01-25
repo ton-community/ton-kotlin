@@ -5,20 +5,23 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @SerialName("account_storage")
 @Serializable
 public data class AccountStorage(
-    @SerialName("last_trans_lt")
-    val lastTransLt: ULong,
-    val balance: CurrencyCollection,
-    val state: AccountState
-) {
-    override fun toString(): String = "(account_storage\nlast_trans_lt:$lastTransLt balance:$balance state:$state)"
+    @SerialName("last_trans_lt") val lastTransLt: ULong, // last_trans_lt : uint64
+    val balance: CurrencyCollection, // balance : CurrencyCollection
+    val state: AccountState // state : AccountState
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_storage") {
+        field("last_trans_lt", lastTransLt)
+        field("balance", balance)
+        field("state", state)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object : TlbConstructorProvider<AccountStorage> by AccountStorageTlbConstructor
 }

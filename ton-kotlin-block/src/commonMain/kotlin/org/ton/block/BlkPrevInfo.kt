@@ -5,21 +5,20 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface BlkPrevInfo {
-    companion object {
+public sealed interface BlkPrevInfo : TlbObject {
+    public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun tlbCodec(multiple: Boolean): TlbCodec<BlkPrevInfo> =
-            (if (multiple) PrevBlksInfo.tlbCodec() else PrevBlkInfo.tlbCodec()) as TlbCodec<BlkPrevInfo>
+        public fun tlbCodec(multiple: Boolean): TlbCodec<BlkPrevInfo> =
+            (if (multiple) PrevBlksInfo else PrevBlkInfo) as TlbCodec<BlkPrevInfo>
 
         @JvmStatic
-        fun tlbCodec(multiple: Int): TlbCodec<BlkPrevInfo> =
+        public fun tlbCodec(multiple: Int): TlbCodec<BlkPrevInfo> =
             tlbCodec(multiple != 0)
     }
-
-    fun prevs(): List<ExtBlkRef>
 }

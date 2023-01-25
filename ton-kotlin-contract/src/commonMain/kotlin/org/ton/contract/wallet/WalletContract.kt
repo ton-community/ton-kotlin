@@ -1,6 +1,7 @@
 package org.ton.contract.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -101,7 +102,8 @@ abstract class WalletContract(
                         src = AddrNone,
                         dest = dest,
                         value = CurrencyCollection(
-                            coins = amount
+                            coins = amount,
+                            other = ExtraCurrencyCollection()
                         )
                     ),
                     init = destinationStateInit,

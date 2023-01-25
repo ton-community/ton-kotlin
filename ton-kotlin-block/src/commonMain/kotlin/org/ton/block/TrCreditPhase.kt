@@ -5,26 +5,25 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @SerialName("tr_phase_credit")
 @Serializable
-data class TrCreditPhase(
-    val due_fees_collected: Maybe<Coins>,
+public data class TrCreditPhase(
+    @SerialName("due_fees_collected") val dueFeesCollected: Maybe<Coins>,
     val credit: CurrencyCollection
-) {
-    companion object : TlbConstructorProvider<TrCreditPhase> by TrCreditPhaseTlbConstructor
-
-    override fun toString(): String = buildString {
-        append("(tr_phase_credit\ndue_fees_collected:")
-        append(due_fees_collected)
-        append(" credit:")
-        append(credit)
-        append(")")
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("tr_phase_credit") {
+            field("due_fees_collected", dueFeesCollected)
+            field("credit", credit)
+        }
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TrCreditPhase> by TrCreditPhaseTlbConstructor
 }
 
 private object TrCreditPhaseTlbConstructor : TlbConstructor<TrCreditPhase>(
@@ -36,7 +35,7 @@ private object TrCreditPhaseTlbConstructor : TlbConstructor<TrCreditPhase>(
         cellBuilder: CellBuilder,
         value: TrCreditPhase
     ) = cellBuilder {
-        storeTlb(maybeCoins, value.due_fees_collected)
+        storeTlb(maybeCoins, value.dueFeesCollected)
         storeTlb(CurrencyCollection, value.credit)
     }
 

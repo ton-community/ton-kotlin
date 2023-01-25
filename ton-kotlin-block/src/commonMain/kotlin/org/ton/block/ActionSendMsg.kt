@@ -6,7 +6,7 @@ import org.ton.cell.Cell
 
 @Serializable
 @SerialName("action_send_msg")
-data class ActionSendMsg(
+public data class ActionSendMsg(
     val mode: Int,
-    val out_msg: MessageRelaxed<Cell>
+    val outMsg: MessageRelaxed<Cell>
 ) : OutAction

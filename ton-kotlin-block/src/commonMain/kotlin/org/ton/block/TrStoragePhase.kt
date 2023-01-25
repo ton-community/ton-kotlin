@@ -5,33 +5,27 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.*
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("tr_phase_storage")
-data class TrStoragePhase(
-    val storage_fees_collected: Coins,
-    val storage_fees_due: Maybe<Coins>,
-    val status_change: AccStatusChange
-) {
-    companion object : TlbCodec<TrStoragePhase> by TrStoragePhaseTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TrStoragePhase> = TrStoragePhaseTlbConstructor
+public data class TrStoragePhase(
+    @SerialName("storage_fees_collected") val storageFeesCollected: Coins,
+    @SerialName("storage_fees_due") val storageFeesDue: Maybe<Coins>,
+    @SerialName("status_change") val statusChange: AccStatusChange
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer {
+            type("tr_phase_storage") {
+                field("storage_fees_collected", storageFeesCollected)
+                field("storage_fees_due", storageFeesDue)
+                field("status_change", statusChange)
+            }
+        }
     }
 
-    override fun toString(): String = buildString {
-        append("(tr_phase_storage\nstorage_fees_collected:")
-        append(storage_fees_collected)
-        append(" storage_fees_due:")
-        append(storage_fees_due)
-        append(" status_change:")
-        append(status_change)
-        append(")")
-    }
+    public companion object : TlbConstructorProvider<TrStoragePhase> by TrStoragePhaseTlbConstructor
 }
 
 private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
@@ -46,9 +40,9 @@ private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
         cellBuilder: CellBuilder,
         value: TrStoragePhase
     ) = cellBuilder {
-        storeTlb(Coins, value.storage_fees_collected)
-        storeTlb(maybeCoins, value.storage_fees_due)
-        storeTlb(AccStatusChange, value.status_change)
+        storeTlb(Coins, value.storageFeesCollected)
+        storeTlb(maybeCoins, value.storageFeesDue)
+        storeTlb(AccStatusChange, value.statusChange)
     }
 
     override fun loadTlb(

@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.http.HttpHeader
 import org.ton.api.http.HttpResponse
+import org.ton.bitstring.Bits256
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 

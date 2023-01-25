@@ -5,30 +5,28 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
+import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmStatic
 
 @SerialName("storage_used_short")
 @Serializable
-data class StorageUsedShort(
+public data class StorageUsedShort(
     val cells: VarUInteger,
     val bits: VarUInteger
-) {
-    companion object : TlbCodec<StorageUsedShort> by StorageUsedShortTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<StorageUsedShort> = StorageUsedShortTlbConstructor
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer {
+            type("storage_used_short") {
+                field("cells", cells)
+                field("bits", bits)
+            }
+        }
     }
 
-    override fun toString(): String = buildString {
-        append("(storage_used_short\ncells:")
-        append(cells)
-        append(" bits:")
-        append(bits)
-        append(")")
-    }
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<StorageUsedShort> by StorageUsedShortTlbConstructor
 }
 
 private object StorageUsedShortTlbConstructor : TlbConstructor<StorageUsedShort>(

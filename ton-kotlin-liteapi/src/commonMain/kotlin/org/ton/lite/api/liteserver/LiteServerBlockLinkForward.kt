@@ -58,7 +58,7 @@ private object LiteServerBlockLinkForwardTlConstructor : TlConstructor<LiteServe
         val to = reader.read(TonNodeBlockIdExt)
         val destProof = reader.readBytes()
         val configProof = reader.readBytes()
-        val signatures = reader.read(LiteServerSignatureSet)
+        val signatures = LiteServerSignatureSet.decodeBoxed(reader)
         return LiteServerBlockLinkForward(toKeyBlock, from, to, destProof, configProof, signatures)
     }
 
@@ -68,6 +68,6 @@ private object LiteServerBlockLinkForwardTlConstructor : TlConstructor<LiteServe
         writer.write(TonNodeBlockIdExt, value.to)
         writer.writeBytes(value.destProof)
         writer.writeBytes(value.configProof)
-        writer.write(LiteServerSignatureSet, value.signatures)
+        LiteServerSignatureSet.encodeBoxed(writer, value.signatures)
     }
 }

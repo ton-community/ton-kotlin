@@ -33,7 +33,7 @@ sealed interface CommonMsgInfoRelaxed {
         constructor(dest: MsgAddressInt, bounce: Boolean, coins: Coins) : this(
             dest = dest,
             bounce = bounce,
-            value = CurrencyCollection(coins)
+            value = CurrencyCollection(coins, ExtraCurrencyCollection())
         )
 
         constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(

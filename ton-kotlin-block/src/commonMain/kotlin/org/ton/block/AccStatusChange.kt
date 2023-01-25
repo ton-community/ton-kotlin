@@ -10,7 +10,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbStorer
 
 @Serializable
-enum class AccStatusChange {
+public enum class AccStatusChange {
     @SerialName("acst_unchanged")
     UNCHANGED {
         override fun toString(): String = "acst_unchanged"
@@ -27,7 +27,7 @@ enum class AccStatusChange {
     } // frozen -> deleted
     ;
 
-    companion object : TlbCodec<AccStatusChange> by AccStatusChangeTlbCombinator
+    public companion object : TlbCodec<AccStatusChange> by AccStatusChangeTlbCombinator
 }
 
 private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>(

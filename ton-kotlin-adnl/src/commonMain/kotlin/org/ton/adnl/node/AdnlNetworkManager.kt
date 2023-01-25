@@ -8,8 +8,8 @@ import org.ton.adnl.network.UdpServer
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
+import org.ton.bitstring.Bits256
 import org.ton.logger.Logger
-import org.ton.tl.Bits256
 import kotlin.coroutines.CoroutineContext
 
 public class AdnlNetworkManager(

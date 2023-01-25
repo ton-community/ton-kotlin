@@ -6,20 +6,27 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("account")
-data class AccountInfo(
-    val addr: MsgAddressInt,
-    val storage_stat: StorageInfo,
-    val storage: AccountStorage
+public data class AccountInfo(
+    val addr: MsgAddressInt, // addr : MsgAddressInt
+    @SerialName("storage_stat") val storageStat: StorageInfo, // storage_stat : StorageInfo
+    val storage: AccountStorage // storage : AccountStorage
 ) : Account {
-    companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
+    public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
 
-    override fun toString(): String = "(account\naddr:$addr storage_stat:$storage_stat storage:$storage)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account") {
+        field("addr", addr)
+        field("storage_stat", storageStat)
+        field("storage", storage)
+    }
+
+    override fun toString(): String = print().toString()
 }
 
 private object AccountInfoTlbConstructor : TlbConstructor<AccountInfo>(
@@ -30,7 +37,7 @@ private object AccountInfoTlbConstructor : TlbConstructor<AccountInfo>(
         value: AccountInfo
     ) = cellBuilder {
         storeTlb(MsgAddressInt, value.addr)
-        storeTlb(StorageInfo, value.storage_stat)
+        storeTlb(StorageInfo, value.storageStat)
         storeTlb(AccountStorage, value.storage)
     }
 

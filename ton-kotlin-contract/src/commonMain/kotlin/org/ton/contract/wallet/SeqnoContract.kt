@@ -10,7 +10,7 @@ interface SeqnoContract : Contract {
 
     public suspend fun seqno(blockIdExt: TonNodeBlockIdExt): Int {
         val address = address()
-        val liteServerAccountId = LiteServerAccountId(address.workchain_id, address.address.toByteArray())
+        val liteServerAccountId = LiteServerAccountId(address.workchainId, address.address.toByteArray())
         val result = liteClient.runSmcMethod(
             address = liteServerAccountId,
             methodName = "get_seqno",

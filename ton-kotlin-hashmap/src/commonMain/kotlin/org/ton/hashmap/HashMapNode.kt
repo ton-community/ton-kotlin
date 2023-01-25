@@ -11,7 +11,7 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed interface HashMapNode<out T> {
+public sealed interface HashMapNode<out T> : TlbObject {
     public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic

@@ -3,30 +3,30 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.CellRef
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.*
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("prev_blks_info")
 public data class PrevBlksInfo(
-    val prev1: CellRef<ExtBlkRef>,
-    val prev2: CellRef<ExtBlkRef>
+    val prev1: CellRef<ExtBlkRef>, // prev1 : ^ExtBlkRef
+    val prev2: CellRef<ExtBlkRef> // prev2 : ^ExtBlkRef
 ) : BlkPrevInfo {
-    override fun prevs(): List<ExtBlkRef> = listOf(prev1.value, prev2.value)
-
-    public companion object {
-        @JvmStatic
-        public fun tlbCodec(): TlbConstructor<PrevBlksInfo> = PrevBlksInfoTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("prev_blks_info") {
+        field("prev1", prev1)
+        field("prev2", prev2)
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<PrevBlksInfo> by PrevBlksInfoTlbConstructor
 }
 
 private object PrevBlksInfoTlbConstructor : TlbConstructor<PrevBlksInfo>(
     schema = "prev_blks_info\$_ prev1:^ExtBlkRef prev2:^ExtBlkRef = BlkPrevInfo 1;"
 ) {
     private val cellRef = CellRef.tlbCodec(ExtBlkRef)
+
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: PrevBlksInfo

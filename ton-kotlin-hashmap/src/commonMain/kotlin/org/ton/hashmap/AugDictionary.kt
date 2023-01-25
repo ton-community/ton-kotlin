@@ -6,11 +6,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
-public sealed interface AugDictionary<out X, out Y> : Iterable<Pair<X, Y>> {
+public sealed interface AugDictionary<out X, out Y> : Iterable<Pair<X, Y>>, TlbObject {
     public val extra: Y
 
     override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()

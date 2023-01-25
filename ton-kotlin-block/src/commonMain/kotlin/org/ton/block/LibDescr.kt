@@ -15,11 +15,11 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("shared_lib_descr")
-data class LibDescr(
+public data class LibDescr(
     val lib: Cell,
     val publishers: HashMapEdge<Unit>
 ) {
-    companion object : TlbConstructorProvider<LibDescr> by LibDescrTlbConstructor
+    public companion object : TlbConstructorProvider<LibDescr> by LibDescrTlbConstructor
 }
 
 private object LibDescrTlbConstructor : TlbConstructor<LibDescr>(

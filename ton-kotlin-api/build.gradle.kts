@@ -4,6 +4,7 @@ kotlin {
             dependencies {
                 api(projects.tonKotlinBigint)
                 api(projects.tonKotlinTl)
+                api(projects.tonKotlinBitstring)
                 api(projects.tonKotlinTlb)
                 api(libs.datetime)
             }

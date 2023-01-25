@@ -11,7 +11,7 @@ import org.ton.tlb.TlbStorer
 import kotlin.jvm.JvmStatic
 
 @Serializable
-enum class ComputeSkipReason {
+public enum class ComputeSkipReason {
     @SerialName("cskip_no_state")
     NO_STATE {
         override fun toString(): String = "cskip_no_state"

@@ -7,6 +7,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.AugDictionary
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.constructor.tlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -14,10 +15,16 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("block_create_stats_ext")
-data class BlockCreateStatsExt(
+public data class BlockCreateStatsExt(
     val counters: AugDictionary<CreatorStats, UInt>
 ) : BlockCreateStats {
-    companion object : TlbConstructorProvider<BlockCreateStatsExt> by BlockCreateStateExtTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("block_create_stats_ext") {
+        field("counters", counters)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<BlockCreateStatsExt> by BlockCreateStateExtTlbConstructor
 }
 
 private object BlockCreateStateExtTlbConstructor : TlbConstructor<BlockCreateStatsExt>(

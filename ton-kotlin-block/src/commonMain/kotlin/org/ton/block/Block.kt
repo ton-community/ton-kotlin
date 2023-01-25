@@ -8,48 +8,58 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 
 @SerialName("block")
 @Serializable
-data class Block(
-    val global_id: Int,
-    val infoCell: CellRef<BlockInfo>,
-    val valueFlowCell: CellRef<ValueFlow>,
-    val stateUpdateCell: CellRef<MerkleUpdate<ShardState>>,
-    val extraCell: CellRef<BlockExtra>
-) {
-    val info: BlockInfo by infoCell
-    val valueFlow: ValueFlow by valueFlowCell
-    val stateUpdate: MerkleUpdate<ShardState> by stateUpdateCell
-    val extra: BlockExtra by extraCell
+public data class Block(
+    @SerialName("global_id")
+    val globalId: Int, // global_id:int32
+    val info: CellRef<BlockInfo>, // info : ^BlockInfo
+    @SerialName("value_flow")
+    val valueFlow: CellRef<ValueFlow>, // value_flow : ^ValueFlow
+    @SerialName("state_update")
+    val stateUpdate: CellRef<MerkleUpdate<ShardState>>, // state_update : ^(MERKLE_UPDATE ShardState)
+    val extra: CellRef<BlockExtra> // extra : ^BlockExtra
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("block") {
+            field("global_id", globalId)
+            field("info", info)
+            field("value_flow", valueFlow)
+            field("state_update", stateUpdate)
+            field("extra", extra)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object : TlbCombinatorProvider<Block> by TlbConstructor.asTlbCombinator()
+}
 
-    private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
-        schema = "block#11ef55aa global_id:int32 " +
-                "info:^BlockInfo value_flow:^ValueFlow " +
-                "state_update:^(MERKLE_UPDATE ShardState) " +
-                "extra:^BlockExtra = Block;"
-    ) {
-        private val merkleUpdate = MerkleUpdate.tlbCodec(ShardState)
+private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
+    schema = "block#11ef55aa global_id:int32 " +
+            "info:^BlockInfo value_flow:^ValueFlow " +
+            "state_update:^(MERKLE_UPDATE ShardState) " +
+            "extra:^BlockExtra = Block;"
+) {
+    private val merkleUpdate = MerkleUpdate.tlbCodec(ShardState)
 
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: Block
-        ) = cellBuilder {
-            storeInt(value.global_id, 32)
-            storeRef(value.infoCell.toCell(BlockInfo))
-            storeRef(value.valueFlowCell.toCell(ValueFlow))
-            storeRef(value.stateUpdateCell.toCell(merkleUpdate))
-            storeRef(value.extraCell.toCell(BlockExtra))
-        }
+    override fun storeTlb(
+        cellBuilder: CellBuilder,
+        value: Block
+    ) = cellBuilder {
+        storeInt(value.globalId, 32)
+        storeRef(value.info.toCell(BlockInfo))
+        storeRef(value.valueFlow.toCell(ValueFlow))
+        storeRef(value.stateUpdate.toCell(merkleUpdate))
+        storeRef(value.extra.toCell(BlockExtra))
+    }
 
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): Block = cellSlice {
-            val globalId = loadInt(32).toInt()
-            val info = loadRef().asRef(BlockInfo)
-            val valueFlow = loadRef().asRef(ValueFlow)
-            val stateUpdate = loadRef().asRef(merkleUpdate)
-            val extra = loadRef().asRef(BlockExtra)
-            Block(globalId, info, valueFlow, stateUpdate, extra)
-        }
+    override fun loadTlb(
+        cellSlice: CellSlice
+    ): Block = cellSlice {
+        val globalId = loadInt(32).toInt()
+        val info = loadRef().asRef(BlockInfo)
+        val valueFlow = loadRef().asRef(ValueFlow)
+        val stateUpdate = loadRef().asRef(merkleUpdate)
+        val extra = loadRef().asRef(BlockExtra)
+        Block(globalId, info, valueFlow, stateUpdate, extra)
     }
 }

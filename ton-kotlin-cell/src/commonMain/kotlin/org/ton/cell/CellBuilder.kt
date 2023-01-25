@@ -13,6 +13,7 @@ import kotlin.jvm.JvmStatic
 public interface CellBuilder {
     public var bits: MutableBitString
     public var refs: MutableList<Cell>
+    public var isExotic: Boolean
 
     public val bitsPosition: Int
 
@@ -162,8 +163,9 @@ private class CellBuilderImpl(
 ) : CellBuilder {
     private val remainder: Int get() = maxLength - bitsPosition
     override val bitsPosition: Int get() = bits.size
+    override var isExotic: Boolean = false
 
-    override fun endCell(): Cell = Cell(bits, refs)
+    override fun endCell(): Cell = Cell(bits, refs, isExotic)
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)

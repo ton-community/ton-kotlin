@@ -1,24 +1,33 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.AugDictionary
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbConstructor
+import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbConstructor
-import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
-data class OutMsgQueueInfo(
-    val out_queue: AugDictionary<EnqueuedMsg, ULong>,
-    val proc_info: HashMapE<ProcessedUpto>,
-    val ihr_pending: HashMapE<IhrPendingSince>
-) {
-    companion object : TlbConstructorProvider<OutMsgQueueInfo> by OutMsgQueueInfoTlbConstructor
+public data class OutMsgQueueInfo(
+    @SerialName("out_queue") val outQueue: AugDictionary<EnqueuedMsg, ULong>, // out_queue : OutMsgQueue
+    @SerialName("proc_info") val procInfo: HashMapE<ProcessedUpto>, // proc_info : ProcessedInfo
+    @SerialName("ihr_pending") val ihrPending: HashMapE<IhrPendingSince> // ihr_pending : IhrPendingInfo
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("out_msg_queue_info") {
+            field("out_queue", outQueue)
+            field("proc_info", procInfo)
+            field("ihr_pending", ihrPending)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<OutMsgQueueInfo> by OutMsgQueueInfoTlbConstructor
 }
 
 // _ (HashmapAugE 352 EnqueuedMsg uint64) = OutMsgQueue;
@@ -35,9 +44,9 @@ private object OutMsgQueueInfoTlbConstructor : TlbConstructor<OutMsgQueueInfo>(
         cellBuilder: CellBuilder,
         value: OutMsgQueueInfo
     ) = cellBuilder {
-        storeTlb(outQueue, value.out_queue)
-        storeTlb(procInfo, value.proc_info)
-        storeTlb(ihrPending, value.ihr_pending)
+        storeTlb(outQueue, value.outQueue)
+        storeTlb(procInfo, value.procInfo)
+        storeTlb(ihrPending, value.ihrPending)
     }
 
     override fun loadTlb(

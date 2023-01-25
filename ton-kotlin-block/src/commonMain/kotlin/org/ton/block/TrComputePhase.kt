@@ -4,17 +4,14 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.TlbObject
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface TrComputePhase {
-    companion object : TlbCodec<TrComputePhase> by TrComputePhaseTlbCombinator {
-        @JvmStatic
-        fun tlbCodec(): TlbCombinator<TrComputePhase> = TrComputePhaseTlbCombinator
-    }
+public sealed interface TrComputePhase : TlbObject {
+    public companion object : TlbCombinatorProvider<TrComputePhase> by TrComputePhaseTlbCombinator
 }
 
 private object TrComputePhaseTlbCombinator : TlbCombinator<TrComputePhase>(

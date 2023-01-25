@@ -7,6 +7,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import org.ton.bitstring.Bits256
 import org.ton.crypto.*
 import org.ton.tl.*
 import org.ton.tl.constructors.*

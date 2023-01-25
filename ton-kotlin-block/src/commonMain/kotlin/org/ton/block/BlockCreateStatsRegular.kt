@@ -7,16 +7,23 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("block_create_stats")
-data class BlockCreateStatsRegular(
+public data class BlockCreateStatsRegular(
     val counters: HashMapE<CreatorStats>
 ) : BlockCreateStats {
-    companion object : TlbConstructorProvider<BlockCreateStatsRegular> by BlockCreateStatsRegularTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("block_create_stats") {
+        field("counters", counters)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<BlockCreateStatsRegular> by BlockCreateStatsRegularTlbConstructor
 }
 
 private object BlockCreateStatsRegularTlbConstructor : TlbConstructor<BlockCreateStatsRegular>(

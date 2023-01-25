@@ -6,10 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @SerialName("ahmn_leaf")
@@ -18,7 +15,14 @@ public data class AugDictionaryNodeLeaf<X, Y>(
     override val extra: Y,
     val value: X
 ) : AugDictionaryNode<X, Y> {
-    override fun toString(): String = "(ahmn_leaf\nextra:$extra value:$value)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("ahmn_leaf") {
+            field("extra", extra)
+            field("value", value)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

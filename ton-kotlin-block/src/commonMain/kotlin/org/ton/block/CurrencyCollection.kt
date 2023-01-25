@@ -5,20 +5,23 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @SerialName("currencies")
 @Serializable
-data class CurrencyCollection(
-    val coins: Coins,
-    val other: ExtraCurrencyCollection = ExtraCurrencyCollection()
-) {
-    override fun toString(): String = "currencies(coins:$coins other:$other)"
+public data class CurrencyCollection(
+    val coins: Coins, // coins: Coins
+    val other: ExtraCurrencyCollection // other: ExtraCurrencyCollection
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("currencies") {
+        field("coins", coins)
+        field("other", other)
+    }
 
-    companion object : TlbConstructorProvider<CurrencyCollection> by CurrencyCollectionTlbConstructor
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<CurrencyCollection> by CurrencyCollectionTlbConstructor
 }
 
 private object CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollection>(

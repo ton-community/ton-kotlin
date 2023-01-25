@@ -29,6 +29,11 @@ public value class LevelMask(
     public infix fun shr(bitCount: Int): LevelMask =
         LevelMask(mask shr bitCount)
 
+    public fun isEmpty(): Boolean = mask == 0
+
+    public fun virtualize(offset: Int = 1): LevelMask =
+        LevelMask(mask ushr offset)
+
     public companion object {
         private val ZERO = LevelMask(0)
 

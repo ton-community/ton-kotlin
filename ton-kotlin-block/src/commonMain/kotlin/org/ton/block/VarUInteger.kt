@@ -8,15 +8,17 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmStatic
 
 @SerialName("var_uint")
 @Serializable
-data class VarUInteger(
+public data class VarUInteger(
     val len: Int,
     @Serializable(BigIntSerializer::class)
     val value: BigInt
-) {
+) : TlbObject {
     constructor(byte: Byte) : this(BigInt(byte))
     constructor(short: Short) : this(BigInt(short))
     constructor(int: Int) : this(BigInt(int))
@@ -84,6 +86,13 @@ data class VarUInteger(
         val result = value - 1.toBigInt()
         if (result < 0.toBigInt()) throw NumberFormatException("Integer overflow")
         return VarUInteger(len, result)
+    }
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("var_uint") {
+            field("len", len)
+            field("value", value)
+        }
     }
 
     override fun toString(): String = value.toString()

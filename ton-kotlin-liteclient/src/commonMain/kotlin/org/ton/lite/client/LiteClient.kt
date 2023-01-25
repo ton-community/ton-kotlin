@@ -14,6 +14,7 @@ import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
+import org.ton.bitstring.Bits256
 import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
@@ -29,13 +30,11 @@ import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
-import org.ton.tl.Bits256
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
@@ -44,11 +43,11 @@ private const val BLOCK_ID_CACHE_SIZE = 100
 
 public class LiteClient(
     coroutineContext: CoroutineContext,
-    private val liteClientConfigGlobal: LiteClientConfigGlobal
+    liteClientConfigGlobal: LiteClientConfigGlobal
 ) : Closeable, CoroutineScope {
     public constructor(
         coroutineContext: CoroutineContext,
-        liteServers: List<LiteServerDesc>
+        liteServers: Collection<LiteServerDesc>
     ) : this(coroutineContext, LiteClientConfigGlobal(liteServers = liteServers))
 
     public constructor(
@@ -325,69 +324,6 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't parse block: $blockId", e)
         }
-        val shard = block.info.shard
-        val prevs: List<TonNodeBlockIdExt>
-        val prevSeqno: UInt
-        if (!block.info.after_merge) {
-            val prev1 = block.info.prev_ref.prevs().first()
-            prevSeqno = prev1.seq_no
-            val prevBlockIdExt = TonNodeBlockIdExt(
-                shard.workchain_id,
-                (if (block.info.after_split) Shard.shardParent(shard.shard_prefix.toLong()) else shard.shard_prefix.toLong()),
-                prev1.seq_no.toInt(),
-                Bits256(prev1.root_hash),
-                Bits256(prev1.file_hash)
-            )
-            check(!block.info.after_split || prev1.seq_no != 0u) {
-                "shardchains cannot be split immediately after initial state"
-            }
-            prevs = listOf(prevBlockIdExt)
-        } else {
-            check(!block.info.after_split) {
-                "shardchains cannot be simultaneously split and merged at the same block"
-            }
-            val (prev1, prev2) = block.info.prev_ref.prevs()
-            prevSeqno = max(prev1.seq_no, prev2.seq_no)
-            prevs = listOf(
-                TonNodeBlockIdExt(
-                    shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toLong(), true),
-                    prev1.seq_no.toInt(),
-                    Bits256(prev1.root_hash),
-                    Bits256(prev1.file_hash)
-                ),
-                TonNodeBlockIdExt(
-                    shard.workchain_id,
-                    Shard.shardChild(shard.shard_prefix.toLong(), false),
-                    prev2.seq_no.toInt(),
-                    Bits256(prev2.root_hash),
-                    Bits256(prev2.file_hash)
-                ),
-            )
-            check(prev1.seq_no != 0u && prev2.seq_no != 0u) {
-                "shardchains cannot be merged immediately after initial state"
-            }
-        }
-        check(block.info.seq_no == prevSeqno + 1u) {
-            "block $blockId has invalid seqno, expected: ${prevSeqno + 1u} , actual: ${block.info.seq_no}"
-        }
-        prevs.forEachIndexed { index, id ->
-            logger.debug { "previous block #$index : $id" }
-        }
-        val mcBlockId = if (shard.workchain_id == Workchain.MASTERCHAIN_ID) {
-            prevs.first()
-        } else {
-            val mcRef = checkNotNull(block.info.master_ref?.master) { "missing master block reference" }
-            TonNodeBlockIdExt(
-                Workchain.MASTERCHAIN_ID,
-                Shard.ID_ALL,
-                mcRef.seq_no.toInt(),
-                Bits256(mcRef.root_hash),
-                Bits256(mcRef.file_hash)
-            )
-        }
-        logger.debug { "reference masterchain block: $mcBlockId" }
-        registerBlockId(mcBlockId)
         return block
     }
 
@@ -549,7 +485,7 @@ public class LiteClient(
         "dnsroot" -> TODO()
         else -> {
             val addrStd = AddrStd(string)
-            LiteServerAccountId(addrStd.workchain_id, addrStd.address.toByteArray())
+            LiteServerAccountId(addrStd.workchainId, addrStd.address.toByteArray())
         }
     }
 

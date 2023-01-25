@@ -6,21 +6,23 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("prev_blk_info")
-data class PrevBlkInfo(
-    val prev: ExtBlkRef
+public data class PrevBlkInfo(
+    val prev: ExtBlkRef // prev : ExtBlkRef
 ) : BlkPrevInfo {
-    override fun prevs(): List<ExtBlkRef> = listOf(prev)
-
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<PrevBlkInfo> = PrevBlkInfoTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("prev_blk_info") {
+        field("prev", prev)
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<PrevBlkInfo> by PrevBlkInfoTlbConstructor
 }
 
 private object PrevBlkInfoTlbConstructor : TlbConstructor<PrevBlkInfo>(

@@ -21,7 +21,13 @@ public data class RootHashMapE<T>(
 
     override fun nodes(): Sequence<Pair<BitString, T>> = rootCellRef.value.nodes()
 
-    override fun toString(): String = "(hme_root\nroot:$rootCellRef)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("hme_root") {
+            field("root", rootCellRef)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

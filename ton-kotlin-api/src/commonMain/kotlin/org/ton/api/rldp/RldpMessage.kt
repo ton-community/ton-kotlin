@@ -5,7 +5,7 @@ package org.ton.api.rldp
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tl.Bits256
+import org.ton.bitstring.Bits256
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlObject
 

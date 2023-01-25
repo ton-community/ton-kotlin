@@ -4,6 +4,7 @@ package org.ton.cell
 
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.cell.exception.CellUnderflowException
@@ -40,6 +41,8 @@ public interface CellSlice {
 
     public fun loadBits(length: Int): BitString
     public fun preloadBits(length: Int): BitString
+
+    public fun loadBits256(): Bits256 = Bits256(loadBits(256))
 
     public fun loadInt(length: Int): BigInt
     public fun preloadInt(length: Int): BigInt

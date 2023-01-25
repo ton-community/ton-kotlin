@@ -6,6 +6,6 @@ import org.ton.cell.Cell
 
 @Serializable
 @SerialName("action_set_code")
-data class ActionSetCode(
-    val new_code: Cell
+public data class ActionSetCode(
+    val newCode: Cell
 ) : OutAction

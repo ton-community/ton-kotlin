@@ -4,16 +4,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.*
+import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @SerialName("msg_envelope")
-data class MsgEnvelope(
-    val cur_addr: IntermediateAddress,
-    val next_addr: IntermediateAddress,
-    val fwd_fee_remaining: Coins,
-    val msg: Message<Cell>
-) {
-    companion object : TlbCodec<MsgEnvelope> by MsgEnvelopeTlbConstructor.asTlbCombinator()
+public data class MsgEnvelope(
+    @SerialName("cur_addr") val curAddr: IntermediateAddress,
+    @SerialName("next_addr") val nextAddr: IntermediateAddress,
+    @SerialName("fwd_fee_remaining") val fwdFeeRemaining: Coins,
+    val msg: CellRef<Message<Cell>>
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_envelope") {
+            field("cur_addr", curAddr)
+            field("next_addr", nextAddr)
+            field("fwd_fee_remaining", fwdFeeRemaining)
+            field("msg", msg)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCombinatorProvider<MsgEnvelope> by MsgEnvelopeTlbConstructor.asTlbCombinator()
 }
 
 private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
@@ -21,17 +33,14 @@ private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
             "next_addr:IntermediateAddress fwd_fee_remaining:Coins " +
             "msg:^(Message Any) = MsgEnvelope;"
 ) {
-
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: MsgEnvelope
     ) = cellBuilder {
-        storeTlb(IntermediateAddress, value.cur_addr)
-        storeTlb(IntermediateAddress, value.next_addr)
-        storeTlb(Coins, value.fwd_fee_remaining)
-        storeRef {
-            storeTlb(Message.Any, value.msg)
-        }
+        storeTlb(IntermediateAddress, value.curAddr)
+        storeTlb(IntermediateAddress, value.nextAddr)
+        storeTlb(Coins, value.fwdFeeRemaining)
+        storeRef(Message.Any, value.msg)
     }
 
     override fun loadTlb(
@@ -40,9 +49,7 @@ private object MsgEnvelopeTlbConstructor : TlbConstructor<MsgEnvelope>(
         val curAddr = loadTlb(IntermediateAddress)
         val nextAddr = loadTlb(IntermediateAddress)
         val fwdFeeRemaining = loadTlb(Coins)
-        val msg = loadRef {
-            loadTlb(Message.Any)
-        }
+        val msg = loadRef(Message.Any)
         MsgEnvelope(curAddr, nextAddr, fwdFeeRemaining, msg)
     }
 }

@@ -13,20 +13,20 @@ import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <X, Y> Pair<X?, Y?>.toEither(): Either<X, Y> = Either.of(first, second)
+public inline fun <X, Y> Pair<X?, Y?>.toEither(): Either<X, Y> = Either.of(first, second)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface Either<X, Y> {
-    val x: X?
-    val y: Y?
+public sealed interface Either<X, Y> : TlbObject {
+    public val x: X?
+    public val y: Y?
 
-    fun toPair(): Pair<X?, Y?> = x to y
+    public fun toPair(): Pair<X?, Y?> = x to y
 
     @SerialName("left")
     @Serializable
-    class Left<X, Y>(
-        val value: X
+    public class Left<X, Y>(
+        public val value: X
     ) : Either<X, Y> {
         override val x: X? = value
         override val y: Y? = null
@@ -43,13 +43,19 @@ sealed interface Either<X, Y> {
 
         override fun hashCode(): Int = value.hashCode()
 
-        override fun toString(): String = "(left\nvalue:$value)"
+        override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+            type("left") {
+                field("value", value)
+            }
+        }
+
+        override fun toString(): String = print().toString()
     }
 
     @SerialName("right")
     @Serializable
-    class Right<X, Y>(
-        val value: Y
+    public class Right<X, Y>(
+        public val value: Y
     ) : Either<X, Y> {
         override val x: X? = null
         override val y: Y? = value
@@ -66,10 +72,16 @@ sealed interface Either<X, Y> {
 
         override fun hashCode(): Int = value.hashCode()
 
-        override fun toString(): String = "(right\nvalue:$value)"
+        override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+            type("right") {
+                field("value", value)
+            }
+        }
+
+        override fun toString(): String = print().toString()
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
         fun <X, Y> of(left: X?, right: Y?): Either<X, Y> {
             if (left != null) {

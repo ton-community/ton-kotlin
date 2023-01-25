@@ -15,7 +15,7 @@ public inline fun HashMapLabel(key: BitString, max: Int = key.size): HashMapLabe
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed interface HashMapLabel {
+public sealed interface HashMapLabel : TlbObject {
     public val s: BitString
 
     public companion object {

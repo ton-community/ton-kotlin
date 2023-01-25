@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.ton.bitstring.Bits256
 import org.ton.tl.constructors.Bool
 import org.ton.tl.constructors.BoolTlCombinator
 

@@ -3,33 +3,32 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("bt_fork")
-data class BinTreeFork<X>(
-    val left: BinTree<X>,
-    val right: BinTree<X>
+public data class BinTreeFork<X>(
+    val left: CellRef<BinTree<X>>,
+    val right: CellRef<BinTree<X>>
 ) : BinTree<X> {
-
-    override fun nodes(): Sequence<X> = left.nodes() + right.nodes()
-
-    override fun toString(): String = buildString {
-        append("(bt_fork\n")
-        append("left:^")
-        append(left)
-        append(" right:^")
-        append(right)
-        append(")")
+    override fun nodes(): Sequence<X> = sequence {
+        yieldAll(left.value.nodes())
+        yieldAll(right.value.nodes())
     }
 
-    companion object {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("bt_fork") {
+            field("left", left)
+            field("right", right)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object {
         @JvmStatic
-        fun <X> tlbCodec(
+        public fun <X> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<BinTreeFork<X>> = BinTreeForkTlbConstructor(x)
     }
@@ -40,21 +39,23 @@ private class BinTreeForkTlbConstructor<X>(
 ) : TlbConstructor<BinTreeFork<X>>(
     schema = "bt_fork\$1 {X:Type} left:^(BinTree X) right:^(BinTree X) = BinTree X;"
 ) {
-    private val binTree by lazy { BinTree.tlbCodec(x) }
+    val binTree by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        BinTree.tlbCodec(x)
+    }
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BinTreeFork<X>
     ) = cellBuilder {
-        storeRef { storeTlb(binTree, value.left) }
-        storeRef { storeTlb(binTree, value.right) }
+        storeRef(binTree, value.left)
+        storeRef(binTree, value.right)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): BinTreeFork<X> = cellSlice {
-        val left = loadRef { loadTlb(binTree) }
-        val right = loadRef { loadTlb(binTree) }
+        val left = loadRef(binTree)
+        val right = loadRef(binTree)
         BinTreeFork(left, right)
     }
 }

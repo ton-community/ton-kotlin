@@ -13,8 +13,7 @@ import kotlin.jvm.JvmStatic
 public data class HashMapEdge<T>(
     val label: HashMapLabel,
     val node: HashMapNode<T>
-) : Iterable<Pair<BitString, T>> {
-    override fun toString(): String = "(hm_edge\nlabel:$label node:$node)"
+) : Iterable<Pair<BitString, T>>, TlbObject {
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
 
@@ -35,6 +34,15 @@ public data class HashMapEdge<T>(
             (label.s + childLabel) to value
         }
     }
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("hm_edge") {
+            field("label", label)
+            field("node", node)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

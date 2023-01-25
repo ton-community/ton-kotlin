@@ -1,17 +1,29 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
-data class MsgDiscardFin(
-    val in_msg: MsgEnvelope,
-    val transaction_id: ULong,
-    val fwd_fee: Coins
+@Serializable
+@SerialName("msg_discard_fin")
+public data class MsgDiscardFin(
+    val inMsg: CellRef<MsgEnvelope>,
+    val transactionId: ULong,
+    val fwdFee: Coins
 ) : InMsg {
-    companion object : TlbConstructorProvider<MsgDiscardFin> by MsgDiscardFinTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_discard_fin") {
+            field("in_msg", inMsg)
+            field("transaction_id", transactionId)
+            field("fwd_fee", fwdFee)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<MsgDiscardFin> by MsgDiscardFinTlbConstructor
 }
 
 private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
@@ -21,19 +33,15 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
         cellBuilder: CellBuilder,
         value: MsgDiscardFin
     ) = cellBuilder {
-        storeRef {
-            storeTlb(MsgEnvelope, value.in_msg)
-        }
-        storeUInt64(value.transaction_id)
-        storeTlb(Coins, value.fwd_fee)
+        storeRef(MsgEnvelope, value.inMsg)
+        storeUInt64(value.transactionId)
+        storeTlb(Coins, value.fwdFee)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgDiscardFin = cellSlice {
-        val inMsg = loadRef {
-            loadTlb(MsgEnvelope)
-        }
+        val inMsg = loadRef(MsgEnvelope)
         val transactionId = loadUInt64()
         val fwdFee = loadTlb(Coins)
         MsgDiscardFin(inMsg, transactionId, fwdFee)

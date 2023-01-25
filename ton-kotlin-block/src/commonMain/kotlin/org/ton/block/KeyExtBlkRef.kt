@@ -1,20 +1,28 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
-data class KeyExtBlkRef(
-    val key: Boolean,
-    val blk_ref: ExtBlkRef
-) {
-    companion object : TlbConstructorProvider<KeyExtBlkRef> by KeyExtBlkRefTlbConstructor
+public data class KeyExtBlkRef(
+    val key: Boolean, // key: Bool
+    @SerialName("blk_ref") val blkRef: ExtBlkRef // blk_ref: ExtBlkRef
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type {
+            field("key", key)
+            field("blk_ref", blkRef)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<KeyExtBlkRef> by KeyExtBlkRefTlbConstructor
 }
 
 private object KeyExtBlkRefTlbConstructor : TlbConstructor<KeyExtBlkRef>(
@@ -25,7 +33,7 @@ private object KeyExtBlkRefTlbConstructor : TlbConstructor<KeyExtBlkRef>(
         value: KeyExtBlkRef
     ) = cellBuilder {
         storeBit(value.key)
-        storeTlb(ExtBlkRef, value.blk_ref)
+        storeTlb(ExtBlkRef, value.blkRef)
     }
 
     override fun loadTlb(

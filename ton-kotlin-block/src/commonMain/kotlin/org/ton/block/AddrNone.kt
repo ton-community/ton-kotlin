@@ -5,12 +5,17 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("addr_none")
 @Serializable
-object AddrNone : MsgAddressExt, TlbConstructorProvider<AddrNone> by AddrNoneTlbConstructor {
-    override fun toString(): String = "addr_none"
+public object AddrNone : MsgAddressExt, TlbConstructorProvider<AddrNone> by AddrNoneTlbConstructor {
+    override fun toString(): String = print().toString()
+
+    override fun print(tlbPrettyPrinter: TlbPrettyPrinter): TlbPrettyPrinter = tlbPrettyPrinter {
+        type("addr_none")
+    }
 }
 
 private object AddrNoneTlbConstructor : TlbConstructor<AddrNone>(

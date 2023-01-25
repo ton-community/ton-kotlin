@@ -17,13 +17,14 @@ public data class LiteServerSignatureSet(
 }
 
 private object LiteServerSignatureSetTlConstructor : TlConstructor<LiteServerSignatureSet>(
-    schema = "liteServer.signatureSet validator_set_hash:int catchain_seqno:int signatures:(vector liteServer.signature) = liteServer.SignatureSet"
+    schema = "liteServer.signatureSet validator_set_hash:int catchain_seqno:int signatures:vector liteServer.signature = liteServer.SignatureSet"
 ) {
     override fun decode(reader: TlReader): LiteServerSignatureSet {
         val validatorSetHash = reader.readInt()
         val catchainSeqno = reader.readInt()
-        val signatures = reader.readVector {
-            read(LiteServerSignature)
+        val size = reader.readInt()
+        val signatures = List(size) {
+            reader.read(LiteServerSignature)
         }
         return LiteServerSignatureSet(validatorSetHash, catchainSeqno, signatures)
     }

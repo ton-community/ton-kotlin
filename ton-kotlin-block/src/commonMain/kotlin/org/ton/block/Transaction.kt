@@ -5,136 +5,102 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.*
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
-import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.providers.TlbCombinatorProvider
+import org.ton.tlb.providers.TlbConstructorProvider
 
-@SerialName("transaction")
 @Serializable
-data class Transaction(
-    val account_addr: BitString,
-    val lt: ULong,
-    val prev_trans_hash: BitString,
-    val prev_trans_lt: ULong,
-    val now: UInt,
-    val outmsg_cnt: Int,
-    val orig_status: AccountStatus,
-    val end_status: AccountStatus,
-    val in_msg: Maybe<Message<Cell>>,
-    val out_msgs: HashMapE<Message<Cell>>,
-    val total_fees: CurrencyCollection,
-    val state_update: HashUpdate,
-    val description: TransactionDescr
-) {
-    init {
-        require(account_addr.size == 256) { "required: account_addr.size == 256, actual: ${account_addr.size}" }
-        require(prev_trans_hash.size == 256) { "required: prev_trans_hash.size == 256, actual: ${prev_trans_hash.size}" }
-    }
-
-    fun toCell(): Cell = CellBuilder.createCell {
+@SerialName("transaction")
+public data class Transaction(
+    @SerialName("account_addr") val accountAddr: Bits256, // account_addr : bits256
+    val lt: ULong, // lt : uint64
+    @SerialName("prev_trans_hash") val prevTransHash: Bits256, // prev_trans_hash : bits256
+    @SerialName("prev_trans_lt") val prevTransLt: ULong, // prev_trans_lt : uint64
+    @SerialName("now") val now: UInt, // now : uint32
+    @SerialName("outmsg_cnt") val outmsgCnt: Int, // outmsg_cnt : uint15
+    @SerialName("orig_status") val origStatus: AccountStatus, // orig_status : AccountStatus
+    @SerialName("end_status") val endStatus: AccountStatus, // end_status : AccountStatus
+    val r1: CellRef<TransactionAux>, // r1 : Aux
+    @SerialName("total_fees") val totalFees: CurrencyCollection, // total_fees : CurrencyCollection
+    @SerialName("state_update") val stateUpdate: CellRef<HashUpdate>, // state_update : ^HashUpdate
+    val description: CellRef<TransactionDescr> // description : ^TransactionDescr
+) : TlbObject {
+    private fun toCell(): Cell = CellBuilder.createCell {
         storeTlb(Transaction, this@Transaction)
     }
 
-    fun hash(): ByteArray = toCell().hash()
+    public fun hash(): ByteArray = toCell().hash()
 
-    companion object : TlbCodec<Transaction> by TransactionTlbConstructor.asTlbCombinator()
-
-    override fun toString(): String = buildString {
-        append("(transaction\n")
-        append("account_addr:")
-        append(account_addr)
-        append(" lt:")
-        append(lt)
-        append(" prev_trans_hash:")
-        append(prev_trans_hash)
-        append(" prev_trans_lt:")
-        append(prev_trans_lt)
-        append(" now:")
-        append(now)
-        append(" outmsg_cnt:")
-        append(outmsg_cnt)
-        append(" orig_status:")
-        append(orig_status)
-        append(" end_status:")
-        append(end_status)
-        append(" in_msg:")
-        append(in_msg)
-        append(" out_msgs:")
-        append(out_msgs)
-        append(" total_fees:")
-        append(total_fees)
-        append(" state_update:")
-        append(state_update)
-        append(" description:")
-        append(description)
-        append(")")
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("transaction") {
+            field("account_addr", accountAddr)
+            field("lt", lt)
+            field("prev_trans_hash", prevTransHash)
+            field("prev_trans_lt", prevTransLt)
+            field("now", now)
+            field("outmsg_cnt", outmsgCnt)
+            field("orig_status", origStatus)
+            field("end_status", endStatus)
+            field(r1)
+            field("total_fees", totalFees)
+            field("state_update", stateUpdate)
+            field("description", description)
+        }
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCombinatorProvider<Transaction> by TransactionTlConstructor.asTlbCombinator()
 }
 
-private object TransactionTlbConstructor : TlbConstructor<Transaction>(
-    schema = "transaction\$0111 account_addr:bits256 lt:uint64 " +
-            "prev_trans_hash:bits256 prev_trans_lt:uint64 now:uint32 " +
-            "outmsg_cnt:uint15 " +
-            "orig_status:AccountStatus end_status:AccountStatus " +
-            "^[ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) ] " +
-            "total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
-            "description:^TransactionDescr = Transaction;"
-) {
-    val RefMessageAny = Cell.tlbCodec(Message.Any)
-    val maybeMessageAny = Maybe(RefMessageAny)
-    val hashMapEMessageAny = HashMapE.tlbCodec(15, RefMessageAny)
-
-    override fun storeTlb(
-        cellBuilder: CellBuilder,
-        value: Transaction
-    ) = cellBuilder {
-        storeBits(value.account_addr)
-        storeUInt64(value.lt)
-        storeBits(value.prev_trans_hash)
-        storeUInt64(value.prev_trans_lt)
-        storeUInt32(value.now)
-        storeUInt(value.outmsg_cnt, 15)
-        storeTlb(AccountStatus, value.orig_status)
-        storeTlb(AccountStatus, value.end_status)
-        storeRef {
-            storeTlb(maybeMessageAny, value.in_msg)
-            storeTlb(hashMapEMessageAny, value.out_msgs)
-        }
-        storeTlb(CurrencyCollection, value.total_fees)
-        storeRef {
-            storeTlb(HashUpdate, value.state_update)
-        }
-        storeRef {
-            storeTlb(TransactionDescr, value.description)
+@Serializable
+public data class TransactionAux(
+    @SerialName("in_msg") val inMsg: Maybe<CellRef<Message<Cell>>>,
+    @SerialName("out_msgs") val outMsgs: HashMapE<CellRef<Message<Cell>>>,
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type {
+            field("in_msg", inMsg)
+            field("out_msgs", outMsgs)
         }
     }
 
-    override fun loadTlb(
-        cellSlice: CellSlice
-    ): Transaction = cellSlice {
-        val accountAddr = loadBits(256)
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TransactionAux> by TransactionAuxTlbConstructor
+}
+
+private object TransactionTlConstructor : TlbConstructor<Transaction>(
+    schema = "transaction\$0111 " +
+            "  account_addr:bits256 " +
+            "  lt:uint64 " +
+            "  prev_trans_hash:bits256 " +
+            "  prev_trans_lt:uint64 " +
+            "  now:uint32 " +
+            "  outmsg_cnt:uint15 " +
+            "  orig_status:AccountStatus " +
+            "  end_status:AccountStatus " +
+            "  ^[ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) ] " +
+            "  total_fees:CurrencyCollection state_update:^(HASH_UPDATE Account) " +
+            "  description:^TransactionDescr = Transaction;"
+) {
+    override fun loadTlb(cellSlice: CellSlice): Transaction = cellSlice {
+        val accountAddr = loadBits256()
         val lt = loadUInt64()
-        val prevTransHash = loadBits(256)
+        val prevTransHash = loadBits256()
         val prevTransLt = loadUInt64()
         val now = loadUInt32()
         val outmsgCnt = loadUInt(15).toInt()
         val origStatus = loadTlb(AccountStatus)
         val endStatus = loadTlb(AccountStatus)
-        val (inMsg, outMsgs) = loadRef {
-            val inMsg = loadTlb(maybeMessageAny)
-            val outMsgs = loadTlb(hashMapEMessageAny)
-            inMsg to outMsgs
-        }
+        val r1 = loadRef(TransactionAux)
         val totalFees = loadTlb(CurrencyCollection)
-        val stateUpdate = loadRef {
-            loadTlb(HashUpdate)
-        }
-        val description = loadRef {
-            loadTlb(TransactionDescr)
-        }
+        val stateUpdate = loadRef(HashUpdate)
+        val description = loadRef(TransactionDescr)
         Transaction(
             accountAddr,
             lt,
@@ -144,11 +110,44 @@ private object TransactionTlbConstructor : TlbConstructor<Transaction>(
             outmsgCnt,
             origStatus,
             endStatus,
-            inMsg,
-            outMsgs,
+            r1,
             totalFees,
             stateUpdate,
             description
+        )
+    }
+
+    override fun storeTlb(cellBuilder: CellBuilder, value: Transaction) = cellBuilder {
+        storeBits(value.accountAddr)
+        storeUInt64(value.lt)
+        storeBits(value.prevTransHash)
+        storeUInt64(value.prevTransLt)
+        storeUInt32(value.now)
+        storeUInt(value.outmsgCnt, 15)
+        storeTlb(AccountStatus, value.origStatus)
+        storeTlb(AccountStatus, value.endStatus)
+        storeRef(TransactionAux, value.r1)
+        storeTlb(CurrencyCollection, value.totalFees)
+        storeRef(HashUpdate, value.stateUpdate)
+        storeRef(TransactionDescr, value.description)
+    }
+}
+
+private object TransactionAuxTlbConstructor : TlbConstructor<TransactionAux>(
+    schema = "\$_ in_msg:(Maybe ^(Message Any)) out_msgs:(HashmapE 15 ^(Message Any)) "
+) {
+    val maybeMessage = Maybe.tlbCodec(CellRef.tlbCodec(Message.Any))
+    val outMsgs = HashMapE.tlbCodec(15, CellRef.tlbCodec(Message.Any))
+
+    override fun storeTlb(cellBuilder: CellBuilder, value: TransactionAux) = cellBuilder {
+        storeTlb(maybeMessage, value.inMsg)
+        storeTlb(outMsgs, value.outMsgs)
+    }
+
+    override fun loadTlb(cellSlice: CellSlice): TransactionAux = cellSlice {
+        TransactionAux(
+            inMsg = loadTlb(maybeMessage),
+            outMsgs = loadTlb(outMsgs)
         )
     }
 }

@@ -2,11 +2,16 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.tlb.TlbPrettyPrinter
 
 @Serializable
 @SerialName("unary_succ")
 public data class UnarySuccess(
     val x: Unary
 ) : Unary() {
-    override fun toString(): String = "(unary_succ\nx:$x)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("unary_succ") {
+        field("x", x)
+    }
+
+    override fun toString(): String = print().toString()
 }

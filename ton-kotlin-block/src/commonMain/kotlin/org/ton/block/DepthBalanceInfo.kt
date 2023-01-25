@@ -5,22 +5,27 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("depth_balance")
-data class DepthBalanceInfo(
-    val split_depth: Int,
+public data class DepthBalanceInfo(
+    @SerialName("split_depth") val splitDepth: Int,
     val balance: CurrencyCollection
-) {
+) : TlbObject {
     init {
-        require(split_depth <= 30) { "required: split_depth <= 30, actual: $split_depth" }
+        require(splitDepth <= 30) { "required: split_depth <= 30, actual: $splitDepth" }
     }
 
-    companion object : TlbConstructorProvider<DepthBalanceInfo> by DepthBalanceInfoTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("depth_balance") {
+        field("split_depth", splitDepth)
+        field("balance", balance)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<DepthBalanceInfo> by DepthBalanceInfoTlbConstructor
 }
 
 private object DepthBalanceInfoTlbConstructor : TlbConstructor<DepthBalanceInfo>(
@@ -31,7 +36,7 @@ private object DepthBalanceInfoTlbConstructor : TlbConstructor<DepthBalanceInfo>
         cellBuilder: CellBuilder,
         value: DepthBalanceInfo
     ) = cellBuilder {
-        storeUIntLeq(value.split_depth, 30)
+        storeUIntLeq(value.splitDepth, 30)
         storeTlb(CurrencyCollection, value.balance)
     }
 

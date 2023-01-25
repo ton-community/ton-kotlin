@@ -7,16 +7,27 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmStatic
 
 @Serializable
-data class SimpleLib(
+public data class SimpleLib(
     val public: Boolean,
     val root: Cell
-) {
-    companion object : TlbCodec<SimpleLib> by SimpleLibTlbConstructor {
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer {
+            type("simple_lib") {
+                field("public", public)
+                field("root", root)
+            }
+        }
+    }
+
+    public companion object : TlbCodec<SimpleLib> by SimpleLibTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<SimpleLib> = SimpleLibTlbConstructor
+        public fun tlbCodec(): TlbConstructor<SimpleLib> = SimpleLibTlbConstructor
     }
 }
 

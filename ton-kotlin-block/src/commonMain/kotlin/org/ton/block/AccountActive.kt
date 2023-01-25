@@ -6,22 +6,27 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
+import kotlin.jvm.JvmInline
 
+@JvmInline
 @Serializable
 @SerialName("account_active")
-data class AccountActive(
-    @SerialName("_")
-    val init: StateInit
+public value class AccountActive(
+    public val value: StateInit
 ) : AccountState {
-    override fun toString(): String = "account_active($init)"
-
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<AccountActive> = AccountActiveTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("account_active") {
+            value.print(printer)
+        }
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<AccountActive> by AccountActiveTlbConstructor
 }
 
 private object AccountActiveTlbConstructor : TlbConstructor<AccountActive>(
@@ -31,7 +36,7 @@ private object AccountActiveTlbConstructor : TlbConstructor<AccountActive>(
         cellBuilder: CellBuilder,
         value: AccountActive
     ) = cellBuilder {
-        storeTlb(StateInit, value.init)
+        storeTlb(StateInit, value.value)
     }
 
     override fun loadTlb(

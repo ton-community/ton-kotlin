@@ -6,23 +6,23 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.*
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("extra_currencies")
-data class ExtraCurrencyCollection(
+public data class ExtraCurrencyCollection(
     val dict: HashMapE<VarUInteger> = HashMapE.of()
-) {
-    override fun toString(): String = "(extra_currencies\ndict:$dict)"
-
-    companion object : TlbCodec<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ExtraCurrencyCollection> = ExtraCurrencyCollectionTlbConstructor
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("extra_currencies") {
+            field("dict", dict)
+        }
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor
 }
 
 private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(

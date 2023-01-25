@@ -5,12 +5,13 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbObject
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface InMsg {
-    companion object : TlbCombinatorProvider<InMsg> by InMsgTlbCombinator
+public sealed interface InMsg : TlbObject {
+    public companion object : TlbCombinatorProvider<InMsg> by InMsgTlbCombinator
 }
 
 private object InMsgTlbCombinator : TlbCombinator<InMsg>(

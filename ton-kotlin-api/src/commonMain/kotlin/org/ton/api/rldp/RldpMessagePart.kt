@@ -1,7 +1,7 @@
 package org.ton.api.rldp
 
 import kotlinx.serialization.Serializable
-import org.ton.tl.Bits256
+import org.ton.bitstring.Bits256
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlObject
 

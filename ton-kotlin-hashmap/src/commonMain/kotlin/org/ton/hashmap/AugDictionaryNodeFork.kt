@@ -4,22 +4,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.*
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @SerialName("ahmn_fork")
 @Serializable
 public data class AugDictionaryNodeFork<X, Y>(
-    val left: AugDictionaryEdge<X, Y>,
-    val right: AugDictionaryEdge<X, Y>,
+    val left: CellRef<AugDictionaryEdge<X, Y>>,
+    val right: CellRef<AugDictionaryEdge<X, Y>>,
     override val extra: Y,
 ) : AugDictionaryNode<X, Y> {
-    override fun toString(): String = "ahmn_fork(left:$left right:$right extra:$extra)"
+    public fun nodes(): Sequence<Pair<X, Y>> = sequence {
+        yieldAll(left.value.nodes())
+        yieldAll(right.value.nodes())
+    }
 
-    public fun nodes(): Sequence<Pair<X, Y>> = left.nodes() + right.nodes()
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("ahmn_fork") {
+        field("left", left)
+        field("right", right)
+        field("extra", extra)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic
@@ -46,24 +52,16 @@ private class AugDictionaryNodeForkTlbConstructor<X, Y>(
         cellBuilder: CellBuilder,
         value: AugDictionaryNodeFork<X, Y>
     ) = cellBuilder {
-        storeRef {
-            storeTlb(edge, value.left)
-        }
-        storeRef {
-            storeTlb(edge, value.right)
-        }
+        storeRef(edge, value.left)
+        storeRef(edge, value.right)
         storeTlb(y, value.extra)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AugDictionaryNodeFork<X, Y> = cellSlice {
-        val left = loadRef {
-            loadTlb(edge)
-        }
-        val right = loadRef {
-            loadTlb(edge)
-        }
+        val left = loadRef(edge)
+        val right = loadRef(edge)
         val extra = loadTlb(y)
         AugDictionaryNodeFork(left, right, extra)
     }

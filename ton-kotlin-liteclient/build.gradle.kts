@@ -5,6 +5,7 @@ kotlin {
                 api(projects.tonKotlinAdnl)
                 api(projects.tonKotlinLiteapi)
                 api(projects.tonKotlinLogger)
+                api(projects.tonKotlinBlock)
                 implementation(libs.serialization.json)
                 implementation(libs.atomicfu)
             }

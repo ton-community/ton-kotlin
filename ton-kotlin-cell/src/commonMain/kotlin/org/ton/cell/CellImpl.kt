@@ -47,6 +47,14 @@ internal class CellImpl(
         return depths[hashIndex]
     }
 
+    override fun virtualize(offset: Int): Cell {
+        return if (levelMask.isEmpty()) {
+            this
+        } else {
+            VirtualCell(this, offset)
+        }
+    }
+
     override fun toString(): String = Cell.toString(this)
 
     override fun equals(other: Any?): Boolean {

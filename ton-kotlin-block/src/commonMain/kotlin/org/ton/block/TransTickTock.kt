@@ -2,27 +2,36 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.constructor.tlbCodec
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("trans_tick_tock")
-data class TransTickTock(
-    val is_tock: Boolean,
-    val storage_ph: TrStoragePhase,
-    val compute_ph: TrComputePhase,
-    val action: Maybe<TrActionPhase>,
+public data class TransTickTock(
+    @SerialName("is_tock") val isTock: Boolean,
+    @SerialName("storage_ph") val storagePh: TrStoragePhase,
+    @SerialName("compute_ph") val computePh: TrComputePhase,
+    val action: Maybe<CellRef<TrActionPhase>>,
     val aborted: Boolean,
     val destroyed: Boolean
 ) : TransactionDescr {
-    companion object : TlbConstructorProvider<TransTickTock> by TransTickTockTlbConstructor
+    override fun toString(): String = print().toString()
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("trans_tick_tock") {
+            field("is_tock", isTock)
+            field("storage_ph", storagePh)
+            field("compute_ph", computePh)
+            field("action", action)
+            field("aborted", aborted)
+            field("destroyed", destroyed)
+        }
+    }
+
+    public companion object : TlbConstructorProvider<TransTickTock> by TransTickTockTlbConstructor
 }
 
 private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
@@ -30,15 +39,15 @@ private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
             "  compute_ph:TrComputePhase action:(Maybe ^TrActionPhase)\n" +
             "  aborted:Bool destroyed:Bool = TransactionDescr;"
 ) {
-    val maybeTrActionPhase = Maybe.tlbCodec(Cell.tlbCodec(TrActionPhase))
+    val maybeTrActionPhase = Maybe.tlbCodec(CellRef.tlbCodec(TrActionPhase))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TransTickTock
     ) = cellBuilder {
-        storeBit(value.is_tock)
-        storeTlb(TrStoragePhase, value.storage_ph)
-        storeTlb(TrComputePhase, value.compute_ph)
+        storeBit(value.isTock)
+        storeTlb(TrStoragePhase, value.storagePh)
+        storeTlb(TrComputePhase, value.computePh)
         storeTlb(maybeTrActionPhase, value.action)
         storeBit(value.aborted)
         storeBit(value.destroyed)

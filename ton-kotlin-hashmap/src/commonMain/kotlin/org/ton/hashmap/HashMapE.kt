@@ -12,7 +12,7 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed interface HashMapE<out T> : Iterable<Pair<BitString, T>> {
+public sealed interface HashMapE<out T> : Iterable<Pair<BitString, T>>, TlbObject {
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
     public fun nodes(): Sequence<Pair<BitString, T>>

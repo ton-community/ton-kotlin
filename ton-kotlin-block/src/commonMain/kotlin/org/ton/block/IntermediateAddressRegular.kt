@@ -6,18 +6,26 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("interm_addr_regular")
-data class IntermediateAddressRegular(
-    val use_dest_bits: Int
+public data class IntermediateAddressRegular(
+    @SerialName("use_dest_bits") val useDestBits: Int
 ) : IntermediateAddress {
     init {
-        require(use_dest_bits <= 96) { "expected: use_dest_bits <= 96, actual: $use_dest_bits" }
+        require(useDestBits <= 96) { "expected: use_dest_bits <= 96, actual: $useDestBits" }
     }
 
-    companion object : TlbConstructorProvider<IntermediateAddressRegular> by IntermediateAddressRegularTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("interm_addr_regular") {
+        field("use_dest_bits", useDestBits)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object :
+        TlbConstructorProvider<IntermediateAddressRegular> by IntermediateAddressRegularTlbConstructor
 }
 
 private object IntermediateAddressRegularTlbConstructor : TlbConstructor<IntermediateAddressRegular>(
@@ -27,7 +35,7 @@ private object IntermediateAddressRegularTlbConstructor : TlbConstructor<Interme
         cellBuilder: CellBuilder,
         value: IntermediateAddressRegular
     ) = cellBuilder {
-        storeUIntLeq(value.use_dest_bits, 96)
+        storeUIntLeq(value.useDestBits, 96)
     }
 
     override fun loadTlb(

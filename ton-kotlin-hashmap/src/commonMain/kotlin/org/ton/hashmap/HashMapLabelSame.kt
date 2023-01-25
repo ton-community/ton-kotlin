@@ -3,6 +3,7 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmStatic
 
 @Serializable
@@ -15,7 +16,12 @@ public data class HashMapLabelSame(
 
     override val s: BitString get() = BitString(*BooleanArray(n) { v })
 
-    override fun toString(): String = "(hml_same\nv:$v n:$n)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("hml_same") {
+        field("v", v)
+        field("n", n)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

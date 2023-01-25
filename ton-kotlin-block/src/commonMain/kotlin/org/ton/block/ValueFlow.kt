@@ -1,22 +1,40 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.*
 
 @Serializable
-data class ValueFlow(
-    val from_prev_blk: CurrencyCollection,
-    val to_next_blk: CurrencyCollection,
+@SerialName("value_flow")
+public data class ValueFlow(
+    @SerialName("from_prev_blk") val fromPrevBlk: CurrencyCollection,
+    @SerialName("to_next_blk") val toNextBlk: CurrencyCollection,
     val imported: CurrencyCollection,
     val exported: CurrencyCollection,
-    val fees_collected: CurrencyCollection,
-    val fees_imported: CurrencyCollection,
+    @SerialName("fees_collected") val feesCollected: CurrencyCollection,
+    @SerialName("fees_imported") val feesImported: CurrencyCollection,
     val recovered: CurrencyCollection,
     val created: CurrencyCollection,
     val minted: CurrencyCollection
-) {
-    companion object : TlbCodec<ValueFlow> by ValueFlowTlbConstructor.asTlbCombinator()
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("value_flow") {
+            field("from_prev_blk", fromPrevBlk)
+            field("to_next_blk", toNextBlk)
+            field("imported", imported)
+            field("exported", exported)
+            field("fees_collected", feesCollected)
+            field("fees_imported", feesImported)
+            field("recovered", recovered)
+            field("created", created)
+            field("minted", minted)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<ValueFlow> by ValueFlowTlbConstructor.asTlbCombinator()
 }
 
 private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
@@ -36,14 +54,14 @@ private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
         cellBuilder: CellBuilder, value: ValueFlow
     ) = cellBuilder {
         storeRef {
-            storeTlb(CurrencyCollection, value.from_prev_blk)
-            storeTlb(CurrencyCollection, value.to_next_blk)
+            storeTlb(CurrencyCollection, value.fromPrevBlk)
+            storeTlb(CurrencyCollection, value.toNextBlk)
             storeTlb(CurrencyCollection, value.imported)
             storeTlb(CurrencyCollection, value.exported)
         }
-        storeTlb(CurrencyCollection, value.fees_collected)
+        storeTlb(CurrencyCollection, value.feesCollected)
         storeRef {
-            storeTlb(CurrencyCollection, value.fees_imported)
+            storeTlb(CurrencyCollection, value.feesImported)
             storeTlb(CurrencyCollection, value.recovered)
             storeTlb(CurrencyCollection, value.created)
             storeTlb(CurrencyCollection, value.minted)

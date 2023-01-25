@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.tlb.CellRef
 import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbPrettyPrinter
 
 @Serializable
 @SerialName("hmn_fork")
@@ -32,5 +33,10 @@ public data class HashMapNodeFork<T>(
     val left: HashMapEdge<T> by leftCellRef
     val right: HashMapEdge<T> by rightCellRef
 
-    override fun toString(): String = "(hmn_fork\nleft:$leftCellRef right:$rightCellRef)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("hmn_fork") {
+        field("left", left)
+        field("right", right)
+    }
+
+    override fun toString(): String = print().toString()
 }

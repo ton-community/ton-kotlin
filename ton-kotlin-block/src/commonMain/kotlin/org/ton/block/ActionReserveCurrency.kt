@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("action_reserve_currency")
-data class ActionReserveCurrency(
+public data class ActionReserveCurrency(
     val mode: Int,
     val currency: CurrencyCollection
 ) : OutAction

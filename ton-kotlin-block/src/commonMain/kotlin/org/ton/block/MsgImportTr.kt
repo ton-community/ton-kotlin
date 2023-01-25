@@ -3,19 +3,27 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_import_tr")
-data class MsgImportTr(
-    val in_msg: MsgEnvelope,
-    val out_msg: MsgEnvelope,
-    val transit_fee: Coins
+public data class MsgImportTr(
+    @SerialName("in_msg") val inMsg: CellRef<MsgEnvelope>,
+    @SerialName("out_msg") val outMsg: CellRef<MsgEnvelope>,
+    @SerialName("transit_fee") val transitFee: Coins
 ) : InMsg {
-    companion object : TlbConstructorProvider<MsgImportTr> by MsgImportTrTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_import_tr") {
+            field("in_msg", inMsg)
+            field("out_msg", outMsg)
+            field("transit_fee", transitFee)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<MsgImportTr> by MsgImportTrTlbConstructor
 }
 
 private object MsgImportTrTlbConstructor : TlbConstructor<MsgImportTr>(
@@ -25,18 +33,17 @@ private object MsgImportTrTlbConstructor : TlbConstructor<MsgImportTr>(
         cellBuilder: CellBuilder,
         value: MsgImportTr
     ) = cellBuilder {
-        storeRef { storeTlb(MsgEnvelope, value.in_msg) }
-        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
-        storeTlb(Coins, value.transit_fee)
+        storeRef(MsgEnvelope, value.inMsg)
+        storeRef(MsgEnvelope, value.outMsg)
+        storeTlb(Coins, value.transitFee)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgImportTr = cellSlice {
-        val inMsg = loadRef { loadTlb(MsgEnvelope) }
-        val outMsg = loadRef { loadTlb(MsgEnvelope) }
+        val inMsg = loadRef(MsgEnvelope)
+        val outMsg = loadRef(MsgEnvelope)
         val transitFee = loadTlb(Coins)
         MsgImportTr(inMsg, outMsg, transitFee)
     }
 }
-

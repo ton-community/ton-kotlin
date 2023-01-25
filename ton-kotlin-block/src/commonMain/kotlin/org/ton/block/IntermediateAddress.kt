@@ -5,12 +5,13 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbObject
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface IntermediateAddress {
-    companion object : TlbCombinatorProvider<IntermediateAddress> by IntermediateAddressTlbCombinator
+public sealed interface IntermediateAddress : TlbObject {
+    public companion object : TlbCombinatorProvider<IntermediateAddress> by IntermediateAddressTlbCombinator
 }
 
 private object IntermediateAddressTlbCombinator : TlbCombinator<IntermediateAddress>(

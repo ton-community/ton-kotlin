@@ -6,19 +6,20 @@ import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 import kotlin.math.pow
 
 @SerialName("nanocoins")
 @Serializable
-data class Coins(
+public data class Coins(
     val amount: VarUInteger = VarUInteger(0)
-) {
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("nanocoins") {
+        field("amount", amount)
+    }
+
     override fun toString() = toString(decimals = DECIMALS)
 
     fun toString(decimals: Int): String =

@@ -14,15 +14,20 @@ import kotlin.jvm.JvmStatic
 public data class AugDictionaryEdge<X, Y>(
     val label: HashMapLabel,
     val node: AugDictionaryNode<X, Y>
-) : Iterable<Pair<X, Y>> {
-    override fun toString(): String = "ahm_edge(label:$label node:$node)"
-
+) : Iterable<Pair<X, Y>>, TlbObject {
     override fun iterator(): Iterator<Pair<X, Y>> = nodes().iterator()
 
     public fun nodes(): Sequence<Pair<X, Y>> = when (node) {
         is AugDictionaryNodeFork -> node.nodes()
         is AugDictionaryNodeLeaf -> sequenceOf(node.value to node.extra)
     }
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("ahm_edge") {
+        field("label", label)
+        field("node", node)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

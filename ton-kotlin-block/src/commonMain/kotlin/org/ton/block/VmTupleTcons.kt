@@ -12,7 +12,7 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("vm_tuple_tcons")
 @Serializable
-data class VmTupleTcons(
+public data class VmTupleTcons(
     val head: VmTupleRef,
     val tail: VmStackValue
 ) : VmTuple {
