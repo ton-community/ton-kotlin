@@ -21,7 +21,7 @@ abstract class AbstractContractV4(
     override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
         storeUInt(subwalletId, 32)
-        storeBits(privateKey.publicKey().key.toBitString())
+        storeBits(privateKey.publicKey().key)
         storeUInt(0, 1) // plugins dict empty
     }
 

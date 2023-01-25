@@ -52,11 +52,11 @@ public data class Just<X>(
 ) : Maybe<X> {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("just") {
-            field("value", value as Any)
+            field("value", value)
         }
     }
 
-    override fun toString(): String = "(just\nvalue:$value)"
+    override fun toString(): String = print().toString()
 }
 
 private class MaybeTlbCombinator(

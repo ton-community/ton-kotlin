@@ -52,11 +52,13 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: T) {
-        val constructor = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
-        if (constructor is TlbConstructor<*>) {
-            cellBuilder.storeBits(constructor.id)
+        val storer = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
+        if (storer is TlbConstructorProvider<*>) {
+            cellBuilder.storeBits(storer.tlbConstructor().id)
+        } else if (storer is TlbConstructor<*>) {
+            cellBuilder.storeBits(storer.id)
         }
-        return constructor.storeTlb(cellBuilder, value)
+        return storer.storeTlb(cellBuilder, value)
     }
 
     protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {

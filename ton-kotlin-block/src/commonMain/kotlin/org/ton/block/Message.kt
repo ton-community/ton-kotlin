@@ -52,16 +52,7 @@ public data class Message<X>(
         ): TlbConstructor<Message<X>> = MessageTlbConstructor(x)
     }
 
-    override fun toString(): String = buildString {
-        append("(message\n")
-        append("info:")
-        append(info)
-        append(" init:")
-        append(init)
-        append(" body:")
-        append(body.toString())
-        append(")")
-    }
+    override fun toString(): String = print().toString()
 }
 
 operator fun <X : Any> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)

@@ -11,10 +11,10 @@ import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface CommonMsgInfo : TlbObject {
-    companion object : TlbCodec<CommonMsgInfo> by CommonMsgInfoTlbCombinator {
+public sealed interface CommonMsgInfo : TlbObject {
+    public companion object : TlbCodec<CommonMsgInfo> by CommonMsgInfoTlbCombinator {
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator
+        public fun tlbCodec(): TlbCombinator<CommonMsgInfo> = CommonMsgInfoTlbCombinator
     }
 }
 

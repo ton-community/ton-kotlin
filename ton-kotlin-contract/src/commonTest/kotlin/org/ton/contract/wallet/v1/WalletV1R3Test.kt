@@ -9,7 +9,6 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.wallet.liteClient
-import org.ton.crypto.encodeHex
 import org.ton.crypto.hex
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
@@ -88,7 +87,7 @@ class WalletV1R3Test {
             Cell("FF0020DD2082014C97BA218201339CBAB19C71B0ED44D0D31FD70BFFE304E0A4F260810200D71820D70B1FED44D0D31FD3FFD15112BAF2A122F901541044F910F2A2F80001D31F3120D74A96D307D402FB00DED1A4C8CB1FCBFFC9ED54"),
             Cell("000000003B6A27BCCEB6A42D62A3A8D02A6F0D73653215771DE243A63AC048A18B59DA29")
         )
-        assertEquals(actual, expected)
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -107,14 +106,6 @@ class WalletV1R3Test {
         val expectedBoc =
             BagOfCells(hex("b5ee9c720101030100f10002cf880083a2c647078b8a66f9765a64401ce06b507a077e2e426e1c0eb9d0dfc45bc7ac11985b73c78dd0fef1ad628feeba22ce006ddd70361e50f671607a41713ad2373bd9c24dac2cb48bf838599e15897e063f5d528e5bdc150d40e28e78aff0c798c08000000010010200baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed540048000000003b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"))
         assertEquals(expectedBoc, actualBoc)
-
-
-        println("---")
-        println(actualBoc)
-
-        println("---")
-        println(actualBoc.toByteArray().encodeHex())
-
 //        assertEquals(expected, hex(actual).uppercase())
     }
 

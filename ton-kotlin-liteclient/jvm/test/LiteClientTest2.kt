@@ -10,6 +10,7 @@ import org.ton.crypto.base64
 import org.ton.lite.client.LiteClient
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
 
 class LiteClientTest2 {
     private fun getClient() = LiteClient(
@@ -25,6 +26,7 @@ class LiteClientTest2 {
         coroutineContext = Dispatchers.Default
     )
 
+    @ExperimentalTime
     @Test
     fun getAccount() {
         val liteClient = getClient()
