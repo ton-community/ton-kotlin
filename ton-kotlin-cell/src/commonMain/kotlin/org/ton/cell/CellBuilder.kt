@@ -26,6 +26,7 @@ public interface CellBuilder {
     public fun storeBits(vararg bits: Boolean): CellBuilder
     public fun storeBits(bits: Iterable<Boolean>): CellBuilder
     public fun storeBits(bits: Collection<Boolean>): CellBuilder
+    public fun storeBits(bits: BitString): CellBuilder
 
     public fun storeBytes(byteArray: ByteArray): CellBuilder
 
@@ -81,14 +82,14 @@ public interface CellBuilder {
     public companion object {
         @JvmStatic
         public fun of(cell: Cell): CellBuilder =
-            CellBuilderImpl(BitString.MAX_LENGTH, cell.bits.toMutableBitString(), cell.refs.toMutableList())
+            CellBuilderImpl(cell.bits.toMutableBitString(), cell.refs.toMutableList())
 
         @JvmStatic
-        public fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
+        public fun beginCell(): CellBuilder = CellBuilderImpl()
 
         @JvmStatic
-        public fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
-            CellBuilderImpl(maxLength).apply(builder).endCell()
+        public fun createCell(builder: CellBuilder.() -> Unit): Cell =
+            CellBuilderImpl().apply(builder).endCell()
 
         @JvmStatic
         public fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
@@ -149,19 +150,18 @@ public fun CellBuilder(cell: Cell): CellBuilder =
     CellBuilder.of(cell)
 
 @OptIn(ExperimentalContracts::class)
-public fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder {
+public fun CellBuilder(builder: CellBuilder.() -> Unit = {}): CellBuilder {
     contract {
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
-    return CellBuilderImpl(maxLength).apply(builder)
+    return CellBuilderImpl().apply(builder)
 }
 
 private class CellBuilderImpl(
-    val maxLength: Int,
     override var bits: MutableBitString = ByteBackedMutableBitString.of(),
     override var refs: MutableList<Cell> = ArrayList()
 ) : CellBuilder {
-    private val remainder: Int get() = maxLength - bitsPosition
+    private val remainder: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
     override val bitsPosition: Int get() = bits.size
     override var isExotic: Boolean = false
 
@@ -169,7 +169,7 @@ private class CellBuilderImpl(
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
-        bits += bit
+        bits.plus(bit)
     }
 
     override fun storeBits(vararg bits: Boolean): CellBuilder = apply {
@@ -182,11 +182,12 @@ private class CellBuilderImpl(
         this.bits.plus(bits)
     }
 
-    override fun storeBits(bits: Iterable<Boolean>): CellBuilder = apply {
-        val currentSize = this.bits.size
+    override fun storeBits(bits: BitString): CellBuilder = apply {
+        checkBitsOverflow(bits.size)
         this.bits.plus(bits)
-        checkBitsOverflow(this.bits.size - currentSize)
     }
+
+    override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(bits.toList())
 
     override fun storeBytes(byteArray: ByteArray): CellBuilder = apply {
         checkBitsOverflow(byteArray.size * Byte.SIZE_BITS)
@@ -205,14 +206,14 @@ private class CellBuilderImpl(
 
     override fun storeRefs(vararg refs: Cell): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
+        this.refs.addAll(refs.filter { !it.bits.isEmpty() })
     }
 
     override fun storeRefs(refs: Iterable<Cell>): CellBuilder = storeRefs(refs.toList())
 
     override fun storeRefs(refs: Collection<Cell>): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
+        this.refs.addAll(refs.filter { !it.bits.isEmpty() })
     }
 
     override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {
@@ -249,7 +250,7 @@ private class CellBuilderImpl(
     override fun toString(): String = endCell().toString()
 
     private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
-        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left.")
+        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left. - ${bits.size}")
     }
 
     private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {

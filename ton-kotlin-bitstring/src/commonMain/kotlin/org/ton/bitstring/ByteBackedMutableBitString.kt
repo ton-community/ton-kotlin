@@ -5,7 +5,7 @@ import kotlin.experimental.inv
 import kotlin.experimental.or
 import kotlin.jvm.JvmStatic
 
-open class ByteBackedMutableBitString(
+public open class ByteBackedMutableBitString(
     override var bytes: ByteArray,
     override var size: Int
 ) : ByteBackedBitString(size, bytes), MutableBitString {
@@ -19,9 +19,6 @@ open class ByteBackedMutableBitString(
         bytes = newBytes
         return previous
     }
-
-    override fun subList(fromIndex: Int, toIndex: Int): MutableBitString =
-        slice(fromIndex..toIndex).toMutableBitString()
 
     override fun plus(bits: BooleanArray) = plus(bits.asIterable())
     override fun plus(bytes: ByteArray) = plus(bytes, bytes.size * Byte.SIZE_BITS)
@@ -41,8 +38,9 @@ open class ByteBackedMutableBitString(
         }
     }
 
+    override fun plus(bit: Boolean): MutableBitString = plus(listOf(bit))
+
     override fun plus(bytes: ByteArray, bits: Int) = apply {
-        checkSize(size + bits)
         if (bits != 0) {
             if (size % 8 == 0) {
                 if (bits % 8 == 0) {
@@ -54,50 +52,6 @@ open class ByteBackedMutableBitString(
                 appendWithDoubleShifting(bytes, bits)
             }
         }
-    }
-
-    override fun iterator(): MutableIterator<Boolean> = listIterator()
-    override fun listIterator(): MutableListIterator<Boolean> = BitStringMutableIterator(this)
-    override fun listIterator(index: Int): MutableListIterator<Boolean> = BitStringMutableIterator(this, index)
-
-    override fun add(element: Boolean): Boolean {
-        val newBytes = expandByteArray(bytes, size + 1)
-        set(newBytes, size, element)
-        bytes = newBytes
-        size += 1
-        return true
-    }
-
-    override fun add(index: Int, element: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun addAll(index: Int, elements: Collection<Boolean>): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun addAll(elements: Collection<Boolean>): Boolean {
-        plus(elements)
-        return true
-    }
-
-    override fun clear() {
-        bytes = ByteArray(0)
-        size = 0
-    }
-
-    override fun remove(element: Boolean): Boolean = removeAt(lastIndexOf(element))
-
-    override fun removeAll(elements: Collection<Boolean>): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeAt(index: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun retainAll(elements: Collection<Boolean>): Boolean {
-        TODO("Not yet implemented")
     }
 
     private fun appendWithoutShifting(byteArray: ByteArray, bits: Int) {
@@ -161,23 +115,6 @@ open class ByteBackedMutableBitString(
             newBytes[newBytes.lastIndex] = lastByte.toByte()
             bytes = newBytes
             size = newSize
-        }
-    }
-
-    class BitStringMutableIterator(
-        override val bitString: MutableBitString,
-        index: Int = 0
-    ) : BitStringIterator(bitString, index), MutableListIterator<Boolean> {
-        override fun add(element: Boolean) {
-            bitString.add(index, element)
-        }
-
-        override fun remove() {
-            bitString.removeAt(index)
-        }
-
-        override fun set(element: Boolean) {
-            bitString[index] = element
         }
     }
 

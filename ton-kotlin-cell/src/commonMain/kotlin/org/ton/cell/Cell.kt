@@ -72,6 +72,7 @@ public interface Cell {
         public const val DEPTH_BITS: Int = DEPTH_BYTES * Byte.SIZE_BITS
         public const val MAX_LEVEL: Int = 3
         public const val MAX_DEPTH: Int = 1024
+        public const val MAX_BITS_SIZE: Int = 1023
 
         @JvmStatic
         public fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =

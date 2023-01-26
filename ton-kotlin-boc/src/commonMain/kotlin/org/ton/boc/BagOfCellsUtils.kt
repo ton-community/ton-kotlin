@@ -99,7 +99,7 @@ internal fun Input.readBagOfCell(): BagOfCells {
         val depthOffset = hashesOffset + if (hasHashes) hashesCount * Cell.HASH_BYTES else 0
         val dataOffset = depthOffset + if (hasHashes) hashesCount * Cell.DEPTH_BYTES else 0
         val dataLen = (d2 shr 1) + (d2 and 1)
-        val dataWithBits = (d2 and 1) != 0
+        val isAligned = (d2 and 1) == 0
         val refsOffset = dataOffset + dataLen
         val endOffset = refsOffset + refsCount * refSize
 
@@ -109,7 +109,7 @@ internal fun Input.readBagOfCell(): BagOfCells {
         }
 
         val cellData = readBytes(dataLen)
-        val cellSize = if (dataWithBits) BitString.findAugmentTag(cellData) else dataLen * 8
+        val cellSize = if (isAligned) dataLen * Byte.SIZE_BITS else findAugmentTag(cellData)
         cellBits[cellIndex] = BitString(cellData, cellSize)
         cellRefs[cellIndex] = IntArray(refsCount) { k ->
             val refIndex = readInt(refSize)
@@ -276,4 +276,26 @@ private fun Output.writeInt(value: Int, bytes: Int) {
 
         else -> writeInt(value)
     }
+}
+
+private fun findAugmentTag(byteArray: ByteArray): Int {
+    if (byteArray.isEmpty()) return 0
+    var length = byteArray.size * 8
+    var index = byteArray.lastIndex
+    while (true) {
+        val byte = byteArray[index--].toInt()
+        if (byte == 0) {
+            length -= 8
+        } else {
+            var skip = 1
+            var mask = 1
+            while (byte and mask == 0) {
+                skip++
+                mask = mask shl 1
+            }
+            length -= skip
+            break
+        }
+    }
+    return length
 }
