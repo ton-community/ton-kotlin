@@ -13,6 +13,7 @@ public inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * B
 public inline fun BitString(size: Int): BitString = BitString.of(size)
 public inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
 public inline fun BitString(bits: Iterable<Boolean>): BitString = BitString.of(bits)
+public inline fun BitString(bits: Collection<Boolean>): BitString = BitString.of(bits)
 public inline fun BitString(hex: String): BitString = BitString.of(hex)
 
 public inline fun Iterable<Boolean>.toBitString(): BitString = BitString(this)
@@ -26,17 +27,40 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public operator fun get(index: Int): Boolean
     public fun getOrNull(index: Int): Boolean?
 
-    operator fun plus(bits: BooleanArray): BitString
-    operator fun plus(bits: Iterable<Boolean>): BitString
-    operator fun plus(bits: Collection<Boolean>): BitString
+    public operator fun plus(bit: Boolean): BitString =
+        plus(booleanArrayOf(bit))
+
+    public operator fun plus(bits: BooleanArray): BitString =
+        plus(bits.asIterable())
+
+    public operator fun plus(bits: Collection<Boolean>): BitString =
+        plus(bits.asIterable())
+
+    public operator fun plus(bits: Iterable<Boolean>): BitString =
+        binary(toBinary() + bits.joinToString("") { if (it) "1" else "0" })
+
     operator fun plus(bytes: ByteArray): BitString
     fun plus(bytes: ByteArray, bits: Int): BitString
 
-    fun slice(indices: IntRange): BitString = slice(indices.first, indices.last)
-    fun slice(fromIndex: Int, toIndex: Int): BitString
     fun toByteArray(augment: Boolean = false): ByteArray
     fun toBooleanArray(): BooleanArray
     fun toMutableBitString(): MutableBitString
+
+    public fun startsWith(prefix: BitString): Boolean =
+        toBinary().startsWith(prefix.toBinary())
+
+    public fun endsWith(suffix: BitString): Boolean =
+        toBinary().endsWith(suffix.toBinary())
+
+    public fun commonPrefixWith(other: BitString): BitString =
+        binary(toBinary().commonPrefixWith(other.toBinary()))
+
+    public fun commonSuffixWith(other: BitString): BitString =
+        binary(toBinary().commonSuffixWith(other.toBinary()))
+
+    public fun slice(indices: IntRange): BitString = slice(indices.first, indices.last)
+    public fun slice(startIndex: Int, endIndex: Int = size): BitString =
+        binary(toBinary().substring(startIndex, endIndex))
 
     infix fun xor(other: BitString): BitString
     infix fun or(other: BitString): BitString
@@ -86,11 +110,14 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
         }
 
         @JvmStatic
-        public fun of(bits: Iterable<Boolean>): BitString {
-            val bitsList = bits.toList()
-            if (bitsList.isEmpty()) return empty()
-            val bitString = ByteBackedMutableBitString.of(bitsList.size)
-            bitsList.forEachIndexed { index, bit ->
+        public fun of(bits: Iterable<Boolean>): BitString =
+            of(bits.toList())
+
+        @JvmStatic
+        public fun of(bits: Collection<Boolean>): BitString {
+            if (bits.isEmpty()) return empty()
+            val bitString = ByteBackedMutableBitString.of(bits.size)
+            bits.forEachIndexed { index, bit ->
                 bitString[index] = bit
             }
             return bitString

@@ -23,9 +23,9 @@ internal object EmptyBitString : BitString {
         throw IndexOutOfBoundsException(indices.toString())
     }
 
-    override fun slice(fromIndex: Int, toIndex: Int): BitString {
-        if (fromIndex == 0 && toIndex == 0) return this
-        throw IndexOutOfBoundsException((fromIndex..toIndex).toString())
+    override fun slice(startIndex: Int, endIndex: Int): BitString {
+        if (startIndex == 0 && endIndex == 0) return this
+        throw IndexOutOfBoundsException((startIndex..endIndex).toString())
     }
 
     override fun toByteArray(augment: Boolean): ByteArray =

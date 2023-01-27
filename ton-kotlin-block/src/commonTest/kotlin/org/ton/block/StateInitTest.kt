@@ -5,7 +5,7 @@ import org.ton.bitstring.BitString
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
 import org.ton.crypto.hex
-import org.ton.hashmap.EmptyHashMapE
+import org.ton.hashmap.HmeEmpty
 import org.ton.tlb.storeTlb
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,7 +29,7 @@ class StateInitTest {
                 storeUInt(0, 32)
                 storeBits(BitString(publicKey))
             },
-            library = EmptyHashMapE()
+            library = HmeEmpty()
         )
 
         val stateInitCell = CellBuilder.createCell { storeTlb(stateInitCodec, stateInit) }

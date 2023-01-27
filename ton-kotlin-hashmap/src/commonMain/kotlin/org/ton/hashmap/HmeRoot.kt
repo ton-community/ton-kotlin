@@ -11,19 +11,24 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hme_root")
-public data class RootHashMapE<T>(
-    val rootCellRef: CellRef<HashMapEdge<T>>
+public data class HmeRoot<T>(
+    val root: CellRef<HmEdge<T>>
 ) : HashMapE<T> {
-    public constructor(root: Cell, tlbCodec: TlbCodec<HashMapEdge<T>>) : this(CellRef(root, tlbCodec))
-    public constructor(root: HashMapEdge<T>) : this(CellRef(root))
+    public constructor(root: Cell, tlbCodec: TlbCodec<HmEdge<T>>) : this(CellRef(root, tlbCodec))
+    public constructor(root: HmEdge<T>) : this(CellRef(root))
 
-    val root: HashMapEdge<T> by rootCellRef
+    override fun nodes(): Sequence<Pair<BitString, T>> = sequence {
+        yieldAll(root.value.nodes())
+    }
 
-    override fun nodes(): Sequence<Pair<BitString, T>> = rootCellRef.value.nodes()
+    override fun set(key: BitString, value: T): HmeRoot<T> {
+        val root = root.value.set(key, value)
+        return HmeRoot(root)
+    }
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("hme_root") {
-            field("root", rootCellRef)
+            field("root", root)
         }
     }
 
@@ -31,7 +36,7 @@ public data class RootHashMapE<T>(
 
     public companion object {
         @JvmStatic
-        public fun <X> tlbConstructor(n: Int, x: TlbCodec<X>): TlbConstructor<RootHashMapE<X>> =
+        public fun <X> tlbConstructor(n: Int, x: TlbCodec<X>): TlbConstructor<HmeRoot<X>> =
             RootHashMapETlbConstructor(n, x)
     }
 }
@@ -39,24 +44,24 @@ public data class RootHashMapE<T>(
 private class RootHashMapETlbConstructor<X>(
     n: Int,
     x: TlbCodec<X>
-) : TlbConstructor<RootHashMapE<X>>(
+) : TlbConstructor<HmeRoot<X>>(
     schema = "hme_root\$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;",
     id = ID
 ) {
-    private val cellRef = CellRef.tlbCodec(HashMapEdge.tlbCodec(n, x))
+    private val cellRef = CellRef.tlbCodec(HmEdge.tlbCodec(n, x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: RootHashMapE<X>
+        value: HmeRoot<X>
     ) {
-        cellBuilder.storeTlb(cellRef, value.rootCellRef)
+        cellBuilder.storeTlb(cellRef, value.root)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): RootHashMapE<X> {
+    ): HmeRoot<X> {
         val root = cellSlice.loadTlb(cellRef)
-        return RootHashMapE(root)
+        return HmeRoot(root)
     }
 
     companion object {

@@ -10,7 +10,7 @@ public interface MutableBitString : BitString {
     override operator fun plus(bits: Iterable<Boolean>): MutableBitString
     override operator fun plus(bits: Collection<Boolean>): MutableBitString
     override operator fun plus(bytes: ByteArray): MutableBitString
-    public operator fun plus(bit: Boolean): MutableBitString
+    override operator fun plus(bit: Boolean): MutableBitString
     override fun plus(bytes: ByteArray, bits: Int): MutableBitString
 
     public companion object {

@@ -50,7 +50,7 @@ public interface Cell {
     public fun <T> parse(block: CellSlice.() -> T): T {
         val slice = beginParse()
         val result = block(slice)
-        slice.endParse()
+//        slice.endParse()
         return result
     }
 

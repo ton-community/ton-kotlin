@@ -1,0 +1,6 @@
+dictnew
+0b1100 b{1100} 2 exch 4 udict! drop
+0b1110 b{1110} 2 exch 4 udict! drop
+0b0000 b{0000} 2 exch 4 udict! drop
+
+boc>B Bx.

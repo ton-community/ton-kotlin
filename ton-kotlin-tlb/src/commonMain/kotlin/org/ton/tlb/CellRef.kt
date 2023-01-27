@@ -12,10 +12,10 @@ public inline fun <T> CellRef(codec: TlbCodec<T>): TlbCodec<CellRef<T>> = CellRe
 
 public inline fun <T> Cell.asRef(codec: TlbCodec<T>): CellRef<T> = CellRef.valueOf(this, codec)
 
-public interface CellRef<T> : TlbObject {
+public interface CellRef<out T> : TlbObject {
     public val value: T
 
-    public fun toCell(codec: TlbCodec<T>? = null): Cell
+    public fun toCell(codec: TlbCodec<@UnsafeVariance T>? = null): Cell
 
     public operator fun getValue(thisRef: Any?, property: Any?): T = value
 

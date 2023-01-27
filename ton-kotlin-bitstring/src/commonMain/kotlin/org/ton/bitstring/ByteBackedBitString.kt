@@ -17,21 +17,19 @@ public open class ByteBackedBitString protected constructor(
     override fun getOrNull(index: Int): Boolean? =
         if (index in 0..size) get(bytes, index) else null
 
-    override fun plus(bits: BooleanArray): BitString = toMutableBitString().plus(bits)
-    override fun plus(bits: Iterable<Boolean>): BitString = toMutableBitString().plus(bits)
-    override fun plus(bits: Collection<Boolean>): BitString = toMutableBitString().plus(bits)
     override fun plus(bytes: ByteArray): BitString = toMutableBitString().plus(bytes)
     override fun plus(bytes: ByteArray, bits: Int): BitString = toMutableBitString().plus(bytes, bits)
 
-    override fun slice(fromIndex: Int, toIndex: Int): BitString = slice(fromIndex..toIndex)
-
-    override fun slice(indices: IntRange): BitString {
-        val result = ByteBackedMutableBitString.of(size = indices.last - indices.first + 1)
-        for ((position, i) in indices.withIndex()) {
-            result[position] = get(i)
-        }
-        return result
-    }
+    // TODO: fix
+//    override fun slice(startIndex: Int, endIndex: Int): BitString = slice(startIndex..endIndex)
+//
+//    override fun slice(indices: IntRange): BitString {
+//        val result = ByteBackedMutableBitString.of(size = indices.last - indices.first)
+//        for ((position, i) in indices.withIndex()) {
+//            result[position] = get(i)
+//        }
+//        return result
+//    }
 
     override fun toByteArray(augment: Boolean): ByteArray =
         if (augment && (size % 8 != 0)) {

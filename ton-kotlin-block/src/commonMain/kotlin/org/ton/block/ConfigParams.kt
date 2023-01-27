@@ -3,8 +3,11 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.Bits256
-import org.ton.cell.*
-import org.ton.hashmap.HashMapEdge
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.hashmap.HmEdge
 import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -12,7 +15,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @Serializable
 public data class ConfigParams(
     @SerialName("config_addr") val configAddr: Bits256,
-    val config: CellRef<HashMapEdge<Cell>>
+    val config: CellRef<HmEdge<Cell>>
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type {
         field("config_addr", configAddr)
@@ -27,7 +30,7 @@ public data class ConfigParams(
 private object ConfigParamsTlbConstructor : TlbConstructor<ConfigParams>(
     schema = "_ config_addr:bits256 config:^(Hashmap 32 ^Cell) = ConfigParams;"
 ) {
-    val hashmap = HashMapEdge.tlbCodec(32, Cell.tlbCodec())
+    val hashmap = HmEdge.tlbCodec(32, Cell.tlbCodec())
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

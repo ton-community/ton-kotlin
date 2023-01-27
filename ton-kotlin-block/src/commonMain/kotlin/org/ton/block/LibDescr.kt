@@ -6,7 +6,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.hashmap.HashMapEdge
+import org.ton.hashmap.HmEdge
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
@@ -17,7 +17,7 @@ import org.ton.tlb.storeTlb
 @SerialName("shared_lib_descr")
 public data class LibDescr(
     val lib: Cell,
-    val publishers: HashMapEdge<Unit>
+    val publishers: HmEdge<Unit>
 ) {
     public companion object : TlbConstructorProvider<LibDescr> by LibDescrTlbConstructor
 }
@@ -26,7 +26,7 @@ private object LibDescrTlbConstructor : TlbConstructor<LibDescr>(
     schema = "shared_lib_descr\$00 lib:^Cell publishers:(Hashmap 256 True) = LibDescr;"
 ) {
     val publishers by lazy {
-        HashMapEdge.tlbCodec(256, object : TlbCodec<Unit> {
+        HmEdge.tlbCodec(256, object : TlbCodec<Unit> {
             override fun storeTlb(cellBuilder: CellBuilder, value: Unit) {
             }
 
