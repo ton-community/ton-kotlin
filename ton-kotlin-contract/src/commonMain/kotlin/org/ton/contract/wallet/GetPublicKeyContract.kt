@@ -11,7 +11,7 @@ interface GetPublicKeyContract : Contract {
 
     suspend fun getPublicKey(blockIdExt: TonNodeBlockIdExt): PublicKeyEd25519 {
         val address = address()
-        val liteServerAccountId = LiteServerAccountId(address.workchainId, address.address.toByteArray())
+        val liteServerAccountId = LiteServerAccountId(address.workchainId, address.address)
         val result = liteClient.runSmcMethod(
             address = liteServerAccountId,
             methodName = "get_public_key",

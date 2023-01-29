@@ -485,7 +485,7 @@ public class LiteClient(
         "dnsroot" -> TODO()
         else -> {
             val addrStd = AddrStd(string)
-            LiteServerAccountId(addrStd.workchainId, addrStd.address.toByteArray())
+            LiteServerAccountId(addrStd.workchainId, addrStd.address)
         }
     }
 

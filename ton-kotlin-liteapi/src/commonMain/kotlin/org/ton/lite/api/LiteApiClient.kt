@@ -11,12 +11,12 @@ public interface LiteApiClient : LiteApi {
         queryCodec: TlCodec<Q>,
         answerCodec: TlCodec<A>,
         query: Q,
-        seqno: Int = -1
+        waitMasterchainSeqno: Int = -1
     ): A {
         val rawQuery = buildPacket {
 //            println("send query to lite server: $query")
-            if (seqno >= 0) {
-                val wait = LiteServerWaitMasterchainSeqno(seqno, 5000)
+            if (waitMasterchainSeqno > 0) {
+                val wait = LiteServerWaitMasterchainSeqno(waitMasterchainSeqno, 30000)
 //                println("with prefix: $wait")
                 LiteServerWaitMasterchainSeqno.encodeBoxed(this, wait)
             }
@@ -40,11 +40,17 @@ public interface LiteApiClient : LiteApi {
 
     public suspend fun sendRawQuery(query: ByteReadPacket): ByteReadPacket
 
-    override suspend fun invoke(function: LiteServerGetMasterchainInfo): LiteServerMasterchainInfo =
-        sendQuery(LiteServerGetMasterchainInfo, LiteServerMasterchainInfo, function)
+    override suspend fun invoke(
+        function: LiteServerGetMasterchainInfo,
+        waitMasterchainSeqno: Int
+    ): LiteServerMasterchainInfo =
+        sendQuery(LiteServerGetMasterchainInfo, LiteServerMasterchainInfo, function, waitMasterchainSeqno)
 
-    override suspend fun invoke(function: LiteServerGetMasterchainInfoExt): LiteServerMasterchainInfoExt =
-        sendQuery(LiteServerGetMasterchainInfoExt, LiteServerMasterchainInfoExt, function)
+    override suspend fun invoke(
+        function: LiteServerGetMasterchainInfoExt,
+        waitMasterchainSeqno: Int
+    ): LiteServerMasterchainInfoExt =
+        sendQuery(LiteServerGetMasterchainInfoExt, LiteServerMasterchainInfoExt, function, waitMasterchainSeqno)
 
     override suspend fun invoke(function: LiteServerGetTime): LiteServerCurrentTime =
         sendQuery(LiteServerGetTime, LiteServerCurrentTime, function)
@@ -82,8 +88,8 @@ public interface LiteApiClient : LiteApi {
     override suspend fun invoke(function: LiteServerGetTransactions): LiteServerTransactionList =
         sendQuery(LiteServerGetTransactions, LiteServerTransactionList, function)
 
-    override suspend fun invoke(function: LiteServerLookupBlock): LiteServerBlockHeader =
-        sendQuery(LiteServerLookupBlock, LiteServerBlockHeader, function)
+    override suspend fun invoke(function: LiteServerLookupBlock, waitMasterchainSeqno: Int): LiteServerBlockHeader =
+        sendQuery(LiteServerLookupBlock, LiteServerBlockHeader, function, waitMasterchainSeqno)
 
     override suspend fun invoke(function: LiteServerListBlockTransactions): LiteServerBlockTransactions =
         sendQuery(LiteServerListBlockTransactions, LiteServerBlockTransactions, function)

@@ -2,8 +2,6 @@
 
 package org.ton.lite.api.liteserver
 
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

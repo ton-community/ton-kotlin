@@ -5,10 +5,11 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
+import org.ton.crypto.encodeHex
 import kotlin.experimental.and
 
 @OptIn(ExperimentalUnsignedTypes::class)
-internal fun Input.readBagOfCell(): BagOfCells {
+internal fun ByteReadPacket.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
     val hashCrc32: Boolean

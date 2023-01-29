@@ -20,10 +20,12 @@ public data class AccountInfo(
 ) : Account {
     public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
 
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account") {
-        field("addr", addr)
-        field("storage_stat", storageStat)
-        field("storage", storage)
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("account") {
+            field("addr", addr)
+            field("storage_stat", storageStat)
+            field("storage", storage)
+        }
     }
 
     override fun toString(): String = print().toString()
