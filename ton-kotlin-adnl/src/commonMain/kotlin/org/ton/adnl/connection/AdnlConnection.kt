@@ -1,5 +1,6 @@
 package org.ton.adnl.connection
 
+import io.ktor.util.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.errors.*
@@ -12,7 +13,8 @@ import org.ton.adnl.network.TcpClient
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.crypto.AesCtr
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.sha256
+import org.ton.crypto.digest.Digest
+import org.ton.crypto.digest.sha256
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -175,7 +177,10 @@ public class AdnlConnection(
         require(dataSize in 32..(1 shl 24)) { "Invalid packet size: $dataSize" }
         val nonce = SecureRandom.nextBytes(32)
         val payload = packet.readBytes()
-        val hash = sha256(nonce, payload)
+        val hash = Digest.sha256().apply {
+            update(nonce)
+            update(payload)
+        }.build()
         val data = buildPacket {
             writeIntLittleEndian(dataSize)
             writeFully(nonce)

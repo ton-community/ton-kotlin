@@ -5,8 +5,8 @@ import org.ton.cell.Cell.Companion.DEPTH_BYTES
 import org.ton.cell.Cell.Companion.HASH_BYTES
 import org.ton.cell.Cell.Companion.getBitsDescriptor
 import org.ton.cell.Cell.Companion.getRefsDescriptor
+import org.ton.crypto.digest.sha256
 import org.ton.crypto.encodeHex
-import org.ton.crypto.sha256
 import kotlin.jvm.JvmStatic
 import kotlin.math.max
 

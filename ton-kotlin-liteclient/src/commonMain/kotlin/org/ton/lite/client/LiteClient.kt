@@ -22,7 +22,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
 import org.ton.crypto.crc16
-import org.ton.crypto.sha256
+import org.ton.crypto.digest.sha256
 import org.ton.lite.api.LiteApiClient
 import org.ton.lite.api.exception.LiteServerNotReadyException
 import org.ton.lite.api.exception.LiteServerUnknownException

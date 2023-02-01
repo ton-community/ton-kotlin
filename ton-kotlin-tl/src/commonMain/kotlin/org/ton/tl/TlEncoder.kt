@@ -1,7 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.crypto.sha256
+import org.ton.crypto.digest.sha256
 
 public interface TlEncoder<in T> {
     public fun encode(output: Output, value: T): Unit = encode(TlWriter(output), value)

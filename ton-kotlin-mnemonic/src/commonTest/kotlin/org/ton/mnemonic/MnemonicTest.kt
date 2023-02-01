@@ -25,7 +25,7 @@ class MnemonicTest {
     }
 
     @Test
-    fun `mnemonic validation`() = runBlocking {
+    fun `mnemonic validation`() = runBlocking{
         assertTrue(Mnemonic.isValid(arrayOf("kangaroo", "hen", "toddler", "resist")))
         assertTrue(Mnemonic.isValid(arrayOf("disease", "adult", "device", "grit")))
         assertFalse(Mnemonic.isValid(arrayOf("disease", "adult", "device", "grit"), "password"))

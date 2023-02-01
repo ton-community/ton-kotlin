@@ -1,5 +1,7 @@
 package org.ton.crypto
 
+import org.ton.crypto.digest.sha256
+
 public expect class AesCtr(key: ByteArray, iv: ByteArray) {
     public fun update(input: ByteArray, output: ByteArray = ByteArray(input.size)): ByteArray
     public fun doFinal(output: ByteArray): ByteArray
