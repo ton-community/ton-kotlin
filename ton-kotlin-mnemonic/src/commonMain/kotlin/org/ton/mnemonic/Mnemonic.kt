@@ -31,13 +31,13 @@ public interface Mnemonic {
 
         public const val DEFAULT_WORD_COUNT: Int = 24
 
-        public fun mnemonicWords(): List<String> = MNEMONIC_WORD_LIST.toList()
+        public fun mnemonicWords(): Array<String> = MNEMONIC_WORD_LIST
 
         @JvmStatic
         public suspend fun generate(
             password: String = "",
             wordCount: Int = DEFAULT_WORD_COUNT,
-            wordlist: Array<String> = MNEMONIC_WORD_LIST,
+            wordlist: Array<String> = mnemonicWords(),
             random: Random = SecureRandom
         ): Array<String> {
             while (true) {
@@ -66,7 +66,7 @@ public interface Mnemonic {
         public suspend fun isValid(
             mnemonic: Array<String>,
             password: String = "",
-            wordlist: Array<String> = MNEMONIC_WORD_LIST
+            wordlist: Array<String> = mnemonicWords()
         ): Boolean {
             if (!mnemonic.all { wordlist.contains(it) }) {
                 return false
