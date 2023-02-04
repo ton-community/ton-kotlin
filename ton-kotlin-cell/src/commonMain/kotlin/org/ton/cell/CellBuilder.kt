@@ -159,8 +159,8 @@ public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): Cell
     storeRef(cell)
 }
 
-public fun CellBuilder(cell: Cell): CellBuilder =
-    CellBuilder.of(cell)
+public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
+public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
 private class CellBuilderImpl(
     override var bits: MutableBitString = ByteBackedMutableBitString.of(),

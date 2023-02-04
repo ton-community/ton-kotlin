@@ -17,7 +17,7 @@ val isCI = System.getenv("CI") == "true"
 
 allprojects {
     group = "org.ton"
-    version = "0.2.11"
+    version = "0.2.12"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
