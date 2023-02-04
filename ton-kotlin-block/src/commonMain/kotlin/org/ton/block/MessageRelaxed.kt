@@ -5,40 +5,29 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
+import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbCodec
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
 @Serializable
-data class MessageRelaxed<X>(
+public data class MessageRelaxed<X>(
     val info: CommonMsgInfoRelaxed,
-    val init: Maybe<Either<StateInit, StateInit>>,
-    val body: Either<X, X>
-) {
-    constructor(
-        info: CommonMsgInfoRelaxed,
-        init: StateInit? = null,
-        body: X? = null,
-        storeInitInRef: Boolean = true,
-        storeBodyInRef: Boolean = true
-    ) : this(
-        info = info,
-        init = Maybe.of(
-            if (init != null) {
-                if (storeInitInRef) Either.of(null, init)
-                else Either.of(init, null)
-            } else null
-        ),
-        body = if (storeBodyInRef) Either.of(null, body)
-        else Either.of(body, null)
-    )
+    val init: Maybe<Either<StateInit, CellRef<StateInit>>>,
+    val body: Either<X, CellRef<X>>
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("message") {
+            field("info", info)
+            field("init", init)
+            field("body", body)
+        }
+    }
 
-    companion object {
+    override fun toString(): String = print().toString()
+
+    public companion object {
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        public fun <X : Any> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<MessageRelaxed<X>> = MessageRelaxedTlbConstructor(x)
     }
@@ -53,11 +42,11 @@ private class MessageRelaxedTlbConstructor<X : Any>(
 ) {
     companion object {
         private val referencedStateInitCodec = Cell.tlbCodec(StateInit)
-        private val eitherStateInitCodec = Either.tlbCodec(StateInit, referencedStateInitCodec)
+        private val eitherStateInitCodec = Either.tlbCodec(StateInit, CellRef(referencedStateInitCodec))
         private val maybeEitherCodec = Maybe.tlbCodec(eitherStateInitCodec)
     }
 
-    private val eitherXCodec = Either.tlbCodec(x, Cell.tlbCodec(x))
+    private val eitherXCodec = Either.tlbCodec(x, CellRef(x))
 
     override fun storeTlb(
         cellBuilder: CellBuilder, value: MessageRelaxed<X>

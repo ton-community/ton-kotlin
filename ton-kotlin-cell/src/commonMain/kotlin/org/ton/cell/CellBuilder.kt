@@ -87,9 +87,16 @@ public interface CellBuilder {
         @JvmStatic
         public fun beginCell(): CellBuilder = CellBuilderImpl()
 
+        @OptIn(ExperimentalContracts::class)
         @JvmStatic
-        public fun createCell(builder: CellBuilder.() -> Unit): Cell =
-            CellBuilderImpl().apply(builder).endCell()
+        public fun createCell(builder: CellBuilder.() -> Unit): Cell {
+            contract {
+                callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+            }
+            val cellBuilder = CellBuilderImpl()
+            builder(cellBuilder)
+            return cellBuilder.endCell()
+        }
 
         @JvmStatic
         public fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
@@ -139,6 +146,12 @@ public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
 }
 
+@OptIn(ExperimentalContracts::class)
+public inline fun buildCell(builderAction: CellBuilder.() -> Unit): Cell {
+    contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+    return CellBuilder.beginCell().apply(builderAction).endCell()
+}
+
 public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
     val cellBuilder = CellBuilder.beginCell()
     cellBuilder.apply(refBuilder)
@@ -148,14 +161,6 @@ public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): Cell
 
 public fun CellBuilder(cell: Cell): CellBuilder =
     CellBuilder.of(cell)
-
-@OptIn(ExperimentalContracts::class)
-public fun CellBuilder(builder: CellBuilder.() -> Unit = {}): CellBuilder {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-    return CellBuilderImpl().apply(builder)
-}
 
 private class CellBuilderImpl(
     override var bits: MutableBitString = ByteBackedMutableBitString.of(),

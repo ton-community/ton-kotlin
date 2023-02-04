@@ -1,153 +1,69 @@
 package org.ton.contract.wallet
 
-import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.bitstring.toBitString
+import org.ton.api.pub.PublicKeyEd25519
+import org.ton.bitstring.Bits256
 import org.ton.block.*
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
-import org.ton.cell.exception.CellOverflowException
-import org.ton.cell.storeRef
-import org.ton.contract.Contract
-import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
-import org.ton.lite.client.LiteClient
-import org.ton.logger.Logger
-import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeTlb
+import org.ton.contract.SmartContract
+import org.ton.lite.api.LiteApi
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.jvm.JvmField
 
-abstract class WalletContract(
-    override val liteClient: LiteClient,
-    val privateKey: PrivateKeyEd25519,
-    override val workchainId: Int = 0
-) : Contract {
-    val logger: Logger by lazy {
-        Logger.println(name, Logger.Level.DEBUG)
+public interface WalletContract : SmartContract {
+
+    public suspend fun getSeqno(liteApi: LiteApi): Int {
+        val stack = runGetMethod(liteApi, "seqno").stack ?: throw IllegalStateException("seqno get method failed")
+        return stack.toMutableVmStack().popInt().toInt()
     }
 
-    override suspend fun deploy(): LiteServerSendMsgStatus {
-        val initMessage = createExternalInitMessage()
-        logger.info { "Deploy: $initMessage" }
-        return liteClient.sendMessage(initMessage)
+    public suspend fun getPublicKey(liteApi: LiteApi): PublicKeyEd25519 {
+        val stack = runGetMethod(liteApi, "get_public_key").stack
+            ?: throw IllegalStateException("get_public_key get method failed")
+        val int = stack.toMutableVmStack().popInt()
+        val key = CellBuilder.createCell {
+            storeUInt(int, 256)
+        }.bits
+
+        return PublicKeyEd25519(Bits256(key))
     }
 
-    suspend fun transfer(
-        dest: MsgAddressInt,
-        bounce: Boolean,
-        coins: Coins,
-        seqno: Int,
-        comment: String?
-    ): LiteServerSendMsgStatus = transfer(dest, bounce, coins, seqno, createCommentPayload(comment))
-
-    suspend fun transfer(
-        dest: MsgAddressInt,
-        bounce: Boolean,
-        coins: Coins,
-        seqno: Int,
-        payload: Cell,
-        destinationStateInit: StateInit? = null,
-    ): LiteServerSendMsgStatus {
-        val transferMessage =
-            createTransferMessage(dest, bounce, coins, seqno, payload, destinationStateInit = destinationStateInit)
-        logger.info { "Transfer: $transferMessage" }
-        return liteClient.sendMessage(transferMessage)
+    public companion object {
+        @JvmField
+        public val DEFAULT_WALLET_ID: Int = 698983191
     }
+}
 
-    override fun createDataInit(): Cell = CellBuilder.createCell {
-        storeUInt(0, 32) // seqno
-        storeBits(privateKey.publicKey().key.toBitString())
-    }
+public data class WalletTransfer internal constructor(
+    val destination: MsgAddressInt,
+    val bounceable: Boolean,
+    val coins: CurrencyCollection,
+    val sendMode: Int,
+    val body: Cell?,
+    val stateInit: StateInit?
+)
 
-    open fun createSigningMessage(seqno: Int, builder: CellBuilder.() -> Unit = {}): Cell = CellBuilder.createCell {
-        storeUInt(seqno, 32)
-        apply(builder)
-    }
-
-    override fun createExternalInitMessage(): Message<Cell> {
-        val stateInit = createStateInit()
-        val dest = address(stateInit)
-        val signingMessage = createSigningMessage(0)
-        val signature = privateKey.sign(signingMessage.hash())
-        val body = CellBuilder.createCell {
-            storeBytes(signature)
-            storeBits(signingMessage.bits)
-            storeRefs(signingMessage.refs)
+public class WalletTransferBuilder {
+    public lateinit var destination: MsgAddressInt
+    public var bounceable: Boolean = true
+    public var currencyCollection: CurrencyCollection = CurrencyCollection(Coins(), ExtraCurrencyCollection())
+    public var coins: Coins
+        get() = currencyCollection.coins
+        set(value) {
+            currencyCollection = currencyCollection.copy(coins = value)
         }
-        val info = ExtInMsgInfo(dest)
-        return Message(
-            info,
-            stateInit to null,
-            body to null
-        )
-    }
+    public var sendMode: Int = 3
+    public var body: Cell? = null
+    public var stateInit: StateInit? = null
 
-    fun createTransferMessage(
-        dest: MsgAddressInt,
-        bounce: Boolean,
-        amount: Coins,
-        seqno: Int,
-        payload: Cell,
-        sendMode: Int = 3,
-        destinationStateInit: StateInit? = null,
-    ): Message<Cell> {
-        val stateInit = createStateInit()
-        val address = address(stateInit)
-        val info = ExtInMsgInfo(address)
-        val signingMessage = createSigningMessage(seqno) {
-            storeUInt(sendMode, 8)
-            storeRef {
-                val messageRelaxed = MessageRelaxed(
-                    info = CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
-                        ihr_disabled = true,
-                        bounce = bounce,
-                        bounced = false,
-                        src = AddrNone,
-                        dest = dest,
-                        value = CurrencyCollection(
-                            coins = amount,
-                            other = ExtraCurrencyCollection()
-                        )
-                    ),
-                    init = destinationStateInit,
-                    body = payload,
-                    storeBodyInRef = false
-                )
-                try {
-                    storeTlb(MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed)
-                } catch (e: CellOverflowException) {
-                    storeTlb(
-                        MessageRelaxed.tlbCodec(AnyTlbConstructor), messageRelaxed.copy(
-                            body = Either.of(null, payload)
-                        )
-                    )
-                }
-            }
-        }
-        val signature = privateKey.sign(signingMessage.hash())
-        val body = CellBuilder.createCell {
-            storeBytes(signature)
-            storeBits(signingMessage.bits)
-            storeRefs(signingMessage.refs)
-        }
-        return Message(
-            info = info,
-            init = null,
-            body = body,
-            storeInitInRef = false,
-            storeBodyInRef = false
-        )
-    }
+    public fun build(): WalletTransfer =
+        WalletTransfer(destination, bounceable, currencyCollection, sendMode, body, stateInit)
+}
 
-    fun createCommentPayload(comment: String? = null): Cell {
-        return if (comment == null) {
-            Cell.of()
-        } else {
-            val commentBytes = comment.encodeToByteArray()
-            require(commentBytes.size <= 123) { TODO("Commentaries with more than 123 bytes not supported yet. Provided: ${commentBytes.size}") }
-            CellBuilder.createCell {
-                storeUInt(0, 32)
-                storeBytes(commentBytes)
-            }
-        }
-    }
-
-    override fun toString(): String = name
+@OptIn(ExperimentalContracts::class)
+public inline fun WalletTransfer(builderAction: WalletTransferBuilder.() -> Unit): WalletTransfer {
+    contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+    return WalletTransferBuilder().apply(builderAction).build()
 }

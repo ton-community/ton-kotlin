@@ -15,26 +15,6 @@ public data class Message<X>(
     val init: Maybe<Either<StateInit, CellRef<StateInit>>>,
     val body: Either<X, CellRef<X>>
 ) : TlbObject {
-    constructor(
-        info: CommonMsgInfo,
-        init: Pair<StateInit?, CellRef<StateInit>?>?,
-        body: Pair<X?, CellRef<X>?>
-    ) : this(info, init?.toEither().toMaybe(), body.toEither())
-
-    constructor(
-        info: CommonMsgInfo,
-        init: StateInit?,
-        body: X,
-        storeInitInRef: Boolean = true,
-        storeBodyInRef: Boolean = true
-    ) : this(
-        info = info,
-        init = init?.let {
-            if (storeInitInRef) null to CellRef(init) else init to null
-        },
-        body = if (storeBodyInRef) null to CellRef(body!!) else body!! to null
-    )
-
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer.type("message") {
             field("info", info)
