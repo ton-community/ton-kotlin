@@ -11,7 +11,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.12")
+    implementation("org.ton:ton-kotlin:0.2.13")
 }
 ```
 
