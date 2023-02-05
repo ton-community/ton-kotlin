@@ -5,19 +5,27 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("trans_merge_prepare")
-data class TransMergePrepare(
-    val split_info: SplitMergeInfo,
-    val storage_ph: TrStoragePhase,
+public data class TransMergePrepare(
+    @SerialName("split_info") val splitInfo: SplitMergeInfo,
+    @SerialName("storage_ph") val storagePh: TrStoragePhase,
     val aborted: Boolean
 ) : TransactionDescr {
-    companion object : TlbConstructorProvider<TransMergePrepare> by TransMergePrepareTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("trans_merge_prepare") {
+            field("split_info", splitInfo)
+            field("storage_ph", storagePh)
+            field("aborted", aborted)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TransMergePrepare> by TransMergePrepareTlbConstructor
 }
 
 private object TransMergePrepareTlbConstructor : TlbConstructor<TransMergePrepare>(
@@ -29,8 +37,8 @@ private object TransMergePrepareTlbConstructor : TlbConstructor<TransMergePrepar
         cellBuilder: CellBuilder,
         value: TransMergePrepare
     ) = cellBuilder {
-        storeTlb(SplitMergeInfo, value.split_info)
-        storeTlb(TrStoragePhase, value.storage_ph)
+        storeTlb(SplitMergeInfo, value.splitInfo)
+        storeTlb(TrStoragePhase, value.storagePh)
         storeBit(value.aborted)
     }
 

@@ -12,16 +12,33 @@ import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed interface HashMapE<out T> : Iterable<Pair<BitString, T>> {
+public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
 
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
     public fun nodes(): Sequence<Pair<BitString, T>>
     public fun toMap(): Map<BitString, T> = nodes().toMap()
 
+    public fun set(key: BitString, value: T): HmeRoot<T>
+
     public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        public fun <T> of(): HashMapE<T> = EmptyHashMapE()
+        public fun <T> of(): HashMapE<T> = HmeEmpty()
+
+        @JvmStatic
+        public fun <T> empty(): HashMapE<T> = HmeEmpty()
+
+        @JvmStatic
+        public fun <T> root(root: CellRef<HmEdge<T>>): HashMapE<T> = HmeRoot(root)
+
+        public fun <T> fromMap(map: Map<BitString, T>?): HashMapE<T> {
+            var hashMap = empty<T>()
+            if (map == null) return hashMap
+            map.forEach { (key, value) ->
+                hashMap = hashMap.set(key, value)
+            }
+            return hashMap
+        }
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
@@ -36,20 +53,20 @@ private class HashMapETlbCombinator<X>(
     x: TlbCodec<X>
 ) : TlbCombinator<HashMapE<*>>(
     HashMapE::class,
-    EmptyHashMapE::class to EmptyHashMapETlbConstructor,
-    RootHashMapE::class to RootHashMapE.tlbConstructor(n, x),
+    HmeEmpty::class to EmptyHashMapETlbConstructor,
+    HmeRoot::class to HmeRoot.tlbConstructor(n, x),
 ) {
-    private object EmptyHashMapETlbConstructor : TlbConstructor<EmptyHashMapE<*>>(
+    private object EmptyHashMapETlbConstructor : TlbConstructor<HmeEmpty<*>>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;",
         id = BitString(false)
     ) {
         override fun storeTlb(
             cellBuilder: CellBuilder,
-            value: EmptyHashMapE<*>
+            value: HmeEmpty<*>
         ) = Unit
 
         override fun loadTlb(
             cellSlice: CellSlice
-        ): EmptyHashMapE<*> = EmptyHashMapE<Nothing>()
+        ): HmeEmpty<*> = HmeEmpty<Nothing>()
     }
 }

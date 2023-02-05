@@ -9,8 +9,8 @@ import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-sealed interface SnakeData {
-    companion object : TlbCombinatorProvider<SnakeData> by SnakeDataTlbCombinator
+public sealed interface SnakeData {
+    public companion object : TlbCombinatorProvider<SnakeData> by SnakeDataTlbCombinator
 
     private object SnakeDataTlbCombinator : TlbCombinator<SnakeData>(
         SnakeData::class,
@@ -27,10 +27,10 @@ sealed interface SnakeData {
     }
 }
 
-data class SnakeDataTail(
+public data class SnakeDataTail(
     val bits: BitString
 ) : SnakeData {
-    companion object : TlbConstructorProvider<SnakeDataTail> by SnakeDataTailTlbConstructor
+    public companion object : TlbConstructorProvider<SnakeDataTail> by SnakeDataTailTlbConstructor
 
     private object SnakeDataTailTlbConstructor : TlbConstructor<SnakeDataTail>(
         schema = "tail#_ {bn:#} b:(bits bn) = SnakeData 0;"

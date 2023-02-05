@@ -2,48 +2,69 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.cell.*
 import org.ton.tlb.*
 
 @SerialName("block_info")
 @Serializable
-data class BlockInfo(
-    val version: UInt,
-    val not_master: Boolean,
-    val after_merge: Boolean,
-    val before_split: Boolean,
-    val after_split: Boolean,
-    val want_split: Boolean,
-    val want_merge: Boolean,
-    val key_block: Boolean,
-    val vert_seqno_incr: Boolean,
-    val flags: BitString,
-    val seq_no: UInt,
-    val vert_seq_no: UInt,
-    val shard: ShardIdent,
-    val gen_utime: UInt,
-    val start_lt: ULong,
-    val end_lt: ULong,
-    val gen_validator_list_hash_short: UInt,
-    val gen_catchain_seqno: UInt,
-    val min_ref_mc_seqno: UInt,
-    val prev_key_block_seqno: UInt,
-    val gen_software: GlobalVersion?,
-    val master_ref: BlkMasterInfo?,
-    val prev_ref: BlkPrevInfo,
-    val prev_vert_ref: BlkPrevInfo?
-) {
-    val prev_seq_no: UInt get() = seq_no - 1u
-
-    init {
-        require(flags.size == 8) { "expected: flags.size == 8, actual: ${flags.size}" }
-        require(flags.subList(1, flags.lastIndex).all { !it }) { "expected: flags <= 1, actual: $flags" }
-        require(vert_seq_no >= 0u) { "expected: vert_seq_no >= vert_seqno_incr, actual: $vert_seq_no" }
+public data class BlockInfo(
+    val version: UInt, // version : uint32
+    @SerialName("not_master") val notMaster: Boolean, // not_master : ## 1
+    @SerialName("after_merge") val afterMerge: Boolean, // after_merge : ## 1
+    @SerialName("before_split") val beforeSplit: Boolean, // before_split : ## 1
+    @SerialName("after_split") val afterSplit: Boolean, // after_split : ## 1
+    @SerialName("want_split") val wantSplit: Boolean, // want_split : Bool
+    @SerialName("want_merge") val wantMerge: Boolean, // want_merge : Bool
+    @SerialName("key_block") val keyBlock: Boolean, // key_block : Bool
+    @SerialName("ver_seqno_inc") val vertSeqnoIncr: Boolean, // vert_seqno_incr : ## 1
+    val flags: Int, // flags : ## 8
+    @SerialName("seq_no") val seqNo: Int, // seq_no : #
+    @SerialName("vert_seq_no") val vertSeqNo: Int, // vert_seq_no : #
+    val shard: ShardIdent, // shard : ShardIdent
+    @SerialName("gen_utime") val genUtime: UInt, // gen_utime : uint32
+    @SerialName("start_lt") val startLt: ULong, // start_lt : uint64
+    @SerialName("end_lt") val endLt: ULong, // end_lt : uint64
+    @SerialName("gen_validator_list_hash_short") val genValidatorListHashShort: UInt, // gen_validator_list_hash_short : uint32
+    @SerialName("gen_catchain_seqno") val genCatchainSeqno: UInt, // gen_catchain_seqno : uint32
+    @SerialName("min_ref_mc_seqno") val minRefMcSeqno: UInt, // min_ref_mc_seqno : uint32
+    @SerialName("prevKeyBlockSeqno") val prevKeyBlockSeqno: UInt, // prev_key_block_seqno : uint32
+    @SerialName("gen_software") val genSoftware: GlobalVersion?, // gen_software : flags.0?GlobalVersion
+    @SerialName("master_ref") val masterRef: CellRef<BlkMasterInfo>?, // master_ref : not_master?^BlkMasterInfo
+    @SerialName("prev_ref") val prevRef: CellRef<BlkPrevInfo>, // prev_ref : ^(BlkPrevInfo after_merge)
+    @SerialName("prev_vert_ref") val prevVertRef: CellRef<BlkPrevInfo>? // prev_vert_ref : after_merge?^(BlkPrevInfo 0)
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("block_info") {
+            field("version", version)
+            field("not_master", notMaster)
+            field("after_merge", afterMerge)
+            field("before_split", beforeSplit)
+            field("after_split", afterSplit)
+            field("want_split", wantSplit)
+            field("want_merge", wantMerge)
+            field("key_block", keyBlock)
+            field("ver_seqno_inc", vertSeqnoIncr)
+            field("flags", flags)
+            field("seq_no", seqNo)
+            field("vert_seq_no", vertSeqNo)
+            field("shard", shard)
+            field("gen_utime", genUtime)
+            field("start_lt", startLt)
+            field("end_lt", endLt)
+            field("gen_validator_list_hash_short", genValidatorListHashShort)
+            field("gen_catchain_seqno", genCatchainSeqno)
+            field("min_ref_mc_seqno", minRefMcSeqno)
+            field("prevKeyBlockSeqno", prevKeyBlockSeqno)
+            field("gen_software", genSoftware)
+            field("master_ref", masterRef)
+            field("prev_ref", prevRef)
+            field("prev_vert_ref", prevVertRef)
+        }
     }
 
-    companion object : TlbCodec<BlockInfo> by BlockInfoTlbConstructor.asTlbCombinator()
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<BlockInfo> by BlockInfoTlbConstructor.asTlbCombinator()
 }
 
 private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
@@ -68,45 +89,42 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         "prev_vert_ref:vert_seqno_incr?^(BlkPrevInfo 0) " +
         "= BlockInfo;"
 ) {
+    private val blkMasterInfo = CellRef.tlbCodec(BlkMasterInfo)
+    private val blkPrevInfoVert = CellRef.tlbCodec(BlkPrevInfo.tlbCodec(0))
+
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: BlockInfo
     ) = cellBuilder {
         storeUInt32(value.version)
-        storeBit(value.not_master)
-        storeBit(value.after_merge)
-        storeBit(value.before_split)
-        storeBit(value.after_split)
-        storeBit(value.want_split)
-        storeBit(value.want_merge)
-        storeBit(value.key_block)
-        storeBit(value.vert_seqno_incr)
-        storeBits(value.flags.asReversed())
-        storeUInt32(value.seq_no)
-        storeUInt32(value.vert_seq_no)
+        storeBit(value.notMaster)
+        storeBit(value.afterMerge)
+        storeBit(value.beforeSplit)
+        storeBit(value.afterSplit)
+        storeBit(value.wantSplit)
+        storeBit(value.wantMerge)
+        storeBit(value.keyBlock)
+        storeBit(value.vertSeqnoIncr)
+        storeInt(value.flags, 8)
+        storeInt(value.seqNo, 32)
+        storeInt(value.vertSeqNo, 32)
         storeTlb(ShardIdent, value.shard)
-        storeUInt32(value.gen_utime)
-        storeUInt64(value.start_lt)
-        storeUInt64(value.end_lt)
-        storeUInt32(value.gen_validator_list_hash_short)
-        storeUInt32(value.gen_catchain_seqno)
-        storeUInt32(value.min_ref_mc_seqno)
-        storeUInt32(value.prev_key_block_seqno)
-        if (value.flags[0] && value.gen_software != null) {
-            storeTlb(GlobalVersion, value.gen_software)
+        storeUInt32(value.genUtime)
+        storeUInt64(value.startLt)
+        storeUInt64(value.endLt)
+        storeUInt32(value.genValidatorListHashShort)
+        storeUInt32(value.genCatchainSeqno)
+        storeUInt32(value.minRefMcSeqno)
+        storeUInt32(value.prevKeyBlockSeqno)
+        if (value.flags and 1 != 0 && value.genSoftware != null) {
+            storeTlb(GlobalVersion, value.genSoftware)
         }
-        if (value.not_master && value.master_ref != null) {
-            storeRef {
-                storeTlb(BlkMasterInfo, value.master_ref)
-            }
+        if (value.notMaster && value.masterRef != null) {
+            storeTlb(blkMasterInfo, value.masterRef)
         }
-        storeRef {
-            storeTlb(BlkPrevInfo.tlbCodec(value.after_merge), value.prev_ref)
-        }
-        if (value.vert_seqno_incr && value.prev_vert_ref != null) {
-            storeRef {
-                storeTlb(BlkPrevInfo.tlbCodec(0), value.prev_vert_ref)
-            }
+        storeTlb(CellRef.tlbCodec(BlkPrevInfo.tlbCodec(value.afterMerge)), value.prevRef)
+        if (value.vertSeqnoIncr && value.prevVertRef != null) {
+            storeTlb(blkPrevInfoVert, value.prevVertRef)
         }
     }
 
@@ -122,9 +140,9 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val wantMerge = loadBit()
         val keyBlock = loadBit()
         val verSeqnoIncr = loadBit()
-        val flags = loadBits(8).asReversed().toBitString()
-        val seqNo = loadUInt32()
-        val vertSeqNo = loadUInt32()
+        val flags = loadInt(8).toInt()
+        val seqNo = loadUInt32().toInt()
+        val vertSeqNo = loadUInt32().toInt()
         val shard = loadTlb(ShardIdent)
         val genUtime = loadUInt32()
         val startLt = loadUInt64()
@@ -133,16 +151,10 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val genCatchainSeqno = loadUInt32()
         val minRefMcSeqno = loadUInt32()
         val prevKeyBlockSeqno = loadUInt32()
-        val genSoftware = if (flags[0]) {
-            loadTlb(GlobalVersion)
-        } else null
-        val masterRef = if (notMaster) {
-            loadRef { loadTlb(BlkMasterInfo) }
-        } else null
-        val prevRef = loadRef { loadTlb(BlkPrevInfo.tlbCodec(afterMerge)) }
-        val prevVertRef = if (verSeqnoIncr) {
-            loadRef { loadTlb(BlkPrevInfo.tlbCodec(0)) }
-        } else null
+        val genSoftware = if (flags and 1 != 0) loadTlb(GlobalVersion) else null
+        val masterRef = if (notMaster) loadTlb(blkMasterInfo) else null
+        val prevRef = loadTlb(CellRef.tlbCodec(BlkPrevInfo.tlbCodec(afterMerge)))
+        val prevVertRef = if (verSeqnoIncr) loadTlb(blkPrevInfoVert) else null
         BlockInfo(
             version,
             notMaster,

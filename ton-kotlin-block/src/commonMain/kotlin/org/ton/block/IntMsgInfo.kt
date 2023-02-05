@@ -6,50 +6,52 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("int_msg_info")
 @Serializable
-data class IntMsgInfo(
-    val ihr_disabled: Boolean,
+public data class IntMsgInfo(
+    @SerialName("ihr_disabled") val ihrDisabled: Boolean,
     val bounce: Boolean,
     val bounced: Boolean,
     val src: MsgAddressInt,
     val dest: MsgAddressInt,
     val value: CurrencyCollection,
-    val ihr_fee: Coins = Coins(),
-    val fwd_fee: Coins = Coins(),
-    val created_lt: Long = 0,
-    val created_at: Int = 0
+    @SerialName("ihr_fee") val ihr_fee: Coins,
+    @SerialName("fwd_fee") val fwd_fee: Coins,
+    @SerialName("created_lt") val created_lt: Long,
+    @SerialName("created_at") val created_at: Int
 ) : CommonMsgInfo {
-    companion object {
-        fun tlbCodec(): TlbConstructor<IntMsgInfo> = IntMsgInfoTlbConstructor()
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("int_msg_info") {
+            field("ihr_disabled", ihrDisabled)
+            field("bounce", bounce)
+            field("bounced", bounced)
+            field("src", src)
+            field("dest", dest)
+            field("value", value)
+            field("ihr_fee", ihr_fee)
+            field("fwd_fee", fwd_fee)
+            field("created_lt", created_lt)
+            field("created_at", created_at)
+        }
     }
 
-    override fun toString(): String = buildString {
-        append("(int_msg_info\n")
-        append("ihr_disabled:$ihr_disabled ")
-        append("bounce:$bounce ")
-        append("bounced:$bounced ")
-        append("src:$src ")
-        append("dest:$dest ")
-        append("value:$value ")
-        append("ihr_fee:$ihr_fee ")
-        append("fwd_fee:$fwd_fee ")
-        append("created_lt:$created_lt ")
-        append("created_at:$created_at")
-        append(")")
-    }
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<IntMsgInfo> by IntMsgInfoTlbConstructor
 }
 
-private class IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
+private object IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
     schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool src:MsgAddressInt dest:MsgAddressInt value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins created_lt:uint64 created_at:uint32 = CommonMsgInfo;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder, value: IntMsgInfo
     ) = cellBuilder {
-        storeBit(value.ihr_disabled)
+        storeBit(value.ihrDisabled)
         storeBit(value.bounce)
         storeBit(value.bounced)
         storeTlb(MsgAddressInt, value.src)

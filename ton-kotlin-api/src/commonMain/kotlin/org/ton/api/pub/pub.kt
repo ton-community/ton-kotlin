@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
+import org.ton.bitstring.Bits256
 import org.ton.crypto.*
 import org.ton.tl.*
 

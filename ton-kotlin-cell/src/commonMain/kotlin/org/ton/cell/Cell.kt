@@ -45,36 +45,23 @@ public interface Cell {
         }
     }
 
-    public fun loadCell(): Cell =
-        when (type) {
-            CellType.ORDINARY -> this
-            CellType.PRUNED_BRANCH -> error("Can't load pruned branch cell")
-            CellType.LIBRARY_REFERENCE -> TODO()
-            CellType.MERKLE_PROOF -> refs[0]
-            CellType.MERKLE_UPDATE -> refs[1]
-        }
-
     public fun beginParse(): CellSlice = CellSlice.beginParse(this)
 
     public fun <T> parse(block: CellSlice.() -> T): T {
         val slice = beginParse()
         val result = block(slice)
-        slice.endParse()
+//        slice.endParse()
         return result
     }
-
-    public fun toPrunedBranch(newLevel: Int, virtualizationLevel: Int = MAX_LEVEL): Cell =
-        CellBuilder.createPrunedBranch(this, newLevel, virtualizationLevel)
-
-    public fun toMerkleProof(): Cell =
-        CellBuilder.createMerkleProof(this)
-
-    public fun toMerkleUpdate(toProof: Cell): Cell =
-        CellBuilder.createMerkleUpdate(this, toProof)
 
     public fun descriptors(): ByteArray = byteArrayOf(getRefsDescriptor(), getBitsDescriptor())
     public fun getBitsDescriptor(): Byte = Companion.getBitsDescriptor(bits)
     public fun getRefsDescriptor(): Byte = Companion.getRefsDescriptor(refs.size, isExotic, levelMask)
+
+    /**
+     * Creates a virtualized cell
+     */
+    public fun virtualize(offset: Int = 1): Cell
 
     override fun toString(): String
 
@@ -85,6 +72,7 @@ public interface Cell {
         public const val DEPTH_BITS: Int = DEPTH_BYTES * Byte.SIZE_BITS
         public const val MAX_LEVEL: Int = 3
         public const val MAX_DEPTH: Int = 1024
+        public const val MAX_BITS_SIZE: Int = 1023
 
         @JvmStatic
         public fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =

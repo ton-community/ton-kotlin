@@ -13,40 +13,50 @@ import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
+public inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface Maybe<X> {
-    val value: X?
+public sealed interface Maybe<X> : TlbObject {
+    public val value: X?
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
+        public fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x) as TlbCodec<Maybe<X>>
+        public fun <X> tlbCodec(x: TlbCodec<X>): TlbCodec<Maybe<X>> = MaybeTlbCombinator(x) as TlbCodec<Maybe<X>>
+
+        public inline operator fun <X> invoke(x: TlbCodec<X>): TlbCodec<Maybe<X>> = tlbCodec(x)
     }
 }
 
-operator fun <X> Maybe.Companion.invoke(x: TlbCodec<X>): TlbCodec<Maybe<X>> = tlbCodec(x)
-
 @SerialName("nothing")
 @Serializable
-class Nothing<X> : Maybe<X> {
+public class Nothing<X> : Maybe<X> {
     override val value: X? = null
     override fun hashCode(): Int = 0
     override fun equals(other: Any?): Boolean = other is Nothing<*>
-    override fun toString(): String = "nothing"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("nothing")
+    }
+
+    override fun toString(): String = print().toString()
 }
 
 @SerialName("just")
 @Serializable
-data class Just<X>(
+public data class Just<X>(
     override val value: X
 ) : Maybe<X> {
-    override fun toString(): String = "(just\nvalue:$value)"
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("just") {
+            field("value", value)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 }
 
 private class MaybeTlbCombinator(

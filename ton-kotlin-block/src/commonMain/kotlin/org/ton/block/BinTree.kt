@@ -6,14 +6,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface BinTree<X> : Iterable<X> {
+public sealed interface BinTree<X> : Iterable<X>, TlbObject {
 
     override fun iterator(): Iterator<X> = nodes().iterator()
-    fun nodes(): Sequence<X>
+    public fun nodes(): Sequence<X>
 
     companion object {
         @Suppress("UNCHECKED_CAST")

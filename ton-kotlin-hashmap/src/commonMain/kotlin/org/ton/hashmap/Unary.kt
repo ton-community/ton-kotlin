@@ -13,7 +13,7 @@ public inline fun Unary(depth: Int): Unary = Unary.of(depth)
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed class Unary {
+public sealed class Unary : TlbObject {
     public companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
         @JvmStatic
         public fun of(depth: Int): Unary {

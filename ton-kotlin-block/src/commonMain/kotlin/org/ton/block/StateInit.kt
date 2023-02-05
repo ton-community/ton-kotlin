@@ -20,7 +20,7 @@ public data class StateInit(
     val code: Maybe<CellRef<Cell>>,
     val data: Maybe<CellRef<Cell>>,
     val library: HashMapE<SimpleLib>
-) {
+) : TlbObject {
     public constructor(
         code: Cell? = null,
         data: Cell? = null,
@@ -35,7 +35,17 @@ public data class StateInit(
         library
     )
 
-    override fun toString(): String = "split_depth:$splitDepth special:$special code:$code data:$data library:$library"
+    override fun toString(): String = print().toString()
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type {
+            field("split_depth", splitDepth)
+            field("special", special)
+            field("code", code)
+            field("data", data)
+            field("library", library)
+        }
+    }
 
     public companion object : TlbCodec<StateInit> by StateInitTlbConstructor {
         @JvmStatic

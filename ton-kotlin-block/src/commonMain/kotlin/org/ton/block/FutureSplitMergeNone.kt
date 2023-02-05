@@ -9,8 +9,10 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("fsm_none")
-object FutureSplitMergeNone : FutureSplitMerge,
-    TlbConstructorProvider<FutureSplitMergeNone> by FutureSplitMergeNoneTlbConstructor
+public object FutureSplitMergeNone : FutureSplitMerge,
+    TlbConstructorProvider<FutureSplitMergeNone> by FutureSplitMergeNoneTlbConstructor {
+    override fun toString(): String = "fsm_none"
+}
 
 private object FutureSplitMergeNoneTlbConstructor : TlbConstructor<FutureSplitMergeNone>(
     schema = "fsm_none\$0 = FutureSplitMerge;"

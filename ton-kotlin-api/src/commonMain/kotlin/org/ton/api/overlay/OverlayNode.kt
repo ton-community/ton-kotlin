@@ -13,7 +13,7 @@ import org.ton.tl.constructors.*
 @SerialName("overlay.node")
 public data class OverlayNode(
     val id: PublicKey,
-    val overlay: Bits256,
+    val overlay: ByteArray,
     val version: Int,
     override val signature: ByteArray = ByteArray(0)
 ) : SignedTlObject<OverlayNode> {
@@ -42,7 +42,7 @@ public data class OverlayNode(
         if (other !is OverlayNode) return false
 
         if (id != other.id) return false
-        if (overlay != other.overlay) return false
+        if (!overlay.contentEquals(other.overlay)) return false
         if (version != other.version) return false
         if (!signature.contentEquals(other.signature)) return false
 
@@ -62,14 +62,14 @@ public data class OverlayNode(
     ) {
         override fun encode(writer: TlWriter, value: OverlayNode) {
             writer.write(PublicKey, value.id)
-            writer.writeBits256(value.overlay)
+            writer.writeRaw(value.overlay)
             writer.writeInt(value.version)
             writer.writeBytes(value.signature)
         }
 
         override fun decode(reader: TlReader): OverlayNode {
             val id = reader.read(PublicKey)
-            val overlay = reader.readBits256()
+            val overlay = reader.readRaw(32)
             val version = reader.readInt()
             val signature = reader.readBytes()
             return OverlayNode(id, overlay, version, signature)

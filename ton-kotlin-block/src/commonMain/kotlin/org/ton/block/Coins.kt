@@ -6,19 +6,19 @@ import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
-import kotlin.math.pow
 
 @SerialName("nanocoins")
 @Serializable
-data class Coins(
+public data class Coins(
     val amount: VarUInteger = VarUInteger(0)
-) {
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("nanocoins") {
+        field("amount", amount)
+    }
+
     override fun toString() = toString(decimals = DECIMALS)
 
     fun toString(decimals: Int): String =
@@ -42,14 +42,14 @@ data class Coins(
 
         @JvmStatic
         fun of(coins: Long, decimals: Int = DECIMALS): Coins =
-            Coins(VarUInteger(BigInt(coins) * BigInt(10).pow(decimals)))
+            Coins(VarUInteger(coins.toBigInt() * 10.toBigInt().pow(decimals)))
 
         @JvmStatic
         fun of(coins: Double, decimals: Int = DECIMALS): Coins =
             Coins(
                 VarUInteger(
-                    BigInt(coins.toLong() * 10.0.pow(decimals)) +
-                        BigInt((coins - coins.toLong()) * 10.0.pow(decimals))
+                    (coins.toLong().toBigInt() * 10L.toBigInt().pow(decimals)) +
+                            ((coins - coins.toLong()).toLong().toBigInt() * 10.toBigInt().pow(decimals))
                 )
             )
 

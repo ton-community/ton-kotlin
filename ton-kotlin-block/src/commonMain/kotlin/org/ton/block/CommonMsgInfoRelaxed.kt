@@ -16,28 +16,28 @@ import org.ton.tlb.storeTlb
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface CommonMsgInfoRelaxed {
+public sealed interface CommonMsgInfoRelaxed {
     @SerialName("int_msg_info")
-    data class IntMsgInfoRelaxed(
-        val ihr_disabled: Boolean = true,
+    public data class IntMsgInfoRelaxed(
+        val ihrDisabled: Boolean = true,
         val bounce: Boolean,
         val bounced: Boolean = false,
         val src: MsgAddress = MsgAddressExt(),
         val dest: MsgAddressInt,
         val value: CurrencyCollection,
-        val ihr_fee: Coins = Coins(),
-        val fwd_fee: Coins = Coins(),
-        val created_lt: ULong = 0u,
-        val created_at: UInt = 0u
+        val ihrFee: Coins = Coins(),
+        val fwdFee: Coins = Coins(),
+        val createdLt: ULong = 0u,
+        val createdAt: UInt = 0u
     ) : CommonMsgInfoRelaxed {
-        constructor(dest: MsgAddressInt, bounce: Boolean, coins: Coins) : this(
+        public constructor(dest: MsgAddressInt, bounce: Boolean, coins: Coins) : this(
             dest = dest,
             bounce = bounce,
-            value = CurrencyCollection(coins)
+            value = CurrencyCollection(coins, ExtraCurrencyCollection())
         )
 
-        constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(
-            ihr_disabled = true,
+        public constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(
+            ihrDisabled = true,
             bounce = bounce,
             bounced = false,
             src = MsgAddressExt(),
@@ -72,16 +72,16 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
         override fun storeTlb(
             cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.IntMsgInfoRelaxed
         ) = cellBuilder {
-            storeBit(value.ihr_disabled)
+            storeBit(value.ihrDisabled)
             storeBit(value.bounce)
             storeBit(value.bounced)
             storeTlb(MsgAddress, value.src)
             storeTlb(MsgAddressInt, value.dest)
             storeTlb(CurrencyCollection, value.value)
-            storeTlb(Coins, value.ihr_fee)
-            storeTlb(Coins, value.fwd_fee)
-            storeUInt64(value.created_lt)
-            storeUInt32(value.created_at)
+            storeTlb(Coins, value.ihrFee)
+            storeTlb(Coins, value.fwdFee)
+            storeUInt64(value.createdLt)
+            storeUInt32(value.createdAt)
         }
 
         override fun loadTlb(

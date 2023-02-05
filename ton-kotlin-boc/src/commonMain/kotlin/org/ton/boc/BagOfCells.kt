@@ -49,6 +49,6 @@ public interface BagOfCells : Iterable<Cell> {
         }
 
         @JvmStatic
-        public fun read(input: Input): BagOfCells = input.readBagOfCell()
+        public fun read(input: Input): BagOfCells = ByteReadPacket(input.readBytes()).readBagOfCell()
     }
 }

@@ -13,6 +13,7 @@ import kotlin.jvm.JvmStatic
 public interface CellBuilder {
     public var bits: MutableBitString
     public var refs: MutableList<Cell>
+    public var isExotic: Boolean
 
     public val bitsPosition: Int
 
@@ -25,6 +26,7 @@ public interface CellBuilder {
     public fun storeBits(vararg bits: Boolean): CellBuilder
     public fun storeBits(bits: Iterable<Boolean>): CellBuilder
     public fun storeBits(bits: Collection<Boolean>): CellBuilder
+    public fun storeBits(bits: BitString): CellBuilder
 
     public fun storeBytes(byteArray: ByteArray): CellBuilder
 
@@ -41,9 +43,9 @@ public interface CellBuilder {
      * Stores an unsigned [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 256.
      */
     public fun storeUInt(value: BigInt, length: Int): CellBuilder
-    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(value.toLong(), length)
-    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(value.toLong(), length)
-    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(value.toLong(), length)
+    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(value.toInt(), length)
+    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(value.toInt(), length)
+    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
     public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
 
     public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
@@ -52,14 +54,14 @@ public interface CellBuilder {
     public fun storeUInt64(value: ULong): CellBuilder = storeInt(value.toLong(), 64)
 
     public fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
-    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
-    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(value.toInt(), max.toInt())
+    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(value.toInt(), max.toInt())
     public fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
     public fun storeUIntLeq(value: Long, max: Long): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
 
-    public fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1).bitLength)
-    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
-    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
+    public fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, (max - 1.toBigInt()).bitLength)
+    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(value.toInt(), max.toInt())
+    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(value.toInt(), max.toInt())
     public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
     public fun storeUIntLes(value: Long, max: Long): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
 
@@ -67,8 +69,8 @@ public interface CellBuilder {
      * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
      */
     public fun storeInt(value: BigInt, length: Int): CellBuilder
-    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
-    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(value.toInt(), length)
+    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toInt(), length)
     public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
     public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
 
@@ -80,14 +82,21 @@ public interface CellBuilder {
     public companion object {
         @JvmStatic
         public fun of(cell: Cell): CellBuilder =
-            CellBuilderImpl(BitString.MAX_LENGTH, cell.bits.toMutableBitString(), cell.refs.toMutableList())
+            CellBuilderImpl(cell.bits.toMutableBitString(), cell.refs.toMutableList())
 
         @JvmStatic
-        public fun beginCell(maxLength: Int = BitString.MAX_LENGTH): CellBuilder = CellBuilderImpl(maxLength)
+        public fun beginCell(): CellBuilder = CellBuilderImpl()
 
+        @OptIn(ExperimentalContracts::class)
         @JvmStatic
-        public fun createCell(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit): Cell =
-            CellBuilderImpl(maxLength).apply(builder).endCell()
+        public fun createCell(builder: CellBuilder.() -> Unit): Cell {
+            contract {
+                callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+            }
+            val cellBuilder = CellBuilderImpl()
+            builder(cellBuilder)
+            return cellBuilder.endCell()
+        }
 
         @JvmStatic
         public fun createPrunedBranch(cell: Cell, newLevel: Int, virtualizationLevel: Int = Cell.MAX_LEVEL): Cell =
@@ -133,14 +142,14 @@ public interface CellBuilder {
     public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
 }
 
-public inline fun CellBuilder.storeUInt(value: UByte, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
-public inline fun CellBuilder.storeUInt(value: UShort, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
-public inline fun CellBuilder.storeUInt(value: UInt, bits: Int): CellBuilder = storeUInt(value.toLong(), bits)
-public inline fun CellBuilder.storeUInt(value: ULong, bits: Int): CellBuilder =
-    storeUInt(BigInt(value.toString()), bits)
-
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
+}
+
+@OptIn(ExperimentalContracts::class)
+public inline fun buildCell(builderAction: CellBuilder.() -> Unit): Cell {
+    contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
+    return CellBuilder.beginCell().apply(builderAction).endCell()
 }
 
 public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
@@ -150,30 +159,22 @@ public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): Cell
     storeRef(cell)
 }
 
-public fun CellBuilder(cell: Cell): CellBuilder =
-    CellBuilder.of(cell)
-
-@OptIn(ExperimentalContracts::class)
-public fun CellBuilder(maxLength: Int = BitString.MAX_LENGTH, builder: CellBuilder.() -> Unit = {}): CellBuilder {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-    return CellBuilderImpl(maxLength).apply(builder)
-}
+public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
+public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
 private class CellBuilderImpl(
-    val maxLength: Int,
     override var bits: MutableBitString = ByteBackedMutableBitString.of(),
     override var refs: MutableList<Cell> = ArrayList()
 ) : CellBuilder {
-    private val remainder: Int get() = maxLength - bitsPosition
+    private val remainder: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
     override val bitsPosition: Int get() = bits.size
+    override var isExotic: Boolean = false
 
-    override fun endCell(): Cell = Cell(bits, refs)
+    override fun endCell(): Cell = Cell(bits, refs, isExotic)
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
-        bits += bit
+        bits.plus(bit)
     }
 
     override fun storeBits(vararg bits: Boolean): CellBuilder = apply {
@@ -186,11 +187,12 @@ private class CellBuilderImpl(
         this.bits.plus(bits)
     }
 
-    override fun storeBits(bits: Iterable<Boolean>): CellBuilder = apply {
-        val currentSize = this.bits.size
+    override fun storeBits(bits: BitString): CellBuilder = apply {
+        checkBitsOverflow(bits.size)
         this.bits.plus(bits)
-        checkBitsOverflow(this.bits.size - currentSize)
     }
+
+    override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(bits.toList())
 
     override fun storeBytes(byteArray: ByteArray): CellBuilder = apply {
         checkBitsOverflow(byteArray.size * Byte.SIZE_BITS)
@@ -209,14 +211,14 @@ private class CellBuilderImpl(
 
     override fun storeRefs(vararg refs: Cell): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
+        this.refs.addAll(refs.filter { !it.bits.isEmpty() })
     }
 
     override fun storeRefs(refs: Iterable<Cell>): CellBuilder = storeRefs(refs.toList())
 
     override fun storeRefs(refs: Collection<Cell>): CellBuilder = apply {
         checkRefsOverflow(refs.size)
-        this.refs.addAll(refs.filter { it.bits.isNotEmpty() })
+        this.refs.addAll(refs.filter { !it.bits.isEmpty() })
     }
 
     override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {
@@ -253,7 +255,7 @@ private class CellBuilderImpl(
     override fun toString(): String = endCell().toString()
 
     private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
-        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left.")
+        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left. - ${bits.size}")
     }
 
     private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {

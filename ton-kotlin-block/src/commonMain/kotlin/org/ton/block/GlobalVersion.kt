@@ -5,17 +5,23 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.asTlbCombinator
+import org.ton.tlb.*
 
 @SerialName("capabilities")
 @Serializable
-data class GlobalVersion(
-    val version: Long,
-    val capabilities: Long
-) {
-    companion object : TlbCodec<GlobalVersion> by GlobalVersionTlbConstructor.asTlbCombinator()
+public data class GlobalVersion(
+    val version: UInt, // version : uint32
+    val capabilities: ULong // capabilities : uint64
+) : TlbObject {
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("capabilities") {
+        field("version", version)
+        field("capabilities", capabilities)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<GlobalVersion> by GlobalVersionTlbConstructor.asTlbCombinator()
 }
 
 private object GlobalVersionTlbConstructor : TlbConstructor<GlobalVersion>(
@@ -25,15 +31,15 @@ private object GlobalVersionTlbConstructor : TlbConstructor<GlobalVersion>(
         cellBuilder: CellBuilder,
         value: GlobalVersion
     ) = cellBuilder {
-        storeUInt(value.version, 32)
-        storeUInt(value.capabilities, 64)
+        storeUInt(value.version.toInt(), 32)
+        storeUInt(value.capabilities.toLong(), 64)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): GlobalVersion = cellSlice {
-        val version = loadUInt(32).toLong()
-        val capabilities = loadUInt(64).toLong()
+        val version = loadUInt(32).toInt().toUInt()
+        val capabilities = loadUInt(64).toLong().toULong()
         GlobalVersion(version, capabilities)
     }
 }

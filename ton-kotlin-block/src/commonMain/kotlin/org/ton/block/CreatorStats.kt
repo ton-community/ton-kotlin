@@ -5,18 +5,23 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("creator_info")
-data class CreatorStats(
-    val mc_blocks: Counters,
-    val shard_blocks: Counters
-) {
-    companion object : TlbConstructorProvider<CreatorStats> by CreatorStatsTlbConstructor
+public data class CreatorStats(
+    @SerialName("mc_blocks") val mcBlocks: Counters,
+    @SerialName("shard_blocks") val shardBlocks: Counters
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("creator_info") {
+        field("mc_blocks", mcBlocks)
+        field("shard_blocks", shardBlocks)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<CreatorStats> by CreatorStatsTlbConstructor
 }
 
 private object CreatorStatsTlbConstructor : TlbConstructor<CreatorStats>(
@@ -26,8 +31,8 @@ private object CreatorStatsTlbConstructor : TlbConstructor<CreatorStats>(
         cellBuilder: CellBuilder,
         value: CreatorStats
     ) = cellBuilder {
-        storeTlb(Counters, value.mc_blocks)
-        storeTlb(Counters, value.shard_blocks)
+        storeTlb(Counters, value.mcBlocks)
+        storeTlb(Counters, value.shardBlocks)
     }
 
     override fun loadTlb(cellSlice: CellSlice): CreatorStats = cellSlice {

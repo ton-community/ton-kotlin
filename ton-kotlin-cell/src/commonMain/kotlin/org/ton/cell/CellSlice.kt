@@ -4,6 +4,7 @@ package org.ton.cell
 
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.exception.BitStringUnderflowException
 import org.ton.cell.exception.CellUnderflowException
@@ -41,6 +42,8 @@ public interface CellSlice {
 
     public fun loadBits(length: Int): BitString
     public fun preloadBits(length: Int): BitString
+
+    public fun loadBits256(): Bits256 = Bits256(loadBits(256))
 
     public fun loadInt(length: Int): BigInt
     public fun preloadInt(length: Int): BigInt
@@ -155,8 +158,8 @@ private open class CellSliceImpl(
 
     override fun preloadInt(length: Int): BigInt {
         val uint = preloadUInt(length)
-        val int = BigInt(1) shl (length - 1)
-        return if (uint >= int) uint - (int * 2) else uint
+        val int = 1.toBigInt() shl (length - 1)
+        return if (uint >= int) uint - (int * 2.toBigInt()) else uint
     }
 
     override fun loadUInt(length: Int): BigInt {
@@ -166,7 +169,7 @@ private open class CellSliceImpl(
     }
 
     override fun preloadUInt(length: Int): BigInt {
-        if (length == 0) return BigInt(0)
+        if (length == 0) return 0.toBigInt()
         val bits = preloadBits(length)
         val intBits = buildString(length) {
             bits.forEach { bit ->
@@ -278,7 +281,7 @@ private class CellSliceByteBackedBitString(
                 if (value > Long.MAX_VALUE.toULong()) {
                     BigInt(value.toString(), 10)
                 } else {
-                    BigInt(value.toLong())
+                    value.toLong().toBigInt()
                 }
             }
         }
@@ -292,9 +295,9 @@ private class CellSliceByteBackedBitString(
                 val uint = getLong(length).toLong()
                 val int = 1L shl (length - 1)
                 if (uint >= int) {
-                    BigInt(uint - (int * 2))
+                    (uint - (int * 2)).toBigInt()
                 } else {
-                    BigInt(uint)
+                    uint.toBigInt()
                 }
             }
         }

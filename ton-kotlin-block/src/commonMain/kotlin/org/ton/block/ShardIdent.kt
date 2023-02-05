@@ -5,22 +5,28 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.asTlbCombinator
+import org.ton.tlb.*
 
 @SerialName("shard_ident")
 @Serializable
-data class ShardIdent(
-    val shard_pfx_bits: Int,
-    val workchain_id: Int,
-    val shard_prefix: ULong
-) {
+public data class ShardIdent(
+    @SerialName("shard_pfx_bits") val shardPfxBits: Int, // shard_pfx_bits : #<= 60
+    @SerialName("workchain_id") val workchainId: Int, // workchain_id : int32
+    @SerialName("shard_prefix") val shardPrefix: ULong // shard_prefix : uint64
+) : TlbObject {
     init {
-        require(shard_pfx_bits <= 60) { "expected: shard_pfx_bits <= 60, actual: $shard_pfx_bits" }
+        require(shardPfxBits <= 60) { "expected: shard_pfx_bits <= 60, actual: $shardPfxBits" }
     }
 
-    companion object : TlbCodec<ShardIdent> by ShardIdentTlbConstructor.asTlbCombinator()
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("shard_ident") {
+        field("shard_pfx_bits", shardPfxBits)
+        field("workchain_id", workchainId)
+        field("shard_prefix", shardPrefix)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<ShardIdent> by ShardIdentTlbConstructor.asTlbCombinator()
 }
 
 private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
@@ -31,9 +37,9 @@ private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
         cellBuilder: CellBuilder,
         value: ShardIdent
     ) = cellBuilder {
-        storeUIntLeq(value.shard_pfx_bits, 60)
-        storeInt(value.workchain_id, 32)
-        storeUInt64(value.shard_prefix)
+        storeUIntLeq(value.shardPfxBits, 60)
+        storeInt(value.workchainId, 32)
+        storeUInt64(value.shardPrefix)
     }
 
     override fun loadTlb(

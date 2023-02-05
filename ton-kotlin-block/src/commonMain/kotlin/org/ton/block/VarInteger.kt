@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bigint.BigInt
 import org.ton.bigint.BigIntSerializer
 import org.ton.bigint.bitLength
+import org.ton.bigint.toBigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -18,10 +19,8 @@ data class VarInteger(
     @Serializable(BigIntSerializer::class)
     val value: BigInt
 ) : Number() {
-    constructor(byte: Byte) : this(BigInt(byte))
-    constructor(short: Short) : this(BigInt(short))
-    constructor(int: Int) : this(BigInt(int))
-    constructor(long: Long) : this(BigInt(long))
+    constructor(int: Int) : this(int.toBigInt())
+    constructor(long: Long) : this(long.toBigInt())
     constructor(value: BigInt) : this(value.bitLength, value)
 
     override fun toByte(): Byte = value.toByte()

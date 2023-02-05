@@ -5,29 +5,29 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.asTlbCombinator
+import org.ton.tlb.*
 
 @Serializable
 @SerialName("update_hashes")
-data class HashUpdate(
-    val old_hash: BitString,
-    val new_hash: BitString
-) {
-    override fun toString(): String = buildString {
-        append("(update_hashes\n")
-        append("old_hash:$old_hash")
-        append(" new_hash:$new_hash")
-        append(")")
+public data class HashUpdate(
+    @SerialName("old_hash") val oldHash: Bits256, // old_hash : bits256
+    @SerialName("new_hash") val newHash: Bits256 // new_hash : bits256
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("update_hashes") {
+            field("old_hash", oldHash)
+            field("new_hash", newHash)
+        }
     }
 
-    companion object : TlbCodec<HashUpdate> by HashUpdateTlbConstructor.asTlbCombinator()
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<HashUpdate> by HashUpdateTlbConstructor.asTlbCombinator()
 }
 
 private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate>(
@@ -37,15 +37,15 @@ private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate>(
         cellBuilder: CellBuilder,
         value: HashUpdate
     ) = cellBuilder {
-        storeBits(value.old_hash)
-        storeBits(value.new_hash)
+        storeBits(value.oldHash.value)
+        storeBits(value.newHash.value)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): HashUpdate = cellSlice {
-        val oldHash = loadBits(256)
-        val newHash = loadBits(256)
+        val oldHash = Bits256(loadBits(256))
+        val newHash = Bits256(loadBits(256))
         HashUpdate(oldHash, newHash)
     }
 }

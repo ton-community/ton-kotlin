@@ -5,17 +5,20 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 
 @SerialName("master_info")
 @Serializable
-data class BlkMasterInfo(
-    val master: ExtBlkRef
-) {
-    companion object : TlbCodec<BlkMasterInfo> by BlkMasterInfoTlbConstructor
+public data class BlkMasterInfo(
+    val master: ExtBlkRef // master : ExtBlkRef
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("master_info") {
+        field("master", master)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<BlkMasterInfo> by BlkMasterInfoTlbConstructor
 }
 
 private object BlkMasterInfoTlbConstructor : TlbConstructor<BlkMasterInfo>(

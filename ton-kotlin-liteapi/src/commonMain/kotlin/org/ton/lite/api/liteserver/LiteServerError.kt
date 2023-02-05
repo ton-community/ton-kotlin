@@ -1,17 +1,17 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
 
 @Serializable
+@SerialName("liteServer.error")
 public data class LiteServerError(
     val code: Int,
     val message: String
 ) {
-    override fun toString(): String = "[$code] $message"
-
     public companion object : TlConstructor<LiteServerError>(
         schema = "liteServer.error code:int message:string = liteServer.Error"
     ) {

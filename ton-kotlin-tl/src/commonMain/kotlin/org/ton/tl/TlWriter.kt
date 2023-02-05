@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.ton.bitstring.Bits256
 import org.ton.tl.constructors.Bool
 import org.ton.tl.constructors.BoolTlCombinator
 
@@ -17,6 +18,10 @@ public class TlWriter(
 
     public fun writeLong(value: Long) {
         output.writeLongLittleEndian(value)
+    }
+
+    public fun writeRaw(value: ByteArray) {
+        output.writeFully(value)
     }
 
     public fun writeBytes(value: ByteArray, offset: Int = 0, length: Int = value.size - offset) {
@@ -61,6 +66,13 @@ public class TlWriter(
         output.writeFully(value.toByteArray())
     }
 
+    public inline fun <T> writeVector(value: Collection<T>, block: TlWriter.(T) -> Unit) {
+        writeInt(value.size)
+        for (item in value) {
+            block(item)
+        }
+    }
+
     public inline operator fun invoke(block: TlWriter.() -> Unit) {
         block()
     }
@@ -81,12 +93,5 @@ public inline fun <T : Any> TlWriter.writeNullable(flag: Boolean, value: T?, blo
         } else {
             throw IllegalStateException("Nullable value is null, but flag is true")
         }
-    }
-}
-
-public inline fun <T> TlWriter.writeCollection(value: Collection<T>, block: TlWriter.(T) -> Unit) {
-    writeInt(value.size)
-    for (item in value) {
-        block(item)
     }
 }

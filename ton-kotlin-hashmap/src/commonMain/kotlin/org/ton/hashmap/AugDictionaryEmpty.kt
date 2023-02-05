@@ -6,10 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @SerialName("ahme_empty")
@@ -17,9 +14,13 @@ import kotlin.jvm.JvmStatic
 public data class AugDictionaryEmpty<out X, out Y>(
     override val extra: Y
 ) : AugDictionary<X, Y> {
-    override fun toString(): String = "(ahme_empty\nextra:$extra)"
-
     override fun nodes(): Sequence<Pair<X, Y>> = emptySequence()
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("ahme_empty") {
+        field("extra", extra)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic

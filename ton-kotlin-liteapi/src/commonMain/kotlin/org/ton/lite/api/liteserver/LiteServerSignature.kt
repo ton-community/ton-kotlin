@@ -3,9 +3,11 @@ package org.ton.lite.api.liteserver
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.Bits256
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.signature")
 public data class LiteServerSignature(
     @SerialName("node_id_short")
     val nodeIdShort: Bits256,

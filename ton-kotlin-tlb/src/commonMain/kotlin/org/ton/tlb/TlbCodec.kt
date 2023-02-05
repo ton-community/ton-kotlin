@@ -8,6 +8,9 @@ import org.ton.cell.CellSlice
 
 public interface TlbStorer<in T> {
     public fun storeTlb(cellBuilder: CellBuilder, value: T)
+    public fun createCell(value: T): Cell = CellBuilder.createCell {
+        storeTlb(this, value)
+    }
 }
 
 public interface TlbNegatedStorer<T> : TlbStorer<T> {

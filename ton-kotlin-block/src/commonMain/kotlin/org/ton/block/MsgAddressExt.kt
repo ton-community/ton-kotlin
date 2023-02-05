@@ -5,6 +5,7 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
+import org.ton.bitstring.isNullOrEmpty
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import kotlin.jvm.JvmStatic

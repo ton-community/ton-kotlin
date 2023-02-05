@@ -4,21 +4,23 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.*
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @SerialName("ahme_root")
 @Serializable
 public data class AugDictionaryRoot<X, Y>(
-    val root: AugDictionaryEdge<X, Y>,
+    val root: CellRef<AugDictionaryEdge<X, Y>>,
     override val extra: Y
 ) : AugDictionary<X, Y> {
-    override fun toString(): String = "(ahme_root\nroot:$root extra:$extra)"
+    override fun nodes(): Sequence<Pair<X, Y>> = root.value.nodes()
 
-    override fun nodes(): Sequence<Pair<X, Y>> = root.nodes()
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("ahme_root") {
+        field("root", root)
+        field("extra", extra)
+    }
+
+    override fun toString(): String = print().toString()
 
     public companion object {
         @JvmStatic
@@ -44,18 +46,14 @@ private class AugDictionaryRootTlbConstructor<X, Y>(
         cellBuilder: CellBuilder,
         value: AugDictionaryRoot<X, Y>
     ) = cellBuilder {
-        storeRef {
-            storeTlb(edge, value.root)
-        }
+        storeRef(edge, value.root)
         storeTlb(y, value.extra)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AugDictionaryRoot<X, Y> = cellSlice {
-        val root = loadRef {
-            loadTlb(edge)
-        }
+        val root = loadRef(edge)
         val extra = loadTlb(y)
         AugDictionaryRoot(root, extra)
     }

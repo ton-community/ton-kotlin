@@ -1,11 +1,13 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerConfigInfo
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getConfigAll")
 public data class LiteServerGetConfigAll(
     val mode: Int,
     val id: TonNodeBlockIdExt

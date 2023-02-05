@@ -234,7 +234,7 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
         val from = reader.readNullable(flags, 0) { read(PublicKey) }
         val from_short = reader.readNullable(flags, 1) { read(AdnlIdShort) }
         val message = reader.readNullable(flags, 2) { read(AdnlMessage) }
-        val messages = reader.readNullable(flags, 3) { readCollection { read(AdnlMessage) } }
+        val messages = reader.readNullable(flags, 3) { readVector { read(AdnlMessage) } }
         val address = reader.readNullable(flags, 4) { read(AdnlAddressList) }
         val priority_address = reader.readNullable(flags, 5) { read(AdnlAddressList) }
         val seqno = reader.readNullable(flags, 6) { readLong() }
@@ -274,7 +274,7 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
         writer.writeNullable(flags, 1, value.fromShort) { write(AdnlIdShort, it) }
         writer.writeNullable(flags, 2, value.message) { write(AdnlMessage, it) }
         writer.writeNullable(flags, 3, value.messages) { list ->
-            writeCollection(list) { element ->
+            writeVector(list) { element ->
                 write(AdnlMessage, element)
             }
         }

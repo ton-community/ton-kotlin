@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.http.HttpHeader
 import org.ton.api.http.HttpResponse
+import org.ton.bitstring.Bits256
 import org.ton.tl.*
 import org.ton.tl.constructors.*
 
@@ -29,7 +30,7 @@ public data class HttpRequest(
             val method = input.readString()
             val url = input.readString()
             val http_version = input.readString()
-            val headers = input.readCollection {
+            val headers = input.readVector {
                 HttpHeader.decode(input)
             }
             return HttpRequest(id, method, url, http_version, headers)
@@ -40,7 +41,7 @@ public data class HttpRequest(
             output.writeString(value.method)
             output.writeString(value.url)
             output.writeString(value.http_version)
-            output.writeCollection(value.headers) {
+            output.writeVector(value.headers) {
                 write(HttpHeader, it)
             }
         }

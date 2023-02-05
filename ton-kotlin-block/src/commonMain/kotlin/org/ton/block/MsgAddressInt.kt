@@ -16,8 +16,8 @@ inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.parse(a
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface MsgAddressInt : MsgAddress {
-    val workchain_id: Int
+public sealed interface MsgAddressInt : MsgAddress {
+    val workchainId: Int
 
     companion object : TlbCodec<MsgAddressInt> by MsgAddressIntTlbCombinator {
         @JvmStatic

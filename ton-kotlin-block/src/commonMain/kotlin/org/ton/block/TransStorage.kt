@@ -6,16 +6,25 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("trans_storage")
-data class TransStorage(
-    val storage_ph: TrStoragePhase
+public data class TransStorage(
+    @SerialName("storage_ph") val storagePh: TrStoragePhase
 ) : TransactionDescr {
-    companion object : TlbConstructorProvider<TransStorage> by TransStorageTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("storage_ph") {
+            field("storage_ph", storagePh)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TransStorage> by TransStorageTlbConstructor
 }
 
 private object TransStorageTlbConstructor : TlbConstructor<TransStorage>(
@@ -26,7 +35,7 @@ private object TransStorageTlbConstructor : TlbConstructor<TransStorage>(
         cellBuilder: CellBuilder,
         value: TransStorage
     ) = cellBuilder {
-        storeTlb(TrStoragePhase, value.storage_ph)
+        storeTlb(TrStoragePhase, value.storagePh)
     }
 
     override fun loadTlb(

@@ -1,16 +1,18 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockHeader
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getBlockHeader")
 public data class LiteServerGetBlockHeader(
     val id: TonNodeBlockIdExt,
     val mode: Int
 ) : TLFunction<LiteServerGetBlockHeader, LiteServerBlockHeader> {
-    override fun tlCodec(): TlCodec<LiteServerGetBlockHeader> = Companion
+    override fun tlCodec(): TlCodec<LiteServerGetBlockHeader> = LiteServerGetBlockHeaderTlConstructor
     override fun resultTlCodec(): TlCodec<LiteServerBlockHeader> = LiteServerBlockHeader
 
     public companion object : TlCodec<LiteServerGetBlockHeader> by LiteServerGetBlockHeaderTlConstructor

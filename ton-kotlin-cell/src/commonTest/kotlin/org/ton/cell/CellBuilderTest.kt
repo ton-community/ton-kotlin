@@ -39,9 +39,11 @@ class CellBuilderTest {
 
     @Test
     fun `fail on too many bits added`() {
-        val builder = CellBuilder.beginCell(10)
+        val builder = CellBuilder.beginCell()
             .storeUInt(0, 10) // fine for now
         assertEquals(10, builder.bits.size)
+        builder.storeBits(*BooleanArray(1023 - builder.bits.size))
+        println(builder.bits.size)
         assertFails {
             builder.storeBit(false)
         }

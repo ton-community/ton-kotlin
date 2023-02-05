@@ -32,7 +32,7 @@ public sealed interface AdnlIp : AdnlAddress {
 }
 
 public sealed interface AdnlIp6 : AdnlAddress {
-    public val ip: Bits128
+    public val ip: ByteArray
     public val port: Int
 }
 
@@ -64,22 +64,21 @@ public data class AdnlAddressUdp(
 @SerialName("adnl.address.udp6")
 @Serializable
 public data class AdnlAddressUdp6(
-    override val ip: Bits128,
+    override val ip: ByteArray,
     override val port: Int
 ) : AdnlAddress, AdnlIp6 {
-    public constructor(ip: ByteArray, port: Int) : this(Bits128(ip), port)
 
     public companion object : TlConstructor<AdnlAddressUdp6>(
         schema = "adnl.address.udp6 ip:int128 port:int = adnl.Address"
     ) {
         override fun decode(reader: TlReader): AdnlAddressUdp6 {
-            val ip = reader.readBits128()
+            val ip = reader.readRaw(16)
             val port = reader.readInt()
             return AdnlAddressUdp6(ip, port)
         }
 
         override fun encode(writer: TlWriter, value: AdnlAddressUdp6) {
-            writer.writeBits128(value.ip)
+            writer.writeRaw(value.ip)
             writer.writeInt(value.port)
         }
     }
@@ -89,22 +88,21 @@ public data class AdnlAddressUdp6(
 @SerialName("adnl.address.tunnel")
 @Serializable
 public data class AdnlAddressTunnel(
-    val to: Bits256,
+    val to: ByteArray,
     val pubkey: PublicKey
 ) : AdnlAddress {
-    public constructor(to: ByteArray, pubkey: PublicKey) : this(Bits256(to), pubkey)
     public constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
 
     public companion object : TlConstructor<AdnlAddressTunnel>(
         schema = "adnl.address.tunnel to:int256 pubkey:PublicKey = adnl.Address"
     ) {
         override fun encode(writer: TlWriter, value: AdnlAddressTunnel) {
-            writer.writeBits256(value.to)
+            writer.writeRaw(value.to)
             writer.write(PublicKey, value.pubkey)
         }
 
         override fun decode(reader: TlReader): AdnlAddressTunnel {
-            val to = reader.readBits256()
+            val to = reader.readRaw(32)
             val pubKey = reader.read(PublicKey)
             return AdnlAddressTunnel(to, pubKey)
         }

@@ -17,11 +17,6 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation(libs.bouncycastle)
-            }
-        }
         val nativeMain by getting {
             dependencies {
                 api(libs.serialization.core)

@@ -26,7 +26,7 @@ public data class AdnlAddressList(
         schema = "adnl.addressList addrs:(vector adnl.Address) version:int reinit_date:int priority:int expire_at:int = adnl.AddressList"
     ) {
         override fun encode(writer: TlWriter, value: AdnlAddressList) {
-            writer.writeCollection(value.addrs) {
+            writer.writeVector(value.addrs) {
                 write(AdnlAddress, it)
             }
             writer.writeInt(value.version)
@@ -36,7 +36,7 @@ public data class AdnlAddressList(
         }
 
         override fun decode(reader: TlReader): AdnlAddressList {
-            val addrs = reader.readCollection {
+            val addrs = reader.readVector {
                 read(AdnlAddress)
             }
             val version = reader.readInt()

@@ -1,6 +1,10 @@
 package org.ton.bitstring
 
-internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
+internal object EmptyBitString : BitString {
+    override val size: Int get() = 0
+
+    override fun get(index: Int): Boolean = throw IndexOutOfBoundsException()
+
     override fun getOrNull(index: Int): Boolean? = null
 
     override fun plus(bits: BooleanArray): BitString = BitString(*bits)
@@ -13,13 +17,15 @@ internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
 
     override fun plus(bytes: ByteArray, bits: Int): BitString = BitString(bytes, bits)
 
-    override fun subList(fromIndex: Int, toIndex: Int): BitString {
-        return super.subList(fromIndex, toIndex)
-    }
 
     override fun slice(indices: IntRange): BitString {
         if (indices.first == 0 && indices.last == 0) return this
         throw IndexOutOfBoundsException(indices.toString())
+    }
+
+    override fun slice(startIndex: Int, endIndex: Int): BitString {
+        if (startIndex == 0 && endIndex == 0) return this
+        throw IndexOutOfBoundsException((startIndex..endIndex).toString())
     }
 
     override fun toByteArray(augment: Boolean): ByteArray =
@@ -42,6 +48,8 @@ internal object EmptyBitString : BitString, List<Boolean> by emptyList() {
         if (other.size != 0) return false
         return true
     }
+
+    override fun iterator(): Iterator<Boolean> = iterator { }
 
     override fun compareTo(other: BitString): Int = -1
 }

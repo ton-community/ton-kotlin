@@ -8,6 +8,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.bitstring.Bits256
 import org.ton.crypto.*
 import org.ton.tl.*
 import kotlin.jvm.JvmStatic

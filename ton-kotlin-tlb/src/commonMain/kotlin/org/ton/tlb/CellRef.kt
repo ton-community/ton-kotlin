@@ -3,19 +3,32 @@ package org.ton.tlb
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.CellType
 import kotlin.jvm.JvmStatic
 
 public inline fun <T> CellRef(cell: Cell, codec: TlbCodec<T>): CellRef<T> = CellRef.valueOf(cell, codec)
 public inline fun <T> CellRef(value: T): CellRef<T> = CellRef.valueOf(value)
+public inline fun <T> CellRef(codec: TlbCodec<T>): TlbCodec<CellRef<T>> = CellRef.tlbCodec(codec)
 
 public inline fun <T> Cell.asRef(codec: TlbCodec<T>): CellRef<T> = CellRef.valueOf(this, codec)
 
-public interface CellRef<T> {
+public interface CellRef<out T> : TlbObject {
     public val value: T
 
-    public fun toCell(codec: TlbCodec<T>? = null): Cell
+    public fun toCell(codec: TlbCodec<@UnsafeVariance T>? = null): Cell
 
     public operator fun getValue(thisRef: Any?, property: Any?): T = value
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        val value = value
+        return if (value is TlbObject) {
+            value.print(printer)
+        } else {
+            printer {
+                type(value.toString())
+            }
+        }
+    }
 
     public companion object {
         @JvmStatic
@@ -34,13 +47,21 @@ private class CellRefImpl<T>(
     val codec: TlbCodec<T>
 ) : CellRef<T> {
     override val value: T by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        cell.parse {
-            codec.loadTlb(this)
-        }
+        codec.loadTlb(cell)
     }
 
     override fun toCell(codec: TlbCodec<T>?): Cell {
         return cell
+    }
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return if (cell.type == CellType.PRUNED_BRANCH) {
+            printer.type("!pruned_branch") {
+                field("cell", cell.bits)
+            }
+        } else {
+            super.print(printer)
+        }
     }
 
     override fun toString(): String = "CellRef($cell)"
@@ -69,4 +90,12 @@ private class CellRefTlbConstructor<T>(
     override fun loadTlb(cellSlice: CellSlice): CellRef<T> {
         return cellSlice.loadRef().asRef(codec)
     }
+}
+
+public inline fun <T> CellBuilder.storeRef(codec: TlbCodec<T>, value: CellRef<T>) {
+    storeRef(value.toCell(codec))
+}
+
+public inline fun <T> CellSlice.loadRef(codec: TlbCodec<T>): CellRef<T> {
+    return loadRef().asRef(codec)
 }

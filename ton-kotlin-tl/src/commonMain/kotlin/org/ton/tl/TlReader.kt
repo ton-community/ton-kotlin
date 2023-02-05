@@ -1,6 +1,7 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
+import org.ton.bitstring.Bits256
 import org.ton.tl.constructors.BoolTlCombinator
 
 public class TlReader(
@@ -9,6 +10,7 @@ public class TlReader(
     public fun readBoolean(): Boolean = BoolTlCombinator.decode(this).value
     public fun readInt(): Int = input.readIntLittleEndian()
     public fun readLong(): Long = input.readLongLittleEndian()
+    public fun readRaw(size: Int): ByteArray = input.readBytes(size)
     public fun readBytes(): ByteArray {
         var resultLength = input.readUByte().toInt()
         var resultAlignedLength: Int
@@ -45,18 +47,18 @@ public class TlReader(
     public fun readBits128(): Bits128 = Bits128(input.readBytes(16))
 
     public fun readBits256(): Bits256 = Bits256(input.readBytes(32))
+
+    public fun <T> readVector(block: TlReader.() -> T): List<T> {
+        val size = readInt()
+        return List(size) {
+            block()
+        }
+    }
 }
 
 public inline operator fun <R> TlReader.invoke(block: TlReader.() -> R): R = block()
 
 public inline fun <T> TlReader.read(codec: TlCodec<T>): T = codec.decode(this)
-
-public inline fun <E> TlReader.readCollection(block: TlReader.() -> E): Collection<E> {
-    val size = readInt()
-    return List(size) {
-        block()
-    }
-}
 
 public inline fun <E> TlReader.readNullable(flag: Int, index: Int, block: TlReader.() -> E): E? =
     readNullable(flag and (1 shl index) != 0, block)

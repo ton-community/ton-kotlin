@@ -5,6 +5,7 @@ kotlin {
                 api(projects.tonKotlinBoc)
                 api(projects.tonKotlinHashmap)
                 api(projects.tonKotlinTlb)
+                api(projects.tonKotlinTl)
                 implementation(libs.serialization.json)
             }
         }

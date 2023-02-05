@@ -13,7 +13,7 @@ public abstract class TlbCombinator<T : Any>(
     vararg subClasses: Pair<KClass<out T>, TlbCodec<out T>>
 ) : AbstractTlbCombinator<T>(), TlbCombinatorProvider<T> {
     private val class2codec: MutableMap<KClass<out T>, TlbCodec<out T>>
-    private val constructorTree = TlbConstructorTree<TlbCodec<out T>>()
+    private val codec2Class = HashMap<BitString, TlbCodec<out T>>()
 
     init {
         class2codec = subClasses.toMap().toMutableMap()
@@ -29,13 +29,11 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     private fun addConstructor(constructor: TlbConstructor<out T>) {
-        constructorTree.add(constructor.id, constructor)
+        codec2Class.set(constructor.id, constructor)
     }
 
     private fun addCombinator(combinator: TlbCombinator<out T>) {
-        combinator.constructorTree.values().forEach { (key, value) ->
-            constructorTree.add(key, value)
-        }
+        codec2Class.putAll(combinator.codec2Class)
         class2codec.putAll(combinator.class2codec)
     }
 
@@ -52,11 +50,13 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: T) {
-        val constructor = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
-        if (constructor is TlbConstructor<*>) {
-            cellBuilder.storeBits(constructor.id)
+        val storer = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
+        if (storer is TlbConstructorProvider<*>) {
+            cellBuilder.storeBits(storer.tlbConstructor().id)
+        } else if (storer is TlbConstructor<*>) {
+            cellBuilder.storeBits(storer.id)
         }
-        return constructor.storeTlb(cellBuilder, value)
+        return storer.storeTlb(cellBuilder, value)
     }
 
     protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {
@@ -65,9 +65,9 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     protected open fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out T>? {
-        val (_, constructor) = constructorTree.find(bitString)
-            ?: return null
-        return constructor
+        return codec2Class.maxByOrNull {
+            it.key.commonPrefixWith(bitString).size
+        }?.value
     }
 
     @Suppress("UNCHECKED_CAST")

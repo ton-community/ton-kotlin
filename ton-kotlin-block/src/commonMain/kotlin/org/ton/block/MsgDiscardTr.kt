@@ -1,18 +1,29 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
-data class MsgDiscardTr(
-    val in_msg: MsgEnvelope,
-    val transaction_id: ULong,
-    val fwd_fee: Coins,
-    val proof_delivered: Cell
+@Serializable
+@SerialName("msg_discard_tr")
+public data class MsgDiscardTr(
+    @SerialName("in_msg") val inMsg: CellRef<MsgEnvelope>,
+    @SerialName("transaction_id") val transactionId: ULong,
+    @SerialName("fwd_fee") val fwdFee: Coins,
+    @SerialName("proof_delivered") val proofDelivered: Cell
 ) : InMsg {
-    companion object : TlbConstructorProvider<MsgDiscardTr> by MsgDiscardTrTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_discard_tr") {
+            field("in_msg", inMsg)
+            field("transaction_id", transactionId)
+            field("fwd_fee", fwdFee)
+            field("proof_delivered", proofDelivered)
+        }
+    }
+
+    public companion object : TlbConstructorProvider<MsgDiscardTr> by MsgDiscardTrTlbConstructor
 }
 
 private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
@@ -22,20 +33,16 @@ private object MsgDiscardTrTlbConstructor : TlbConstructor<MsgDiscardTr>(
         cellBuilder: CellBuilder,
         value: MsgDiscardTr
     ) = cellBuilder {
-        storeRef {
-            storeTlb(MsgEnvelope, value.in_msg)
-        }
-        storeUInt64(value.transaction_id)
-        storeTlb(Coins, value.fwd_fee)
-        storeRef(value.proof_delivered)
+        storeRef(MsgEnvelope, value.inMsg)
+        storeUInt64(value.transactionId)
+        storeTlb(Coins, value.fwdFee)
+        storeRef(value.proofDelivered)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgDiscardTr = cellSlice {
-        val inMsg = loadRef {
-            loadTlb(MsgEnvelope)
-        }
+        val inMsg = loadRef(MsgEnvelope)
         val transactionId = loadUInt64()
         val fwdFee = loadTlb(Coins)
         val proofDelivered = loadRef()

@@ -6,36 +6,31 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
+import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
 
 @SerialName("ext_out_msg_info")
 @Serializable
-data class ExtOutMsgInfo(
+public data class ExtOutMsgInfo(
     val src: MsgAddressInt,
     val dest: MsgAddressExt,
-    val created_lt: Long,
-    val created_at: Int
+    @SerialName("created_lt") val createdLt: ULong,
+    @SerialName("created_at") val createdAt: UInt
 ) : CommonMsgInfo {
-
-    override fun toString(): String = buildString {
-        append("(ext_out_msg_info\n")
-        append("src:")
-        append(src)
-        append(" dest:")
-        append(dest)
-        append(" created_lt:")
-        append(created_lt)
-        append(" created_at:")
-        append(created_at)
-        append(")")
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("ext_out_msg_info") {
+            field("src", src)
+            field("dest", dest)
+            field("created_lt", createdLt)
+            field("created_at", createdAt)
+        }
     }
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<ExtOutMsgInfo> = ExtOutMsgInfoTlbConstructor
-    }
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<ExtOutMsgInfo> by ExtOutMsgInfoTlbConstructor
 }
 
 private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
@@ -46,8 +41,8 @@ private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     ) = cellBuilder {
         storeTlb(MsgAddressInt, value.src)
         storeTlb(MsgAddressExt, value.dest)
-        storeUInt(value.created_lt, 64)
-        storeUInt(value.created_at, 32)
+        storeUInt(value.createdLt.toLong(), 64)
+        storeUInt(value.createdAt.toInt(), 32)
     }
 
     override fun loadTlb(
@@ -55,8 +50,8 @@ private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     ): ExtOutMsgInfo = cellSlice {
         val src = loadTlb(MsgAddressInt)
         val dest = loadTlb(MsgAddressExt)
-        val createdLt = loadUInt(64).toLong()
-        val createdAt = loadUInt(32).toInt()
+        val createdLt = loadUInt64()
+        val createdAt = loadUInt32()
         ExtOutMsgInfo(src, dest, createdLt, createdAt)
     }
 }

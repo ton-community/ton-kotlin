@@ -5,77 +5,55 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
+import org.ton.tlb.*
 import org.ton.tlb.constructor.IntTlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("tr_phase_action")
 @Serializable
-data class TrActionPhase(
+public data class TrActionPhase(
     val success: Boolean,
     val valid: Boolean,
-    val no_funds: Boolean,
-    val status_change: AccStatusChange,
-    val total_fwd_fees: Maybe<Coins>,
-    val total_action_fees: Maybe<Coins>,
-    val result_code: Int,
-    val result_arg: Maybe<Int>,
-    val tot_actions: Int,
-    val spec_actions: Int,
-    val skipped_actions: Int,
-    val msgs_created: Int,
-    val action_list_hash: BitString,
-    val tot_msg_size: StorageUsedShort
-) {
-    init {
-        require(action_list_hash.size == 256) { "required: action_list_hash.size == 256, actual: ${action_list_hash.size}" }
+    @SerialName("no_funds") val noFunds: Boolean,
+    @SerialName("status_change") val statusChange: AccStatusChange,
+    @SerialName("total_fwd_fees") val totalFwdFees: Maybe<Coins>,
+    @SerialName("total_action_fees") val totalActionFees: Maybe<Coins>,
+    @SerialName("result_code") val resultCode: Int,
+    @SerialName("result_arg") val resultArg: Maybe<Int>,
+    @SerialName("tot_actions") val totActions: Int,
+    @SerialName("spec_actions") val specActions: Int,
+    @SerialName("skipped_actions") val skippedActions: Int,
+    @SerialName("msgs_created") val msgsCreated: Int,
+    @SerialName("action_list_hash") val actionListHash: Bits256,
+    @SerialName("tot_msg_size") val totMsgSize: StorageUsedShort
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("tr_phase_action") {
+            field("success", success)
+            field("valid", valid)
+            field("no_funds", noFunds)
+            field("status_change", statusChange)
+            field("total_fwd_fees", totalFwdFees)
+            field("total_action_fees", totalActionFees)
+            field("result_code", resultCode)
+            field("result_arg", resultArg)
+            field("tot_actions", totActions)
+            field("spec_actions", specActions)
+            field("skipped_actions", skippedActions)
+            field("msgs_created", msgsCreated)
+            field("action_list_hash", actionListHash)
+            field("tot_msg_size", totMsgSize)
+        }
     }
 
+    override fun toString(): String = print().toString()
 
-    companion object : TlbCodec<TrActionPhase> by TrActionPhaseTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<TrActionPhase> = TrActionPhaseTlbConstructor
-    }
-
-    override fun toString(): String = buildString {
-        append("(tr_phase_action\nsuccess:")
-        append(success)
-        append(" valid:")
-        append(valid)
-        append(" no_funds:")
-        append(no_funds)
-        append(" status_change:")
-        append(status_change)
-        append(" total_fwd_fees:")
-        append(total_fwd_fees)
-        append(" total_action_fees:")
-        append(total_action_fees)
-        append(" result_code:")
-        append(result_code)
-        append(" result_arg:")
-        append(result_arg)
-        append(" tot_actions:")
-        append(tot_actions)
-        append(" spec_actions:")
-        append(spec_actions)
-        append(" skipped_actions:")
-        append(skipped_actions)
-        append(" msgs_created:")
-        append(msgs_created)
-        append(" action_list_hash:")
-        append(action_list_hash)
-        append(" tot_msg_size:")
-        append(tot_msg_size)
-        append(")")
-    }
+    public companion object : TlbConstructorProvider<TrActionPhase> by TrActionPhaseTlbConstructor
 }
 
 private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
@@ -96,18 +74,18 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
     ) = cellBuilder {
         storeBit(value.success)
         storeBit(value.valid)
-        storeBit(value.no_funds)
-        storeTlb(AccStatusChange, value.status_change)
-        storeTlb(maybeCoins, value.total_fwd_fees)
-        storeTlb(maybeCoins, value.total_action_fees)
-        storeInt(value.result_code, 32)
-        storeTlb(maybeInt32, value.result_arg)
-        storeUInt(value.tot_actions, 16)
-        storeUInt(value.spec_actions, 16)
-        storeUInt(value.skipped_actions, 16)
-        storeUInt(value.msgs_created, 16)
-        storeBits(value.action_list_hash)
-        storeTlb(StorageUsedShort, value.tot_msg_size)
+        storeBit(value.noFunds)
+        storeTlb(AccStatusChange, value.statusChange)
+        storeTlb(maybeCoins, value.totalFwdFees)
+        storeTlb(maybeCoins, value.totalActionFees)
+        storeInt(value.resultCode, 32)
+        storeTlb(maybeInt32, value.resultArg)
+        storeUInt(value.totActions, 16)
+        storeUInt(value.specActions, 16)
+        storeUInt(value.skippedActions, 16)
+        storeUInt(value.msgsCreated, 16)
+        storeBits(value.actionListHash)
+        storeTlb(StorageUsedShort, value.totMsgSize)
     }
 
     override fun loadTlb(
@@ -125,7 +103,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val specActions = loadUInt(16).toInt()
         val skippedActions = loadUInt(16).toInt()
         val msgCreated = loadUInt(16).toInt()
-        val actionListHash = loadBits(256)
+        val actionListHash = loadBits256()
         val totMsgSize = loadTlb(StorageUsedShort)
         TrActionPhase(
             success,

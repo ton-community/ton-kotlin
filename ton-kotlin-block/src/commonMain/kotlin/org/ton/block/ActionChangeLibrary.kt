@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("action_change_library")
-data class ActionChangeLibrary(
+public data class ActionChangeLibrary(
     val mode: Int,
     @Suppress("SpellCheckingInspection")
     val libref: LibRef

@@ -5,7 +5,7 @@ package org.ton.crypto
 import kotlin.random.Random
 
 public actual object SecureRandom : Random() {
-    private val javaSecureRandom = java.security.SecureRandom.getInstanceStrong()
+    private val javaSecureRandom = java.security.SecureRandom()
 
     override fun nextBits(bitCount: Int): Int = nextInt().takeUpperBits(bitCount)
 

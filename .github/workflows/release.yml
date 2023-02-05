@@ -1,12 +1,31 @@
-name: Release project
-
+name: Release
 on:
   push:
     tags:
       - 'v*'
+
 jobs:
   build:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            gradle_args: publishJvmPublicationToSonatypeRepository publishKotlinMultiplatformPublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishLinuxX64PublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishMingwX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishIosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishIosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishIosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishMacosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishMacosArm64PublicationToSonatypeRepository
+    runs-on: ${{ matrix.os }}
     env:
       SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
       SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
@@ -16,16 +35,11 @@ jobs:
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
-      - name: Cache konan
-        uses: actions/cache@v3
+      - uses: actions/setup-java@v3
         with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan
-      - name: Build
+          distribution: liberica
+          java-version: 17
+      - name: Build using gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assemble
-      - name: Publish
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publish closeAndReleaseStagingRepository
+          arguments: ${{ matrix.gradle_args }} closeAndReleaseSonatypeStagingRepository

@@ -7,25 +7,32 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
+import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun Pair<Boolean, Boolean>.toTickTock(): TickTock = TickTock(first, second)
+public inline fun Pair<Boolean, Boolean>.toTickTock(): TickTock = TickTock(first, second)
 
 @SerialName("tick_tock")
 @Serializable
-data class TickTock(
+public data class TickTock(
     val tick: Boolean,
     val tock: Boolean
-) {
-    fun toPair(): Pair<Boolean, Boolean> = tick to tock
+) : TlbObject {
+    public fun toPair(): Pair<Boolean, Boolean> = tick to tock
 
-    override fun toString(): String = "tick_tock(tick:$tick tock:$tock)"
-
-    companion object : TlbCodec<TickTock> by TickTockTlbConstructor {
-        @JvmStatic
-        fun tlbCodec(): TlbCodec<TickTock> = TickTockTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("tick_tock") {
+            field("tick", tick)
+            field("tick", tock)
+        }
     }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TickTock> by TickTockTlbConstructor
 }
 
 private object TickTockTlbConstructor : TlbConstructor<TickTock>(

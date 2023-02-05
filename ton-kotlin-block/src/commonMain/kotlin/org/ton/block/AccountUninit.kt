@@ -5,13 +5,17 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("account_uninit")
-object AccountUninit : AccountState {
-    fun tlbCodec(): TlbConstructor<AccountUninit> = AccountUninitTlbConstructor
+public object AccountUninit : AccountState, TlbConstructorProvider<AccountUninit> by AccountUninitTlbConstructor {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("account_uninit")
+    }
 
-    override fun toString(): String = "account_uninit"
+    override fun toString(): String = print().toString()
 }
 
 private object AccountUninitTlbConstructor : TlbConstructor<AccountUninit>(

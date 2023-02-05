@@ -2,27 +2,35 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.*
 import org.ton.hashmap.AugDictionary
 import org.ton.tlb.*
 
 @SerialName("block_extra")
 @Serializable
-data class BlockExtra(
-    val in_msg_descr: CellRef<AugDictionary<InMsg, ImportFees>>,
-    val out_msg_descr: CellRef<AugDictionary<OutMsg, CurrencyCollection>>,
-    val account_blocks: CellRef<AugDictionary<AccountBlock, CurrencyCollection>>,
-    val rand_seed: BitString,
-    val created_by: BitString,
+public data class BlockExtra(
+    @SerialName("in_msg_descr") val inMsgDescr: CellRef<AugDictionary<InMsg, ImportFees>>,
+    @SerialName("out_msg_descr") val outMsgDescr: CellRef<AugDictionary<OutMsg, CurrencyCollection>>,
+    @SerialName("account_blocks") val accountBlocks: CellRef<AugDictionary<AccountBlock, CurrencyCollection>>,
+    @SerialName("rand_seed") val randSeed: Bits256,
+    @SerialName("created_by") val createdBy: Bits256,
     val custom: Maybe<CellRef<McBlockExtra>>
-) {
-    init {
-        require(rand_seed.size == 256) { "expected: rand_seed.size == 256, actual: ${rand_seed.size}" }
-        require(created_by.size == 256) { "expected: created_by.size == 256, actual: ${created_by.size}" }
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("block_extra") {
+            field("in_msg_descr", inMsgDescr)
+            field("out_msg_descr", outMsgDescr)
+            field("account_blocks", accountBlocks)
+            field("rand_seed", randSeed)
+            field("created_by", createdBy)
+            field("custom", custom)
+        }
     }
 
-    companion object : TlbCodec<BlockExtra> by BlockExtraTlbConstructor.asTlbCombinator()
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<BlockExtra> by BlockExtraTlbConstructor.asTlbCombinator()
 }
 
 private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
@@ -48,11 +56,11 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
         cellBuilder: CellBuilder,
         value: BlockExtra
     ) = cellBuilder {
-        storeTlb(inMsgDescr, value.in_msg_descr)
-        storeTlb(outMsgDescr, value.out_msg_descr)
-        storeTlb(shardAccountBlock, value.account_blocks)
-        storeBits(value.rand_seed)
-        storeBits(value.created_by)
+        storeTlb(inMsgDescr, value.inMsgDescr)
+        storeTlb(outMsgDescr, value.outMsgDescr)
+        storeTlb(shardAccountBlock, value.accountBlocks)
+        storeBits(value.randSeed)
+        storeBits(value.createdBy)
         storeTlb(maybeMcBlockExtra, value.custom)
     }
 
@@ -62,8 +70,8 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
         val inMsgDescr = cellSlice.loadTlb(inMsgDescr)
         val outMsgDescr = cellSlice.loadTlb(outMsgDescr)
         val accountBlocks = loadTlb(shardAccountBlock)
-        val randSeed = loadBits(256)
-        val createdBy = loadBits(256)
+        val randSeed = loadBits256()
+        val createdBy = loadBits256()
         val custom = loadTlb(maybeMcBlockExtra)
         BlockExtra(inMsgDescr, outMsgDescr, accountBlocks, randSeed, createdBy, custom)
     }

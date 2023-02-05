@@ -6,7 +6,7 @@ import kotlinx.coroutines.withTimeout
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.liteserver.LiteServerDesc
-import org.ton.tl.Bits256
+import org.ton.bitstring.Bits256
 import kotlin.random.Random
 import kotlin.time.Duration
 

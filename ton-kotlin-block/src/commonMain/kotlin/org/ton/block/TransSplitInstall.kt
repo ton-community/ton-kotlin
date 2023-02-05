@@ -5,20 +5,29 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.cell.storeRef
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("trans_split_install")
-data class TransSplitInstall(
-    val split_info: SplitMergeInfo,
-    val prepare_transaction: Transaction,
+public data class TransSplitInstall(
+    @SerialName("split_info") val splitInfo: SplitMergeInfo,
+    @SerialName("prepare_transaction") val prepareTransaction: CellRef<Transaction>,
     val installed: Boolean
 ) : TransactionDescr {
-    companion object : TlbConstructorProvider<TransSplitInstall> by TransSplitInstallTlbConstructor
+    public companion object : TlbConstructorProvider<TransSplitInstall> by TransSplitInstallTlbConstructor
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer {
+            type("trans_split_install") {
+                field("split_info", splitInfo)
+                field("prepare_transaction", prepareTransaction)
+                field("installed", installed)
+            }
+        }
+    }
+
+    override fun toString(): String = print().toString()
 }
 
 private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstall>(
@@ -30,8 +39,8 @@ private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstal
         cellBuilder: CellBuilder,
         value: TransSplitInstall
     ) = cellBuilder {
-        storeTlb(SplitMergeInfo, value.split_info)
-        storeRef { storeTlb(Transaction, value.prepare_transaction) }
+        storeTlb(SplitMergeInfo, value.splitInfo)
+        storeRef(Transaction, value.prepareTransaction)
         storeBit(value.installed)
     }
 
@@ -39,7 +48,7 @@ private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstal
         cellSlice: CellSlice
     ): TransSplitInstall = cellSlice {
         val splitInfo = loadTlb(SplitMergeInfo)
-        val prepareTransaction = loadTlb(Transaction)
+        val prepareTransaction = loadRef(Transaction)
         val installed = loadBit()
         TransSplitInstall(splitInfo, prepareTransaction, installed)
     }

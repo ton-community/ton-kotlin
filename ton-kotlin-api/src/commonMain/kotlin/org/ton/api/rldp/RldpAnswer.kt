@@ -3,6 +3,7 @@ package org.ton.api.rldp
 import io.ktor.util.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.Bits256
 import org.ton.tl.*
 
 @SerialName("rldp.answer")

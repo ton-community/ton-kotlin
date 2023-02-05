@@ -6,16 +6,26 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("validator_info")
-data class ValidatorInfo(
-    val validator_list_hash_short: UInt,
-    val catchain_seqno: UInt,
-    val nx_cc_updated: Boolean
-) {
-    companion object : TlbConstructorProvider<ValidatorInfo> by ValidatorInfoTlbConstructor
+public data class ValidatorInfo(
+    @SerialName("validator_list_hash_short") val validatorListHashShort: UInt,
+    @SerialName("catchain_seqno") val catchainSeqno: UInt,
+    @SerialName("nx_cc_updated") val nxCcUpdated: Boolean
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("validator_info") {
+        field("validator_list_hash_short", validatorListHashShort)
+        field("catchain_seqno", catchainSeqno)
+        field("nx_cc_updated", nxCcUpdated)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<ValidatorInfo> by ValidatorInfoTlbConstructor
 }
 
 private object ValidatorInfoTlbConstructor : TlbConstructor<ValidatorInfo>(
@@ -29,9 +39,9 @@ private object ValidatorInfoTlbConstructor : TlbConstructor<ValidatorInfo>(
         cellBuilder: CellBuilder,
         value: ValidatorInfo
     ) = cellBuilder {
-        storeUInt32(value.validator_list_hash_short)
-        storeUInt32(value.catchain_seqno)
-        storeBit(value.nx_cc_updated)
+        storeUInt32(value.validatorListHashShort)
+        storeUInt32(value.catchainSeqno)
+        storeBit(value.nxCcUpdated)
     }
 
     override fun loadTlb(

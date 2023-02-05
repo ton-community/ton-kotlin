@@ -19,13 +19,13 @@ public data class DhtNodes(
         schema = "dht.nodes nodes:(vector dht.node) = dht.Nodes"
     ) {
         override fun encode(writer: TlWriter, value: DhtNodes) {
-            writer.writeCollection(value.nodes) {
+            writer.writeVector(value.nodes) {
                 write(DhtNode, it)
             }
         }
 
         override fun decode(reader: TlReader): DhtNodes {
-            val nodes = reader.readCollection {
+            val nodes = reader.readVector {
                 read(DhtNode)
             }
             return DhtNodes(nodes)

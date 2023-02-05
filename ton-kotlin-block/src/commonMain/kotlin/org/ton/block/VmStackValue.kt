@@ -13,14 +13,8 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 import kotlin.jvm.JvmStatic
 
 inline fun VmStackValue(): VmStackValue = VmStackValue.of()
-inline fun VmStackValue(byte: Byte): VmStackTinyInt = VmStackValue.of(byte)
-inline fun VmStackValue(byte: UByte): VmStackTinyInt = VmStackValue.of(byte.toLong())
-inline fun VmStackValue(short: Short): VmStackTinyInt = VmStackValue.of(short)
-inline fun VmStackValue(short: UShort): VmStackTinyInt = VmStackValue.of(short.toLong())
 inline fun VmStackValue(int: Int): VmStackTinyInt = VmStackValue.of(int)
-inline fun VmStackValue(int: UInt): VmStackTinyInt = VmStackValue.of(int.toLong())
 inline fun VmStackValue(long: Long): VmStackTinyInt = VmStackValue.of(long)
-inline fun VmStackValue(long: ULong): VmStackTinyInt = VmStackValue.of(long.toLong())
 inline fun VmStackValue(boolean: Boolean): VmStackTinyInt = VmStackValue.of(boolean)
 inline fun VmStackValue(bigInt: BigInt): VmStackInt = VmStackValue.of(bigInt)
 inline fun VmStackValue(cell: Cell): VmStackCell = VmStackValue.of(cell)
@@ -35,12 +29,6 @@ sealed interface VmStackValue {
     companion object : TlbCombinatorProvider<VmStackValue> by VmStackValueTlbCombinator {
         @JvmStatic
         fun of(): VmStackNull = VmStackNull
-
-        @JvmStatic
-        fun of(byte: Byte): VmStackTinyInt = VmStackTinyInt(byte)
-
-        @JvmStatic
-        fun of(short: Short): VmStackTinyInt = VmStackTinyInt(short)
 
         @JvmStatic
         fun of(int: Int): VmStackTinyInt = VmStackTinyInt(int)

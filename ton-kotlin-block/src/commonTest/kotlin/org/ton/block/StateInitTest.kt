@@ -1,12 +1,11 @@
 package org.ton.block
 
-import org.ton.bigint.BigInt
+import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
 import org.ton.crypto.hex
-import org.ton.hashmap.EmptyHashMapE
-import org.ton.hashmap.HashMapE
+import org.ton.hashmap.HmeEmpty
 import org.ton.tlb.storeTlb
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,7 +29,7 @@ class StateInitTest {
                 storeUInt(0, 32)
                 storeBits(BitString(publicKey))
             },
-            library = EmptyHashMapE as HashMapE<SimpleLib>
+            library = HmeEmpty()
         )
 
         val stateInitCell = CellBuilder.createCell { storeTlb(stateInitCodec, stateInit) }
@@ -39,7 +38,7 @@ class StateInitTest {
         assertEquals(SIMPLE_WALLET_R3_CODE.bits, stateInitCell.refs[0].bits)
 
         stateInitCell.refs[1].parse {
-            assertEquals(BigInt(0), loadUInt(32))
+            assertEquals(0.toBigInt(), loadUInt(32))
             assertEquals(BitString(publicKey), loadBits(256))
         }
 

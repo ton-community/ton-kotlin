@@ -5,18 +5,23 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_import_ext")
-data class MsgImportExt(
-    val msg: Message<Cell>,
-    val transaction: Transaction
+public data class MsgImportExt(
+    val msg: CellRef<Message<Cell>>,
+    val transaction: CellRef<Transaction>
 ) : InMsg {
-    companion object : TlbConstructorProvider<MsgImportExt> by MsgImportExtTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("msg_import_ext") {
+        field("msg", msg)
+        field("transaction", transaction)
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<MsgImportExt> by MsgImportExtTlbConstructor
 }
 
 private object MsgImportExtTlbConstructor : TlbConstructor<MsgImportExt>(
@@ -27,23 +32,15 @@ private object MsgImportExtTlbConstructor : TlbConstructor<MsgImportExt>(
         cellBuilder: CellBuilder,
         value: MsgImportExt
     ) = cellBuilder {
-        storeRef {
-            storeTlb(Message.Any, value.msg)
-        }
-        storeRef {
-            storeTlb(Transaction, value.transaction)
-        }
+        storeRef(Message.Any, value.msg)
+        storeRef(Transaction, value.transaction)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgImportExt = cellSlice {
-        val msg = loadRef {
-            loadTlb(Message.Any)
-        }
-        val transaction = loadRef {
-            loadTlb(Transaction)
-        }
+        val msg = loadRef(Message.Any)
+        val transaction = loadRef(Transaction)
         MsgImportExt(msg, transaction)
     }
 }

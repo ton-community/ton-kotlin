@@ -1,23 +1,28 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerPartialBlockProof
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getBlockProof")
 public data class LiteServerGetBlockProof(
     val mode: Int,
+    @SerialName("known_block")
     val knownBlock: TonNodeBlockIdExt,
+    @SerialName("target_block")
     val targetBlock: TonNodeBlockIdExt?
 ) : TLFunction<LiteServerGetBlockProof, LiteServerPartialBlockProof> {
-    override fun tlCodec(): TlCodec<LiteServerGetBlockProof> = Companion
-    override fun resultTlCodec(): TlCodec<LiteServerPartialBlockProof> = LiteServerPartialBlockProof
-
     public constructor(
         knownBlock: TonNodeBlockIdExt,
         targetBlock: TonNodeBlockIdExt? = null
     ) : this(if (targetBlock != null) 1 else 0, knownBlock, targetBlock)
+
+    override fun tlCodec(): TlCodec<LiteServerGetBlockProof> = Companion
+    override fun resultTlCodec(): TlCodec<LiteServerPartialBlockProof> = LiteServerPartialBlockProof
+
 
     public companion object : TlCodec<LiteServerGetBlockProof> by LiteServerGetBlockProofTlConstructor
 }

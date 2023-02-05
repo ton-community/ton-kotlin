@@ -30,7 +30,7 @@ private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
         val http_version = input.readString()
         val status_code = input.readInt()
         val reason = input.readString()
-        val headers = input.readCollection {
+        val headers = input.readVector {
             read(HttpHeader)
         }
         val on_payload = input.readBoolean()
@@ -41,7 +41,7 @@ private object HttpResponseTlConstructor : TlConstructor<HttpResponse>(
         output.writeString(value.httpVersion)
         output.writeInt(value.statusCode)
         output.writeString(value.reason)
-        output.writeCollection(value.headers) {
+        output.writeVector(value.headers) {
             write(HttpHeader, it)
         }
         output.writeBoolean(value.noPayload)

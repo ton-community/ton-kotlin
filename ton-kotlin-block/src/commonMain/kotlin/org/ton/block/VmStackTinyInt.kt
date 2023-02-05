@@ -13,17 +13,15 @@ import kotlin.math.abs
 
 @SerialName("vm_stk_tinyint")
 @Serializable
-data class VmStackTinyInt(
+public data class VmStackTinyInt(
     val value: Long
 ) : VmStackValue, VmStackNumber {
-    constructor(byte: Byte) : this(byte.toLong())
-    constructor(short: Short) : this(short.toLong())
-    constructor(int: Int) : this(int.toLong())
-    constructor(boolean: Boolean) : this(if (boolean) -1 else 0)
+    public constructor(int: Int) : this(int.toLong())
+    public constructor(boolean: Boolean) : this(if (boolean) -1 else 0)
 
     override fun toInt(): Int = value.toInt()
     override fun toLong(): Long = value
-    override fun toBigInt(): BigInt = BigInt(value)
+    override fun toBigInt(): BigInt = value.toBigInt()
     override fun toBoolean(): Boolean = value != 0L
 
     override fun plus(other: VmStackNumber): VmStackNumber {
@@ -32,13 +30,13 @@ data class VmStackTinyInt(
                 // HD 2-12 Overflow iff both arguments have the opposite sign of the result
                 val r = value + other.value
                 if (((value xor r) and (other.value xor r)) < 0) {
-                    VmStackInt(BigInt(value) + other.value)
+                    VmStackInt(value.toBigInt() + other.value.toBigInt())
                 } else {
                     VmStackTinyInt(r)
                 }
             }
 
-            is VmStackInt -> VmStackInt(other.value + value)
+            is VmStackInt -> VmStackInt(other.value + value.toBigInt())
             VmStackNan -> throw VmStackNanException()
         }
     }
@@ -51,11 +49,11 @@ data class VmStackTinyInt(
             if ((value xor other.value) and (value xor r) < 0) {
                 VmStackTinyInt(r)
             } else {
-                VmStackInt(BigInt(value) - other.value)
+                VmStackInt(value.toBigInt() - other.value.toBigInt())
             }
         }
 
-        is VmStackInt -> VmStackInt(other.value + value)
+        is VmStackInt -> VmStackInt(other.value + value.toBigInt())
         VmStackNan -> throw VmStackNanException()
     }
 
@@ -72,20 +70,20 @@ data class VmStackTinyInt(
                     if (((other.value != 0L) and (r / other.value != value)) ||
                         (value == Long.MAX_VALUE && other.value == -1L)
                     ) {
-                        return VmStackInt(BigInt(value) * other.value)
+                        return VmStackInt(value.toBigInt() * other.value.toBigInt())
                     }
                 }
                 VmStackTinyInt(r)
             }
 
-            is VmStackInt -> VmStackInt(BigInt(value) * other.value)
+            is VmStackInt -> VmStackInt(value.toBigInt() * other.value)
             VmStackNan -> throw VmStackNanException()
         }
     }
 
     override fun div(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackTinyInt -> VmStackTinyInt(value / other.value)
-        is VmStackInt -> VmStackInt(BigInt(value) / other.value)
+        is VmStackInt -> VmStackInt(value.toBigInt() / other.value)
         is VmStackNan -> throw VmStackNanException()
     }
 

@@ -11,7 +11,7 @@ class VmStackValueTest {
     val codec = VmStackValue.tlbCombinator()
 
     @Test
-    fun `test VmStackValue (de)serialization`() {
+    fun `test VmStackValue deserialization`() {
 
         testSerialization(codec, VmStackNull)
 

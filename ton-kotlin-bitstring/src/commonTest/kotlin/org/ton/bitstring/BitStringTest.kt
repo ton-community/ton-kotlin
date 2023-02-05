@@ -81,7 +81,7 @@ class BitStringTest {
     @Test
     fun `random BitString`() {
         repeat(100) {
-            repeat(BitString.MAX_LENGTH) { length ->
+            repeat(1023) { length ->
                 val bits1 = BooleanArray(length) { Random.nextBoolean() }
                 try {
                     val bitString1 = BitString(*bits1)

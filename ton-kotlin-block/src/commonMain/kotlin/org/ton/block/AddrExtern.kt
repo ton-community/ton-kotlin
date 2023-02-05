@@ -8,31 +8,32 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("addr_extern")
-data class AddrExtern(
-    val len: Int,
-    val external_address: BitString
+public data class AddrExtern(
+    val len: Int, // len : ## 9
+    @SerialName("external_address") val externalAddress: BitString // external_address : bits len
 ) : MsgAddressExt {
     init {
-        require(external_address.size == len) { "required: external_address.size == len, actual: ${external_address.size}" }
+        require(externalAddress.size == len) { "required: external_address.size == len, actual: ${externalAddress.size}" }
     }
 
-    constructor(externalAddress: ByteArray) : this(externalAddress.toBitString())
-    constructor(externalAddress: BitString) : this(externalAddress.size, externalAddress)
+    public constructor(externalAddress: ByteArray) : this(externalAddress.toBitString())
+    public constructor(externalAddress: BitString) : this(externalAddress.size, externalAddress)
 
-    override fun toString(): String = buildString {
-        append("(addr_extern\n")
-        append("len:")
-        append(len)
-        append(" external_address:")
-        append(external_address)
-        append(")")
+    override fun toString(): String = print().toString()
+
+    public override fun print(tlbPrettyPrinter: TlbPrettyPrinter): TlbPrettyPrinter = tlbPrettyPrinter {
+        type("addr_extern") {
+            field("len", len)
+            field("external_address", externalAddress)
+        }
     }
 
-    companion object : TlbConstructorProvider<AddrExtern> by AddrExternTlbConstructor
+    public companion object : TlbConstructorProvider<AddrExtern> by AddrExternTlbConstructor
 }
 
 private object AddrExternTlbConstructor : TlbConstructor<AddrExtern>(
@@ -42,7 +43,7 @@ private object AddrExternTlbConstructor : TlbConstructor<AddrExtern>(
         cellBuilder: CellBuilder, value: AddrExtern
     ) = cellBuilder {
         storeUInt(value.len, 9)
-        storeBits(value.external_address)
+        storeBits(value.externalAddress)
     }
 
     override fun loadTlb(

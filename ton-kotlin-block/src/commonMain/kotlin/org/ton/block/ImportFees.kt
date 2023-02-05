@@ -1,20 +1,29 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
-data class ImportFees(
-    val fees_collected: Coins,
-    val value_imported: CurrencyCollection
-) {
-    companion object : TlbConstructorProvider<ImportFees> by ImportFeesTlbConstructor
+@SerialName("import_fees")
+public data class ImportFees(
+    val feesCollected: Coins,
+    val valueImported: CurrencyCollection
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type("import_fees") {
+            field("fees_collected", feesCollected)
+            field("value_imported", valueImported)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<ImportFees> by ImportFeesTlbConstructor
 }
 
 private object ImportFeesTlbConstructor : TlbConstructor<ImportFees>(
@@ -23,8 +32,8 @@ private object ImportFeesTlbConstructor : TlbConstructor<ImportFees>(
     override fun storeTlb(
         cellBuilder: CellBuilder, value: ImportFees
     ) = cellBuilder {
-        storeTlb(Coins, value.fees_collected)
-        storeTlb(CurrencyCollection, value.value_imported)
+        storeTlb(Coins, value.feesCollected)
+        storeTlb(CurrencyCollection, value.valueImported)
     }
 
     override fun loadTlb(

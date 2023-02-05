@@ -1,40 +1,42 @@
 package org.ton.block
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
-data class EnqueuedMsg(
-    val enqueued_lt: ULong,
-    val out_msg: MsgEnvelope
-) {
-    companion object : TlbConstructorProvider<EnqueuedMsg> by EnqueuedMsgTlbConstructor
+public data class EnqueuedMsg(
+    @SerialName("enqueued_lt") val enqueuedLt: ULong,
+    @SerialName("out_msg") val outMsg: CellRef<MsgEnvelope>
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
+        return printer.type {
+            field("enqueued_lt", enqueuedLt)
+            field("out_msg", outMsg)
+        }
+    }
+
+    public companion object : TlbConstructorProvider<EnqueuedMsg> by EnqueuedMsgTlbConstructor
 }
 
 private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
-    schema = "_ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;\n"
+    schema = "_ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;"
 ) {
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: EnqueuedMsg
     ) = cellBuilder {
-        storeUInt64(value.enqueued_lt)
-        storeRef {
-            storeTlb(MsgEnvelope, value.out_msg)
-        }
+        storeUInt64(value.enqueuedLt)
+        storeRef(MsgEnvelope, value.outMsg)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): EnqueuedMsg = cellSlice {
         val enqueuedLt = loadUInt64()
-        val outMsg = loadRef {
-            loadTlb(MsgEnvelope)
-        }
+        val outMsg = loadRef(MsgEnvelope)
         EnqueuedMsg(enqueuedLt, outMsg)
     }
 }

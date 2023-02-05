@@ -11,7 +11,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.4")
+    implementation("org.ton:ton-kotlin:0.2.13")
 }
 ```
 
@@ -21,7 +21,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://search.maven.org/artifact/org.ton/ton-kotlin
+[maven-central]: https://search.maven.org/search?q=g:%22org.ton%22%20AND%20a:%22ton-kotlin%22
 
 [license]: LICENSE
 [kotlin]: http://kotlinlang.org
@@ -29,7 +29,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 [telegram]: https://t.me/tonkotlin
 
 [maven-central-svg]: https://img.shields.io/maven-central/v/org.ton/ton-kotlin?color=blue
-[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.7.22-blue.svg?logo=kotlin
+[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.8.0-blue.svg?logo=kotlin
 [telegram-svg]: https://img.shields.io/badge/Telegram-join%20chat-blue.svg?logo=telegram
 [ton-svg]: https://img.shields.io/badge/Based%20on-TON-blue
 [license-svg]: https://img.shields.io/github/license/andreypfau/ton-kotlin?color=blue

@@ -7,22 +7,19 @@ import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("addr_var")
-data class AddrVar(
+public data class AddrVar(
     val anycast: Maybe<Anycast>,
-    val addr_len: Int,
-    override val workchain_id: Int,
+    @SerialName("addr_len") val addrLen: Int,
+    @SerialName("workchain_id") override val workchainId: Int,
     val address: BitString
 ) : MsgAddressInt {
     init {
-        require(address.size == addr_len) { "required: address.size == addr_len, actual: ${address.size}" }
+        require(address.size == addrLen) { "required: address.size == addr_len, actual: ${address.size}" }
     }
 
     constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
@@ -41,18 +38,16 @@ data class AddrVar(
         address.toBitString()
     )
 
-    override fun toString(): String = buildString {
-        append("(addr_var\n")
-        append("anycast:")
-        append(anycast)
-        append(" addr_len:")
-        append(addr_len)
-        append(" workchain_id:")
-        append(workchain_id)
-        append(" address:")
-        append(address)
-        append(")")
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("addr_var") {
+            field("anycast", anycast)
+            field("addr_len", addrLen)
+            field("workchain_id", workchainId)
+            field("address", address)
+        }
     }
+
+    override fun toString(): String = print().toString()
 
     companion object : TlbCodec<AddrVar> by AddrVarTlbConstructor {
         @JvmStatic
@@ -70,8 +65,8 @@ private object AddrVarTlbConstructor : TlbConstructor<AddrVar>(
         value: AddrVar
     ) = cellBuilder {
         storeTlb(MaybeAnycast, value.anycast)
-        storeUInt(value.addr_len, 9)
-        storeInt(value.workchain_id, 32)
+        storeUInt(value.addrLen, 9)
+        storeInt(value.workchainId, 32)
         storeBits(value.address)
     }
 

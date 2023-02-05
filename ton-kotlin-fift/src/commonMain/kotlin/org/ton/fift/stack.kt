@@ -3,6 +3,8 @@
 package org.ton.fift
 
 import org.ton.bigint.BigInt
+import org.ton.bigint.toBigInt
+import org.ton.bigint.unaryMinus
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -18,9 +20,9 @@ class Stack(
 
     fun push(stackEntry: Any) {
         when (stackEntry) {
-            is Int -> push(BigInt(stackEntry))
-            is Long -> push(BigInt(stackEntry))
-            is Boolean -> push(BigInt(if (stackEntry) -1 else 0))
+            is Int -> push(stackEntry.toBigInt())
+            is Long -> push(stackEntry.toBigInt())
+            is Boolean -> push(if (stackEntry) (-1).toBigInt() else 0.toBigInt())
             else -> {
                 fift.logger.debug { "${fift.debugExecutionDepthIndent()}Stack push: ${stackEntry.fiftFormat()}" }
                 storage.addLast(stackEntry)

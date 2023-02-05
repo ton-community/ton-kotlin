@@ -1,16 +1,18 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.lite.api.liteserver.LiteServerMasterchainInfoExt
 import org.ton.tl.*
 
 @Serializable
+@SerialName("liteServer.getMasterchainInfoExt")
 public data class LiteServerGetMasterchainInfoExt(
     val mode: Int
 ) : TLFunction<LiteServerGetMasterchainInfoExt, LiteServerMasterchainInfoExt> {
     public companion object : TlCodec<LiteServerGetMasterchainInfoExt> by LiteServerGetMasterchainInfoExtTlConstructor
 
-    override fun tlCodec(): TlCodec<LiteServerGetMasterchainInfoExt> = LiteServerGetMasterchainInfoExt
+    override fun tlCodec(): TlCodec<LiteServerGetMasterchainInfoExt> = LiteServerGetMasterchainInfoExtTlConstructor
 
     override fun resultTlCodec(): TlCodec<LiteServerMasterchainInfoExt> = LiteServerMasterchainInfoExt
 }

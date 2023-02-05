@@ -2,28 +2,26 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
-import kotlin.jvm.JvmStatic
+import org.ton.tlb.TlbPrettyPrinter
+import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("account_frozen")
-data class AccountFrozen(
-    val state_hash: BitString
+public data class AccountFrozen(
+    @SerialName("state_hash") val stateHash: Bits256 // state_hash : bits256
 ) : AccountState {
-    init {
-        require(state_hash.size == 256) { "required: state_hash.size == 256, actual: ${state_hash.size}" }
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_frozen") {
+        printer.field("state_hash", stateHash)
     }
 
-    override fun toString(): String = "(account_frozen\nstate_hash:$state_hash)"
+    override fun toString(): String = print().toString()
 
-    companion object {
-        @JvmStatic
-        fun tlbCodec(): TlbConstructor<AccountFrozen> = AccountFrozenTlbConstructor
-    }
+    public companion object : TlbConstructorProvider<AccountFrozen> by AccountFrozenTlbConstructor
 }
 
 private object AccountFrozenTlbConstructor : TlbConstructor<AccountFrozen>(
@@ -33,13 +31,13 @@ private object AccountFrozenTlbConstructor : TlbConstructor<AccountFrozen>(
         cellBuilder: CellBuilder,
         value: AccountFrozen
     ) = cellBuilder {
-        storeBits(value.state_hash)
+        storeBits(value.stateHash)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountFrozen = cellSlice {
-        val stateHash = loadBits(256)
+        val stateHash = loadBits256()
         AccountFrozen(stateHash)
     }
 }
