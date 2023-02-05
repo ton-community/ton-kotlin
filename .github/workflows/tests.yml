@@ -16,13 +16,10 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: liberica
-          java-version: 18
-      - name: Cache konan
-        uses: actions/cache@v3
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan
+          java-version: 17
       - name: Publish multiplatform metadata to Maven Local
         uses: gradle/gradle-build-action@v2
         with:
           arguments: publishKotlinMultiplatformPublicationToMavenLocal
+      - name: Check metadata
+        run: cat ~/.m2/repository/org/ton/ton-kotlin/0.2.12/ton-kotlin-0.2.12.module
