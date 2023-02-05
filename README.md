@@ -21,7 +21,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://search.maven.org/artifact/org.ton/ton-kotlin
+[maven-central]: https://search.maven.org/search?q=g:%22org.ton%22%20AND%20a:%22ton-kotlin%22
 
 [license]: LICENSE
 [kotlin]: http://kotlinlang.org
