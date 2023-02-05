@@ -13,9 +13,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: jvmMainClasses
+            gradle_args: compileKotlinJvm
           - os: ubuntu-latest
             gradle_args: compileKotlinLinuxX64
+          - os: windows-latest
+            gradle_args: compileKotlinMingwX64
+          - os: macos-latest
+            gradle_args: compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileKotlinIosX64 compileMacosArm64 compileMacosX64
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
@@ -24,7 +28,7 @@ jobs:
         with:
           distribution: liberica
           java-version: 17
-      - name: Publish multiplatform metadata to Maven Local
+      - name: Build using gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ matrix.gradle_args }}
