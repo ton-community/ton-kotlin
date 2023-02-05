@@ -22,5 +22,5 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Run tests
-        run: ./gradlew jvmTest publishToMavenLocal --stacktrace
+      - name: Publish kotlin multiplatform publication to Maven Local
+        run: ./gradlew publishKotlinMultiplatformPublicationToMavenLocal --stacktrace
