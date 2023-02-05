@@ -13,21 +13,21 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: compileKotlinJvm
+            gradle_args: publishJvmPublicationToSonatypeRepository publishKotlinMultiplatformPublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: compileKotlinLinuxX64
+            gradle_args: publishLinuxX64PublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: compileKotlinMingwX64
+            gradle_args: publishMingwX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinIosArm64
+            gradle_args: publishIosArm64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinIosX64
+            gradle_args: compileKotlinIosX64 publishIosX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinIosSimulatorArm64
+            gradle_args: publishIosSimulatorArm64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinMacosX64
+            gradle_args: publishMacosX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinMacosArm64
+            gradle_args: publishMacosArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
