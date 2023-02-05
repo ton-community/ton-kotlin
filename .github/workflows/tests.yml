@@ -16,10 +16,12 @@ jobs:
             gradle_args: compileKotlinJvm
           - os: ubuntu-latest
             gradle_args: compileKotlinLinuxX64
+          - os: ubuntu-latest
+            gradle_args: compileKotlinJvm compileKotlinLinuxX64
           - os: windows-latest
             gradle_args: compileKotlinMingwX64
           - os: macos-latest
-            gradle_args: compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileKotlinIosX64 compileMacosArm64 compileMacosX64
+            gradle_args: compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileKotlinIosX64 compileKotlinMacosArm64 compileKotlinMacosX64
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
