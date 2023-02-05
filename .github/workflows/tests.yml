@@ -22,5 +22,7 @@ jobs:
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
-      - name: Publish kotlin multiplatform publication to Maven Local
-        run: ./gradlew publishKotlinMultiplatformPublicationToMavenLocal --stacktrace
+      - name: Publish multiplatform metadata to Maven Local
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishKotlinMultiplatformPublicationToMavenLocal
