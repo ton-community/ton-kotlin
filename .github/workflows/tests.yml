@@ -27,4 +27,4 @@ jobs:
       - name: Publish multiplatform metadata to Maven Local
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ gradle_args }}
+          arguments: ${{ matrix.gradle_args }}
