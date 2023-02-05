@@ -19,10 +19,8 @@ public data class VarUInteger(
     @Serializable(BigIntSerializer::class)
     val value: BigInt
 ) : TlbObject {
-    constructor(byte: Byte) : this(BigInt(byte))
-    constructor(short: Short) : this(BigInt(short))
-    constructor(int: Int) : this(BigInt(int))
-    constructor(long: Long) : this(BigInt(long))
+    constructor(int: Int) : this(int.toBigInt())
+    constructor(long: Long) : this(long.toBigInt())
     constructor(value: BigInt) : this(
         len = value.bitLength / Byte.SIZE_BITS + if (value.bitLength % Byte.SIZE_BITS == 0) 0 else 1,
         value = value

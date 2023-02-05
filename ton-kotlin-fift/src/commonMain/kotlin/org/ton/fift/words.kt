@@ -44,10 +44,10 @@ public fun Dictionary.defineBasicWords() {
     this["+ "] = { interpretPlus() }
     this["- "] = { interpretMinus() }
     this["negate "] = { interpretNegate() }
-    this["1+ "] = { interpretPlus(BigInt(1)) }
-    this["1- "] = { interpretMinus(BigInt(1)) }
-    this["2+ "] = { interpretPlus(BigInt(2)) }
-    this["2- "] = { interpretMinus(BigInt(2)) }
+    this["1+ "] = { interpretPlus(1.toBigInt()) }
+    this["1- "] = { interpretMinus(1.toBigInt()) }
+    this["2+ "] = { interpretPlus(2.toBigInt()) }
+    this["2- "] = { interpretMinus(2.toBigInt()) }
     this["2* "] = { interpretShl(1) }
     this["2/ "] = { interpretShr(1) }
     this["* "] = { interpretTimes() }
@@ -108,7 +108,7 @@ public fun Dictionary.defineBasicWords() {
     this["emit "] = { interpretEmit() }
     this["char ", true] = { interpretChar() }
     this["(char) "] = { interpretCharInternal() }
-    this["bl "] = WordDef(BigInt(32))
+    this["bl "] = WordDef(32.toBigInt())
     this["space "] = { interpretEmitConst(' ') }
     this["$+ "] = { interpretStringConcat() }
     this["$= "] = { interpretStringEqual() }

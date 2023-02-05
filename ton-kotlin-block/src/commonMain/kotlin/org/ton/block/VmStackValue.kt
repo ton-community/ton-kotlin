@@ -13,8 +13,6 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 import kotlin.jvm.JvmStatic
 
 inline fun VmStackValue(): VmStackValue = VmStackValue.of()
-inline fun VmStackValue(byte: Byte): VmStackTinyInt = VmStackValue.of(byte)
-inline fun VmStackValue(short: Short): VmStackTinyInt = VmStackValue.of(short)
 inline fun VmStackValue(int: Int): VmStackTinyInt = VmStackValue.of(int)
 inline fun VmStackValue(long: Long): VmStackTinyInt = VmStackValue.of(long)
 inline fun VmStackValue(boolean: Boolean): VmStackTinyInt = VmStackValue.of(boolean)
@@ -31,12 +29,6 @@ sealed interface VmStackValue {
     companion object : TlbCombinatorProvider<VmStackValue> by VmStackValueTlbCombinator {
         @JvmStatic
         fun of(): VmStackNull = VmStackNull
-
-        @JvmStatic
-        fun of(byte: Byte): VmStackTinyInt = VmStackTinyInt(byte)
-
-        @JvmStatic
-        fun of(short: Short): VmStackTinyInt = VmStackTinyInt(short)
 
         @JvmStatic
         fun of(int: Int): VmStackTinyInt = VmStackTinyInt(int)

@@ -16,37 +16,35 @@ data class VmStackInt(
     @Serializable(BigIntSerializer::class)
     val value: BigInt
 ) : VmStackValue, VmStackNumber {
-    constructor(byte: Byte) : this(BigInt(byte))
-    constructor(short: Short) : this(BigInt(short))
-    constructor(int: Int) : this(BigInt(int))
-    constructor(long: Long) : this(BigInt(long))
+    constructor(int: Int) : this(int.toBigInt())
+    constructor(long: Long) : this(long.toBigInt())
 
     override fun toInt(): Int = value.toInt()
     override fun toLong(): Long = value.toLong()
     override fun toBigInt(): BigInt = value
-    override fun toBoolean(): Boolean = value != BigInt(0)
+    override fun toBoolean(): Boolean = value != 0.toBigInt()
 
     override fun plus(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackInt -> VmStackInt(value + other.value)
-        is VmStackTinyInt -> VmStackInt(value + other.value)
+        is VmStackTinyInt -> VmStackInt(value + other.value.toBigInt())
         VmStackNan -> throw VmStackNanException()
     }
 
     override fun minus(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackInt -> VmStackInt(value - other.value)
-        is VmStackTinyInt -> VmStackInt(value - other.value)
+        is VmStackTinyInt -> VmStackInt(value - other.value.toBigInt())
         VmStackNan -> throw VmStackNanException()
     }
 
     override fun times(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackInt -> VmStackInt(value * other.value)
-        is VmStackTinyInt -> VmStackInt(value * other.value)
+        is VmStackTinyInt -> VmStackInt(value * other.value.toBigInt())
         VmStackNan -> throw VmStackNanException()
     }
 
     override fun div(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackInt -> VmStackInt(value / other.value)
-        is VmStackTinyInt -> VmStackInt(value / other.value)
+        is VmStackTinyInt -> VmStackInt(value / other.value.toBigInt())
         VmStackNan -> throw VmStackNanException()
     }
 

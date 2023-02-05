@@ -1,104 +1,91 @@
 package org.ton.bigint
 
+import com.ionspin.kotlin.bignum.integer.BigInteger
+import com.ionspin.kotlin.bignum.integer.util.fromTwosComplementByteArray
+
 @Suppress("ConvertSecondaryConstructorToPrimary")
-public actual class BigInt : Number, Comparable<BigInt> {
-    public actual constructor(string: String) {
-        TODO("Not yet implemented")
-    }
+public actual class BigInt internal constructor(
+    internal val value: BigInteger
+) : Number(), Comparable<BigInt> {
+    public actual constructor(string: String) : this(string, 10)
 
-    public actual constructor(string: String, radix: Int) {
-        TODO("Not yet implemented")
-    }
+    public actual constructor(string: String, radix: Int) : this(BigInteger.parseString(string, radix))
 
-    public actual constructor(byteArray: ByteArray) {
-        TODO("Not yet implemented")
-    }
+    public actual constructor(byteArray: ByteArray) : this(BigInteger.fromTwosComplementByteArray(byteArray))
 
-    internal constructor(magnitude: IntArray, signum: Int) {
-        TODO()
-    }
+    public actual fun toByteArray(): ByteArray =
+        value.toByteArray()
 
-    public actual fun toByteArray(): ByteArray {
-        TODO("Not yet implemented")
-    }
+    public actual fun toString(radix: Int): String =
+        value.toString(radix)
 
-    public actual fun toString(radix: Int): String {
-        TODO("Not yet implemented")
-    }
+    override fun compareTo(other: BigInt): Int =
+        value.compareTo(other.value)
 
-    public actual fun not(): BigInt {
-        TODO("Not yet implemented")
-    }
+    override fun toByte(): Byte =
+        value.byteValue()
 
-    override fun compareTo(other: BigInt): Int {
-        TODO("Not yet implemented")
-    }
+    override fun toChar(): Char =
+        value.shortValue().toInt().toChar()
 
-    override fun toByte(): Byte {
-        TODO("Not yet implemented")
-    }
+    override fun toDouble(): Double =
+        value.doubleValue()
 
-    override fun toChar(): Char {
-        TODO("Not yet implemented")
-    }
+    override fun toFloat(): Float =
+        value.floatValue()
 
-    override fun toDouble(): Double {
-        TODO("Not yet implemented")
-    }
+    override fun toInt(): Int =
+        value.intValue()
 
-    override fun toFloat(): Float {
-        TODO("Not yet implemented")
-    }
+    override fun toLong(): Long =
+        value.longValue()
 
-    override fun toInt(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun toLong(): Long {
-        TODO("Not yet implemented")
-    }
-
-    override fun toShort(): Short {
-        TODO("Not yet implemented")
-    }
-
-    companion object {
-        const val LONG_MASK = 0xffffffffL
-        val ZERO = BigInt(intArrayOf(), 0)
-        val ONE = BigInt(intArrayOf(1), 1)
-
-        fun bitLengthForInt(n: Int): Int = 32 - n.countLeadingZeroBits()
-    }
+    override fun toShort(): Short =
+        value.shortValue()
 }
 
-public actual fun Number.toBigInt(): BigInt {
-    TODO("Not yet implemented")
+public actual fun Int.toBigInt(): BigInt =
+    BigInt(BigInteger.fromInt(this))
+
+public actual fun Long.toBigInt(): BigInt =
+    BigInt(BigInteger.fromLong(this))
+
+public actual val BigInt.bitLength: Int get() =
+    TODO()
+
+public actual val BigInt.sign: Int get() =
+    value.signum()
+public actual val BigInt.isZero: Boolean get() =
+    value.isZero()
+
+public actual operator fun BigInt.plus(other: BigInt): BigInt =
+    BigInt(value + other.value)
+public actual operator fun BigInt.minus(other: BigInt): BigInt =
+    BigInt(value - other.value)
+public actual operator fun BigInt.times(other: BigInt): BigInt =
+    BigInt(value * other.value)
+public actual operator fun BigInt.div(other: BigInt): BigInt =
+    BigInt(value / other.value)
+public actual operator fun BigInt.unaryMinus(): BigInt =
+    BigInt(-value)
+public actual operator fun BigInt.rem(other: BigInt): BigInt =
+    BigInt(value % other.value)
+public actual infix fun BigInt.shr(shr: Int): BigInt =
+    BigInt(value shr shr)
+public actual infix fun BigInt.shl(shl: Int): BigInt =
+    BigInt(value shl shl)
+public actual infix fun BigInt.and(and: BigInt): BigInt =
+    BigInt(value and and.value)
+public actual infix fun BigInt.or(mod: BigInt): BigInt =
+    BigInt(value or mod.value)
+public actual infix fun BigInt.xor(mod: BigInt): BigInt =
+    BigInt(value xor mod.value)
+public actual fun BigInt.not(): BigInt =
+    BigInt(value.not())
+
+public actual infix fun BigInt.divRem(other: BigInt): Pair<BigInt,BigInt> {
+    val result = other.value.divideAndRemainder(other.value)
+    return BigInt(result.first) to BigInt(result.second)
 }
-
-public actual fun Int.toBigInt(): BigInt {
-    TODO("Not yet implemented")
-}
-
-public actual fun Long.toBigInt(): BigInt {
-    TODO("Not yet implemented")
-}
-
-public actual val BigInt.bitLength: Int get() = TODO()
-public actual val BigInt.sign: Int get() = TODO()
-public actual val BigInt.isZero: Boolean get() = TODO()
-
-public actual operator fun BigInt.plus(number: Number): BigInt = TODO()
-public actual operator fun BigInt.minus(number: Number): BigInt = TODO()
-public actual operator fun BigInt.times(number: Number): BigInt = TODO()
-public actual operator fun BigInt.div(number: Number): BigInt = TODO()
-public actual operator fun BigInt.unaryMinus(): BigInt = TODO()
-public actual operator fun BigInt.rem(mod: BigInt): BigInt = TODO()
-public actual infix fun BigInt.shr(shr: Int): BigInt = TODO()
-public actual infix fun BigInt.shl(shl: Int): BigInt = TODO()
-public actual infix fun BigInt.and(and: BigInt): BigInt = TODO()
-public actual infix fun BigInt.or(mod: BigInt): BigInt = TODO()
-public actual infix fun BigInt.xor(mod: BigInt): BigInt = TODO()
-public actual infix fun BigInt.divRem(value: BigInt): Array<BigInt> = TODO()
-public actual infix fun BigInt.pow(pow: Int): BigInt = TODO()
-public actual operator fun BigInt.compareTo(other: Int): Int = TODO()
-public actual operator fun BigInt.compareTo(other: Long): Int = TODO()
+public actual infix fun BigInt.pow(pow: Int): BigInt =
+    BigInt(value.pow(pow))

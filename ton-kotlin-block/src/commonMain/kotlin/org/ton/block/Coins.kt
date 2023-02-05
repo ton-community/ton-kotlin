@@ -9,7 +9,6 @@ import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmStatic
-import kotlin.math.pow
 
 @SerialName("nanocoins")
 @Serializable
@@ -43,14 +42,14 @@ public data class Coins(
 
         @JvmStatic
         fun of(coins: Long, decimals: Int = DECIMALS): Coins =
-            Coins(VarUInteger(BigInt(coins) * BigInt(10).pow(decimals)))
+            Coins(VarUInteger(coins.toBigInt() * 10.toBigInt().pow(decimals)))
 
         @JvmStatic
         fun of(coins: Double, decimals: Int = DECIMALS): Coins =
             Coins(
                 VarUInteger(
-                    BigInt(coins.toLong() * 10.0.pow(decimals)) +
-                            BigInt((coins - coins.toLong()) * 10.0.pow(decimals))
+                    (coins.toLong().toBigInt() * 10L.toBigInt().pow(decimals)) +
+                            ((coins - coins.toLong()).toLong().toBigInt() * 10.toBigInt().pow(decimals))
                 )
             )
 

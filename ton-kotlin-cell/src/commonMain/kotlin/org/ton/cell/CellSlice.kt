@@ -157,8 +157,8 @@ private open class CellSliceImpl(
 
     override fun preloadInt(length: Int): BigInt {
         val uint = preloadUInt(length)
-        val int = BigInt(1) shl (length - 1)
-        return if (uint >= int) uint - (int * 2) else uint
+        val int = 1.toBigInt() shl (length - 1)
+        return if (uint >= int) uint - (int * 2.toBigInt()) else uint
     }
 
     override fun loadUInt(length: Int): BigInt {
@@ -168,7 +168,7 @@ private open class CellSliceImpl(
     }
 
     override fun preloadUInt(length: Int): BigInt {
-        if (length == 0) return BigInt(0)
+        if (length == 0) return 0.toBigInt()
         val bits = preloadBits(length)
         val intBits = buildString(length) {
             bits.forEach { bit ->
@@ -280,7 +280,7 @@ private class CellSliceByteBackedBitString(
                 if (value > Long.MAX_VALUE.toULong()) {
                     BigInt(value.toString(), 10)
                 } else {
-                    BigInt(value.toLong())
+                    value.toLong().toBigInt()
                 }
             }
         }
@@ -294,9 +294,9 @@ private class CellSliceByteBackedBitString(
                 val uint = getLong(length).toLong()
                 val int = 1L shl (length - 1)
                 if (uint >= int) {
-                    BigInt(uint - (int * 2))
+                    (uint - (int * 2)).toBigInt()
                 } else {
-                    BigInt(uint)
+                    uint.toBigInt()
                 }
             }
         }
