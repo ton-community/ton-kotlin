@@ -21,7 +21,7 @@ jobs:
           - os: macos-latest
             gradle_args: publishIosArm64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: compileKotlinIosX64 publishIosX64PublicationToSonatypeRepository
+            gradle_args: publishIosX64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: publishIosSimulatorArm64PublicationToSonatypeRepository
           - os: macos-latest
@@ -29,6 +29,12 @@ jobs:
           - os: macos-latest
             gradle_args: publishMacosArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
+    env:
+      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
