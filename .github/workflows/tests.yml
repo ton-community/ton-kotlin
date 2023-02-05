@@ -8,8 +8,15 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            gradle_args: jvmMainClasses
+          - os: ubuntu-latest
+            gradle_args: compileKotlinLinuxX64
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
@@ -20,6 +27,4 @@ jobs:
       - name: Publish multiplatform metadata to Maven Local
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publishKotlinMultiplatformPublicationToMavenLocal
-      - name: Check metadata
-        run: cat ~/.m2/repository/org/ton/ton-kotlin/0.2.12/ton-kotlin-0.2.12.module
+          arguments: ${{ gradle_args }}

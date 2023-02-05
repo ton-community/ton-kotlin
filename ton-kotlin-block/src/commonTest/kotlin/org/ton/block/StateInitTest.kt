@@ -1,6 +1,6 @@
 package org.ton.block
 
-import org.ton.bigint.BigInt
+import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
@@ -38,7 +38,7 @@ class StateInitTest {
         assertEquals(SIMPLE_WALLET_R3_CODE.bits, stateInitCell.refs[0].bits)
 
         stateInitCell.refs[1].parse {
-            assertEquals(BigInt(0), loadUInt(32))
+            assertEquals(0.toBigInt(), loadUInt(32))
             assertEquals(BitString(publicKey), loadBits(256))
         }
 
