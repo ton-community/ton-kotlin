@@ -1,6 +1,6 @@
 package org.ton.mnemonic
 
-internal val MNEMONIC_WORD_LIST get() = arrayOf(
+internal val MNEMONIC_WORD_LIST get() = listOf(
     "abandon",
     "ability",
     "able",
