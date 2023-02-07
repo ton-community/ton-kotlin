@@ -2,9 +2,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(projects.tonKotlinCrypto)
                 implementation(libs.serialization.json)
-                implementation(libs.atomicfu)
+                implementation("com.ionspin.kotlin:bignum:0.3.7")
             }
         }
         val commonTest by getting

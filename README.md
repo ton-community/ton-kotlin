@@ -29,7 +29,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 [telegram]: https://t.me/tonkotlin
 
 [maven-central-svg]: https://img.shields.io/maven-central/v/org.ton/ton-kotlin?color=blue
-[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.8.0-blue.svg?logo=kotlin
+[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.8.10-blue.svg?logo=kotlin
 [telegram-svg]: https://img.shields.io/badge/Telegram-join%20chat-blue.svg?logo=telegram
 [ton-svg]: https://img.shields.io/badge/Based%20on-TON-blue
 [license-svg]: https://img.shields.io/github/license/andreypfau/ton-kotlin?color=blue
