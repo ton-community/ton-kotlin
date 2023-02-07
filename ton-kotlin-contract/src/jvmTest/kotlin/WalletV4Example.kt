@@ -17,7 +17,7 @@ suspend fun main(args: Array<String>) {
 
     val liteApi = liteClient().liteApi
     val privateKey =
-        PrivateKeyEd25519(Mnemonic.toSeed(mnemonics.toTypedArray()))
+        PrivateKeyEd25519(Mnemonic.toSeed(mnemonics))
 
     val wallet = WalletV4R2Contract(privateKey.publicKey())
     println(wallet.address)

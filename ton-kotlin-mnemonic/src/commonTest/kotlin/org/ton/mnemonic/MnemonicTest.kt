@@ -1,6 +1,7 @@
 package org.ton.mnemonic
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
