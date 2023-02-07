@@ -1,19 +1,17 @@
 package org.ton.asm.stackbasic
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-data class PUSH(
-    val i: UByte
+public data class PUSH(
+    val i: Int
 ) : AsmInstruction {
     override fun toString(): String = "s$i PUSH"
 
-    companion object : TlbConstructorProvider<PUSH> by PUSHTlbConstructor
+    public companion object : TlbConstructorProvider<PUSH> by PUSHTlbConstructor
 }
 
 private object PUSHTlbConstructor : TlbConstructor<PUSH>(
@@ -24,7 +22,7 @@ private object PUSHTlbConstructor : TlbConstructor<PUSH>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): PUSH {
-        val i = cellSlice.loadUInt(4).toUByte()
+        val i = cellSlice.loadUInt(4).toInt()
         return PUSH(i)
     }
 }

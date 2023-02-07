@@ -22,7 +22,13 @@ public sealed interface Maybe<X> : TlbObject {
 
     public companion object {
         @JvmStatic
-        public fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()
+        public fun <X> of(value: X?): Maybe<X> = if (value != null) just(value) else nothing()
+
+        @JvmStatic
+        public fun <X> nothing(): Maybe<X> = Nothing()
+
+        @JvmStatic
+        public fun <X> just(value: X): Maybe<X> = Just(value)
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic

@@ -26,6 +26,8 @@ public data class HmeRoot<T>(
         return HmeRoot(root)
     }
 
+    override fun isEmpty(): Boolean = false
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("hme_root") {
             field("root", root)

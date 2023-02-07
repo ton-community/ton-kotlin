@@ -1,25 +1,23 @@
 package org.ton.asm.stackbasic
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class XCHG_IJ(
-    val i: UByte,
-    val j: UByte,
+    val i: Int,
+    val j: Int,
 ) : AsmInstruction {
     init {
-        require(i >= 1u) { "expected i >= 1, actual $i" }
-        require(j >= i + 1u) { "expected j >= ${i + 1u}, actual $j" }
+        require(i >= 1) { "expected i >= 1, actual $i" }
+        require(j >= i + 1) { "expected j >= ${i + 1}, actual $j" }
     }
 
     override fun toString(): String = "s$i s$j XCHG"
 
-    companion object : TlbConstructorProvider<XCHG_IJ> by XCHG_IJTlbConstructor
+    public companion object : TlbConstructorProvider<XCHG_IJ> by XCHG_IJTlbConstructor
 }
 
 private object XCHG_IJTlbConstructor : TlbConstructor<XCHG_IJ>(
@@ -31,8 +29,8 @@ private object XCHG_IJTlbConstructor : TlbConstructor<XCHG_IJ>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): XCHG_IJ {
-        val i = cellSlice.loadUInt(4).toUByte()
-        val j = cellSlice.loadUInt(4).toUByte()
+        val i = cellSlice.loadUInt(4).toInt()
+        val j = cellSlice.loadUInt(4).toInt()
         return XCHG_IJ(i, j)
     }
 }

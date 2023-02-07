@@ -1,19 +1,17 @@
 package org.ton.asm.stackbasic
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-data class POP(
-    val i: UByte
+public data class POP(
+    val i: Int
 ) : AsmInstruction {
     override fun toString(): String = "s$i POP"
 
-    companion object : TlbConstructorProvider<POP> by POPTlbConstructor
+    public companion object : TlbConstructorProvider<POP> by POPTlbConstructor
 }
 
 private object POPTlbConstructor : TlbConstructor<POP>(
@@ -24,7 +22,7 @@ private object POPTlbConstructor : TlbConstructor<POP>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): POP {
-        val i = cellSlice.loadUInt(4).toUByte()
+        val i = cellSlice.loadUInt(4).toInt()
         return POP(i)
     }
 }

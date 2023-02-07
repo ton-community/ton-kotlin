@@ -4,25 +4,24 @@ import org.ton.asm.AsmInstruction
 import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-data class XCPU(
+public data class XCPU(
     val i: UByte,
     val j: UByte
 ) : AsmInstruction {
     override fun toString(): String = "s$i s$j XCPU"
 
-    companion object : TlbConstructorProvider<XCPU> by XCPUTlbConstructor
+    public companion object : TlbConstructorProvider<XCPU> by XCPUTlbConstructor
 }
 
 private object XCPUTlbConstructor : TlbConstructor<XCPU>(
     schema = "asm_xcpu#51 i:uint4 j:uint4 = XCPU;"
 ) {
     override fun storeTlb(cellBuilder: CellBuilder, value: XCPU) {
-        cellBuilder.storeUInt(value.i, 4)
-        cellBuilder.storeUInt(value.j, 4)
+        cellBuilder.storeUInt(value.i.toInt(), 4)
+        cellBuilder.storeUInt(value.j.toInt(), 4)
     }
 
     override fun loadTlb(cellSlice: CellSlice): XCPU {

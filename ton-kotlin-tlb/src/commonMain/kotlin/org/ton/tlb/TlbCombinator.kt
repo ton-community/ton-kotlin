@@ -65,9 +65,12 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     protected open fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out T>? {
-        return codec2Class.maxByOrNull {
+        val result = codec2Class.maxByOrNull {
+            println("key = ${it.key}, bitString = $bitString} - ${it.key.commonPrefixWith(bitString)} (${it.key.commonPrefixWith(bitString).size}) - ${it.value}")
             it.key.commonPrefixWith(bitString).size
         }?.value
+        println("max by: $result")
+        return result
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -1,23 +1,21 @@
 package org.ton.asm.codepage
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-data class SETCP_SPECIAL(
-    val z: UByte
+public data class SETCP_SPECIAL(
+    val z: Int
 ) : AsmInstruction {
     init {
-        require(z >= 1u) { "expected z >= 1, actual: $z" }
+        require(z in 1..15) { "expected z >= 1, actual: $z" }
     }
 
-    override fun toString(): String = "${z - 16u} SETCP"
+    override fun toString(): String = "${z - 16} SETCP"
 
-    companion object : TlbConstructorProvider<SETCP_SPECIAL> by SETCP_SPECIALTlbConstructor
+    public companion object : TlbConstructorProvider<SETCP_SPECIAL> by SETCP_SPECIALTlbConstructor
 }
 
 private object SETCP_SPECIALTlbConstructor : TlbConstructor<SETCP_SPECIAL>(
@@ -28,7 +26,7 @@ private object SETCP_SPECIALTlbConstructor : TlbConstructor<SETCP_SPECIAL>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): SETCP_SPECIAL {
-        val z = cellSlice.loadUInt(4).toUByte()
+        val z = cellSlice.loadUInt(4).toInt()
         return SETCP_SPECIAL(z)
     }
 }

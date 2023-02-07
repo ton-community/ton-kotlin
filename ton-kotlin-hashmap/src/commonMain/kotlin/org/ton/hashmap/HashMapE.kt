@@ -19,6 +19,12 @@ public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
     public fun toMap(): Map<BitString, T> = nodes().toMap()
 
     public fun set(key: BitString, value: T): HmeRoot<T>
+    public operator fun get(key: BitString): T? = nodes().find { it.first == key }?.second
+
+    /**
+     * Checks whether a dictionary is empty.
+     */
+    public fun isEmpty(): Boolean
 
     public companion object {
         @Suppress("UNCHECKED_CAST")

@@ -18,5 +18,7 @@ public class HmeEmpty<T> : HashMapE<T> {
         return HmeRoot(root)
     }
 
+    override fun isEmpty(): Boolean = true
+
     override fun toString(): String = print().toString()
 }

@@ -142,6 +142,11 @@ public interface CellBuilder {
     public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
 }
 
+public inline fun CellBuilder.storeUInt(value: UByte, length: Int): CellBuilder = storeUInt(value.toInt(), length)
+public inline fun CellBuilder.storeUInt(value: UShort, length: Int): CellBuilder = storeUInt(value.toInt(), length)
+public inline fun CellBuilder.storeUInt(value: UInt, length: Int): CellBuilder = storeUInt(value.toInt(), length)
+public inline fun CellBuilder.storeUInt(value: ULong, length: Int): CellBuilder = storeUInt(value.toLong(), length)
+
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
 }

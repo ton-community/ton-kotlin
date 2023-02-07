@@ -6,6 +6,7 @@ kotlin {
                 api(projects.tonKotlinBigint)
                 api(projects.tonKotlinTlb)
                 api(projects.tonKotlinBlock)
+                api(projects.tonKotlinLogger)
                 implementation(libs.serialization.json)
             }
         }

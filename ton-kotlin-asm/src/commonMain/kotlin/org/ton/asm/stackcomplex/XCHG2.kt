@@ -1,20 +1,18 @@
 package org.ton.asm.stackcomplex
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-data class XCHG2(
-    val i: UByte,
-    val j: UByte
+public data class XCHG2(
+    val i: Int,
+    val j: Int
 ) : AsmInstruction {
     override fun toString(): String = "s$i s$j XCHG2"
 
-    companion object : TlbConstructorProvider<XCHG2> by XCHG2TlbConstructor
+    public companion object : TlbConstructorProvider<XCHG2> by XCHG2TlbConstructor
 }
 
 private object XCHG2TlbConstructor : TlbConstructor<XCHG2>(
@@ -26,8 +24,8 @@ private object XCHG2TlbConstructor : TlbConstructor<XCHG2>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): XCHG2 {
-        val i = cellSlice.loadUInt(4).toUByte()
-        val j = cellSlice.loadUInt(4).toUByte()
+        val i = cellSlice.loadUInt(4).toInt()
+        val j = cellSlice.loadUInt(4).toInt()
         return XCHG2(i, j)
     }
 }

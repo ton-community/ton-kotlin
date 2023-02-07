@@ -1,18 +1,16 @@
 package org.ton.asm.stackbasic
 
 import org.ton.asm.AsmInstruction
-import org.ton.bigint.toUByte
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 data class XCHG_1I(
-    val i: UByte,
+    val i: Int,
 ) : AsmInstruction {
     init {
-        require(i >= 2u) { "expected i >= 2, actual $i" }
+        require(i >= 2) { "expected i >= 2, actual $i" }
     }
 
     override fun toString(): String = "s1 s$i XCHG"
@@ -28,7 +26,7 @@ private object XCHG_1ITlbConstructor : TlbConstructor<XCHG_1I>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): XCHG_1I {
-        val i = cellSlice.loadUInt(4).toUByte()
+        val i = cellSlice.loadUInt(4).toInt()
         return XCHG_1I(i)
     }
 }

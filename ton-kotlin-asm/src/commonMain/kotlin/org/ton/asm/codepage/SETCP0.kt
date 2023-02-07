@@ -6,7 +6,7 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-object SETCP0 : AsmInstruction, TlbConstructorProvider<SETCP0> by SETCP0TlbConstructor {
+public object SETCP0 : AsmInstruction, TlbConstructorProvider<SETCP0> by SETCP0TlbConstructor {
     override fun toString(): String = "SETCP0"
 }
 
