@@ -18,9 +18,11 @@ public data class DepthBalanceInfo(
         require(splitDepth <= 30) { "required: split_depth <= 30, actual: $splitDepth" }
     }
 
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("depth_balance") {
-        field("split_depth", splitDepth)
-        field("balance", balance)
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("depth_balance") {
+            field("split_depth", splitDepth)
+            field("balance", balance)
+        }
     }
 
     override fun toString(): String = print().toString()

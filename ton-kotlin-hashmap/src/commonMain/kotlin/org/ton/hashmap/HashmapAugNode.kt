@@ -6,6 +6,7 @@ import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 public interface HashmapAugNode<X, Y> : TlbObject {
+
     /**
      * ```tl-b
      * ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = HashmapAugNode 0 X Y;
@@ -20,6 +21,12 @@ public interface HashmapAugNode<X, Y> : TlbObject {
                 field("value", value)
             }
         }
+
+        public companion object {
+            @JvmStatic
+            public fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<AhmnLeaf<X, Y>> =
+                AhmnLeafTlbConstructor(x, y)
+        }
     }
 
     /**
@@ -29,6 +36,7 @@ public interface HashmapAugNode<X, Y> : TlbObject {
      */
     public interface AhmnFork<X, Y> : HashmapAugNode<X, Y> {
         public val n: Int
+
         public val left: CellRef<HashmapAug<X, Y>>
         public val right: CellRef<HashmapAug<X, Y>>
         public val extra: Y
@@ -43,6 +51,12 @@ public interface HashmapAugNode<X, Y> : TlbObject {
                 field("extra", extra)
             }
         }
+
+        public companion object {
+            @JvmStatic
+            public fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>, n: Int): TlbCodec<AhmnFork<X, Y>> =
+                AhmnForkTlbConstructor(x, y, n)
+        }
     }
 
     public companion object {
@@ -56,7 +70,17 @@ public interface HashmapAugNode<X, Y> : TlbObject {
             left: CellRef<HashmapAug<X, Y>>,
             right: CellRef<HashmapAug<X, Y>>,
             extra: Y
-        ): AhmnFork<X, Y> = AhmnForkImpl(n, left, right, extra)
+        ): AhmnFork<X, Y> = AhmnForkImpl(n - 1, left, right, extra)
+
+        @Suppress("UNCHECKED_CAST")
+        @JvmStatic
+        public fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>, n: Int): TlbCodec<HashmapAugNode<X, Y>> {
+            return if (n == 0) {
+                AhmnLeaf.tlbCodec(x, y)
+            } else {
+                AhmnFork.tlbCodec(x, y, n)
+            } as TlbCodec<HashmapAugNode<X, Y>>
+        }
     }
 }
 
@@ -85,7 +109,7 @@ private class AhmnLeafTlbConstructor<X, Y>(
     override fun loadTlb(cellSlice: CellSlice): HashmapAugNode.AhmnLeaf<X, Y> {
         val extra = y.loadTlb(cellSlice)
         val value = x.loadTlb(cellSlice)
-        return HashmapAugNode.leaf(extra, value)
+        return AhmnLeafImpl(extra, value)
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugNode.AhmnLeaf<X, Y>) {
@@ -95,25 +119,26 @@ private class AhmnLeafTlbConstructor<X, Y>(
 }
 
 private class AhmnForkTlbConstructor<X, Y>(
-    val n: Int,
-    val x: TlbCodec<X>,
+    x: TlbCodec<X>,
     val y: TlbCodec<Y>,
+    n: Int
 ) : TlbConstructor<HashmapAugNode.AhmnFork<X, Y>>(
     schema = "ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(HashmapAug n X Y) right:^(HashmapAug n X Y) extra:Y = HashmapAugNode (n + 1) X Y"
 ) {
-    private val hashmapAug = HashmapAug
+    private val n = n - 1
+    private val hashmapAug = HashmapAug.tlbCodec(this.n, x, y)
 
     override fun loadTlb(cellSlice: CellSlice): HashmapAugNode.AhmnFork<X, Y> {
-        val n = this.n - 1
-        val left = cellSlice.loadRef(x)
-        val right = cellSlice.loadRef(x)
+        val left = cellSlice.loadRef(hashmapAug)
+        val right = cellSlice.loadRef(hashmapAug)
         val extra = y.loadTlb(cellSlice)
-        return HashmapAugNode.fork(n, left, right, extra)
+        return AhmnForkImpl(this.n, left, right, extra)
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugNode.AhmnFork<X, Y>) {
-        cellBuilder.reference(value.left)
-        cellBuilder.reference(value.right)
-        y.storeTlb(cellBuilder, value.extra)
+        check(value.n == this.n) { "n mismatch, expected: $n, actual: ${value.n}" }
+        cellBuilder.storeRef(hashmapAug, value.left)
+        cellBuilder.storeRef(hashmapAug, value.right)
+        cellBuilder.storeTlb(y, value.extra)
     }
 }
