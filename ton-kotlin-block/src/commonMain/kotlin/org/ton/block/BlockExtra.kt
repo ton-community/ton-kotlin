@@ -4,15 +4,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.Bits256
 import org.ton.cell.*
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
 
 @SerialName("block_extra")
 @Serializable
 public data class BlockExtra(
-    @SerialName("in_msg_descr") val inMsgDescr: CellRef<AugDictionary<InMsg, ImportFees>>,
-    @SerialName("out_msg_descr") val outMsgDescr: CellRef<AugDictionary<OutMsg, CurrencyCollection>>,
-    @SerialName("account_blocks") val accountBlocks: CellRef<AugDictionary<AccountBlock, CurrencyCollection>>,
+    @SerialName("in_msg_descr") val inMsgDescr: CellRef<HashmapAugE<InMsg, ImportFees>>,
+    @SerialName("out_msg_descr") val outMsgDescr: CellRef<HashmapAugE<OutMsg, CurrencyCollection>>,
+    @SerialName("account_blocks") val accountBlocks: CellRef<HashmapAugE<AccountBlock, CurrencyCollection>>,
     @SerialName("rand_seed") val randSeed: Bits256,
     @SerialName("created_by") val createdBy: Bits256,
     val custom: Maybe<CellRef<McBlockExtra>>
@@ -41,10 +41,10 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
             "  created_by:bits256\n" +
             "  custom:(Maybe ^McBlockExtra) = BlockExtra;"
 ) {
-    val inMsgDescr = CellRef.tlbCodec(AugDictionary.tlbCodec(256, InMsg, ImportFees))
-    val outMsgDescr = CellRef.tlbCodec(AugDictionary.tlbCodec(256, OutMsg, CurrencyCollection))
+    val inMsgDescr = CellRef.tlbCodec(HashmapAugE.tlbCodec(256, InMsg, ImportFees))
+    val outMsgDescr = CellRef.tlbCodec(HashmapAugE.tlbCodec(256, OutMsg, CurrencyCollection))
     val shardAccountBlock = CellRef.tlbCodec(
-        AugDictionary.tlbCodec(
+        HashmapAugE.tlbCodec(
             256,
             AccountBlock,
             CurrencyCollection

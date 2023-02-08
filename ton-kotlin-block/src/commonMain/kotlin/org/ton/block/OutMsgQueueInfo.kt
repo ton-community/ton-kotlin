@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbConstructor
@@ -13,7 +13,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 public data class OutMsgQueueInfo(
-    @SerialName("out_queue") val outQueue: AugDictionary<EnqueuedMsg, ULong>, // out_queue : OutMsgQueue
+    @SerialName("out_queue") val outQueue: HashmapAugE<EnqueuedMsg, ULong>, // out_queue : OutMsgQueue
     @SerialName("proc_info") val procInfo: HashMapE<ProcessedUpto>, // proc_info : ProcessedInfo
     @SerialName("ihr_pending") val ihrPending: HashMapE<IhrPendingSince> // ihr_pending : IhrPendingInfo
 ) : TlbObject {
@@ -36,7 +36,7 @@ public data class OutMsgQueueInfo(
 private object OutMsgQueueInfoTlbConstructor : TlbConstructor<OutMsgQueueInfo>(
     schema = "_ out_queue:OutMsgQueue proc_info:ProcessedInfo ihr_pending:IhrPendingInfo = OutMsgQueueInfo;"
 ) {
-    val outQueue = AugDictionary.tlbCodec(352, EnqueuedMsg, ULong.tlbConstructor())
+    val outQueue = HashmapAugE.tlbCodec(352, EnqueuedMsg, ULong.tlbConstructor())
     val procInfo = HashMapE.tlbCodec(96, ProcessedUpto)
     val ihrPending = HashMapE.tlbCodec(320, IhrPendingSince)
 

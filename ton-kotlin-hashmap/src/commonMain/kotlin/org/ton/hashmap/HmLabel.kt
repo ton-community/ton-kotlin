@@ -10,16 +10,16 @@ import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
-public inline fun HashMapLabel(key: BitString, max: Int = key.size): HashMapLabel = HashMapLabel.of(key, max)
+public inline fun HashMapLabel(key: BitString, max: Int = key.size): HmLabel = HmLabel.of(key, max)
 
 @Serializable
 @JsonClassDiscriminator("@type")
-public sealed interface HashMapLabel : TlbObject {
+public sealed interface HmLabel : TlbObject {
     public fun toBitString(): BitString
 
     public companion object {
         @JvmStatic
-        public fun of(key: BitString, max: Int = key.size): HashMapLabel {
+        public fun of(key: BitString, max: Int = key.size): HmLabel {
             val len = 16 - max.toShort().countLeadingZeroBits()
             val longLength = 2 + len + key.size
             val shortLength = 1 + 2 * key.size + 1
@@ -38,14 +38,14 @@ public sealed interface HashMapLabel : TlbObject {
         }
 
         @JvmStatic
-        public fun tlbCodec(m: Int): TlbNegatedCodec<HashMapLabel> = HashMapLabelTlbCombinator(m)
+        public fun tlbCodec(m: Int): TlbNegatedCodec<HmLabel> = HashMapLabelTlbCombinator(m)
     }
 }
 
 private class HashMapLabelTlbCombinator(
     m: Int,
-) : TlbNegatedCombinator<HashMapLabel>(
-    HashMapLabel::class,
+) : TlbNegatedCombinator<HmLabel>(
+    HmLabel::class,
     HmlLong::class to HmlLong.tlbCodec(m),
     HmlShort::class to HmlShort.tlbCodec(),
     HmlSame::class to HmlSame.tlbCodec(m),

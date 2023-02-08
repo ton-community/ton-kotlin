@@ -3,7 +3,7 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
@@ -12,7 +12,7 @@ import kotlin.jvm.JvmInline
 @Serializable
 @JvmInline
 public value class ShardAccounts(
-    public val x: AugDictionary<ShardAccount, DepthBalanceInfo>
+    public val x: HashmapAugE<ShardAccount, DepthBalanceInfo>
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return x.print(printer)
@@ -24,7 +24,7 @@ public value class ShardAccounts(
 }
 
 private object ShardAccountsTlbCodec : TlbCodec<ShardAccounts> {
-    private val codec = AugDictionary.tlbCodec(256, ShardAccount, DepthBalanceInfo)
+    private val codec = HashmapAugE.tlbCodec(256, ShardAccount, DepthBalanceInfo)
 
     override fun storeTlb(cellBuilder: CellBuilder, value: ShardAccounts) {
         codec.storeTlb(cellBuilder, value.x)

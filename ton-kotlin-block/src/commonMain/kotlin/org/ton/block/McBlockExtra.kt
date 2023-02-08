@@ -3,7 +3,7 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.constructor.tlbCodec
@@ -15,7 +15,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 public data class McBlockExtra(
     @SerialName("key_block") val keyBlock: Boolean,
     @SerialName("shard_hases") val shardHashes: HashMapE<BinTree<ShardDescr>>,
-    @SerialName("shard_fees") val shardFees: AugDictionary<ShardFeeCreated, ShardFeeCreated>,
+    @SerialName("shard_fees") val shardFees: HashmapAugE<ShardFeeCreated, ShardFeeCreated>,
     val r1: CellRef<McBlockExtraAux>,
     val config: ConfigParams?
 ) : TlbObject {
@@ -65,7 +65,7 @@ private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(
             "= McBlockExtra;"
 ) {
     val shardHashes = HashMapE.tlbCodec(32, Cell.tlbCodec(BinTree.tlbCodec(ShardDescr)))
-    val shardFees = AugDictionary.tlbCodec(96, ShardFeeCreated, ShardFeeCreated)
+    val shardFees = HashmapAugE.tlbCodec(96, ShardFeeCreated, ShardFeeCreated)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

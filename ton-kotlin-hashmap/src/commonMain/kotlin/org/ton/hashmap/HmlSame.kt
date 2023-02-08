@@ -14,7 +14,7 @@ import kotlin.jvm.JvmStatic
 public data class HmlSame(
     val v: Boolean,
     val n: Int
-) : HashMapLabel {
+) : HmLabel {
     public constructor(v: Int, n: Int) : this(v != 0, n)
 
     override fun toBitString(): BitString = BitString(*BooleanArray(n) { v })

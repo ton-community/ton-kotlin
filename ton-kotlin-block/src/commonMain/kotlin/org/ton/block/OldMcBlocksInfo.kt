@@ -3,7 +3,7 @@ package org.ton.block
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
@@ -12,7 +12,7 @@ import kotlin.jvm.JvmInline
 @Serializable
 @JvmInline
 public value class OldMcBlocksInfo(
-    public val value: AugDictionary<KeyExtBlkRef, KeyMaxLt>
+    public val value: HashmapAugE<KeyExtBlkRef, KeyMaxLt>
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return value.print(printer)
@@ -24,7 +24,7 @@ public value class OldMcBlocksInfo(
 }
 
 private object OldMcBlocksInfoTlbCodec : TlbCodec<OldMcBlocksInfo> {
-    private val codec = AugDictionary.tlbCodec(32, KeyExtBlkRef, KeyMaxLt)
+    private val codec = HashmapAugE.tlbCodec(32, KeyExtBlkRef, KeyMaxLt)
 
     override fun storeTlb(cellBuilder: CellBuilder, value: OldMcBlocksInfo) {
         codec.storeTlb(cellBuilder, value.value)

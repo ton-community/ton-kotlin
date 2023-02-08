@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.Bits256
 import org.ton.cell.*
-import org.ton.hashmap.AugDictionaryEdge
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 
