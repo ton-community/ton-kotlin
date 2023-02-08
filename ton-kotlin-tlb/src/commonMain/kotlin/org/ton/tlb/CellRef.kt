@@ -47,6 +47,7 @@ private class CellRefImpl<T>(
     val codec: TlbCodec<T>
 ) : CellRef<T> {
     override val value: T by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        check(cell.type == CellType.ORDINARY) { "Can't load reference value: $cell" }
         codec.loadTlb(cell)
     }
 

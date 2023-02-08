@@ -2,7 +2,7 @@ package org.ton.tonlib.block
 
 import org.ton.block.KeyExtBlkRef
 import org.ton.block.KeyMaxLt
-import org.ton.hashmap.AugDictionary
+import org.ton.hashmap.HashmapAugE
 import org.ton.tonlib.BlockSeqno
 
 internal class ConfigInfo(
@@ -22,7 +22,7 @@ internal class ConfigInfo(
     }
 
     private fun checkOldMcBlockId(
-        prevBlocksDictionary: AugDictionary<KeyExtBlkRef, KeyMaxLt>,
+        prevBlocksDictionary: HashmapAugE<KeyExtBlkRef, KeyMaxLt>,
         blkId: BlockIdExt
     ) = checkOldMcBlockId(blkId, false)
 }

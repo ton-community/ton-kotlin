@@ -15,7 +15,7 @@ import org.ton.tlb.storeNegatedTlb
 public data class HmlShort(
     val len: Unary,
     val s: BitString
-) : HashMapLabel {
+) : HmLabel {
     public constructor(s: BitString) : this(Unary(s.size), s)
 
     override fun toBitString(): BitString = s

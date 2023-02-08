@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.Bits256
 import org.ton.cell.*
-import org.ton.hashmap.AugDictionaryEdge
+import org.ton.hashmap.HashmapAug
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 
@@ -12,7 +12,7 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 @SerialName("acc_trans")
 public data class AccountBlock(
     @SerialName("account_addr") val accountAddr: Bits256,
-    val transactions: AugDictionaryEdge<CellRef<Transaction>, CurrencyCollection>,
+    val transactions: HashmapAug<CellRef<Transaction>, CurrencyCollection>,
     @SerialName("state_update") val stateUpdate: CellRef<HashUpdate>
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
@@ -34,12 +34,12 @@ private object AccountBlockTlbCombinator : TlbCombinator<AccountBlock>(
 )
 
 private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
-    schema = "acc_trans#5 account_addr:bits256 " +
-            "transactions:(AugDictionaryEdge 64 ^Transaction CurrencyCollection) " +
-            "state_update:^(HASH_UPDATE Account) " +
-            "= AccountBlock;"
+    schema = "acc_trans#5 account_addr:bits256" +
+            "            transactions:(HashmapAug 64 ^Transaction CurrencyCollection)" +
+            "            state_update:^(HASH_UPDATE Account)" +
+            "          = AccountBlock"
 ) {
-    val augDictionaryEdge = AugDictionaryEdge.tlbCodec(
+    val augDictionaryEdge = HashmapAug.tlbCodec(
         64,
         CellRef.tlbCodec(Transaction),
         CurrencyCollection

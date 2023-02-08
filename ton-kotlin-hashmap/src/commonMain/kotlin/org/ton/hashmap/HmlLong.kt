@@ -13,7 +13,7 @@ import org.ton.tlb.TlbPrettyPrinter
 public data class HmlLong(
     val n: Int,
     val s: BitString
-) : HashMapLabel {
+) : HmLabel {
     public constructor(s: BitString) : this(s.size, s)
 
     override fun toBitString(): BitString = s

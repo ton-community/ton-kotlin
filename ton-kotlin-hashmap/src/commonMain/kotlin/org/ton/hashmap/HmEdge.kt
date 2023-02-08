@@ -11,7 +11,7 @@ import kotlin.jvm.JvmStatic
 @Serializable
 @SerialName("hm_edge")
 public data class HmEdge<T>(
-    val label: HashMapLabel,
+    val label: HmLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>>, TlbObject {
     override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
@@ -96,7 +96,7 @@ private class HashMapEdgeTlbConstructor<X>(
     schema = "hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n) {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;",
     id = BitString.empty()
 ) {
-    private val hashMapLabelCodec = HashMapLabel.tlbCodec(n)
+    private val hashMapLabelCodec = HmLabel.tlbCodec(n)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
