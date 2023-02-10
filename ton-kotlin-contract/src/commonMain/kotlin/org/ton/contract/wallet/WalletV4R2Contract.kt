@@ -180,7 +180,7 @@ public class WalletV4R2Contract private constructor(
                 Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it))
             })
             val body = if (gift.body == null) {
-                Either.of<Cell, CellRef<Cell>>(Cell.of(), null)
+                Either.of<Cell, CellRef<Cell>>(Cell.empty(), null)
             } else {
                 Either.of<Cell, CellRef<Cell>>(null, CellRef(gift.body))
             }

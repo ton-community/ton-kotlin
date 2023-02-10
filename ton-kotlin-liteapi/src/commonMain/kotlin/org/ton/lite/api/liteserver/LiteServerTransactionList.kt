@@ -41,10 +41,10 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
         return LiteServerTransactionList(ids, transactions)
     }
 
-    override fun encode(output: TlWriter, value: LiteServerTransactionList) {
-        output.writeVector(value.ids) {
+    override fun encode(writer: TlWriter, value: LiteServerTransactionList) {
+        writer.writeVector(value.ids) {
             write(TonNodeBlockIdExt, it)
         }
-        output.writeBytes(value.transactions)
+        writer.writeBytes(value.transactions)
     }
 }
