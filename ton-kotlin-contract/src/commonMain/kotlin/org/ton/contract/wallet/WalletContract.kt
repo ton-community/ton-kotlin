@@ -15,13 +15,18 @@ import kotlin.jvm.JvmField
 public interface WalletContract : SmartContract {
 
     public suspend fun getSeqno(liteApi: LiteApi): Int {
-        val stack = runGetMethod(liteApi, "seqno").stack ?: throw IllegalStateException("seqno get method failed")
+        val stack = runGetMethod(liteApi, "seqno").let {
+            check(it.isSuccess && it.stack != null) { "seqno failed with exit code ${it.exitCode}" }
+            it.stack
+        }
         return stack.toMutableVmStack().popInt().toInt()
     }
 
     public suspend fun getPublicKey(liteApi: LiteApi): PublicKeyEd25519 {
-        val stack = runGetMethod(liteApi, "get_public_key").stack
-            ?: throw IllegalStateException("get_public_key get method failed")
+        val stack = runGetMethod(liteApi, "get_public_key").let {
+            check(it.isSuccess && it.stack != null) { "get_public_key failed with exit code ${it.exitCode}" }
+            it.stack
+        }
         val int = stack.toMutableVmStack().popInt()
         val key = CellBuilder.createCell {
             storeUInt(int, 256)

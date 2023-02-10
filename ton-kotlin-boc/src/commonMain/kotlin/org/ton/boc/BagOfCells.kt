@@ -44,7 +44,7 @@ public interface BagOfCells : Iterable<Cell> {
             try {
                 return read(ByteReadPacket(byteArray))
             } catch (e: Exception) {
-                throw IllegalArgumentException("Can't load BoC: ${byteArray.encodeHex()}", e)
+                throw IllegalArgumentException("Can't load BoC: (${byteArray.size}) ${byteArray.encodeHex()}", e)
             }
         }
 

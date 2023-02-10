@@ -1,5 +1,6 @@
 package org.ton.contract.wallet
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.ton.api.pk.PrivateKeyEd25519
@@ -29,8 +30,10 @@ public class WalletV4R2Contract private constructor(
     ) : this(SmartContract.address(workchain, createStateInit(publicKey, subWalletId)))
 
     public suspend fun getSubWalletId(liteApi: LiteApi): Int {
-        val stack = runGetMethod(liteApi, "get_subwallet_id").stack
-            ?: throw IllegalStateException("get_subwallet_id get method has no stack")
+        val stack = runGetMethod(liteApi, "get_subwallet_id").let {
+            check(it.isSuccess && it.stack != null) { "get_subwallet_id failed with exit code ${it.exitCode}" }
+            it.stack
+        }
         return stack.toMutableVmStack().popInt().toInt()
     }
 
@@ -39,8 +42,14 @@ public class WalletV4R2Contract private constructor(
         privateKey: PrivateKeyEd25519,
         vararg transfers: WalletTransfer
     ): Unit = coroutineScope {
-        val walletId = async { getSubWalletId(liteApi) }
-        val seqno = async { getSeqno(liteApi) }
+        val accountInfo = getAccountInfo(liteApi)
+        val isActive = accountInfo != null && accountInfo.isActive
+        val walletId = if (isActive) {
+            async { getSubWalletId(liteApi) }
+        } else CompletableDeferred(DEFAULT_WALLET_ID + address.workchainId)
+        val seqno = if (isActive) {
+            async { getSeqno(liteApi) }
+        } else CompletableDeferred(0)
         transfer(liteApi, privateKey, Int.MAX_VALUE, walletId.await(), seqno.await(), *transfers)
     }
 
@@ -69,7 +78,7 @@ public class WalletV4R2Contract private constructor(
             validUntil = validUntil,
             walletId = walletId,
             seqno = seqno,
-            gifts = transfers
+            transfers = transfers
         )
         sendExternalMessage(liteApi, message)
     }
@@ -90,7 +99,7 @@ public class WalletV4R2Contract private constructor(
             walletId: Int,
             validUntil: Int,
             seqno: Int,
-            vararg gifts: WalletTransfer
+            vararg transfers: WalletTransfer
         ): Message<Cell> {
             val info = ExtInMsgInfo(
                 src = AddrNone,
@@ -99,14 +108,14 @@ public class WalletV4R2Contract private constructor(
             )
             val maybeStateInit =
                 Maybe.of(stateInit?.let { Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it)) })
-            val giftBody = createGiftMessageBody(
+            val transferBody = createTransferMessageBody(
                 privateKey,
                 walletId,
                 validUntil,
                 seqno,
-                *gifts
+                *transfers
             )
-            val body = Either.of<Cell, CellRef<Cell>>(null, CellRef(giftBody))
+            val body = Either.of<Cell, CellRef<Cell>>(null, CellRef(transferBody))
             return Message(
                 info = info,
                 init = maybeStateInit,
@@ -131,7 +140,7 @@ public class WalletV4R2Contract private constructor(
             )
         }
 
-        private fun createGiftMessageBody(
+        private fun createTransferMessageBody(
             privateKey: PrivateKeyEd25519,
             walletId: Int,
             validUntil: Int,

@@ -20,6 +20,10 @@ public data class AccountInfo(
 ) : Account {
     public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
 
+    val isActive: Boolean get() = storage.state is AccountActive
+    val isFrozen: Boolean get() = storage.state is AccountFrozen
+    val isUninit: Boolean get() = storage.state is AccountUninit
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("account") {
             field("addr", addr)
