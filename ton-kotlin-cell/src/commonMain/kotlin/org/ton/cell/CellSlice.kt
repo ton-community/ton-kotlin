@@ -42,6 +42,7 @@ public interface CellSlice {
     public fun loadBits(length: Int): BitString
     public fun preloadBits(length: Int): BitString
 
+    public fun preloadBits256(): Bits256 = Bits256(preloadBits(256))
     public fun loadBits256(): Bits256 = Bits256(loadBits(256))
 
     public fun loadInt(length: Int): BigInt

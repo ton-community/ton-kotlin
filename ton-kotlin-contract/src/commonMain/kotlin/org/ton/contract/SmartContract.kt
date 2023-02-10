@@ -23,12 +23,9 @@ import kotlin.jvm.JvmStatic
 
 public interface SmartContract {
     public val address: AddrStd
-
-    public suspend fun getAccountInfo(liteApi: LiteApi): AccountInfo? =
-        getAccountInfo(liteApi, liteApi(LiteServerGetMasterchainInfo).last)
-
-    public suspend fun getAccountInfo(liteApi: LiteApi, blockId: TonNodeBlockIdExt): AccountInfo? =
-        getAccountInfo(liteApi, blockId, address)
+    public val state: AccountState
+    public val data: Cell? get() = (state as? AccountActive)?.value?.data?.value?.value
+    public val code: Cell? get() = (state as? AccountActive)?.value?.code?.value?.value
 
     public suspend fun sendExternalMessage(liteApi: LiteApi, message: Message<Cell>): Int =
         sendExternalMessage(liteApi, CellBuilder.createCell {

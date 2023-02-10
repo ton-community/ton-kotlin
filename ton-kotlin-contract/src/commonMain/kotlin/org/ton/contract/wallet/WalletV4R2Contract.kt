@@ -1,10 +1,11 @@
 package org.ton.contract.wallet
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
+import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
@@ -14,68 +15,62 @@ import org.ton.contract.SmartContract
 import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.crypto.base64
 import org.ton.lite.api.LiteApi
+import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeRef
 import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
+import kotlin.time.Duration.Companion.seconds
 
 public class WalletV4R2Contract private constructor(
     override val address: AddrStd,
+    public override val state: AccountState
 ) : WalletContract {
     public constructor(
-        publicKey: PublicKeyEd25519,
-        workchain: Int = 0,
-        subWalletId: Int = DEFAULT_WALLET_ID + workchain,
-    ) : this(SmartContract.address(workchain, createStateInit(publicKey, subWalletId)))
+        workchain: Int,
+        init: StateInit
+    ) : this(SmartContract.address(workchain, init), AccountUninit)
 
-    public suspend fun getSubWalletId(liteApi: LiteApi): Int {
-        val stack = runGetMethod(liteApi, "get_subwallet_id").let {
-            check(it.isSuccess && it.stack != null) { "get_subwallet_id failed with exit code ${it.exitCode}" }
-            it.stack
-        }
-        return stack.toMutableVmStack().popInt().toInt()
+    public constructor(
+        workchain: Int,
+        publicKey: PublicKeyEd25519,
+    ) : this(workchain, createStateInit(publicKey, DEFAULT_WALLET_ID + workchain))
+
+    public fun getSeqno(): Int = requireNotNull(data).beginParse().run {
+        preloadInt(32).toInt()
+    }
+
+    public fun getSubWalletId(): Int = requireNotNull(data).beginParse().run {
+        skipBits(32)
+        preloadInt(32).toInt()
+    }
+
+    public fun getPublicKey(): PublicKeyEd25519 = requireNotNull(data).beginParse().run {
+        skipBits(64)
+        PublicKeyEd25519(loadBits256())
     }
 
     public suspend fun transfer(
         liteApi: LiteApi,
         privateKey: PrivateKeyEd25519,
+        vararg transfers: WalletTransfer
+    ): Unit = transfer(liteApi, privateKey, Clock.System.now() + 60.seconds, *transfers)
+
+    public suspend fun transfer(
+        liteApi: LiteApi,
+        privateKey: PrivateKeyEd25519,
+        validUntil: Instant,
         vararg transfers: WalletTransfer
     ): Unit = coroutineScope {
-        val accountInfo = getAccountInfo(liteApi)
-        val isActive = accountInfo != null && accountInfo.isActive
-        val walletId = if (isActive) {
-            async { getSubWalletId(liteApi) }
-        } else CompletableDeferred(DEFAULT_WALLET_ID + address.workchainId)
-        val seqno = if (isActive) {
-            async { getSeqno(liteApi) }
-        } else CompletableDeferred(0)
-        transfer(liteApi, privateKey, Int.MAX_VALUE, walletId.await(), seqno.await(), *transfers)
-    }
-
-    public suspend fun transfer(
-        liteApi: LiteApi,
-        privateKey: PrivateKeyEd25519,
-        seqno: Int,
-        vararg transfers: WalletTransfer
-    ) {
-        val walletId = getSubWalletId(liteApi)
-        transfer(liteApi, privateKey, validUntil = Int.MAX_VALUE, walletId, seqno, *transfers)
-    }
-
-    public suspend fun transfer(
-        liteApi: LiteApi,
-        privateKey: PrivateKeyEd25519,
-        validUntil: Int,
-        walletId: Int,
-        seqno: Int,
-        vararg transfers: WalletTransfer
-    ) {
+        val seqno = getSeqno()
+        val walletId = getSubWalletId()
         val message = createTransferMessage(
             address = address,
-            stateInit = if (seqno == 0) createStateInit(privateKey.publicKey(), walletId) else null,
+            stateInit = if (state !is AccountActive) createStateInit(privateKey.publicKey(), walletId) else null,
             privateKey = privateKey,
-            validUntil = validUntil,
+            validUntil = validUntil.epochSeconds.toInt(),
             walletId = walletId,
             seqno = seqno,
             transfers = transfers
@@ -90,6 +85,19 @@ public class WalletV4R2Contract private constructor(
 
         @JvmField
         val OP_TRANSFER = 0
+
+        @JvmStatic
+        suspend fun loadContract(liteClient: LiteClient, address: AddrStd): WalletV4R2Contract? {
+            val blockId = liteClient.getLastBlockId()
+            return loadContract(liteClient, blockId, address)
+        }
+
+        @JvmStatic
+        suspend fun loadContract(liteClient: LiteClient, blockId: TonNodeBlockIdExt, address: AddrStd): WalletV4R2Contract? {
+            val account = liteClient.getAccount(LiteServerAccountId(address.workchainId, address.address), blockId)
+            val state = account?.storage?.state ?: return null
+            return WalletV4R2Contract(address, state)
+        }
 
         @JvmStatic
         fun createTransferMessage(
