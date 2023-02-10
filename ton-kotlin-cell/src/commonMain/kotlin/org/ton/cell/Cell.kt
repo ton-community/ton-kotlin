@@ -75,22 +75,47 @@ public interface Cell {
         public const val MAX_BITS_SIZE: Int = 1023
 
         @JvmStatic
-        public fun of(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
+        public fun empty() : Cell = CellImpl.of(BitString.empty(), emptyList())
+
+        @JvmStatic
+        public fun of(hex: String): Cell =
+            CellImpl.of(BitString(hex), emptyList())
+
+        @JvmStatic
+        public fun of(hex: String, vararg refs: Cell): Cell =
+            CellImpl.of(BitString(hex), refs.toList())
+
+        @JvmStatic
+        public fun of(hex: String, vararg refs: Cell, isExotic: Boolean): Cell =
             CellImpl.of(BitString(hex), refs.toList(), isExotic)
 
         @JvmStatic
-        public fun of(
-            bits: BitString = BitString(),
-            refs: Iterable<Cell> = emptyList(),
-            isExotic: Boolean = false
-        ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
+        public fun of(hex: String, refs: Iterable<Cell>): Cell =
+            CellImpl.of(BitString(hex), refs.toList())
 
         @JvmStatic
-        public fun of(
-            bits: BitString,
-            vararg refs: Cell,
-            isExotic: Boolean = false
-        ): Cell = CellImpl.of(bits, refs.toList(), isExotic)
+        public fun of(hex: String, refs: Iterable<Cell>, isExotic: Boolean): Cell =
+            CellImpl.of(BitString(hex), refs.toList(), isExotic)
+
+        @JvmStatic
+        public fun of(bits: BitString): Cell =
+            CellImpl.of(bits, emptyList())
+
+        @JvmStatic
+        public fun of(bits: BitString, vararg refs: Cell): Cell =
+            CellImpl.of(bits, refs.toList())
+
+        @JvmStatic
+        public fun of(bits: BitString, vararg refs: Cell, isExotic: Boolean): Cell =
+            CellImpl.of(bits, refs.toList(), isExotic)
+
+        @JvmStatic
+        public fun of(bits: BitString, refs: Iterable<Cell>): Cell =
+            CellImpl.of(bits, refs.toList())
+
+        @JvmStatic
+        public fun of(bits: BitString, refs: Iterable<Cell>, isExotic: Boolean): Cell =
+            CellImpl.of(bits, refs.toList(), isExotic)
 
         @JvmStatic
         public fun toString(cell: Cell): String = buildString {
