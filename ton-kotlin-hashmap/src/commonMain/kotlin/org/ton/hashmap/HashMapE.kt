@@ -34,7 +34,11 @@ public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
         public fun <T> fromMap(map: Map<BitString, T>?): HashMapE<T> {
             var hashMap = empty<T>()
             if (map == null) return hashMap
+            var i = -1
             map.forEach { (key, value) ->
+                require(!key.isEmpty()) { "Empty key" }
+                if (i == -1) i = key.size
+                else require(i == key.size) { "Variable length key, expected: $i, actual: (${key.size}) $key" }
                 hashMap = hashMap.set(key, value)
             }
             return hashMap

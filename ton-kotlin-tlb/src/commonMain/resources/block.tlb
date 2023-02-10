@@ -19,16 +19,16 @@ bit$_ (## 1) = Bit;
  */
 // ordinary Hashmap / HashmapE, with fixed length keys
 //
-hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(DictionaryLabel ~l n)
+hm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n)
           {n = (~m) + l} node:(HashmapNode m X) = Hashmap n X;
 
 hmn_leaf#_ {X:Type} value:X = HashmapNode 0 X;
 hmn_fork#_ {n:#} {X:Type} left:^(Hashmap n X)
            right:^(Hashmap n X) = HashmapNode (n + 1) X;
 
-hml_short$0 {m:#} {n:#} len:(Unary ~n) {n <= m} s:(n * Bit) = DictionaryLabel ~n m;
-hml_long$10 {m:#} n:(#<= m) s:(n * Bit) = DictionaryLabel ~n m;
-hml_same$11 {m:#} v:Bit n:(#<= m) = DictionaryLabel ~n m;
+hml_short$0 {m:#} {n:#} len:(Unary ~n) {n <= m} s:(n * Bit) = HmLabel ~n m;
+hml_long$10 {m:#} n:(#<= m) s:(n * Bit) = HmLabel ~n m;
+hml_same$11 {m:#} v:Bit n:(#<= m) = HmLabel ~n m;
 
 unary_zero$0 = Unary ~0;
 unary_succ$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);
@@ -39,24 +39,24 @@ hme_root$1 {n:#} {X:Type} root:^(Hashmap n X) = HashmapE n X;
 // true#_ = True;
 _ {n:#} _:(Hashmap n True) = BitstringSet n;
 
-//  AugDictionaryEdge, hashmap with an extra value
+//  HashmapAug, hashmap with an extra value
 //   (augmentation) of type Y at every node
 //
 ahm_edge#_ {n:#} {X:Type} {Y:Type} {l:#} {m:#}
-  label:(DictionaryLabel ~l n) {n = (~m) + l}
-  node:(AugDictionaryNode m X Y) = AugDictionaryEdge n X Y;
-ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = AugDictionaryNode 0 X Y;
-ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(AugDictionaryEdge n X Y)
-  right:^(AugDictionaryEdge n X Y) extra:Y = AugDictionaryNode (n + 1) X Y;
+  label:(HmLabel ~l n) {n = (~m) + l}
+  node:(HashmapAugNode m X Y) = HashmapAug n X Y;
+ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = HashmapAugNode 0 X Y;
+ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(HashmapAug n X Y)
+  right:^(HashmapAug n X Y) extra:Y = HashmapAugNode (n + 1) X Y;
 
 ahme_empty$0 {n:#} {X:Type} {Y:Type} extra:Y
-          = AugDictionary n X Y;
-ahme_root$1 {n:#} {X:Type} {Y:Type} root:^(AugDictionaryEdge n X Y)
-  extra:Y = AugDictionary n X Y;
+          = HashmapAugE n X Y;
+ahme_root$1 {n:#} {X:Type} {Y:Type} root:^(HashmapAug n X Y)
+  extra:Y = HashmapAugE n X Y;
 
 // VarHashmap / VarHashmapE, with variable-length keys
 //
-vhm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(DictionaryLabel ~l n)
+vhm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n)
            {n = (~m) + l} node:(VarHashmapNode m X)
            = VarHashmap n X;
 vhmn_leaf$00 {n:#} {X:Type} value:X = VarHashmapNode n X;
@@ -78,7 +78,7 @@ vhme_root$1 {n:#} {X:Type} root:^(VarHashmap n X)
 //                           constituting a prefix code
 //
 
-phm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(DictionaryLabel ~l n)
+phm_edge#_ {n:#} {X:Type} {l:#} {m:#} label:(HmLabel ~l n)
            {n = (~m) + l} node:(PfxHashmapNode m X)
            = PfxHashmap n X;
 
@@ -109,29 +109,32 @@ addr_var$11 anycast:(Maybe Anycast) addr_len:(## 9)
 _ _:MsgAddressInt = MsgAddress;
 _ _:MsgAddressExt = MsgAddress;
 //
-
+var_uint$_ {n:#} len:(#< n) value:(uint (len * 8))
+         = VarUInteger n;
 var_int$_ {n:#} len:(#< n) value:(int (len * 8))
         = VarInteger n;
-var_uint$_ {n:#} len:(#< n) value:(uint (len * 8)) = VarUInteger n;
-nanocoins$_ amount:(VarUInteger 16) = Coins;
+nanograms$_ amount:(VarUInteger 16) = Grams;
+
+_ grams:Grams = Coins;
+
 //
 extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32))
                  = ExtraCurrencyCollection;
-currencies$_ grams:Coins other:ExtraCurrencyCollection
+currencies$_ grams:Grams other:ExtraCurrencyCollection
            = CurrencyCollection;
 //
 int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
   src:MsgAddressInt dest:MsgAddressInt
-  value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins
+  value:CurrencyCollection ihr_fee:Grams fwd_fee:Grams
   created_lt:uint64 created_at:uint32 = CommonMsgInfo;
 ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt
-  import_fee:Coins = CommonMsgInfo;
+  import_fee:Grams = CommonMsgInfo;
 ext_out_msg_info$11 src:MsgAddressInt dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfo;
 
 int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
   src:MsgAddress dest:MsgAddressInt
-  value:CurrencyCollection ihr_fee:Coins fwd_fee:Coins
+  value:CurrencyCollection ihr_fee:Grams fwd_fee:Grams
   created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
 ext_out_msg_info$11 src:MsgAddress dest:MsgAddressExt
   created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
@@ -162,28 +165,28 @@ interm_addr_simple$10 workchain_id:int8 addr_pfx:uint64
 interm_addr_ext$11 workchain_id:int32 addr_pfx:uint64
   = IntermediateAddress;
 msg_envelope#4 cur_addr:IntermediateAddress
-  next_addr:IntermediateAddress fwd_fee_remaining:Coins
+  next_addr:IntermediateAddress fwd_fee_remaining:Grams
   msg:^(Message Any) = MsgEnvelope;
 //
 msg_import_ext$000 msg:^(Message Any) transaction:^Transaction
               = InMsg;
 msg_import_ihr$010 msg:^(Message Any) transaction:^Transaction
-    ihr_fee:Coins proof_created:^Cell = InMsg;
+    ihr_fee:Grams proof_created:^Cell = InMsg;
 msg_import_imm$011 in_msg:^MsgEnvelope
-    transaction:^Transaction fwd_fee:Coins = InMsg;
+    transaction:^Transaction fwd_fee:Grams = InMsg;
 msg_import_fin$100 in_msg:^MsgEnvelope
-    transaction:^Transaction fwd_fee:Coins = InMsg;
+    transaction:^Transaction fwd_fee:Grams = InMsg;
 msg_import_tr$101  in_msg:^MsgEnvelope out_msg:^MsgEnvelope
-    transit_fee:Coins = InMsg;
+    transit_fee:Grams = InMsg;
 msg_discard_fin$110 in_msg:^MsgEnvelope transaction_id:uint64
-    fwd_fee:Coins = InMsg;
+    fwd_fee:Grams = InMsg;
 msg_discard_tr$111 in_msg:^MsgEnvelope transaction_id:uint64
-    fwd_fee:Coins proof_delivered:^Cell = InMsg;
+    fwd_fee:Grams proof_delivered:^Cell = InMsg;
 //
-import_fees$_ fees_collected:Coins
+import_fees$_ fees_collected:Grams
   value_imported:CurrencyCollection = ImportFees;
 
-_ (AugDictionary 256 InMsg ImportFees) = InMsgDescr;
+_ (HashmapAugE 256 InMsg ImportFees) = InMsgDescr;
 
 msg_export_ext$000 msg:^(Message Any)
     transaction:^Transaction = OutMsg;
@@ -205,15 +208,19 @@ msg_export_deq_imm$100 out_msg:^MsgEnvelope
 
 _ enqueued_lt:uint64 out_msg:^MsgEnvelope = EnqueuedMsg;
 
+_ (HashmapAugE 256 OutMsg CurrencyCollection) = OutMsgDescr;
+
+_ (HashmapAugE 352 EnqueuedMsg uint64) = OutMsgQueue;
+
 processed_upto$_ last_msg_lt:uint64 last_msg_hash:bits256 = ProcessedUpto;
 // key is [ shard:uint64 mc_seqno:uint32 ]
+_ (HashmapE 96 ProcessedUpto) = ProcessedInfo;
 
 ihr_pending$_ import_lt:uint64 = IhrPendingSince;
+_ (HashmapE 320 IhrPendingSince) = IhrPendingInfo;
 
-_ out_queue:(AugDictionary 352 EnqueuedMsg uint64)
-  proc_info:(HashmapE 96 ProcessedUpto)
-  ihr_pending:(HashmapE 320 IhrPendingSince)
-  = OutMsgQueueInfo;
+_ out_queue:OutMsgQueue proc_info:ProcessedInfo
+  ihr_pending:IhrPendingInfo = OutMsgQueueInfo;
 //
 storage_used$_ cells:(VarUInteger 7) bits:(VarUInteger 7)
   public_cells:(VarUInteger 7) = StorageUsed;
@@ -222,7 +229,7 @@ storage_used_short$_ cells:(VarUInteger 7)
   bits:(VarUInteger 7) = StorageUsedShort;
 
 storage_info$_ used:StorageUsed last_paid:uint32
-              due_payment:(Maybe Coins) = StorageInfo;
+              due_payment:(Maybe Grams) = StorageInfo;
 
 account_none$0 = Account;
 account$1 addr:MsgAddressInt storage_stat:StorageInfo
@@ -254,7 +261,7 @@ account_descr$_ account:^Account last_trans_hash:bits256
 
 depth_balance$_ split_depth:(#<= 30) balance:CurrencyCollection = DepthBalanceInfo;
 
-_ (AugDictionary 256 ShardAccount DepthBalanceInfo) = ShardAccounts;
+_ (HashmapAugE 256 ShardAccount DepthBalanceInfo) = ShardAccounts;
 
 transaction$0111 account_addr:bits256 lt:uint64
   prev_trans_hash:bits256 prev_trans_lt:uint64 now:uint32
@@ -271,14 +278,14 @@ update_hashes#72 {X:Type} old_hash:bits256 new_hash:bits256
 !merkle_proof#03 {X:Type} virtual_hash:bits256 depth:uint16 virtual_root:^X = MERKLE_PROOF X;
 
 acc_trans#5 account_addr:bits256
-            transactions:(AugDictionaryEdge 64 ^Transaction CurrencyCollection)
+            transactions:(HashmapAug 64 ^Transaction CurrencyCollection)
             state_update:^(HASH_UPDATE Account)
           = AccountBlock;
 
-_ (AugDictionary 256 AccountBlock CurrencyCollection) = ShardAccountBlocks;
+_ (HashmapAugE 256 AccountBlock CurrencyCollection) = ShardAccountBlocks;
 //
-tr_phase_storage$_ storage_fees_collected:Coins
-  storage_fees_due:(Maybe Coins)
+tr_phase_storage$_ storage_fees_collected:Grams
+  storage_fees_due:(Maybe Grams)
   status_change:AccStatusChange
   = TrStoragePhase;
 
@@ -286,13 +293,13 @@ acst_unchanged$0 = AccStatusChange;  // x -> x
 acst_frozen$10 = AccStatusChange;    // init -> frozen
 acst_deleted$11 = AccStatusChange;   // frozen -> deleted
 
-tr_phase_credit$_ due_fees_collected:(Maybe Coins)
+tr_phase_credit$_ due_fees_collected:(Maybe Grams)
   credit:CurrencyCollection = TrCreditPhase;
 
 tr_phase_compute_skipped$0 reason:ComputeSkipReason
   = TrComputePhase;
 tr_phase_compute_vm$1 success:Bool msg_state_used:Bool
-  account_activated:Bool gas_fees:Coins
+  account_activated:Bool gas_fees:Grams
   ^[ gas_used:(VarUInteger 7)
   gas_limit:(VarUInteger 7) gas_credit:(Maybe (VarUInteger 3))
   mode:int8 exit_code:int32 exit_arg:(Maybe int32)
@@ -302,10 +309,11 @@ tr_phase_compute_vm$1 success:Bool msg_state_used:Bool
 cskip_no_state$00 = ComputeSkipReason;
 cskip_bad_state$01 = ComputeSkipReason;
 cskip_no_gas$10 = ComputeSkipReason;
+cskip_suspended$110 = ComputeSkipReason;
 
 tr_phase_action$_ success:Bool valid:Bool no_funds:Bool
   status_change:AccStatusChange
-  total_fwd_fees:(Maybe Coins) total_action_fees:(Maybe Coins)
+  total_fwd_fees:(Maybe Grams) total_action_fees:(Maybe Grams)
   result_code:int32 result_arg:(Maybe int32) tot_actions:uint16
   spec_actions:uint16 skipped_actions:uint16 msgs_created:uint16
   action_list_hash:bits256 tot_msg_size:StorageUsedShort
@@ -313,9 +321,9 @@ tr_phase_action$_ success:Bool valid:Bool no_funds:Bool
 
 tr_phase_bounce_negfunds$00 = TrBouncePhase;
 tr_phase_bounce_nofunds$01 msg_size:StorageUsedShort
-  req_fwd_fees:Coins = TrBouncePhase;
+  req_fwd_fees:Grams = TrBouncePhase;
 tr_phase_bounce_ok$1 msg_size:StorageUsedShort
-  msg_fees:Coins fwd_fees:Coins = TrBouncePhase;
+  msg_fees:Grams fwd_fees:Grams = TrBouncePhase;
 //
 trans_ord$0000 credit_first:Bool
   storage_ph:(Maybe TrStoragePhase)
@@ -358,7 +366,7 @@ trans_merge_install$0111 split_info:SplitMergeInfo
 smc_info#076ef1ea actions:uint16 msgs_sent:uint16
   unixtime:uint32 block_lt:uint64 trans_lt:uint64
   rand_seed:bits256 balance_remaining:CurrencyCollection
-  myself:MsgAddressInt = SmartContractInfo;
+  myself:MsgAddressInt global_config:(Maybe Cell) = SmartContractInfo;
 //
 //
 out_list_empty$_ = OutList 0;
@@ -396,8 +404,7 @@ shard_state#9023afe2 global_id:int32
   min_ref_mc_seqno:uint32
   out_msg_queue_info:^OutMsgQueueInfo
   before_split:(## 1)
-//   accounts:^ShardAccounts
-  accounts:^(AugDictionary 256 ShardAccount DepthBalanceInfo)
+  accounts:^ShardAccounts
   ^[ overload_history:uint64 underload_history:uint64
   total_balance:CurrencyCollection
   total_validator_fees:CurrencyCollection
@@ -412,24 +419,17 @@ split_state#5f327da5 left:^ShardStateUnsplit right:^ShardStateUnsplit = ShardSta
 shared_lib_descr$00 lib:^Cell publishers:(Hashmap 256 True)
   = LibDescr;
 
-block_info#9bc7a987
-  version:uint32
+block_info#9bc7a987 version:uint32
   not_master:(## 1)
-  after_merge:(## 1)
-  before_split:(## 1)
+  after_merge:(## 1) before_split:(## 1)
   after_split:(## 1)
-  want_split:Bool
-  want_merge:Bool
-  key_block:Bool
-  vert_seqno_incr:(## 1)
+  want_split:Bool want_merge:Bool
+  key_block:Bool vert_seqno_incr:(## 1)
   flags:(## 8) { flags <= 1 }
-  seq_no:#
-  vert_seq_no:# { vert_seq_no >= vert_seqno_incr }
+  seq_no:# vert_seq_no:# { vert_seq_no >= vert_seqno_incr }
   { prev_seq_no:# } { ~prev_seq_no + 1 = seq_no }
-  shard:ShardIdent
-  gen_utime:uint32
-  start_lt:uint64
-  end_lt:uint64
+  shard:ShardIdent gen_utime:uint32
+  start_lt:uint64 end_lt:uint64
   gen_validator_list_hash_short:uint32
   gen_catchain_seqno:uint32
   min_ref_mc_seqno:uint32
@@ -449,13 +449,13 @@ block#11ef55aa global_id:int32
   extra:^BlockExtra = Block;
 
 block_extra in_msg_descr:^InMsgDescr
-  out_msg_descr:^(AugDictionary 256 OutMsg CurrencyCollection)
+  out_msg_descr:^OutMsgDescr
   account_blocks:^ShardAccountBlocks
   rand_seed:bits256
   created_by:bits256
   custom:(Maybe ^McBlockExtra) = BlockExtra;
 //
-value_flow ^[ from_prev_blk:CurrencyCollection
+value_flow#b8e48dfb ^[ from_prev_blk:CurrencyCollection
   to_next_blk:CurrencyCollection
   imported:CurrencyCollection
   exported:CurrencyCollection ]
@@ -508,7 +508,7 @@ bta_fork$1 {X:Type} {Y:Type} left:^(BinTreeAug X Y)
            right:^(BinTreeAug X Y) extra:Y = BinTreeAug X Y;
 
 _ fees:CurrencyCollection create:CurrencyCollection = ShardFeeCreated;
-_ (AugDictionary 96 ShardFeeCreated ShardFeeCreated) = ShardFees;
+_ (HashmapAugE 96 ShardFeeCreated ShardFeeCreated) = ShardFees;
 
 _ config_addr:bits256 config:^(Hashmap 32 ^Cell)
   = ConfigParams;
@@ -527,13 +527,13 @@ validator_base_info$_
 _ key:Bool max_end_lt:uint64 = KeyMaxLt;
 _ key:Bool blk_ref:ExtBlkRef = KeyExtBlkRef;
 
-_ (AugDictionary 32 KeyExtBlkRef KeyMaxLt) = OldMcBlocksInfo;
+_ (HashmapAugE 32 KeyExtBlkRef KeyMaxLt) = OldMcBlocksInfo;
 
 
 counters#_ last_updated:uint32 total:uint64 cnt2048:uint64 cnt65536:uint64 = Counters;
 creator_info#4 mc_blocks:Counters shard_blocks:Counters = CreatorStats;
 block_create_stats#17 counters:(HashmapE 256 CreatorStats) = BlockCreateStats;
-block_create_stats_ext#34 counters:(AugDictionary 256 CreatorStats uint32) = BlockCreateStats;
+block_create_stats_ext#34 counters:(HashmapAugE 256 CreatorStats uint32) = BlockCreateStats;
 
 masterchain_state_extra#cc26
   shard_hashes:ShardHashes
@@ -590,7 +590,7 @@ _ minter_addr:bits256 = ConfigParam 2;  // ConfigParam 0 is used if absent
 _ fee_collector_addr:bits256 = ConfigParam 3;  // ConfigParam 1 is used if absent
 _ dns_root_addr:bits256 = ConfigParam 4;  // root TON DNS resolver
 
-_ mint_new_price:Coins mint_add_price:Coins = ConfigParam 6;
+_ mint_new_price:Grams mint_add_price:Grams = ConfigParam 6;
 _ to_mint:ExtraCurrencyCollection = ConfigParam 7;
 
 capabilities#c4 version:uint32 capabilities:uint64 = GlobalVersion;
@@ -615,21 +615,35 @@ wfmt_ext#0 min_addr_len:(## 12) max_addr_len:(## 12) addr_len_step:(## 12)
   workchain_type_id:(## 32) { workchain_type_id >= 1 }
   = WorkchainFormat 0;
 
-workchain#a6 enabled_since:uint32 actual_min_split:(## 8)
-  min_split:(## 8) max_split:(## 8) { actual_min_split <= min_split }
+wc_split_merge_timings#0
+  split_merge_delay:uint32 split_merge_interval:uint32
+  min_split_merge_interval:uint32 max_split_merge_delay:uint32
+  = WcSplitMergeTimings;
+
 //workchain#a5 enabled_since:uint32 min_split:(## 8) max_split:(## 8)
 //  { min_split <= max_split } { max_split <= 60 }
+
+workchain#a6 enabled_since:uint32 actual_min_split:(## 8)
+  min_split:(## 8) max_split:(## 8) { actual_min_split <= min_split }
   basic:(## 1) active:Bool accept_msgs:Bool flags:(## 13) { flags = 0 }
   zerostate_root_hash:bits256 zerostate_file_hash:bits256
   version:uint32 format:(WorkchainFormat basic)
   = WorkchainDescr;
 
+workchain_v2#a7 enabled_since:uint32 actual_min_split:(## 8)
+  min_split:(## 8) max_split:(## 8) { actual_min_split <= min_split }
+  basic:(## 1) active:Bool accept_msgs:Bool flags:(## 13) { flags = 0 }
+  zerostate_root_hash:bits256 zerostate_file_hash:bits256
+  version:uint32 format:(WorkchainFormat basic)
+  split_merge_timings:WcSplitMergeTimings
+  = WorkchainDescr;
+
 _ workchains:(HashmapE 32 WorkchainDescr) = ConfigParam 12;
 
-complaint_prices#1a deposit:Coins bit_price:Coins cell_price:Coins = ComplaintPricing;
+complaint_prices#1a deposit:Grams bit_price:Grams cell_price:Grams = ComplaintPricing;
 _ ComplaintPricing = ConfigParam 13;
 
-block_grams_created#6b masterchain_block_fee:Coins basechain_block_fee:Coins
+block_grams_created#6b masterchain_block_fee:Grams basechain_block_fee:Grams
   = BlockCreateFees;
 _ BlockCreateFees = ConfigParam 14;
 
@@ -643,7 +657,7 @@ _ max_validators:(## 16) max_main_validators:(## 16) min_validators:(## 16)
   { min_validators >= 1 }
   = ConfigParam 16;
 
-_ min_stake:Coins max_stake:Coins min_total_stake:Coins max_stake_factor:uint32 = ConfigParam 17;
+_ min_stake:Grams max_stake:Grams min_total_stake:Grams max_stake_factor:uint32 = ConfigParam 17;
 
 _#cc utime_since:uint32 bit_price_ps:uint64 cell_price_ps:uint64
   mc_bit_price_ps:uint64 mc_cell_price_ps:uint64 = StoragePrices;
@@ -671,8 +685,8 @@ block_limits#5d bytes:ParamLimits gas:ParamLimits lt_delta:ParamLimits
 config_mc_block_limits#_ BlockLimits = ConfigParam 22;
 config_block_limits#_ BlockLimits = ConfigParam 23;
 
-// msg_fwd_fees = (lump_price + ceil((bit_price * msg.bits + cell_price * msg.cells)/2^16)) nanocoins
-// ihr_fwd_fees = ceil((msg_fwd_fees * ihr_price_factor)/2^16) nanocoins
+// msg_fwd_fees = (lump_price + ceil((bit_price * msg.bits + cell_price * msg.cells)/2^16)) nanograms
+// ihr_fwd_fees = ceil((msg_fwd_fees * ihr_price_factor)/2^16) nanograms
 // bits in the root cell of a message are not included in msg.bits (lump_price pays for them)
 msg_forward_prices#ea lump_price:uint64 bit_price:uint64 cell_price:uint64
   ihr_price_factor:uint32 first_frac:uint16 next_frac:uint16 = MsgForwardPrices;
@@ -707,6 +721,13 @@ consensus_config_v3#d8 flags:(## 7) { flags = 0 } new_catchain_ids:Bool
   max_block_bytes:uint32 max_collated_bytes:uint32
   proto_version:uint16 = ConsensusConfig;
 
+consensus_config_v4#d9 flags:(## 7) { flags = 0 } new_catchain_ids:Bool
+  round_candidates:(## 8) { round_candidates >= 1 }
+  next_candidate_delay_ms:uint32 consensus_timeout_ms:uint32
+  fast_attempts:uint32 attempt_duration:uint32 catchain_max_deps:uint32
+  max_block_bytes:uint32 max_collated_bytes:uint32
+  proto_version:uint16 catchain_max_blocks_coeff:uint32 = ConsensusConfig;
+
 _ CatchainConfig = ConfigParam 28;
 _ ConsensusConfig = ConfigParam 29;
 
@@ -723,7 +744,7 @@ signed_temp_key#4 key:^ValidatorTempKey signature:CryptoSignature = ValidatorSig
 _ (HashmapE 256 ValidatorSignedTempKey) = ConfigParam 39;
 
 misbehaviour_punishment_config_v1#01
-  default_flat_fine:Coins default_proportional_fine:uint32
+  default_flat_fine:Grams default_proportional_fine:uint32
   severity_flat_mult:uint16 severity_proportional_mult:uint16
   unpunishable_interval:uint16
   long_interval:uint16 long_flat_mult:uint16 long_proportional_mult:uint16
@@ -731,10 +752,35 @@ misbehaviour_punishment_config_v1#01
    = MisbehaviourPunishmentConfig;
 _ MisbehaviourPunishmentConfig = ConfigParam 40;
 
+size_limits_config#01 max_msg_bits:uint32 max_msg_cells:uint32 max_library_cells:uint32 max_vm_data_depth:uint16
+  max_ext_msg_size:uint32 max_ext_msg_depth:uint16 = SizeLimitsConfig;
+size_limits_config_v2#02 max_msg_bits:uint32 max_msg_cells:uint32 max_library_cells:uint32 max_vm_data_depth:uint16
+  max_ext_msg_size:uint32 max_ext_msg_depth:uint16 max_acc_state_cells:uint32 max_acc_state_bits:uint32 = SizeLimitsConfig;
+_ SizeLimitsConfig = ConfigParam 43;
+
+// key is [ wc:int32 addr:uint256 ]
+suspended_address_list#00 addresses:(HashmapE 288 Unit) suspended_until:uint32 = SuspendedAddressList;
+_ SuspendedAddressList = ConfigParam 44;
+
 oracle_bridge_params#_ bridge_address:bits256 oracle_mutlisig_address:bits256 oracles:(HashmapE 256 uint256) external_chain_address:bits256 = OracleBridgeParams;
 _ OracleBridgeParams = ConfigParam 71; // Ethereum bridge
 _ OracleBridgeParams = ConfigParam 72; // Binance Smart Chain bridge
 _ OracleBridgeParams = ConfigParam 73; // Polygon bridge
+
+// Note that chains in which bridge, minter and jetton-wallet operate are fixated
+jetton_bridge_prices#_ bridge_burn_fee:Coins bridge_mint_fee:Coins
+                       wallet_min_tons_for_storage:Coins
+                       wallet_gas_consumption:Coins
+                       minter_min_tons_for_storage:Coins
+                       discover_gas_consumption:Coins = JettonBridgePrices;
+
+jetton_bridge_params_v0#00 bridge_address:bits256 oracles_address:bits256 oracles:(HashmapE 256 uint256) state_flags:uint8 burn_bridge_fee:Coins = JettonBridgeParams;
+jetton_bridge_params_v1#01 bridge_address:bits256 oracles_address:bits256 oracles:(HashmapE 256 uint256) state_flags:uint8 prices:^JettonBridgePrices external_chain_address:bits256 = JettonBridgeParams;
+
+_ JettonBridgeParams = ConfigParam 79; // ETH->TON token bridge
+_ JettonBridgeParams = ConfigParam 80; // BNB->TON token bridge
+_ JettonBridgeParams = ConfigParam 81; // Polygon->TON token bridge
+
 
 //
 //  PROOFS
@@ -761,7 +807,7 @@ prod_info#34 utime:uint32 mc_blk_ref:ExtBlkRef state_proof:^(MERKLE_PROOF Block)
   prod_proof:^(MERKLE_PROOF ShardState) = ProducerInfo;
 no_blk_gen from_utime:uint32 prod_info:^ProducerInfo = ComplaintDescr;
 no_blk_gen_diff prod_info_old:^ProducerInfo prod_info_new:^ProducerInfo = ComplaintDescr;
-validator_complaint#bc validator_pubkey:bits256 description:^ComplaintDescr created_at:uint32 severity:uint8 reward_addr:uint256 paid:Coins suggested_fine:Coins suggested_fine_part:uint32 = ValidatorComplaint;
+validator_complaint#bc validator_pubkey:bits256 description:^ComplaintDescr created_at:uint32 severity:uint8 reward_addr:uint256 paid:Grams suggested_fine:Grams suggested_fine_part:uint32 = ValidatorComplaint;
 complaint_status#2d complaint:^ValidatorComplaint voters:(HashmapE 16 True) vset_id:uint256 weight_remaining:int64 = ValidatorComplaintStatus;
 
 //
@@ -811,7 +857,7 @@ vmc_pushint$1111 value:int32 next:^VmCont = VmCont;
 //
 //  DNS RECORDS
 //
-_ (HashmapE 16 ^DNSRecord) = DNS_RecordSet;
+_ (HashmapE 256 ^DNSRecord) = DNS_RecordSet;
 
 chunk_ref$_ {n:#} ref:^(TextChunks (n + 1)) = TextChunkRef (n + 1);
 chunk_ref_empty$_ = TextChunkRef 0;
@@ -837,22 +883,24 @@ cap_method_pubkey#71f4 = SmcCapability;
 cap_is_wallet#2177 = SmcCapability;
 cap_name#ff name:Text = SmcCapability;
 
+dns_storage_address#7473 bag_id:bits256 = DNSRecord;
+
 //
 // PAYMENT CHANNELS
 //
 
 chan_config$_  init_timeout:uint32 close_timeout:uint32 a_key:bits256 b_key:bits256
-  a_addr:^MsgAddressInt b_addr:^MsgAddressInt channel_id:uint64 min_A_extra:Coins = ChanConfig;
+  a_addr:^MsgAddressInt b_addr:^MsgAddressInt channel_id:uint64 min_A_extra:Grams = ChanConfig;
 
-chan_state_init$000  signed_A:Bool signed_B:Bool min_A:Coins min_B:Coins expire_at:uint32 A:Coins B:Coins = ChanState;
-chan_state_close$001 signed_A:Bool signed_B:Bool promise_A:Coins promise_B:Coins expire_at:uint32 A:Coins B:Coins = ChanState;
-chan_state_payout$010 A:Coins B:Coins = ChanState;
+chan_state_init$000  signed_A:Bool signed_B:Bool min_A:Grams min_B:Grams expire_at:uint32 A:Grams B:Grams = ChanState;
+chan_state_close$001 signed_A:Bool signed_B:Bool promise_A:Grams promise_B:Grams expire_at:uint32 A:Grams B:Grams = ChanState;
+chan_state_payout$010 A:Grams B:Grams = ChanState;
 
-chan_promise$_ channel_id:uint64 promise_A:Coins promise_B:Coins = ChanPromise;
+chan_promise$_ channel_id:uint64 promise_A:Grams promise_B:Grams = ChanPromise;
 chan_signed_promise#_ sig:(Maybe ^bits512) promise:ChanPromise = ChanSignedPromise;
 
-chan_msg_init#27317822 inc_A:Coins inc_B:Coins min_A:Coins min_B:Coins channel_id:uint64 = ChanMsg;
-chan_msg_close#f28ae183 extra_A:Coins extra_B:Coins promise:ChanSignedPromise  = ChanMsg;
+chan_msg_init#27317822 inc_A:Grams inc_B:Grams min_A:Grams min_B:Grams channel_id:uint64 = ChanMsg;
+chan_msg_close#f28ae183 extra_A:Grams extra_B:Grams promise:ChanSignedPromise  = ChanMsg;
 chan_msg_timeout#43278a28 = ChanMsg;
 chan_msg_payout#37fe7810 = ChanMsg;
 
@@ -862,4 +910,3 @@ chan_op_cmd#912838d1 msg:ChanSignedMsg = ChanOp;
 
 
 chan_data$_ config:^ChanConfig state:^ChanState = ChanData;
-
