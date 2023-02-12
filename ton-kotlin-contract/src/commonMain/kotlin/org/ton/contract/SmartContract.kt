@@ -21,11 +21,13 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
 
-public interface SmartContract {
-    public val address: AddrStd
+public interface SmartContract<T : Any> {
+    public val address: MsgAddressInt
     public val state: AccountState
     public val data: Cell? get() = (state as? AccountActive)?.value?.data?.value?.value
     public val code: Cell? get() = (state as? AccountActive)?.value?.code?.value?.value
+
+    public fun loadData(): T?
 
     public suspend fun sendExternalMessage(liteApi: LiteApi, message: Message<Cell>): Int =
         sendExternalMessage(liteApi, CellBuilder.createCell {
@@ -53,6 +55,7 @@ public interface SmartContract {
         blockId: TonNodeBlockIdExt,
         query: SmartContractQuery
     ): SmartContractAnswer {
+        val address = requireNotNull(address as? AddrStd) { throw UnsupportedOperationException("expected AddrStd, actual: $address") }
         val result = liteApi(
             LiteServerRunSmcMethod(
                 mode = 4,
@@ -138,7 +141,7 @@ public class SmartContractQueryBuilder {
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun SmartContract.runGetMethod(
+public suspend fun SmartContract<*>.runGetMethod(
     liteApi: LiteApi,
     builderAction: SmartContractQueryBuilder.() -> Unit
 ): SmartContractAnswer {
@@ -149,7 +152,7 @@ public suspend fun SmartContract.runGetMethod(
 }
 
 @OptIn(ExperimentalContracts::class)
-public suspend fun SmartContract.runGetMethod(
+public suspend fun SmartContract<*>.runGetMethod(
     liteApi: LiteApi,
     blockId: TonNodeBlockIdExt,
     builderAction: SmartContractQueryBuilder.() -> Unit

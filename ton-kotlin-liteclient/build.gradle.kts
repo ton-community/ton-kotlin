@@ -1,3 +1,4 @@
+
 kotlin {
     sourceSets {
         val commonMain by getting {
@@ -14,6 +15,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.coroutines.core)
+                implementation(projects.tonKotlinContract)
             }
         }
     }

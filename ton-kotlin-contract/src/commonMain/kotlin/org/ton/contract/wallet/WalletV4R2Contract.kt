@@ -25,9 +25,9 @@ import kotlin.jvm.JvmStatic
 import kotlin.time.Duration.Companion.seconds
 
 public class WalletV4R2Contract private constructor(
-    override val address: AddrStd,
+    override val address: MsgAddressInt,
     public override val state: AccountState
-) : WalletContract {
+) : WalletContract<Cell> {
     public constructor(
         workchain: Int,
         init: StateInit
@@ -37,6 +37,12 @@ public class WalletV4R2Contract private constructor(
         workchain: Int,
         publicKey: PublicKeyEd25519,
     ) : this(workchain, createStateInit(publicKey, DEFAULT_WALLET_ID + workchain))
+
+    public constructor(
+        accountInfo: AccountInfo
+    ) : this(accountInfo.addr, accountInfo.storage.state)
+
+    override fun loadData(): Cell? = data
 
     public fun getSeqno(): Int = requireNotNull(data).beginParse().run {
         preloadInt(32).toInt()
@@ -94,14 +100,13 @@ public class WalletV4R2Contract private constructor(
 
         @JvmStatic
         suspend fun loadContract(liteClient: LiteClient, blockId: TonNodeBlockIdExt, address: AddrStd): WalletV4R2Contract? {
-            val account = liteClient.getAccount(LiteServerAccountId(address.workchainId, address.address), blockId)
-            val state = account?.storage?.state ?: return null
-            return WalletV4R2Contract(address, state)
+            val accountInfo = liteClient.getAccount(LiteServerAccountId(address.workchainId, address.address), blockId) ?: return null
+            return WalletV4R2Contract(accountInfo)
         }
 
         @JvmStatic
         fun createTransferMessage(
-            address: AddrStd,
+            address: MsgAddressInt,
             stateInit: StateInit?,
             privateKey: PrivateKeyEd25519,
             walletId: Int,
