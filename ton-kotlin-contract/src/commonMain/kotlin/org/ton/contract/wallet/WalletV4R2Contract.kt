@@ -81,7 +81,7 @@ public class WalletV4R2Contract private constructor(
             seqno = seqno,
             transfers = transfers
         )
-        sendExternalMessage(liteApi, message)
+        sendExternalMessage(liteApi, AnyTlbConstructor, message)
     }
 
     private companion object {

@@ -3,24 +3,41 @@ package org.ton.contract.wallet
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.bitstring.BitString
 import org.ton.bitstring.Bits256
-import org.ton.block.AccountState
-import org.ton.block.MsgAddressInt
+import org.ton.block.*
+import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.cell.buildCell
+import org.ton.contract.SmartContract
+import org.ton.crypto.base64
 import org.ton.hashmap.HashMapE
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbConstructor
+import org.ton.lite.api.LiteApi
+import org.ton.tlb.*
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public class HighLoadWalletV2Contract(
     override val address: MsgAddressInt,
     public override val state: AccountState
 ) : WalletContract<HighLoadWalletV2Contract.Data> {
+
+    public constructor(
+        workchain: Int,
+        init: StateInit
+    ) : this(SmartContract.address(workchain, init), AccountUninit)
+
+    public constructor(
+        workchain: Int,
+        data: Data
+    ) : this(workchain, stateInit(data))
+
+    public constructor(
+        accountInfo: AccountInfo
+    ) : this(accountInfo.addr, accountInfo.storage.state)
+
     override fun loadData(): Data? = data?.let {
         Data.loadTlb(it)
     }
@@ -30,6 +47,19 @@ public class HighLoadWalletV2Contract(
     public fun getLastCleaned(): Long = requireNotNull(loadData()).lastCleaned
 
     public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey)
+
+    public suspend fun <X: Any> sendQuery(liteApi: LiteApi, codec: TlbCodec<X>, query: Query<X>, stateInit: StateInit? = null) {
+        val externalMessage = Message(
+            info = ExtInMsgInfo(
+                src = AddrNone,
+                dest = address,
+                importFee = Coins()
+            ),
+            init = Maybe.of(stateInit?.let { Either.of(left = null, right = CellRef(it)) }),
+            body = Either.of(left = null, CellRef(query))
+        )
+        sendExternalMessage(liteApi, Query.tlbConstructor(codec), externalMessage)
+    }
 
     public interface Data {
         public val subWalletId: Int
@@ -67,6 +97,16 @@ public class HighLoadWalletV2Contract(
     }
 
     public companion object {
+        @JvmField
+        public val CODE: Cell = BagOfCells(
+            base64(
+                "te6ccgEBCQEA5QABFP8A9KQT9LzyyAsBAgEgAgMCAUgEBQHq8oMI1xgg0x/TP/gjqh9TILnyY+1E0NMf0z/T//" +
+                        "QE0VNggED0Dm+hMfJgUXO68qIH+QFUEIf5EPKjAvQE0fgAf44WIYAQ9HhvpSCYAtMH1DAB+wCRMuIBs+" +
+                        "ZbgyWhyEA0gED0Q4rmMcgSyx8Tyz/L//QAye1UCAAE0DACASAGBwAXvZznaiaGmvmOuF/8AEG+X5dqJoaY+Y6Z/p/" +
+                        "5j6AmipEEAgegc30JjJLb/JXdHxQANCCAQPSWb6UyURCUMFMDud4gkzM2AZIyMOKz"
+            )
+        ).first()
+
         @JvmStatic
         public fun data(
             subWalletId: Int,
@@ -87,6 +127,18 @@ public class HighLoadWalletV2Contract(
             queryId: Long,
             msgs: HashMapE<WalletMessage<X>>
         ): QueryPayload<X> = HighLoadWalletV2QueryPayloadImpl(subWalletId, queryId, msgs)
+
+        @JvmStatic
+        public fun stateInit(
+            data: Data
+        ): StateInit {
+            return StateInit(
+                code = CODE,
+                data = buildCell {
+                    Data.storeTlb(this, data)
+                }
+            )
+        }
     }
 }
 

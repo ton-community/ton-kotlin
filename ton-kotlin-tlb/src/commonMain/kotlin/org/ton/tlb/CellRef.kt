@@ -7,7 +7,7 @@ import org.ton.cell.CellType
 import kotlin.jvm.JvmStatic
 
 public inline fun <T> CellRef(cell: Cell, codec: TlbCodec<T>): CellRef<T> = CellRef.valueOf(cell, codec)
-public inline fun <T> CellRef(value: T): CellRef<T> = CellRef.valueOf(value)
+public inline fun <T> CellRef(value: T, codec: TlbCodec<T>? = null): CellRef<T> = CellRef.valueOf(value, codec)
 public inline fun <T> CellRef(codec: TlbCodec<T>): TlbCodec<CellRef<T>> = CellRef.tlbCodec(codec)
 
 public inline fun <T> Cell.asRef(codec: TlbCodec<T>): CellRef<T> = CellRef.valueOf(this, codec)
@@ -35,7 +35,10 @@ public interface CellRef<out T> : TlbObject {
         public fun <T> valueOf(cell: Cell, codec: TlbCodec<T>): CellRef<T> = CellRefImpl(cell, codec)
 
         @JvmStatic
-        public fun <T> valueOf(value: T): CellRef<T> = CellRefValue(value)
+        public fun  <T> valueOf(value: T): CellRef<T> = CellRefValue(value, null)
+
+        @JvmStatic
+        public fun <T> valueOf(value: T, codec: TlbCodec<T>?): CellRef<T> = CellRefValue(value, codec)
 
         @JvmStatic
         public fun <T> tlbCodec(codec: TlbCodec<T>): TlbCodec<CellRef<T>> = CellRefTlbConstructor(codec)
@@ -70,11 +73,13 @@ private class CellRefImpl<T>(
 
 private class CellRefValue<T>(
     override val value: T,
+    val codec: TlbCodec<T>? = null
 ) : CellRef<T> {
     override fun toCell(codec: TlbCodec<T>?): Cell {
-        require(codec != null) { "Codec is not specified" }
+        val currentCodec = codec ?: this.codec
+        require(currentCodec != null) { "Codec is not specified" }
         return CellBuilder.createCell {
-            codec.storeTlb(this, value)
+            currentCodec.storeTlb(this, value)
         }
     }
 

@@ -4,7 +4,6 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
 import org.ton.cell.buildCell
 import org.ton.crypto.crc16
 import org.ton.lite.api.LiteApi
@@ -13,7 +12,8 @@ import org.ton.lite.api.liteserver.functions.LiteServerGetAccountState
 import org.ton.lite.api.liteserver.functions.LiteServerGetMasterchainInfo
 import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
 import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
-import org.ton.tlb.constructor.AnyTlbConstructor
+import org.ton.tlb.CellRef
+import org.ton.tlb.TlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.contracts.ExperimentalContracts
@@ -29,9 +29,9 @@ public interface SmartContract<T : Any> {
 
     public fun loadData(): T?
 
-    public suspend fun sendExternalMessage(liteApi: LiteApi, message: Message<Cell>): Int =
-        sendExternalMessage(liteApi, CellBuilder.createCell {
-            storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
+    public suspend fun <X : Any> sendExternalMessage(liteApi: LiteApi, codec: TlbCodec<X>, message: Message<X>): Int =
+        sendExternalMessage(liteApi, buildCell {
+            storeTlb(Message.tlbCodec(codec), message)
         })
 
     public suspend fun sendExternalMessage(liteApi: LiteApi, message: Cell): Int =
@@ -55,7 +55,8 @@ public interface SmartContract<T : Any> {
         blockId: TonNodeBlockIdExt,
         query: SmartContractQuery
     ): SmartContractAnswer {
-        val address = requireNotNull(address as? AddrStd) { throw UnsupportedOperationException("expected AddrStd, actual: $address") }
+        val address =
+            requireNotNull(address as? AddrStd) { throw UnsupportedOperationException("expected AddrStd, actual: $address") }
         val result = liteApi(
             LiteServerRunSmcMethod(
                 mode = 4,
@@ -65,7 +66,6 @@ public interface SmartContract<T : Any> {
                 params = LiteServerRunSmcMethod.params(query.stack)
             )
         )
-        println(result)
         return SmartContractAnswer(
             exitCode = result.exitCode,
             stack = result.result?.let {
@@ -82,8 +82,13 @@ public interface SmartContract<T : Any> {
             AddrStd(workchain, buildCell { storeTlb(StateInit, stateInit) }.hash())
 
         @JvmStatic
-        public suspend fun getAccountInfo(liteApi: LiteApi, blockId: TonNodeBlockIdExt, address: AddrStd): AccountInfo? {
-            val accountState = liteApi(LiteServerGetAccountState(blockId, LiteServerAccountId(address.workchainId, address.address)))
+        public suspend fun getAccountInfo(
+            liteApi: LiteApi,
+            blockId: TonNodeBlockIdExt,
+            address: AddrStd
+        ): AccountInfo? {
+            val accountState =
+                liteApi(LiteServerGetAccountState(blockId, LiteServerAccountId(address.workchainId, address.address)))
             val stateBoc = BagOfCells(accountState.state)
             val account = stateBoc.first().parse { loadTlb(Account) }
             return account as? AccountInfo
