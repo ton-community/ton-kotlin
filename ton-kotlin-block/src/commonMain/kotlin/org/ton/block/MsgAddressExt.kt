@@ -8,6 +8,7 @@ import org.ton.bitstring.BitString
 import org.ton.bitstring.isNullOrEmpty
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbLoader
 import kotlin.jvm.JvmStatic
 
 inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt.of(externalAddress)
@@ -38,4 +39,20 @@ private object MsgAddressExtTlbCombinator : TlbCombinator<MsgAddressExt>(
     MsgAddressExt::class,
     AddrNone::class to AddrNone.tlbConstructor(),
     AddrExtern::class to AddrExtern.tlbConstructor(),
-)
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out MsgAddressExt>? {
+        return if (bitString.size >= 2) {
+            if (bitString[0]) { // 1
+                null
+            } else { // 0
+                if (bitString[1]) { // 01
+                    AddrExtern.tlbConstructor()
+                } else { // 00
+                    AddrNone.tlbConstructor()
+                }
+            }
+        } else {
+            null
+        }
+    }
+}

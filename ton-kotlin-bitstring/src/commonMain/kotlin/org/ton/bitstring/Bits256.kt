@@ -27,6 +27,8 @@ public value class Bits256(
     public companion object : KSerializer<Bits256> by Bits256Serializer
 }
 
+public inline fun ByteArray.toBits256(): Bits256 = Bits256(this)
+
 public object Bits256Serializer : KSerializer<Bits256> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Bits256", PrimitiveKind.STRING)
 

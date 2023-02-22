@@ -1,14 +1,18 @@
 package org.ton.boc
 
 import io.ktor.utils.io.core.*
+import kotlinx.coroutines.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.LevelMask
 import org.ton.crypto.crc32c
 import org.ton.crypto.encodeHex
 import kotlin.experimental.and
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@OptIn(ExperimentalUnsignedTypes::class, ExperimentalTime::class)
 internal fun ByteReadPacket.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
@@ -80,51 +84,59 @@ internal fun ByteReadPacket.readBagOfCell(): BagOfCells {
     val cellRefs = Array(cellCount) { intArrayOf() }
     val cellExotics = BooleanArray(cellCount) { false }
 
-    repeat(cellCount) { cellIndex ->
-        val d1 = readUByte().toInt()
-        val d2 = readUByte().toInt()
+//    measureTime {
+        repeat(cellCount) { cellIndex ->
+            val d1 = readUByte().toInt()
+            val d2 = readUByte().toInt()
 
-        val hasHashes = (d1 and 0b0001_0000) != 0
-        val isExotic = (d1 and 0b0000_1000) != 0
-        val refsCount = d1 and 0b0000_0111
-        val levelMask = LevelMask(d1 shr 5)
-        if (refsCount > 4) {
-            if (refsCount != 0b111 || !hasHashes) {
-                throw IllegalArgumentException("Invalid first bytes")
+            val hasHashes = (d1 and 0b0001_0000) != 0
+            val isExotic = (d1 and 0b0000_1000) != 0
+            val refsCount = d1 and 0b0000_0111
+            val levelMask = LevelMask(d1 shr 5)
+            if (refsCount > 4) {
+                if (refsCount != 0b111 || !hasHashes) {
+                    throw IllegalArgumentException("Invalid first bytes")
+                }
+                TODO("absent cells")
             }
-            TODO("absent cells")
-        }
 
-        val hashesOffset = 2
-        val hashesCount = levelMask.hashCount
-        val depthOffset = hashesOffset + if (hasHashes) hashesCount * Cell.HASH_BYTES else 0
-        val dataOffset = depthOffset + if (hasHashes) hashesCount * Cell.DEPTH_BYTES else 0
-        val dataLen = (d2 shr 1) + (d2 and 1)
-        val isAligned = (d2 and 1) == 0
-        val refsOffset = dataOffset + dataLen
-        val endOffset = refsOffset + refsCount * refSize
+            val hashesOffset = 2
+            val hashesCount = levelMask.hashCount
+            val depthOffset = hashesOffset + if (hasHashes) hashesCount * Cell.HASH_BYTES else 0
+            val dataOffset = depthOffset + if (hasHashes) hashesCount * Cell.DEPTH_BYTES else 0
+            val dataLen = (d2 shr 1) + (d2 and 1)
+            val isAligned = (d2 and 1) == 0
+            val refsOffset = dataOffset + dataLen
+            val endOffset = refsOffset + refsCount * refSize
 
-        if (hasHashes) {
-            discardExact(hashesCount * Cell.HASH_BYTES)
-            discardExact(hashesCount * Cell.DEPTH_BYTES)
-        }
+            if (hasHashes) {
+                discardExact(hashesCount * Cell.HASH_BYTES)
+                discardExact(hashesCount * Cell.DEPTH_BYTES)
+            }
 
-        val cellData = readBytes(dataLen)
-        val cellSize = if (isAligned) dataLen * Byte.SIZE_BITS else findAugmentTag(cellData)
-        cellBits[cellIndex] = BitString(cellData, cellSize)
-        cellRefs[cellIndex] = IntArray(refsCount) { k ->
-            val refIndex = readInt(refSize)
-            check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
-            check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
-            refIndex
+            val cellData = readBytes(dataLen)
+            val cellSize = if (isAligned) dataLen * Byte.SIZE_BITS else findAugmentTag(cellData)
+            cellBits[cellIndex] = BitString(cellData, cellSize)
+            cellRefs[cellIndex] = IntArray(refsCount) { k ->
+                val refIndex = readInt(refSize)
+                check(refIndex > cellIndex) { "bag-of-cells error: reference #$k of cell #$cellIndex is to cell #$refIndex with smaller index" }
+                check(refIndex < cellCount) { "bag-of-cells error: reference #$k of cell #$cellIndex is to non-existent cell #$refIndex, only $cellCount cells are defined" }
+                refIndex
+            }
+            cellExotics[cellIndex] = isExotic
         }
-        cellExotics[cellIndex] = isExotic
-    }
+//    }.let {
+//        println("read cell data time: $it")
+//    }
 
     // Resolving references & constructing cells from leaves to roots
-    val cells = Array<Cell?>(cellCount) { null }
-    List(cellCount) { cellIndex ->
-        createCell(cellIndex, cells, cellBits, cellRefs, cellExotics)
+    val cells = Array<CompletableDeferred<Cell>>(cellCount) { CompletableDeferred() }
+    GlobalScope.launch {
+        repeat(cellCount) { cellIndex ->
+            launch {
+                createCell(cellIndex, cells, cellBits, cellRefs, cellExotics)
+            }
+        }
     }
 
     // TODO: Crc32c check (calculate size of resulting bytearray)
@@ -133,32 +145,50 @@ internal fun ByteReadPacket.readBagOfCell(): BagOfCells {
     }
 
     val roots = rootIndexes.map { rootIndex ->
-        requireNotNull(cells[rootIndex])
+        runBlocking {
+            cells[rootIndex].await()
+        }
     }
 
     return BagOfCells(roots)
 }
 
-private fun createCell(
+private suspend fun createCell(
     index: Int,
-    cells: Array<Cell?>,
+    cells: Array<CompletableDeferred<Cell>>,
     bits: Array<BitString>,
     refs: Array<IntArray>,
     exotics: BooleanArray
-): Cell {
-    var cell = cells[index]
-    if (cell != null) {
-        return cell
-    }
+) = coroutineScope {
     val cellBits = bits[index]
     val cellRefIndexes = refs[index]
     val cellRefs = cellRefIndexes.map { refIndex ->
-        createCell(refIndex, cells, bits, refs, exotics)
+        cells[refIndex].await()
     }
-    cell = Cell(cellBits, cellRefs, exotics[index])
-    cells[index] = cell
-    return cell
+    cells[index].complete(Cell(cellBits, cellRefs, exotics[index]))
 }
+
+//private fun createCell(
+//    index: Int,
+//    cells: Array<Cell?>,
+//    bits: Array<BitString>,
+//    refs: Array<IntArray>,
+//    exotics: BooleanArray
+//): Cell {
+////    println("$index creating")
+//    val cell = cells[index]
+//    if (cell != null) {
+////        println("$index already created")
+//        return cell
+//    }
+//    val cellBits = bits[index]
+//    val cellRefIndexes = refs[index]
+//    val cellRefs = cellRefIndexes.map { refIndex ->
+//        createCell(refIndex, cells, bits, refs, exotics)
+//    }
+////    println("$index async")
+//    return Cell(cellBits, cellRefs, exotics[index])
+//}
 
 internal fun Output.writeBagOfCells(
     bagOfCells: BagOfCells,

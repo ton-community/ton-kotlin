@@ -2,12 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbStorer
+import org.ton.tlb.*
 
 @Serializable
 public enum class AccStatusChange {
@@ -41,6 +39,26 @@ private object AccStatusChangeTlbCombinator : TlbCombinator<AccStatusChange>(
             AccStatusChange.UNCHANGED -> AccStatusChangeUnchangedTlbConstructor
             AccStatusChange.FROZEN -> AccStatusChangeFrozenTlbConstructor
             AccStatusChange.DELETED -> AccStatusChangeDeletedTlbConstructor
+        }
+    }
+
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out AccStatusChange>? {
+        return if (bitString.size >= 1) {
+            if (bitString[0]) { // 1
+                if (bitString.size >= 2) {
+                    if (bitString[1]) { // 11
+                        AccStatusChangeDeletedTlbConstructor
+                    } else { // 10
+                        AccStatusChangeFrozenTlbConstructor
+                    }
+                } else {
+                    null
+                }
+            } else { // 0
+                AccStatusChangeUnchangedTlbConstructor
+            }
+        } else {
+            null
         }
     }
 }

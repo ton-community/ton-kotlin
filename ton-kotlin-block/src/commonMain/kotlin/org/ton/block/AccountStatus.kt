@@ -2,10 +2,12 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbLoader
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable
@@ -46,6 +48,26 @@ private object AccountStatusTlbCombinator : TlbCombinator<AccountStatus>(
             AccountStatus.FROZEN -> AccountStatusFrozenTlbConstructor
             AccountStatus.ACTIVE -> AccountStatusActiveTlbConstructor
             AccountStatus.NONEXIST -> AccountStatusNonExistTlbConstructor
+        }
+    }
+
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out AccountStatus>? {
+        return if (bitString.size >= 2) {
+            if (bitString[0]) { // 1
+                if (bitString[1]) { // 11
+                    AccountStatusNonExistTlbConstructor
+                } else { // 10
+                    AccountStatusActiveTlbConstructor
+                }
+            } else { // 0
+                if (bitString[1]) { // 01
+                    AccountStatusFrozenTlbConstructor
+                } else { // 00
+                    AccountStatusUninitTlbConstructor
+                }
+            }
+        } else {
+            null
         }
     }
 }

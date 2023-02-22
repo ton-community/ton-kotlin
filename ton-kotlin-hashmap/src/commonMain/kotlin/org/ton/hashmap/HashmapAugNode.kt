@@ -11,9 +11,9 @@ public interface HashmapAugNode<X, Y> : TlbObject {
      * ```tl-b
      * ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = HashmapAugNode 0 X Y;
      */
-    public interface AhmnLeaf<X, Y> : HashmapAugNode<X, Y> {
-        public val extra: Y
-        public val value: X
+    public interface AhmnLeaf<X, Y> : HashmapAugNode<X, Y>, AugmentedDictionary.Leaf<X, Y> {
+        public override val extra: Y
+        public override val value: X
 
         override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
             type("ahmn_leaf") {
@@ -84,11 +84,25 @@ public interface HashmapAugNode<X, Y> : TlbObject {
     }
 }
 
-private data class AhmnLeafImpl<X, Y>(
+private class AhmnLeafImpl<X, Y>(
     override val extra: Y,
     override val value: X,
 ) : HashmapAugNode.AhmnLeaf<X, Y> {
     override fun toString(): String = print().toString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AhmnLeafImpl<*, *>) return false
+
+        if (extra != other.extra) return false
+        return value == other.value
+    }
+
+    override fun hashCode(): Int {
+        var result = extra?.hashCode() ?: 0
+        result = 31 * result + (value?.hashCode() ?: 0)
+        return result
+    }
 }
 
 private data class AhmnForkImpl<X, Y>(

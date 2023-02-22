@@ -4,6 +4,7 @@ package org.ton.hashmap
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -33,7 +34,19 @@ private object UnaryTlbCombinator : TlbNegatedCombinator<Unary>(
     Unary::class,
     UnaryZero::class to UnaryZeroTlbConstructor,
     UnarySuccess::class to UnarySuccessTlbConstructor,
-)
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out Unary>? {
+        return if (bitString.size >= 1) {
+            if (bitString[0]) { // 1
+                UnarySuccessTlbConstructor
+            } else { // 0
+                UnaryZeroTlbConstructor
+            }
+        } else {
+            null
+        }
+    }
+}
 
 private object UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(
     schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"

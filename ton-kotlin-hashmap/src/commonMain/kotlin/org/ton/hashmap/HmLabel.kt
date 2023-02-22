@@ -5,9 +5,7 @@ package org.ton.hashmap
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.tlb.TlbNegatedCodec
-import org.ton.tlb.TlbNegatedCombinator
-import org.ton.tlb.TlbObject
+import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 public inline fun HashMapLabel(key: BitString, max: Int = key.size): HmLabel = HmLabel.of(key, max)
@@ -44,9 +42,24 @@ public sealed interface HmLabel : TlbObject {
 
 private class HashMapLabelTlbCombinator(
     m: Int,
+    val hmlLong: TlbNegatedConstructor<HmlLong> =HmlLong.tlbCodec(m),
+    val hmlShort: TlbNegatedConstructor<HmlShort> = HmlShort.tlbCodec(),
+    val hmlSame: TlbNegatedConstructor<HmlSame> = HmlSame.tlbCodec(m)
 ) : TlbNegatedCombinator<HmLabel>(
     HmLabel::class,
-    HmlLong::class to HmlLong.tlbCodec(m),
-    HmlShort::class to HmlShort.tlbCodec(),
-    HmlSame::class to HmlSame.tlbCodec(m),
-)
+    HmlLong::class to hmlLong,
+    HmlShort::class to hmlShort,
+    HmlSame::class to hmlSame,
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out HmLabel>? {
+        return if (bitString[0]) {
+            if (bitString[1]) {
+                hmlSame
+            } else {
+                hmlLong
+            }
+        } else {
+            hmlShort
+        }
+    }
+}

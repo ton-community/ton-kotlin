@@ -10,20 +10,20 @@ public class TlbPrettyPrinter(
     private var level: Int = 0
 
     public fun open(msg: String = ""): TlbPrettyPrinter = apply {
-        stringBuilder.append('(').append(msg)
+        append('(').append(msg)
         level++
     }
 
     public fun close(msg: String = ""): TlbPrettyPrinter = apply {
         check(level > 0) { "TlbPrettyPrinter is already closed" }
         level--
-        stringBuilder.append(msg).append(')')
+        append(msg).append(')')
     }
 
     public fun newLine() {
         if (indent > 0) {
-            if (level > 0) stringBuilder.appendLine()
-            stringBuilder.append(" ".repeat(level * indent))
+            if (level > 0) append("\n")
+//            append(" ".repeat(level * indent))
         }
     }
 
@@ -33,7 +33,7 @@ public class TlbPrettyPrinter(
         if (type is TlbObject) {
             newLine()
         }
-        stringBuilder.append(" ")
+        append(" ")
         type(type)
         level--
     }
@@ -43,19 +43,29 @@ public class TlbPrettyPrinter(
         if (type is TlbObject) {
             newLine()
         }
-        stringBuilder.append(' ').append(name).append(':')
+        append(' ').append(name).append(':')
         type(type)
     }
 
     public fun type(type: Any?): TlbPrettyPrinter = apply {
-        when (type) {
-            null -> return@apply
-            is TlbObject -> type.print(this)
-            is Boolean -> stringBuilder.append(if (type) 1 else 0)
-            is Bits256 -> stringBuilder.append(type.toString())
-            is BitString -> stringBuilder.append("x{$type}")
-            else -> stringBuilder.append(type)
+        try {
+            when (type) {
+                null -> return@apply
+                is TlbObject -> type.print(this)
+                is Boolean -> append(if (type) 1 else 0)
+                is Bits256 -> append(type.toString())
+                is BitString -> append("x{$type}")
+                else -> append(type)
+            }
+        } catch (e: Exception) {
+            throw RuntimeException("Can't print TL-B:\n${stringBuilder}<-- HERE", e)
+//            throw e
         }
+    }
+
+    private fun append(string: Any) = apply {
+//        print(string.toString())
+        stringBuilder.append(string.toString())
     }
 
     public inline fun type(name: String = "", block: TlbPrettyPrinter.() -> Unit): TlbPrettyPrinter = apply {

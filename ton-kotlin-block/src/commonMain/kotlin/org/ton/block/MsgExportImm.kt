@@ -2,20 +2,30 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_export_imm")
-data class MsgExportImm(
-    val out_msg: MsgEnvelope,
-    val transaction: Transaction,
-    val reimport: InMsg
-) : OutMsg {
-    companion object : TlbConstructorProvider<MsgExportImm> by MsgExportImmTlbConstructor
+public data class MsgExportImm(
+    val outMsg: CellRef<MsgEnvelope>,
+    val transaction: CellRef<Transaction>,
+    val reimport: CellRef<InMsg>
+) : OutMsg, TlbObject {
+    public companion object : TlbConstructorProvider<MsgExportImm> by MsgExportImmTlbConstructor
+
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_export_imm") {
+            field("out_msg", outMsg)
+            field("transaction", transaction)
+            field("reimport", reimport)
+        }
+    }
+
+    override fun toString(): String = print().toString()
 }
 
 private object MsgExportImmTlbConstructor : TlbConstructor<MsgExportImm>(
@@ -25,17 +35,17 @@ private object MsgExportImmTlbConstructor : TlbConstructor<MsgExportImm>(
         cellBuilder: CellBuilder,
         value: MsgExportImm
     ) = cellBuilder {
-        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
-        storeRef { storeTlb(Transaction, value.transaction) }
-        storeRef { storeTlb(InMsg, value.reimport) }
+        storeRef(MsgEnvelope, value.outMsg)
+        storeRef(Transaction, value.transaction)
+        storeRef(InMsg, value.reimport)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportImm = cellSlice {
-        val outMsg = loadRef { loadTlb(MsgEnvelope) }
-        val transaction = loadRef { loadTlb(Transaction) }
-        val reimport = loadRef { loadTlb(InMsg) }
+        val outMsg = loadRef(MsgEnvelope)
+        val transaction = loadRef(Transaction)
+        val reimport = loadRef(InMsg)
         MsgExportImm(outMsg, transaction, reimport)
     }
 }

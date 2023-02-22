@@ -5,8 +5,10 @@ package org.ton.block
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
+import org.ton.tlb.TlbLoader
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
@@ -60,4 +62,20 @@ private object MsgAddressIntTlbCombinator : TlbCombinator<MsgAddressInt>(
     MsgAddressInt::class,
     AddrStd::class to AddrStd.tlbCodec(),
     AddrVar::class to AddrVar.tlbCodec()
-)
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out MsgAddressInt>? {
+        return if (bitString.size >= 2) {
+            if (bitString[0]) { // 1
+                if (bitString[1]) { // 11
+                    AddrVar.tlbCodec()
+                } else { // 10
+                    AddrStd.tlbCodec()
+                }
+            } else { // 0
+                null
+            }
+        } else {
+            null
+        }
+    }
+}

@@ -6,17 +6,27 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("tr_phase_bounce_nofunds")
-data class TrPhaseBounceNoFunds(
-    val msg_size: StorageUsedShort,
-    val req_fwd_fees: Coins
+public data class TrPhaseBounceNoFunds(
+    val msgSize: StorageUsedShort,
+    val reqFwdFees: Coins
 ) : TrBouncePhase {
-    companion object : TlbConstructorProvider<TrPhaseBounceNoFunds> by TrPhaseBounceNoFundsTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("tr_phase_bounce_nofunds") {
+            field("msg_size", msgSize)
+            field("reqFwdFees", reqFwdFees)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<TrPhaseBounceNoFunds> by TrPhaseBounceNoFundsTlbConstructor
 }
 
 private object TrPhaseBounceNoFundsTlbConstructor : TlbConstructor<TrPhaseBounceNoFunds>(
@@ -26,8 +36,8 @@ private object TrPhaseBounceNoFundsTlbConstructor : TlbConstructor<TrPhaseBounce
         cellBuilder: CellBuilder,
         value: TrPhaseBounceNoFunds
     ) = cellBuilder {
-        storeTlb(StorageUsedShort, value.msg_size)
-        storeTlb(Coins, value.req_fwd_fees)
+        storeTlb(StorageUsedShort, value.msgSize)
+        storeTlb(Coins, value.reqFwdFees)
     }
 
     override fun loadTlb(

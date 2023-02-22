@@ -54,12 +54,25 @@ public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
 
 private class HashMapETlbCombinator<X>(
     n: Int,
-    x: TlbCodec<X>
+    x: TlbCodec<X>,
+    val root: TlbConstructor<HmeRoot<X>> = HmeRoot.tlbConstructor(n, x)
 ) : TlbCombinator<HashMapE<*>>(
     HashMapE::class,
     HmeEmpty::class to EmptyHashMapETlbConstructor,
-    HmeRoot::class to HmeRoot.tlbConstructor(n, x),
+    HmeRoot::class to root,
 ) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out HashMapE<*>>? {
+        return if (bitString.size >= 1) {
+            if (bitString[0]) { // 1
+                root
+            } else {
+                EmptyHashMapETlbConstructor
+            }
+        } else {
+            null
+        }
+    }
+
     private object EmptyHashMapETlbConstructor : TlbConstructor<HmeEmpty<*>>(
         schema = "hme_empty\$0 {n:#} {X:Type} = HashmapE n X;",
         id = BitString(false)

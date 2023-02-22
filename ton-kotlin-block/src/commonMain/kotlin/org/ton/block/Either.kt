@@ -102,11 +102,27 @@ public sealed interface Either<X, Y> : TlbObject {
 
 operator fun <X, Y> Either.Companion.invoke(x: TlbCodec<X>, y: TlbCodec<Y>) = tlbCodec(x, y)
 
-private class EitherTlbCombinator<X, Y>(x: TlbCodec<X>, y: TlbCodec<Y>) : TlbCombinator<Either<*, *>>(
+private class EitherTlbCombinator<X, Y>(
+    x: TlbCodec<X>, y: TlbCodec<Y>,
+    val left: LeftTlbConstructor<X, Y> = LeftTlbConstructor(x),
+    val right: RightTlbConstructor<X, Y> =  RightTlbConstructor(y)
+) : TlbCombinator<Either<*, *>>(
     Either::class,
-    Either.Left::class to LeftTlbConstructor<X, Y>(x),
-    Either.Right::class to RightTlbConstructor<X, Y>(y)
-)
+    Either.Left::class to left,
+    Either.Right::class to right
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out Either<*, *>>? {
+        return if (bitString.size >= 1) {
+            if (bitString[0]) { // 1
+                right
+            } else { // 0
+                left
+            }
+        } else {
+            null
+        }
+    }
+}
 
 private class LeftTlbConstructor<X, Y>(val x: TlbCodec<X>) : TlbConstructor<Either.Left<X, Y>>(
     schema = "left\$0 {X:Type} {Y:Type} value:X = Either X Y;",

@@ -80,7 +80,14 @@ private data class AhmeEmptyImpl<X, Y>(
 ) : HashmapAugE.AhmeEmpty<X, Y> {
     override fun get(key: BitString): Pair<X?, Y> = null to extra
 
+    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> = EmptyAugDictionaryIterator()
+
     override fun toString(): String = print().toString()
+}
+
+private class EmptyAugDictionaryIterator<X, Y> : Iterator<AugmentedDictionary.Entry<X, Y>> {
+    override fun hasNext(): Boolean = false
+    override fun next(): AugmentedDictionary.Entry<X, Y> = throw NoSuchElementException()
 }
 
 private data class AhmeRootImpl<X, Y>(
@@ -89,28 +96,13 @@ private data class AhmeRootImpl<X, Y>(
     override val extra: Y,
 ) : HashmapAugE.AhmeRoot<X, Y> {
     override fun get(key: BitString): Pair<X?, Y> {
-        var edge = root.value as HashmapAug.AhmEdge<X, Y>
-        var k = key
-        while (true) {
-            val label = edge.label.toBitString()
-            val commonPrefix = k.commonPrefixWith(label.toBitString())
-            when(val node = edge.node) {
-                is HashmapAugNode.AhmnLeaf -> {
-                    if (commonPrefix.size != label.size) {
-                        return null to node.extra
-                    }
-                    return node.value to node.extra
-                }
-                is HashmapAugNode.AhmnFork -> {
-                    edge = if (k[commonPrefix.size]) {
-                        node.loadRight()
-                    } else {
-                        node.loadLeft()
-                    } as HashmapAug.AhmEdge<X, Y>
-                    k = k.slice(commonPrefix.size + 1)
-                }
-            }
-        }
+        val edge = root.value as HashmapAug.AhmEdge<X, Y>
+        return edge[key]
+    }
+
+    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> {
+        val edge = root.value as HashmapAug.AhmEdge<X, Y>
+        return edge.iterator()
     }
 
     override fun toString(): String = print().toString()
@@ -120,11 +112,21 @@ private class HashmapAugETlbCombinator<X,Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>,
+    val ahmeEmptyCodec: TlbCodec<HashmapAugE.AhmeEmpty<X, Y>> = HashmapAugE.AhmeEmpty.tlbCodec(n, y),
+    val ahmeRootCodec: TlbCodec<HashmapAugE.AhmeRoot<X, Y>> = HashmapAugE.AhmeRoot.tlbCodec(n, x, y)
 ) : TlbCombinator<HashmapAugE<*, *>>(
     HashmapAugE::class,
-    HashmapAugE.AhmeEmpty::class to HashmapAugE.AhmeEmpty.tlbCodec<X, Y>(n, y),
-    HashmapAugE.AhmeRoot::class to HashmapAugE.AhmeRoot.tlbCodec(n, x, y),
-)
+    HashmapAugE.AhmeEmpty::class to ahmeEmptyCodec,
+    HashmapAugE.AhmeRoot::class to ahmeRootCodec,
+) {
+    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out HashmapAugE<*, *>> {
+        return if (bitString[0]) {
+            ahmeRootCodec
+        } else {
+            ahmeEmptyCodec
+        }
+    }
+}
 
 private class AhmeEmptyTlbConstructor<X, Y>(
     private val n: Int,

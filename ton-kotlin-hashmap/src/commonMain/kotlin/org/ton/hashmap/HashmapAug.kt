@@ -1,11 +1,13 @@
 package org.ton.hashmap
 
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
-public interface HashmapAug<X, Y> : TlbObject {
+public interface HashmapAug<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
 
     /**
      * ```tl-b
@@ -51,10 +53,73 @@ private data class AhmeEdgeImpl<X, Y>(
     override val label: HmLabel,
     override val node: HashmapAugNode<X, Y>,
 ) : HashmapAug.AhmEdge<X, Y> {
+    override fun get(key: BitString): Pair<X?, Y> {
+        var edge: HashmapAug.AhmEdge<X, Y> = this
+        var k = key
+        while (true) {
+            val label = edge.label.toBitString()
+            val commonPrefix = k.commonPrefixWith(label.toBitString())
+            when (val node = edge.node) {
+                is HashmapAugNode.AhmnLeaf -> {
+                    if (commonPrefix.size != label.size) {
+                        return null to node.extra
+                    }
+                    return node.value to node.extra
+                }
+                is HashmapAugNode.AhmnFork -> {
+                    edge = if (k[commonPrefix.size]) {
+                        node.loadRight()
+                    } else {
+                        node.loadLeft()
+                    } as HashmapAug.AhmEdge<X, Y>
+                    k = k.slice(commonPrefix.size + 1)
+                }
+            }
+        }
+    }
+
+    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> = iterator {
+        val label = label.toBitString()
+        when (val node = node) {
+            is HashmapAugNode.AhmnLeaf -> {
+                val postfixLabel = BitString(n - label.size)
+                yield(AugmentedDictionaryEntryImpl(label + postfixLabel, node))
+            }
+            is HashmapAugNode.AhmnFork -> {
+                var prefixLabel = label + false
+                node.loadLeft().forEach { entry ->
+                    yield(AugmentedDictionaryEntryImpl(prefixLabel + entry.key, entry.leaf))
+                }
+                prefixLabel = label + true
+                node.loadRight().forEach { entry ->
+                    yield(AugmentedDictionaryEntryImpl(prefixLabel + entry.key, entry.leaf))
+                }
+            }
+        }
+    }
+
     override fun toString(): String = print().toString()
 }
 
-private class AhmEdgeTlbConstructor<X,Y>(
+private class AugmentedDictionaryEntryImpl<X, Y>(
+    override val key: BitString,
+    override val leaf: AugmentedDictionary.Leaf<X, Y>
+) : AugmentedDictionary.Entry<X, Y> {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AugmentedDictionaryEntryImpl<*, *>) return false
+        if (key != other.key) return false
+        return leaf == other.leaf
+    }
+
+    override fun hashCode(): Int {
+        var result = key.hashCode()
+        result = 31 * result + leaf.hashCode()
+        return result
+    }
+}
+
+private class AhmEdgeTlbConstructor<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>,
