@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("hml_short")
@@ -27,6 +28,12 @@ public data class HmlShort(
     override fun toString(): String = print().toString()
 
     public companion object {
+        private val EMPTY = HmlShort(BitString.empty())
+
+        @JvmStatic
+        public fun empty(): HmlShort = EMPTY
+
+        @JvmStatic
         public fun tlbCodec(): TlbNegatedConstructor<HmlShort> = HashMapLabelShortTlbConstructor
     }
 }

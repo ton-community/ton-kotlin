@@ -12,12 +12,18 @@ import kotlin.jvm.JvmStatic
 @JsonClassDiscriminator("@type")
 public interface HashmapAugE<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
 
+    public val n: Int
+
+    override fun get(key: BitString): HashmapAugNode.AhmnLeaf<X, Y>?
+
+    override fun iterator(): Iterator<Pair<BitString, HashmapAugNode<X, Y>>>
+
     /**
      * ```tl-b
      * ahme_empty$0 {n:#} {X:Type} {Y:Type} extra:Y = HashmapAugE n X Y;
      */
     public interface AhmeEmpty<X, Y> : HashmapAugE<X, Y> {
-        public val n: Int
+        public override val n: Int
 
         public val extra: Y
 
@@ -38,7 +44,7 @@ public interface HashmapAugE<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
      * ahme_root$1 {n:#} {X:Type} {Y:Type} root:^(HashmapAug n X Y) extra:Y = HashmapAugE n X Y;
      */
     public interface AhmeRoot<X, Y> : HashmapAugE<X, Y> {
-        public val n: Int
+        public override val n: Int
 
         public val root: CellRef<HashmapAug<X, Y>>
         public val extra: Y
@@ -64,7 +70,7 @@ public interface HashmapAugE<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
             AhmeEmptyImpl(n, extra)
 
         @JvmStatic
-        public fun <X, Y> root(n : Int, root: CellRef<HashmapAug<X, Y>>, extra: Y): AhmeRoot<X, Y> =
+        public fun <X, Y> root(n: Int, root: CellRef<HashmapAug<X, Y>>, extra: Y): AhmeRoot<X, Y> =
             AhmeRootImpl(n, root, extra)
 
         @Suppress("UNCHECKED_CAST")
@@ -77,16 +83,11 @@ private data class AhmeEmptyImpl<X, Y>(
     override val n: Int,
     override val extra: Y,
 ) : HashmapAugE.AhmeEmpty<X, Y> {
-    override fun get(key: BitString): Pair<X?, Y> = null to extra
+    override fun get(key: BitString): HashmapAugNode.AhmnLeaf<X, Y>? = null
 
-    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> = EmptyAugDictionaryIterator()
+    override fun iterator(): Iterator<Pair<BitString, HashmapAugNode<X, Y>>> = AhmnNodeIterator(null)
 
     override fun toString(): String = print().toString()
-}
-
-private class EmptyAugDictionaryIterator<X, Y> : Iterator<AugmentedDictionary.Entry<X, Y>> {
-    override fun hasNext(): Boolean = false
-    override fun next(): AugmentedDictionary.Entry<X, Y> = throw NoSuchElementException()
 }
 
 private data class AhmeRootImpl<X, Y>(
@@ -94,25 +95,21 @@ private data class AhmeRootImpl<X, Y>(
     override val root: CellRef<HashmapAug<X, Y>>,
     override val extra: Y,
 ) : HashmapAugE.AhmeRoot<X, Y> {
-    override fun get(key: BitString): Pair<X?, Y> {
-        val edge = root.value as HashmapAug.AhmEdge<X, Y>
-        return edge[key]
-    }
+    override fun get(key: BitString): HashmapAugNode.AhmnLeaf<X, Y>? =
+        root.value[key]
 
-    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> {
-        val edge = root.value as HashmapAug.AhmEdge<X, Y>
-        return edge.iterator()
-    }
+    override fun iterator(): Iterator<Pair<BitString, HashmapAugNode<X, Y>>> =
+        root.value.iterator()
 
     override fun toString(): String = print().toString()
 }
 
-private class HashmapAugETlbCombinator<X,Y>(
+private class HashmapAugETlbCombinator<X, Y>(
     val n: Int,
     val x: TlbCodec<X>,
     val y: TlbCodec<Y>,
-    val ahmeEmptyCodec: TlbCodec<HashmapAugE.AhmeEmpty<X, Y>> = HashmapAugE.AhmeEmpty.tlbCodec(n, y),
-    val ahmeRootCodec: TlbCodec<HashmapAugE.AhmeRoot<X, Y>> = HashmapAugE.AhmeRoot.tlbCodec(n, x, y)
+    ahmeEmptyCodec: TlbCodec<HashmapAugE.AhmeEmpty<X, Y>> = HashmapAugE.AhmeEmpty.tlbCodec(n, y),
+    ahmeRootCodec: TlbCodec<HashmapAugE.AhmeRoot<X, Y>> = HashmapAugE.AhmeRoot.tlbCodec(n, x, y)
 ) : TlbCombinator<HashmapAugE<*, *>>(
     HashmapAugE::class,
     HashmapAugE.AhmeEmpty::class to ahmeEmptyCodec,

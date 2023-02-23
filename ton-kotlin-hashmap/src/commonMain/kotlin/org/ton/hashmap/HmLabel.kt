@@ -11,7 +11,7 @@ import org.ton.tlb.TlbNegatedConstructor
 import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
-public inline fun HashMapLabel(key: BitString, max: Int = key.size): HmLabel = HmLabel.of(key, max)
+public inline fun HmLabel(key: BitString, max: Int = key.size): HmLabel = HmLabel.of(key, max)
 
 @Serializable
 @JsonClassDiscriminator("@type")
@@ -20,7 +20,11 @@ public sealed interface HmLabel : TlbObject {
 
     public companion object {
         @JvmStatic
+        public fun empty(): HmLabel = HmlShort.empty()
+
+        @JvmStatic
         public fun of(key: BitString, max: Int = key.size): HmLabel {
+            if (key.isEmpty()) return empty()
             val len = 16 - max.toShort().countLeadingZeroBits()
             val longLength = 2 + len + key.size
             val shortLength = 1 + 2 * key.size + 1

@@ -1,13 +1,18 @@
 package org.ton.hashmap
 
 import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
 public interface HashmapAug<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
+
+    public val n: Int
+
+    override fun iterator(): Iterator<Pair<BitString, HashmapAugNode<X, Y>>>
+
+    override fun get(key: BitString): HashmapAugNode.AhmnLeaf<X, Y>?
 
     /**
      * ```tl-b
@@ -16,9 +21,7 @@ public interface HashmapAug<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
      *   node:(HashmapAugNode m X Y) = HashmapAug n X Y;
      */
     public interface AhmEdge<X, Y> : HashmapAug<X, Y> {
-        public val n: Int
-        public val l: Int
-        public val m: Int get() = n - l
+        public override val n: Int
 
         public val label: HmLabel
         public val node: HashmapAugNode<X, Y>
@@ -38,8 +41,12 @@ public interface HashmapAug<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
 
     public companion object {
         @JvmStatic
-        public fun <X, Y> edge(n: Int, l: Int, label: HmLabel, node: HashmapAugNode<X, Y>): AhmEdge<X, Y> =
-            AhmeEdgeImpl(n, l, label, node)
+        public fun <X, Y> edge(n: Int, node: HashmapAugNode<X, Y>): AhmEdge<X, Y> =
+            edge(n, HmLabel.empty(), node)
+
+        @JvmStatic
+        public fun <X, Y> edge(n: Int, label: HmLabel, node: HashmapAugNode<X, Y>): AhmEdge<X, Y> =
+            AhmeEdgeImpl(n, label, node)
 
         @Suppress("UNCHECKED_CAST")
         public fun <X, Y> tlbCodec(n: Int, x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<HashmapAug<X, Y>> =
@@ -49,11 +56,10 @@ public interface HashmapAug<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
 
 private data class AhmeEdgeImpl<X, Y>(
     override val n: Int,
-    override val l: Int,
     override val label: HmLabel,
     override val node: HashmapAugNode<X, Y>,
 ) : HashmapAug.AhmEdge<X, Y> {
-    override fun get(key: BitString): Pair<X?, Y> {
+    override fun get(key: BitString): HashmapAugNode.AhmnLeaf<X, Y>? {
         var edge: HashmapAug.AhmEdge<X, Y> = this
         var k = key
         while (true) {
@@ -62,9 +68,9 @@ private data class AhmeEdgeImpl<X, Y>(
             when (val node = edge.node) {
                 is HashmapAugNode.AhmnLeaf -> {
                     if (commonPrefix.size != label.size) {
-                        return null to node.extra
+                        return null
                     }
-                    return node.value to node.extra
+                    return node
                 }
                 is HashmapAugNode.AhmnFork -> {
                     edge = if (k[commonPrefix.size]) {
@@ -78,44 +84,106 @@ private data class AhmeEdgeImpl<X, Y>(
         }
     }
 
-    override fun iterator(): Iterator<AugmentedDictionary.Entry<X, Y>> = iterator {
-        val label = label.toBitString()
-        when (val node = node) {
-            is HashmapAugNode.AhmnLeaf -> {
-                val postfixLabel = BitString(n - label.size)
-                yield(AugmentedDictionaryEntryImpl(label + postfixLabel, node))
+    override fun iterator(): Iterator<Pair<BitString, HashmapAugNode<X, Y>>> =
+        AhmnNodeIterator(this)
+
+    override fun toString(): String = print().toString()
+}
+
+internal class AhmnNodeIterator<X, Y>(
+    start: HashmapAug.AhmEdge<X, Y>?
+) : AbstractIterator<Pair<BitString, HashmapAugNode<X, Y>>>() {
+    val state = ArrayDeque<WalkState<X, Y>>()
+
+    init {
+        if (start != null) {
+            addState(start.label.toBitString(), start.node)
+        } else {
+            done()
+        }
+    }
+
+    private fun addState(prefix: BitString, node: HashmapAugNode<X, Y>) {
+        when (node) {
+            is HashmapAugNode.AhmnFork<X, Y> -> state.addFirst(WalkState.Fork(prefix, node))
+            is HashmapAugNode.AhmnLeaf<X, Y> -> state.addFirst(WalkState.Leaf(prefix, node))
+        }
+    }
+
+    sealed class WalkState<X, Y>(
+        open val node: HashmapAugNode<X, Y>
+    ) {
+        abstract fun step(): Pair<BitString, HashmapAugNode<X, Y>>?
+
+        class Leaf<X, Y>(
+            private val prefix: BitString,
+            override val node: HashmapAugNode.AhmnLeaf<X, Y>
+        ) : WalkState<X, Y>(node) {
+            var visited = false
+
+            override fun step(): Pair<BitString, HashmapAugNode<X, Y>>? {
+                if (visited) return null
+                visited = true
+                return prefix to node
             }
-            is HashmapAugNode.AhmnFork -> {
-                var prefixLabel = label + false
-                node.loadLeft().forEach { entry ->
-                    yield(AugmentedDictionaryEntryImpl(prefixLabel + entry.key, entry.leaf))
-                }
-                prefixLabel = label + true
-                node.loadRight().forEach { entry ->
-                    yield(AugmentedDictionaryEntryImpl(prefixLabel + entry.key, entry.leaf))
+        }
+
+        class Fork<X, Y>(
+            val prefix: BitString,
+            override val node: HashmapAugNode.AhmnFork<X, Y>
+        ) : WalkState<X, Y>(node) {
+            private var rootVisited = false
+            private var leftVisited = false
+            private var rightVisited = false
+
+            override fun step(): Pair<BitString, HashmapAugNode<X, Y>>? {
+                return if (!rootVisited) {
+                    rootVisited = true
+                    return prefix to node
+                } else if (leftVisited) {
+                    if (rightVisited) null
+                    else {
+                        rightVisited = true
+                        val edge = node.right.value as HashmapAug.AhmEdge
+                        val newPrefix = CellBuilder().apply {
+                            storeBits(prefix)
+                            storeBit(true)
+                            storeBits(edge.label.toBitString())
+                        }.bits.toBitString()
+                        newPrefix to edge.node
+                    }
+                } else {
+                    leftVisited = true
+                    val edge = node.left.value as HashmapAug.AhmEdge
+                    val newPrefix = CellBuilder().apply {
+                        storeBits(prefix)
+                        storeBit(true)
+                        storeBits(edge.label.toBitString())
+                    }.bits.toBitString()
+                    newPrefix to edge.node
                 }
             }
         }
     }
 
-    override fun toString(): String = print().toString()
-}
-
-private class AugmentedDictionaryEntryImpl<X, Y>(
-    override val key: BitString,
-    override val leaf: AugmentedDictionary.Leaf<X, Y>
-) : AugmentedDictionary.Entry<X, Y> {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AugmentedDictionaryEntryImpl<*, *>) return false
-        if (key != other.key) return false
-        return leaf == other.leaf
+    override fun computeNext() {
+        val nextValue = gotoNext()
+        if (nextValue != null) {
+            setNext(nextValue)
+        } else {
+            done()
+        }
     }
 
-    override fun hashCode(): Int {
-        var result = key.hashCode()
-        result = 31 * result + leaf.hashCode()
-        return result
+    private tailrec fun gotoNext(): Pair<BitString, HashmapAugNode<X, Y>>? {
+        val topState = state.firstOrNull() ?: return null
+        val edge = topState.step()
+        return if (edge == null) {
+            state.removeFirst()
+            gotoNext()
+        } else {
+            edge
+        }
     }
 }
 
@@ -130,7 +198,7 @@ private class AhmEdgeTlbConstructor<X, Y>(
         val (l, label) = cellSlice.loadNegatedTlb(HmLabel.tlbCodec(n))
         val m = n - l
         val node = cellSlice.loadTlb(HashmapAugNode.tlbCodec(x, y, m))
-        return HashmapAug.edge(n, l, label, node)
+        return HashmapAug.edge(n, label, node)
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAug.AhmEdge<X, Y>) {

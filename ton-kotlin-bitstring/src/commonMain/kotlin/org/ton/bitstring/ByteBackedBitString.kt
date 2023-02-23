@@ -40,7 +40,9 @@ public open class ByteBackedBitString protected constructor(
 
     override fun toBooleanArray(): BooleanArray = toList().toBooleanArray()
 
-    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes, size)
+    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes.copyOf(), size)
+
+    override fun toBitString(): BitString = ByteBackedBitString(size, bytes.copyOf())
 
     override fun iterator(): Iterator<Boolean> = BitStringIterator(this)
 

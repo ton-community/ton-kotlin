@@ -17,9 +17,7 @@ public data class HmeRoot<T>(
     public constructor(root: Cell, tlbCodec: TlbCodec<HmEdge<T>>) : this(CellRef(root, tlbCodec))
     public constructor(root: HmEdge<T>) : this(CellRef(root))
 
-    override fun nodes(): Sequence<Pair<BitString, T>> = sequence {
-        yieldAll(root.value.nodes())
-    }
+    override fun iterator(): Iterator<Pair<BitString, T>> = root.value.iterator()
 
     override fun set(key: BitString, value: T): HmeRoot<T> {
         val root = root.value.set(key, value)

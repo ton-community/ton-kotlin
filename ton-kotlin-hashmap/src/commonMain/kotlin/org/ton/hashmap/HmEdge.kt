@@ -14,23 +14,7 @@ public data class HmEdge<T>(
     val label: HmLabel,
     val node: HashMapNode<T>
 ) : Iterable<Pair<BitString, T>>, TlbObject {
-    override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
-
-    public fun nodes(): Sequence<Pair<BitString, T>> {
-        val label = label.toBitString()
-        return when (node) {
-            is HmnLeaf -> sequenceOf(label to node.value)
-            is HmnFork -> sequence {
-                yieldAll(node.left.value.nodes().map { (key, value) ->
-//                    (label + false + key) to value
-                    BitString.binary("${label.toBinary()}0${key.toBinary()}") to value
-                })
-                yieldAll(node.right.value.nodes().map { (key, value) ->
-                    BitString.binary("${label.toBinary()}1${key.toBinary()}") to value
-                })
-            }
-        }
-    }
+    override fun iterator(): Iterator<Pair<BitString, T>> = HmEdgeIterator(this)
 
     public fun set(key: BitString, value: T): HmEdge<T> {
         check(!key.isEmpty())
@@ -52,18 +36,18 @@ public data class HmEdge<T>(
             } else if (!labelReminder.isEmpty() && !keyReminder.isEmpty()) {
                 // forking
                 val (left, right) = if (keyReminder[0]) {
-                    HmEdge(HashMapLabel(labelReminder.slice(1)), node) to
-                            HmEdge(HashMapLabel(keyReminder.slice(1)), HmnLeaf(value))
+                    HmEdge(HmLabel(labelReminder.slice(1)), node) to
+                            HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value))
                 } else {
-                    HmEdge(HashMapLabel(keyReminder.slice(1)), HmnLeaf(value)) to
-                            HmEdge(HashMapLabel(labelReminder.slice(1)), node)
+                    HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value)) to
+                            HmEdge(HmLabel(labelReminder.slice(1)), node)
                 }
-                return HmEdge(HashMapLabel(labelPrefix), HmnFork(left, right))
+                return HmEdge(HmLabel(labelPrefix), HmnFork(left, right))
             } else if (!labelPrefix.isEmpty() && labelReminder.isEmpty() && !keyReminder.isEmpty()) {
                 // next iteration
                 node as HmnFork<T>
                 val newNode = node.set(keyReminder, value)
-                return HmEdge(HashMapLabel(labelPrefix), newNode)
+                return HmEdge(HmLabel(labelPrefix), newNode)
             }
             throw IllegalStateException()
         }
@@ -88,6 +72,97 @@ public data class HmEdge<T>(
     }
 }
 
+private class HmEdgeIterator<T>(
+    start: HmEdge<T>
+) : AbstractIterator<Pair<BitString, T>>() {
+    val state = ArrayDeque<WalkState<T>>()
+
+    init {
+        addState(start.label.toBitString(), start.node)
+    }
+
+    private fun addState(prefix: BitString, node: HashMapNode<T>) {
+        when (node) {
+            is HmnFork<T> -> state.addFirst(WalkState.Fork(prefix, node))
+            is HmnLeaf<T> -> state.addFirst(WalkState.Leaf(prefix, node))
+        }
+    }
+
+    sealed class WalkState<T>(open val node: HashMapNode<T>) {
+        abstract fun step(): Pair<BitString, HashMapNode<T>>?
+
+        class Leaf<T>(
+            private val prefix: BitString,
+            override val node: HmnLeaf<T>
+        ) : WalkState<T>(node) {
+            var visited = false
+
+            override fun step(): Pair<BitString, HashMapNode<T>>? {
+                if (visited) return null
+                visited = true
+                return prefix to node
+            }
+        }
+
+        class Fork<T>(
+            val prefix: BitString,
+            override val node: HmnFork<T>
+        ) : WalkState<T>(node) {
+            private var leftVisited = false
+            private var rightVisited = false
+
+            override fun step(): Pair<BitString, HashMapNode<T>>? {
+                return if (leftVisited) {
+                    if (rightVisited) {
+                        null
+                    } else {
+                        rightVisited = true
+                        val newPrefix = CellBuilder().apply {
+                            storeBits(prefix)
+                            storeBit(true)
+                            storeBits(node.right.value.label.toBitString())
+                        }.bits.toBitString()
+                        newPrefix to node.right.value.node
+                    }
+                } else {
+                    leftVisited = true
+                    val newPrefix = CellBuilder().apply {
+                        storeBits(prefix)
+                        storeBit(false)
+                        storeBits(node.left.value.label.toBitString())
+                    }.bits.toBitString()
+                    newPrefix to node.left.value.node
+                }
+            }
+        }
+    }
+
+    override fun computeNext() {
+        val nextValue = gotoNext()
+        if (nextValue != null) {
+            setNext(nextValue)
+        } else {
+            done()
+        }
+    }
+
+    private tailrec fun gotoNext(): Pair<BitString, T>? {
+        val topState = state.firstOrNull() ?: return null
+        val edge = topState.step()
+        return if (edge == null) {
+            state.removeFirst()
+            gotoNext()
+        } else {
+            val (prefix, node) = edge
+            if (node is HmnLeaf<T>) {
+                prefix to node.value
+            } else {
+                addState(prefix, node)
+                gotoNext()
+            }
+        }
+    }
+}
 
 private class HashMapEdgeTlbConstructor<X>(
     val n: Int,

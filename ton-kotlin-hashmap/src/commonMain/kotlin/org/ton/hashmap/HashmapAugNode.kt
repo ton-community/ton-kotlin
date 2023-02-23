@@ -5,13 +5,17 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
-public interface HashmapAugNode<X, Y> : TlbObject {
+public interface HashmapAugNode<X, Y> : AugmentedDictionary.Node<X, Y>, TlbObject {
+
+    public val n: Int
 
     /**
      * ```tl-b
      * ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = HashmapAugNode 0 X Y;
      */
     public interface AhmnLeaf<X, Y> : HashmapAugNode<X, Y>, AugmentedDictionary.Leaf<X, Y> {
+        override val n: Int get() = 0
+
         public override val extra: Y
         public override val value: X
 
@@ -35,11 +39,13 @@ public interface HashmapAugNode<X, Y> : TlbObject {
      *   right:^(HashmapAug n X Y) extra:Y = HashmapAugNode (n + 1) X Y;
      */
     public interface AhmnFork<X, Y> : HashmapAugNode<X, Y> {
-        public val n: Int
+        public override val n: Int
 
         public val left: CellRef<HashmapAug<X, Y>>
         public val right: CellRef<HashmapAug<X, Y>>
-        public val extra: Y
+        public override val extra: Y
+
+        override val value: X? get() = null
 
         public fun loadLeft(): HashmapAug<X, Y> = left.value
         public fun loadRight(): HashmapAug<X, Y> = right.value
@@ -84,25 +90,11 @@ public interface HashmapAugNode<X, Y> : TlbObject {
     }
 }
 
-private class AhmnLeafImpl<X, Y>(
+private data class AhmnLeafImpl<X, Y>(
     override val extra: Y,
     override val value: X,
 ) : HashmapAugNode.AhmnLeaf<X, Y> {
     override fun toString(): String = print().toString()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AhmnLeafImpl<*, *>) return false
-
-        if (extra != other.extra) return false
-        return value == other.value
-    }
-
-    override fun hashCode(): Int {
-        var result = extra?.hashCode() ?: 0
-        result = 31 * result + (value?.hashCode() ?: 0)
-        return result
-    }
 }
 
 private data class AhmnForkImpl<X, Y>(
@@ -135,18 +127,17 @@ private class AhmnLeafTlbConstructor<X, Y>(
 private class AhmnForkTlbConstructor<X, Y>(
     x: TlbCodec<X>,
     val y: TlbCodec<Y>,
-    n: Int
+    val n: Int
 ) : TlbConstructor<HashmapAugNode.AhmnFork<X, Y>>(
     schema = "ahmn_fork#_ {n:#} {X:Type} {Y:Type} left:^(HashmapAug n X Y) right:^(HashmapAug n X Y) extra:Y = HashmapAugNode (n + 1) X Y"
 ) {
-    private val n = n - 1
-    private val hashmapAug = HashmapAug.tlbCodec(this.n, x, y)
+    private val hashmapAug = HashmapAug.tlbCodec(n - 1, x, y)
 
     override fun loadTlb(cellSlice: CellSlice): HashmapAugNode.AhmnFork<X, Y> {
         val left = cellSlice.loadRef(hashmapAug)
         val right = cellSlice.loadRef(hashmapAug)
         val extra = y.loadTlb(cellSlice)
-        return AhmnForkImpl(this.n, left, right, extra)
+        return AhmnForkImpl(n, left, right, extra)
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugNode.AhmnFork<X, Y>) {

@@ -14,9 +14,7 @@ import kotlin.jvm.JvmStatic
 @JsonClassDiscriminator("@type")
 public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
 
-    override fun iterator(): Iterator<Pair<BitString, T>> = nodes().iterator()
-    public fun nodes(): Sequence<Pair<BitString, T>>
-    public fun toMap(): Map<BitString, T> = nodes().toMap()
+    override fun iterator(): Iterator<Pair<BitString, T>>
 
     public fun set(key: BitString, value: T): HmeRoot<T>
 

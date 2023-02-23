@@ -45,6 +45,7 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     fun toByteArray(augment: Boolean = false): ByteArray
     fun toBooleanArray(): BooleanArray
     fun toMutableBitString(): MutableBitString
+    fun toBitString(): BitString = this
 
     public fun startsWith(prefix: BitString): Boolean =
         toBinary().startsWith(prefix.toBinary())
