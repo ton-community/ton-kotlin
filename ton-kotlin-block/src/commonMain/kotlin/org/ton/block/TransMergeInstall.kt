@@ -2,7 +2,9 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -14,7 +16,7 @@ public data class TransMergeInstall(
     @SerialName("storage_ph") val storagePh: Maybe<TrStoragePhase>,
     @SerialName("credit_ph") val creditPh: Maybe<TrCreditPhase>,
     @SerialName("compute_ph") val computePh: TrComputePhase,
-    val action: Maybe<TrActionPhase>,
+    val action: Maybe<CellRef<TrActionPhase>>,
     val aborted: Boolean,
     val destroyed: Boolean
 ) : TransactionDescr {
@@ -47,7 +49,7 @@ private object TransMergeInstallTlbConstructor : TlbConstructor<TransMergeInstal
 ) {
     val maybeTrStoragePhase = Maybe.tlbCodec(TrStoragePhase)
     val maybeTrCreditPhase = Maybe.tlbCodec(TrCreditPhase)
-    val maybeTrActionPhase = Maybe.tlbCodec(TrActionPhase)
+    val maybeTrActionPhase = Maybe.tlbCodec(CellRef(TrActionPhase))
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

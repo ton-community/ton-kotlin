@@ -2,27 +2,35 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 
 @Serializable
 @SerialName("split_merge_info")
-data class SplitMergeInfo(
-    val cur_shard_pfx_len: Int,
-    val acc_split_depth: Int,
-    val this_addr: BitString,
-    val sibling_addr: BitString
-) {
-    init {
-        require(this_addr.size == 256) { "required: this_addr.size == 256, actual: ${this_addr.size}" }
-        require(sibling_addr.size == 256) { "required: sibling_addr.size == 256, actual: ${sibling_addr.size}" }
+public data class SplitMergeInfo(
+    val curShardPfxLen: Int,
+    val accSplitDepth: Int,
+    val thisAddr: Bits256,
+    val siblingAddr: Bits256
+) : TlbObject {
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("split_merge_info") {
+            field("cur_shard_pfx_len", curShardPfxLen)
+            field("acc_split_depth", accSplitDepth)
+            field("this_addr", thisAddr)
+            field("sibling_addr", siblingAddr)
+        }
     }
 
-    companion object : TlbCodec<SplitMergeInfo> by SplitMergeInfoTlbConstructor
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbCodec<SplitMergeInfo> by SplitMergeInfoTlbConstructor
 }
 
 private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
@@ -34,10 +42,10 @@ private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
         cellBuilder: CellBuilder,
         value: SplitMergeInfo
     ) = cellBuilder {
-        storeUInt(value.cur_shard_pfx_len, 6)
-        storeUInt(value.acc_split_depth, 6)
-        storeBits(value.this_addr)
-        storeBits(value.sibling_addr)
+        storeUInt(value.curShardPfxLen, 6)
+        storeUInt(value.accSplitDepth, 6)
+        storeBits(value.thisAddr)
+        storeBits(value.siblingAddr)
     }
 
     override fun loadTlb(
@@ -45,8 +53,8 @@ private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
     ): SplitMergeInfo = cellSlice {
         val curShardPfxLen = loadUInt(6).toInt()
         val accSplitDepth = loadUInt(6).toInt()
-        val thisAddr = loadBits(256)
-        val siblingAddr = loadBits(256)
+        val thisAddr = loadBits256()
+        val siblingAddr = loadBits256()
         SplitMergeInfo(curShardPfxLen, accSplitDepth, thisAddr, siblingAddr)
     }
 }
