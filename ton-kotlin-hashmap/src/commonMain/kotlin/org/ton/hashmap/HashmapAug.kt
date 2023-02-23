@@ -182,7 +182,14 @@ internal class AhmnNodeIterator<X, Y>(
             state.removeFirst()
             gotoNext()
         } else {
-            edge
+            val (prefix, node) = edge
+            if (node == topState.node || node is HashmapAugNode.AhmnLeaf<X, Y>) {
+                edge
+            } else {
+                addState(prefix, node)
+//                println("goto next")
+                gotoNext()
+            }
         }
     }
 }

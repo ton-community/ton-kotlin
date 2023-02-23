@@ -15,7 +15,6 @@ pluginManagement {
 
 System.setProperty("idea.active", "false")
 
-enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
