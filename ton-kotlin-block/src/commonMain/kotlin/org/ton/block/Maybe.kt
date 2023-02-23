@@ -66,19 +66,7 @@ private class MaybeTlbCombinator(
     Maybe::class,
     Nothing::class to NothingConstructor,
     Just::class to justConstructor
-) {
-    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out Maybe<*>>? {
-        return if (bitString.size >= 1) {
-            if (bitString[0]) { // 1
-                justConstructor
-            } else {
-                NothingConstructor
-            }
-        } else {
-            null
-        }
-    }
-}
+)
 
 private object NothingConstructor : TlbConstructor<Nothing<Any>>(
     schema = "nothing\$0 {X:Type} = Maybe X;",

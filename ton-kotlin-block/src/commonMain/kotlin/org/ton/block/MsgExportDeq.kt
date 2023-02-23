@@ -2,19 +2,28 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_export_deq")
-data class MsgExportDeq(
-    val out_msg: MsgEnvelope,
-    val import_block_lt: ULong
+public data class MsgExportDeq(
+    val outMsg: CellRef<MsgEnvelope>,
+    val importBlockLt: ULong
 ) : OutMsg {
-    companion object : TlbConstructorProvider<MsgExportDeq> by MsgExportDeqTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_export_deq") {
+            field("out_msg", outMsg)
+            field("import_block_lt", importBlockLt)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<MsgExportDeq> by MsgExportDeqTlbConstructor
 }
 
 private object MsgExportDeqTlbConstructor : TlbConstructor<MsgExportDeq>(
@@ -24,14 +33,14 @@ private object MsgExportDeqTlbConstructor : TlbConstructor<MsgExportDeq>(
         cellBuilder: CellBuilder,
         value: MsgExportDeq
     ) = cellBuilder {
-        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
-        storeUInt(value.import_block_lt.toLong(), 63)
+        storeRef(MsgEnvelope, value.outMsg)
+        storeUInt(value.importBlockLt.toLong(), 63)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportDeq = cellSlice {
-        val outMsg = loadRef { loadTlb(MsgEnvelope) }
+        val outMsg = loadRef(MsgEnvelope)
         val importBlockLt = loadUInt(63).toLong().toULong()
         MsgExportDeq(outMsg, importBlockLt)
     }

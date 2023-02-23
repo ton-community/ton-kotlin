@@ -2,19 +2,28 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.cell.*
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("msg_export_tr")
-data class MsgExportTr(
-    val out_msg: MsgEnvelope,
-    val imported: InMsg
+public data class MsgExportTr(
+    val outMsg: CellRef<MsgEnvelope>,
+    val imported: CellRef<InMsg>
 ) : OutMsg {
-    companion object : TlbConstructorProvider<MsgExportTr> by MsgExportTrTlbConstructor
+    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+        type("msg_export_tr") {
+            field("out_msg", outMsg)
+            field("imported", imported)
+        }
+    }
+
+    override fun toString(): String = print().toString()
+
+    public companion object : TlbConstructorProvider<MsgExportTr> by MsgExportTrTlbConstructor
 }
 
 private object MsgExportTrTlbConstructor : TlbConstructor<MsgExportTr>(
@@ -25,15 +34,15 @@ private object MsgExportTrTlbConstructor : TlbConstructor<MsgExportTr>(
         cellBuilder: CellBuilder,
         value: MsgExportTr
     ) = cellBuilder {
-        storeRef { storeTlb(MsgEnvelope, value.out_msg) }
-        storeRef { storeTlb(InMsg, value.imported) }
+        storeRef(MsgEnvelope, value.outMsg)
+        storeRef(InMsg, value.imported)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportTr = cellSlice {
-        val outMsg = loadRef { loadTlb(MsgEnvelope) }
-        val imported = loadRef { loadTlb(InMsg) }
+        val outMsg = loadRef(MsgEnvelope)
+        val imported = loadRef(InMsg)
         MsgExportTr(outMsg, imported)
     }
 }

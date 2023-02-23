@@ -16,7 +16,7 @@ public abstract class TlbNegatedCombinator<T : Any>(
         storeNegatedTlb(cellBuilder, value)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
+    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
 
     override fun storeNegatedTlb(cellBuilder: CellBuilder, value: T): Int {
         val constructor = findTlbStorerOrNull(value) as? TlbNegatedConstructor<T>
@@ -25,11 +25,11 @@ public abstract class TlbNegatedCombinator<T : Any>(
         return constructor.storeNegatedTlb(cellBuilder, value)
     }
 
-    override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, T> {
-        val preloadBits = cellSlice.preloadBits(cellSlice.remainingBits)
-        val constructor = findTlbLoaderOrNull(preloadBits) as? TlbNegatedConstructor<out T>
+    @Suppress("UNCHECKED_CAST")
+    override fun loadNegatedTlb(cellSlice: CellSlice): TlbNegatedResult<T> {
+        val constructor = findTlbLoaderOrNull(cellSlice) as? TlbNegatedConstructor<out T>
             ?: throw UnknownTlbConstructorException()
         cellSlice.skipBits(constructor.id.size)
-        return constructor.loadNegatedTlb(cellSlice)
+        return constructor.loadNegatedTlb(cellSlice) as TlbNegatedResult<T>
     }
 }

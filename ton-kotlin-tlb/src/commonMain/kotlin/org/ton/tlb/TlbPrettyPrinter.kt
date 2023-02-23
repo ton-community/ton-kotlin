@@ -5,8 +5,14 @@ import org.ton.bitstring.Bits256
 
 public class TlbPrettyPrinter(
     private val stringBuilder: StringBuilder = StringBuilder(),
-    private var indent: Int = 2
+    private var indent: Int = 2,
+    private val dummy: Boolean = false
 ) {
+    public constructor(stringBuilder: StringBuilder, indent: Int) : this(stringBuilder, indent, false)
+    public constructor(stringBuilder: StringBuilder) : this(stringBuilder, 2)
+    public constructor(indent: Int) : this(StringBuilder(), indent)
+    public constructor() : this(StringBuilder())
+
     private var level: Int = 0
 
     public fun open(msg: String = ""): TlbPrettyPrinter = apply {
@@ -21,9 +27,9 @@ public class TlbPrettyPrinter(
     }
 
     public fun newLine() {
-        if (indent > 0) {
+        if (indent > 0 && !dummy) {
             if (level > 0) append("\n")
-//            append(" ".repeat(level * indent))
+            append(" ".repeat(level * indent))
         }
     }
 
@@ -52,10 +58,16 @@ public class TlbPrettyPrinter(
             when (type) {
                 null -> return@apply
                 is TlbObject -> type.print(this)
-                is Boolean -> append(if (type) 1 else 0)
-                is Bits256 -> append(type.toString())
-                is BitString -> append("x{$type}")
-                else -> append(type)
+                else -> {
+                    if (!dummy) {
+                        when (type) {
+                            is Boolean -> append(if (type) 1 else 0)
+                            is Bits256 -> append(type.toString())
+                            is BitString -> append("x{$type}")
+                            else -> append(type)
+                        }
+                    }
+                }
             }
         } catch (e: Exception) {
             throw RuntimeException("Can't print TL-B:\n${stringBuilder}<-- HERE", e)
@@ -64,8 +76,9 @@ public class TlbPrettyPrinter(
     }
 
     private fun append(string: Any) = apply {
-//        print(string.toString())
-        stringBuilder.append(string.toString())
+        if (!dummy) {
+            stringBuilder.append(string.toString())
+        }
     }
 
     public inline fun type(name: String = "", block: TlbPrettyPrinter.() -> Unit): TlbPrettyPrinter = apply {

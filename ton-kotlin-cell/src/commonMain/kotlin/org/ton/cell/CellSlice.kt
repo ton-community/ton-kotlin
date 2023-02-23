@@ -257,8 +257,12 @@ private class CellSliceByteBackedBitString(
         val remainder = length % 8
         val arraySize = bytes + if (remainder != 0) 1 else 0
         val array = ByteArray(arraySize)
-        repeat(bytes) { i ->
-            array[i] = getByte(i * 8)
+        if (bitsPosition % 8 == 0) {
+            data.copyInto(array, endIndex = bytes)
+        } else {
+            repeat(bytes) { i ->
+                array[i] = getByte(i * 8)
+            }
         }
         if (remainder != 0) {
             val v = getBits(bytes * 8, remainder).toInt() shl (8 - remainder)
@@ -275,7 +279,6 @@ private class CellSliceByteBackedBitString(
                 val byte = getByte(0).toInt() and 0xFF
                 byte.toBigInt()
             }
-
             else -> {
                 val value = getLong(length)
                 if (value > Long.MAX_VALUE.toULong()) {

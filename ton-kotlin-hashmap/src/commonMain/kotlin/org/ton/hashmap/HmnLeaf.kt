@@ -13,28 +13,6 @@ import org.ton.tlb.*
 public data class HmnLeaf<T>(
     val value: T
 ) : HashMapNode<T> {
-//    override fun set(key: BitString, value: T): HashMapNode<T> {
-//        val bit = key[0]
-//        val newLabel = key.slice(1)
-//
-//        println("current bit: $bit")
-//        println("key: ${key.toBinary()}")
-//        println("new label: ${newLabel.toBinary()}")
-//        if (bit) {
-//            // left - current
-//            // right - value
-//            val left = HashMapE()
-//            HmnFork(
-//                left = HmEdge()
-//            )
-//        } else {
-//            // left - value
-//            // right - current
-//        }
-//
-//        return this
-//    }
-
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("hmn_leaf") {
             field("value", value)

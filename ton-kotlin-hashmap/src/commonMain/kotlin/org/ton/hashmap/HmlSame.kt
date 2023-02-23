@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbNegatedConstructor
+import org.ton.tlb.TlbNegatedResult
 import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmStatic
 
@@ -65,10 +66,10 @@ private class HashMapLabelSameTlbConstructor(
 
     override fun loadNegatedTlb(
         cellSlice: CellSlice
-    ): Pair<Int, HmlSame> {
+    ): TlbNegatedResult<HmlSame> {
         val v = cellSlice.loadBit()
         val n = cellSlice.loadUIntLeq(m).toInt()
-        return n to HmlSame(v, n)
+        return TlbNegatedResult(n, HmlSame(v, n))
     }
 
     companion object {

@@ -14,10 +14,9 @@ public data class MsgExportNew(
     val outMsg: CellRef<MsgEnvelope>,
     val transaction: CellRef<Transaction>
 ) : OutMsg, TlbObject {
-
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("msg_export_new") {
-            field("outMsg", outMsg)
+            field("out_msg", outMsg)
             field("transaction", transaction)
         }
     }

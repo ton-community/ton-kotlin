@@ -4,7 +4,6 @@ package org.ton.hashmap
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -118,15 +117,7 @@ private class HashmapAugETlbCombinator<X,Y>(
     HashmapAugE::class,
     HashmapAugE.AhmeEmpty::class to ahmeEmptyCodec,
     HashmapAugE.AhmeRoot::class to ahmeRootCodec,
-) {
-    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out HashmapAugE<*, *>> {
-        return if (bitString[0]) {
-            ahmeRootCodec
-        } else {
-            ahmeEmptyCodec
-        }
-    }
-}
+)
 
 private class AhmeEmptyTlbConstructor<X, Y>(
     private val n: Int,

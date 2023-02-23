@@ -8,15 +8,12 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCombinator
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.loadTlb
+import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
-import org.ton.tlb.storeTlb
 
 @JsonClassDiscriminator("@type")
 @Serializable
-public sealed interface CommonMsgInfoRelaxed {
+public sealed interface CommonMsgInfoRelaxed : TlbObject {
     @SerialName("int_msg_info")
     public data class IntMsgInfoRelaxed(
         val ihrDisabled: Boolean = true,
@@ -44,17 +41,45 @@ public sealed interface CommonMsgInfoRelaxed {
             dest = dest,
             value = value
         )
+
+        override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+            type("int_msg_info") {
+                field("ihr_disabled", ihrDisabled)
+                field("bounce", bounce)
+                field("bounced", bounced)
+                field("src", src)
+                field("dest", dest)
+                field("value", value)
+                field("ihr_fee", ihrFee)
+                field("fwd_fee", fwdFee)
+                field("created_lt", createdLt)
+                field("created_at", createdAt)
+            }
+        }
+
+        override fun toString(): String = print().toString()
     }
 
     @SerialName("ext_out_msg_info")
-    data class ExtOutMsgInfoRelaxed(
+    public data class ExtOutMsgInfoRelaxed(
         val src: MsgAddress,
         val dest: MsgAddressExt,
-        val created_lt: ULong,
-        val created_at: UInt
-    ) : CommonMsgInfoRelaxed
+        val createdLt: ULong,
+        val createdAt: UInt
+    ) : CommonMsgInfoRelaxed {
+        override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
+            type("ext_out_msg_info") {
+                field("src", src)
+                field("dest", dest)
+                field("created_lt", createdLt)
+                field("created_at", createdAt)
+            }
+        }
 
-    companion object : TlbCombinatorProvider<CommonMsgInfoRelaxed> by CommonMsgInfoRelaxedTlbCombinator
+        override fun toString(): String = print().toString()
+    }
+
+    public companion object : TlbCombinatorProvider<CommonMsgInfoRelaxed> by CommonMsgInfoRelaxedTlbCombinator
 }
 
 private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRelaxed>(
@@ -62,7 +87,6 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
     CommonMsgInfoRelaxed.IntMsgInfoRelaxed::class to IntMsgInfoTlbConstructor,
     CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed::class to ExtOutMsgInfoTlbConstructor
 ) {
-
     private object IntMsgInfoTlbConstructor : TlbConstructor<CommonMsgInfoRelaxed.IntMsgInfoRelaxed>(
         schema = "int_msg_info\$0 ihr_disabled:Bool bounce:Bool bounced:Bool" +
                 " src:MsgAddress dest:MsgAddressInt" +
@@ -113,8 +137,8 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
         ) = cellBuilder {
             storeTlb(MsgAddress, value.src)
             storeTlb(MsgAddressExt, value.dest)
-            storeUInt64(value.created_lt)
-            storeUInt32(value.created_at)
+            storeUInt64(value.createdLt)
+            storeUInt32(value.createdAt)
         }
 
         override fun loadTlb(

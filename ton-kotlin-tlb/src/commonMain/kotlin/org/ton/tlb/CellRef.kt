@@ -25,7 +25,7 @@ public interface CellRef<out T> : TlbObject {
             value.print(printer)
         } else {
             printer {
-                type(value.toString())
+                type(value)
             }
         }
     }

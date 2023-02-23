@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.tlb.TlbNegatedConstructor
-import org.ton.tlb.TlbPrettyPrinter
-import org.ton.tlb.loadNegatedTlb
-import org.ton.tlb.storeNegatedTlb
+import org.ton.tlb.*
 
 @Serializable
 @SerialName("hml_short")
@@ -49,9 +46,9 @@ private object HashMapLabelShortTlbConstructor : TlbNegatedConstructor<HmlShort>
 
     override fun loadNegatedTlb(
         cellSlice: CellSlice
-    ): Pair<Int, HmlShort> {
+    ): TlbNegatedResult<HmlShort> {
         val (n, len) = cellSlice.loadNegatedTlb(Unary)
         val s = cellSlice.loadBits(n)
-        return n to HmlShort(len, s)
+        return TlbNegatedResult(n, HmlShort(len, s))
     }
 }

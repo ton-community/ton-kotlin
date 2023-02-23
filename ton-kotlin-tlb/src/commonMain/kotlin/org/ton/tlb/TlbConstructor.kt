@@ -76,7 +76,7 @@ public abstract class TlbNegatedConstructor<T : Any>(
         storeNegatedTlb(cellBuilder, value)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
+    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
 }
 
 public inline fun <reified T : Any> TlbConstructor<T>.asTlbCombinator(): TlbCombinator<T> = asTlbCombinator(T::class)

@@ -30,14 +30,19 @@ public interface TlbLoader<T> {
 }
 
 public interface TlbNegatedLoader<T> : TlbLoader<T> {
-    public fun loadNegatedTlb(cell: Cell): Pair<Int, T> = cell.parse {
+    public fun loadNegatedTlb(cell: Cell): TlbNegatedResult<T> = cell.parse {
         loadNegatedTlb(this)
     }
 
-    public fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, T>
+    public fun loadNegatedTlb(cellSlice: CellSlice): TlbNegatedResult<T>
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).second
+    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
 }
+
+public data class TlbNegatedResult<T>(
+    val num: Int,
+    val value: T
+)
 
 public interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
 public interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
@@ -46,7 +51,7 @@ public inline fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
 }
 
-public inline fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): Pair<Int, T> {
+public inline fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): TlbNegatedResult<T> {
     return codec.loadNegatedTlb(this)
 }
 

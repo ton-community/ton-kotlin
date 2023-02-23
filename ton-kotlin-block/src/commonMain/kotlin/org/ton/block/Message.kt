@@ -2,6 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -23,16 +24,16 @@ public data class Message<X>(
         }
     }
 
-    companion object {
-        val Any = tlbCodec(AnyTlbConstructor)
+    override fun toString(): String = print().toString()
+
+    public companion object {
+        public val Any: TlbConstructor<Message<Cell>> = tlbCodec(AnyTlbConstructor)
 
         @JvmStatic
-        fun <X : Any> tlbCodec(
+        public fun <X : Any> tlbCodec(
             x: TlbCodec<X>
         ): TlbConstructor<Message<X>> = MessageTlbConstructor(x)
     }
-
-    override fun toString(): String = print().toString()
 }
 
 operator fun <X : Any> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)

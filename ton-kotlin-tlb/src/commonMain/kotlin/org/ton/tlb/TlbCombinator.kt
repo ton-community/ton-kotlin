@@ -13,7 +13,7 @@ public abstract class TlbCombinator<T : Any>(
     vararg subClasses: Pair<KClass<out T>, TlbCodec<out T>>
 ) : AbstractTlbCombinator<T>(), TlbCombinatorProvider<T> {
     private val class2codec: MutableMap<KClass<out T>, TlbCodec<out T>>
-    private val codec2Class = HashMap<BitString, TlbCodec<out T>>()
+    private val trie = TlbTrie<TlbCodec<out T>>()
 
     init {
         class2codec = subClasses.toMap().toMutableMap()
@@ -29,11 +29,16 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     private fun addConstructor(constructor: TlbConstructor<out T>) {
-        codec2Class.set(constructor.id, constructor)
+        trie[constructor.id] = constructor
     }
 
     private fun addCombinator(combinator: TlbCombinator<out T>) {
-        codec2Class.putAll(combinator.codec2Class)
+        combinator.class2codec.forEach { (_, constructor) ->
+            when (constructor) {
+                is TlbConstructor<out T> -> addConstructor(constructor)
+                is TlbConstructorProvider<out T> -> addConstructor(constructor.tlbConstructor())
+            }
+        }
         class2codec.putAll(combinator.class2codec)
     }
 
@@ -60,14 +65,11 @@ public abstract class TlbCombinator<T : Any>(
     }
 
     protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {
-        val preloadBits = cellSlice.preloadBits(cellSlice.remainingBits)
-        return findTlbLoaderOrNull(preloadBits)
+        return trie[cellSlice.bits, cellSlice.bitsPosition]
     }
 
     protected open fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out T>? {
-        return codec2Class.maxByOrNull {
-            it.key.commonPrefixWith(bitString).size
-        }?.value
+        return trie[bitString]
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -75,5 +77,43 @@ public abstract class TlbCombinator<T : Any>(
         val constructor = class2codec[value::class]
             ?: return null
         return constructor as TlbStorer<T>
+    }
+
+    private data class TlbTrie<T>(
+        var left: TlbTrie<T>? = null,
+        var right: TlbTrie<T>? = null,
+        var value: T? = null
+    ) {
+        operator fun set(key: BitString, value: T) {
+            var x = this
+            for (i in 0 until key.size) {
+                x = if (key[i]) {
+                    x.right ?: TlbTrie<T>().also {
+                        x.right = it
+                    }
+                } else {
+                    x.left ?: TlbTrie<T>().also {
+                        x.left = it
+                    }
+                }
+            }
+            x.value = value
+        }
+
+        operator fun get(key: BitString, offset: Int = 0): T? {
+            var x = this
+            for (i in offset until key.size) {
+                if (key[i]) {
+                    x.right?.also {
+                        x = it
+                    } ?: break
+                } else {
+                    x.left?.also {
+                        x = it
+                    } ?: break
+                }
+            }
+            return x.value
+        }
     }
 }

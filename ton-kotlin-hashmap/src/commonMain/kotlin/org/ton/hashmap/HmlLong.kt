@@ -6,6 +6,7 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbNegatedConstructor
+import org.ton.tlb.TlbNegatedResult
 import org.ton.tlb.TlbPrettyPrinter
 
 @Serializable
@@ -47,10 +48,10 @@ private class HashMapLabelLongTlbConstructor(
 
     override fun loadNegatedTlb(
         cellSlice: CellSlice
-    ): Pair<Int, HmlLong> {
+    ): TlbNegatedResult<HmlLong> {
         val n = cellSlice.loadUIntLeq(m).toInt()
         val s = cellSlice.loadBits(n)
-        return n to HmlLong(n, s)
+        return TlbNegatedResult(n, HmlLong(n, s))
     }
 
     companion object {

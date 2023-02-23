@@ -4,7 +4,6 @@ package org.ton.hashmap
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -34,19 +33,7 @@ private object UnaryTlbCombinator : TlbNegatedCombinator<Unary>(
     Unary::class,
     UnaryZero::class to UnaryZeroTlbConstructor,
     UnarySuccess::class to UnarySuccessTlbConstructor,
-) {
-    override fun findTlbLoaderOrNull(bitString: BitString): TlbLoader<out Unary>? {
-        return if (bitString.size >= 1) {
-            if (bitString[0]) { // 1
-                UnarySuccessTlbConstructor
-            } else { // 0
-                UnaryZeroTlbConstructor
-            }
-        } else {
-            null
-        }
-    }
-}
+)
 
 private object UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(
     schema = "unary_succ\$1 {n:#} x:(Unary ~n) = Unary ~(n + 1);"
@@ -55,16 +42,17 @@ private object UnarySuccessTlbConstructor : TlbNegatedConstructor<UnarySuccess>(
         return cellBuilder.storeNegatedTlb(Unary, value.x) + 1
     }
 
-    override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, UnarySuccess> {
+    override fun loadNegatedTlb(cellSlice: CellSlice): TlbNegatedResult<UnarySuccess> {
         val (n, x) = cellSlice.loadNegatedTlb(Unary)
-        return n + 1 to UnarySuccess(x)
+        return TlbNegatedResult(n + 1, UnarySuccess(x))
     }
 }
 
 private object UnaryZeroTlbConstructor : TlbNegatedConstructor<UnaryZero>(
     schema = "unary_zero\$0 = Unary ~0;"
 ) {
+    private val result = TlbNegatedResult(0, UnaryZero)
     override fun storeNegatedTlb(cellBuilder: CellBuilder, value: UnaryZero): Int = 0
 
-    override fun loadNegatedTlb(cellSlice: CellSlice): Pair<Int, UnaryZero> = 0 to UnaryZero
+    override fun loadNegatedTlb(cellSlice: CellSlice) = result
 }
