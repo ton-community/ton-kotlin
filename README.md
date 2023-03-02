@@ -6,7 +6,6 @@
 [![Telegram][telegram-svg]][telegram]
 [![Based on TON][ton-svg]][ton]
 
-
 ## Gradle Kotlin DSL
 
 ```kotlin
@@ -15,13 +14,24 @@ dependencies {
 }
 ```
 
+## Maven
+
+```xml
+
+<dependency>
+    <groupId>org.ton</groupId>
+    <artifactId>ton-kotlin-jvm</artifactId>
+    <version>0.2.15</version>
+</dependency>
+```
+
 ## Documentation
 
 https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://search.maven.org/search?q=g:%22org.ton%22%20AND%20a:%22ton-kotlin%22
+[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin/0.2.15
 
 [license]: LICENSE
 [kotlin]: http://kotlinlang.org
