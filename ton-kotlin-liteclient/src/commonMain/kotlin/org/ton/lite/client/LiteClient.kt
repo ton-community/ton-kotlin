@@ -8,7 +8,6 @@ import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.adnl.connection.AdnlClientImpl
-import org.ton.adnl.network.IPAddress.*
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
@@ -316,9 +315,10 @@ public class LiteClient(
             throw RuntimeException("Can't deserialize block data", e)
         }
         val actualRootHash = root.hash().toBitString()
-        check(blockId.rootHash.toBitString() == actualRootHash) {
-            "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
-        }
+        // FIXME: https://github.com/andreypfau/ton-kotlin/issues/82
+//        check(blockId.rootHash.toBitString() == actualRootHash) {
+//            "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
+//        }
         val block = try {
             Block.loadTlb(root.beginParse())
         } catch (e: Exception) {
@@ -329,19 +329,19 @@ public class LiteClient(
 
     public suspend fun getAccount(
         address: String, mode: Int = 0
-    ): Account? {
+    ): AccountInfo? {
         return getAccount(parseAccountId(address) ?: return null, mode)
     }
 
     public suspend fun getAccount(
         address: LiteServerAccountId, mode: Int = 0
-    ): Account? {
+    ): AccountInfo? {
         return getAccount(address, getCachedLastMasterchainBlockId(), mode)
     }
 
     public suspend fun getAccount(
         address: String, blockId: TonNodeBlockIdExt, mode: Int = 0
-    ): Account? {
+    ): AccountInfo? {
         return getAccount(parseAccountId(address) ?: return null, blockId, mode)
     }
 

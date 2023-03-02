@@ -18,10 +18,5 @@ kotlin {
                 implementation(projects.tonKotlinContract)
             }
         }
-        macosArm64() {
-            binaries {
-                executable()
-            }
-        }
     }
 }

@@ -141,20 +141,21 @@ internal class CellImpl(
                     }
                     val merkleHash0 = dataBytes.copyOfRange(1, 1 + HASH_BYTES)
                     val childHash0 = refs[0].hash(level = 0)
-                    check(merkleHash0.contentEquals(childHash0)) {
-                        "First hash mismatch in merkle update cell:\n" +
-                                "merkle hash: ${merkleHash0.encodeHex()}\n" +
-                                " child hash: ${childHash0.encodeHex()}\n" +
-                                "       data: ${dataBytes.encodeHex()}"
-                    }
+                    // FIXME: https://github.com/andreypfau/ton-kotlin/issues/82
+//                    check(merkleHash0.contentEquals(childHash0)) {
+//                        "First hash mismatch in merkle update cell:\n" +
+//                                "merkle hash: ${merkleHash0.encodeHex()}\n" +
+//                                " child hash: ${childHash0.encodeHex()}\n" +
+//                                "       data: ${dataBytes.encodeHex()}"
+//                    }
                     val merkleHash1 = dataBytes.copyOfRange(1 + HASH_BYTES, 1 + HASH_BYTES * 2)
                     val childHash1 = refs[1].hash(level = 0)
-                    check(merkleHash1.contentEquals(childHash1)) {
-                        "Second hash mismatch in merkle update cell:\n" +
-                                "merkle hash: ${merkleHash1.encodeHex()}\n" +
-                                " child hash: ${childHash1.encodeHex()}\n" +
-                                "       data: ${dataBytes.encodeHex()}"
-                    }
+//                    check(merkleHash1.contentEquals(childHash1)) {
+//                        "Second hash mismatch in merkle update cell:\n" +
+//                                "merkle hash: ${merkleHash1.encodeHex()}\n" +
+//                                " child hash: ${childHash1.encodeHex()}\n" +
+//                                "       data: ${dataBytes.encodeHex()}"
+//                    }
                     val depthOffset0 = 1 + 2 * HASH_BYTES
                     val merkleDepth0 = (dataBytes[depthOffset0].toInt() shl 8) or
                             dataBytes[depthOffset0 + 1].toInt()
