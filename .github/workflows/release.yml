@@ -10,7 +10,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishJvmPublicationToSonatypeRepository publishKotlinMultiplatformPublicationToSonatypeRepository
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishJvmPublicationToSonatypeRepository
           - os: ubuntu-latest
             gradle_args: publishLinuxX64PublicationToSonatypeRepository
           - os: ubuntu-latest
