@@ -23,6 +23,7 @@ import org.ton.cell.CellType
 import org.ton.crypto.crc16
 import org.ton.crypto.digest.sha256
 import org.ton.lite.api.LiteApiClient
+import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.exception.LiteServerNotReadyException
 import org.ton.lite.api.exception.LiteServerUnknownException
 import org.ton.lite.api.liteserver.*
@@ -90,10 +91,13 @@ public class LiteClient(
                     liteServer = serverList[currentServer++ % serverList.size]
                     val client = AdnlClientImpl(liteServer)
                     return client.sendQuery(ByteReadPacket(bytes), 10.seconds)
+                } catch (e: LiteServerException) {
+                    exception = e
+                    break
                 } catch (e: Exception) {
                     exception = e
                     attempts++
-                    delay(100L * attempts)
+                    delay(100L)
                 }
             }
             throw RuntimeException("Failed to send query to lite server: $liteServer", exception)
