@@ -296,6 +296,11 @@ public class LiteClient(
         result
     }
 
+    public suspend fun getBlock(blockId: TonNodeBlockId): Block? {
+        val blockIdExt = lookupBlock(blockId) ?: return null
+        return getBlock(blockIdExt)
+    }
+
     public suspend fun getBlock(blockId: TonNodeBlockIdExt): Block? {
         val blockData = try {
             liteApi(LiteServerGetBlock(blockId))

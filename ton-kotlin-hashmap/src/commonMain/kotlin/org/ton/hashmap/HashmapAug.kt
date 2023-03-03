@@ -187,7 +187,6 @@ internal class AhmnNodeIterator<X, Y>(
                 edge
             } else {
                 addState(prefix, node)
-//                println("goto next")
                 gotoNext()
             }
         }

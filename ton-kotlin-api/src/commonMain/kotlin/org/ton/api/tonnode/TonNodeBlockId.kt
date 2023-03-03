@@ -2,7 +2,6 @@
 
 package org.ton.api.tonnode
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
@@ -66,7 +65,7 @@ private data class TonNodeBlockIdImpl(
 ) : TonNodeBlockId {
     override fun withSeqno(seqno: Int): TonNodeBlockId = copy(seqno = seqno)
 
-    override fun toString(): String = "($workchain:${shard.toString(16).uppercase()}:$seqno)"
+    override fun toString(): String = "($workchain:${shard.toShard().hex()}:$seqno)"
 }
 
 private object TonNodeBlockIdTlbConstructor : TlConstructor<TonNodeBlockId>(
