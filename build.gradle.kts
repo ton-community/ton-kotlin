@@ -28,6 +28,8 @@ allprojects {
         mavenCentral()
     }
 
+    buildDir = File(rootDir, "build/${project.name}")
+
     kotlin {
         if (!isCI) {
             explicitApiWarning()

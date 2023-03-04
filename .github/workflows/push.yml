@@ -1,0 +1,46 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            gradle_args: publishJvmPublicationToMavenLocal
+          - os: ubuntu-latest
+            gradle_args: publishLinuxX64PublicationToMavenLocal
+          - os: ubuntu-latest
+            gradle_args: publishMingwX64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishIosArm64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishIosX64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishIosSimulatorArm64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishMacosX64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishMacosArm64PublicationToMavenLocal
+    runs-on: ${{ matrix.os }}
+    env:
+      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: 17
+      - name: Build using gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ${{ matrix.gradle_args }}
+      -
