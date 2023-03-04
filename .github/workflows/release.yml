@@ -38,3 +38,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
+      - name: Publish to staging repo
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishAllPublicationsToSonatypeRepository
