@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
@@ -29,6 +31,10 @@ allprojects {
     }
 
     buildDir = File(rootDir, "build/${project.name}")
+
+    tasks.withType<KotlinCompilationTask<*>> {
+        compilerOptions.freeCompilerArgs.add("-opt-in=kotlin.io.encoding.ExperimentalEncodingApi")
+    }
 
     kotlin {
         if (!isCI) {
@@ -62,12 +68,6 @@ allprojects {
             }
             common("linux") {
                 target("linuxX64")
-            }
-        }
-
-        sourceSets.all {
-            languageSettings.apply {
-                languageVersion = "2.0"
             }
         }
 

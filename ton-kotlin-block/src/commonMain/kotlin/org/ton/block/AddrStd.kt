@@ -2,6 +2,7 @@
 
 package org.ton.block
 
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,13 +11,13 @@ import org.ton.bitstring.Bits256
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.crypto.base64
-import org.ton.crypto.base64url
 import org.ton.crypto.crc16
 import org.ton.crypto.hex
 import org.ton.tlb.*
 import kotlin.experimental.and
 import kotlin.experimental.or
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.JvmStatic
 
 public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
@@ -63,6 +64,7 @@ public data class AddrStd(
         @JvmStatic
         public fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
 
+        @OptIn(ExperimentalEncodingApi::class)
         @JvmStatic
         public fun toString(
             address: AddrStd,
@@ -85,9 +87,9 @@ public data class AddrStd(
                 }.readBytes()
 
                 if (urlSafe) {
-                    base64url(data)
+                    Base64.UrlSafe.encode(data)
                 } else {
-                    base64(data)
+                    Base64.encode(data)
                 }
             } else {
                 "${address.workchainId}:${address.address}"
@@ -117,42 +119,44 @@ public data class AddrStd(
             )
         }
 
+        @OptIn(ExperimentalEncodingApi::class)
         @JvmStatic
         public fun parseUserFriendly(address: String): AddrStd {
-            val packet = ByteReadPacket(
-                try {
-                    base64url(address)
-                } catch (e: Exception) {
-                    try {
-                        base64(address)
-                    } catch (e: Exception) {
-                        throw IllegalArgumentException("Can't parse address: $address", e)
-                    }
-                }
-            )
+            val addressBytes = ByteArray(36)
 
-            require(packet.remaining == 36L) { "invalid byte-array size expected: 36, actual: ${packet.remaining}" }
-            // not 0x80 = 0x7F; here we clean the test only flag to only check proper bounce flags
-            val tag = packet.readByte()
-            val workchain = packet.readByte().toInt()
-            val rawAddress = packet.readBytes(32)
-            val cleanTestOnly = tag and 0x7F.toByte()
-            check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
-                "unknown address tag"
+            try {
+                Base64.UrlSafe.decodeIntoByteArray(address, addressBytes)
+            } catch (e: Exception) {
+                try {
+                    Base64.Default.decodeIntoByteArray(address, addressBytes)
+                } catch (e: Exception) {
+                    throw IllegalArgumentException("Can't parse address: $address", e)
+                }
+            }
+            var tag: Byte = 0
+            var workchainId = 0
+            var rawAddress = ByteArray(32)
+            var expectedChecksum = 0
+            addressBytes.useMemory(0, addressBytes.size) {
+                tag = it.loadAt(0)
+                val cleanTestOnly = tag and 0x7F.toByte()
+                check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
+                    "unknown address tag"
+                }
+                workchainId = it.loadIntAt(1)
+                rawAddress = addressBytes.copyInto(rawAddress, startIndex = 5, endIndex = 5 + 32)
+                expectedChecksum = it.loadUShortAt(5 + 32).toInt()
             }
 
-            val addrStd = AddrStd(
-                workchainId = workchain,
-                address = rawAddress
-            )
-
-            val expectedChecksum = packet.readUShort().toInt()
-            val actualChecksum = checksum(tag, workchain, rawAddress)
+            val actualChecksum = checksum(tag, workchainId, rawAddress)
             check(expectedChecksum == actualChecksum) {
                 "CRC check failed"
             }
 
-            return addrStd
+            return AddrStd(
+                workchainId = workchainId,
+                address = rawAddress
+            )
         }
 
         private fun checksum(tag: Byte, workchainId: Int, address: ByteArray): Int =
