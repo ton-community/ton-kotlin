@@ -1,20 +1,37 @@
 name: Release
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
+
 jobs:
   build:
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: assemble
+            gradle_args: publishJvmPublicationToMavenLocal
           - os: ubuntu-latest
-            gradle_args: assemble
+            gradle_args: publishLinuxX64PublicationToMavenLocal
+          - os: ubuntu-latest
+            gradle_args: publishMingwX64PublicationToMavenLocal
           - os: macos-latest
-            gradle_args: assemble
+            gradle_args: publishIosArm64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishIosX64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishIosSimulatorArm64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishMacosX64PublicationToMavenLocal
+          - os: macos-latest
+            gradle_args: publishMacosArm64PublicationToMavenLocal
     runs-on: ${{ matrix.os }}
+    env:
+      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
@@ -26,19 +43,3 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ matrix.gradle_args }}
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: build/**/*
-  publish:
-    needs: build
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-      - name: Publish to staging repo
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publishAllPublicationsToSonatypeRepository

@@ -1,0 +1,44 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            gradle_args: jvmMainClasses
+          - os: ubuntu-latest
+            gradle_args: mingwX64MainKlibrary linuxX64MainKlibrary
+          - os: macos-latest
+            gradle_args: macosX64MainKlibrary macosArm64MainKlibrary iosX64MainKlibrary iosArm64MainKlibrary iosSimulatorArm64MainKlibrary
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: 17
+      - name: Build using gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ${{ matrix.gradle_args }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/**/*
+  publish:
+    needs: build
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+      - name: Publish to staging repo
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishAllPublicationsToSonatypeRepository
