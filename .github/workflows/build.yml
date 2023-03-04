@@ -33,12 +33,17 @@ jobs:
           path: build/**/*
   publish:
     needs: build
-    runs-on: ubuntu-latest
     steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: build
+      - uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: 17
       - name: Publish to staging repo
         uses: gradle/gradle-build-action@v2
         with:
