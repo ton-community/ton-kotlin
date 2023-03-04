@@ -47,15 +47,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
+          path: build/
       - name: show files
         run: ls -la
       - name: show files build
         run: ls -la build
-#      - uses: actions/setup-java@v3
-#        with:
-#          distribution: liberica
-#          java-version: 17
-#      - name: Publish to staging repo
-#        uses: gradle/gradle-build-action@v2
-#        with:
-#          arguments: publishAllPublicationsToSonatypeRepository
+      - uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: 17
+      - name: Publish to staging repo
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishAllPublicationsToSonatypeRepository
