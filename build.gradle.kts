@@ -65,6 +65,12 @@ allprojects {
             }
         }
 
+        sourceSets.all {
+            languageSettings.apply {
+                languageVersion = "2.0"
+            }
+        }
+
         sourceSets {
             val commonTest by getting {
                 dependencies {

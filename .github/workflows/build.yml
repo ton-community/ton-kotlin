@@ -9,11 +9,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: jvmMainClasses
+            gradle_args: publishKotlinMultiplatformPublicationToMavenLocal publishJvmPublicationToMavenLocal
           - os: ubuntu-latest
-            gradle_args: mingwX64MainKlibrary linuxX64MainKlibrary
+            gradle_args: publishMingwX64PublicationToMavenLocal publishLinuxX64PublicationToMavenLocal
           - os: macos-latest
-            gradle_args: macosX64MainKlibrary macosArm64MainKlibrary iosX64MainKlibrary iosArm64MainKlibrary iosSimulatorArm64MainKlibrary
+            gradle_args: publishMacosX64PublicationToMavenLocal publishMacosArm64PublicationToMavenLocal publishIosX64PublicationToMavenLocal publishIosArm64PublicationToMavenLocal
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
@@ -34,6 +34,12 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
