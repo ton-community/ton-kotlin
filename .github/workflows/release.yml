@@ -10,28 +10,22 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishJvmPublicationToMavenLocal
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishLinuxX64PublicationToMavenLocal
+            gradle_args: jvmTest publishJvmPublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishMingwX64PublicationToMavenLocal
+            gradle_args: publishMingwX64PublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishLinuxX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishIosArm64PublicationToMavenLocal
+            gradle_args: publishMacosX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishIosX64PublicationToMavenLocal
+            gradle_args: publishMacosArm64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishIosSimulatorArm64PublicationToMavenLocal
+            gradle_args: publishIosX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishMacosX64PublicationToMavenLocal
-          - os: macos-latest
-            gradle_args: publishMacosArm64PublicationToMavenLocal
+            gradle_args: publishIosArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
-    env:
-      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
-      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
@@ -43,3 +37,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ matrix.gradle_args }}
+        env:
+          SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
