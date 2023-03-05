@@ -151,11 +151,9 @@ kotlin {
 nexusPublishing {
     repositories {
         sonatype {
-            val repositoryId =
-                System.getenv("OSSRH_REPOSITORY_ID") ?: error("Missing env variable: OSSRH_REPOSITORY_ID")
             username.set(project.findProperty("ossrhUsername") as? String ?: System.getenv("OSSRH_USERNAME"))
             password.set(project.findProperty("ossrhPassword") as? String ?: System.getenv("OSSRH_PASSWORD"))
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/${repositoryId}/"))
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
