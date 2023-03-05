@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.OSSRH_USERNAME }}
           password: ${{ secrets.OSSRH_PASSWORD }}
           staging_profile_id: org.ton
+          base_url: https://s01.oss.sonatype.org/service/local
           description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
   build:
     needs: create_staging_repository
