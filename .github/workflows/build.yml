@@ -5,31 +5,45 @@ on:
       - main
 
 jobs:
-  create_staging_repository:
-    runs-on: ubuntu-latest
-    name: Create staging repository
-    outputs:
-      repository_id: ${{ steps.create.outputs.repository_id }}
-    steps:
-      - id: create
-        uses: nexus-actions/create-nexus-staging-repo@10a43a22d0278ed006f1293214b99184c60fbdff
-        with:
-          username: ${{ secrets.OSSRH_USERNAME }}
-          password: ${{ secrets.OSSRH_PASSWORD }}
-          staging_profile_id: 84d5b7be34ff06
-          base_url: https://s01.oss.sonatype.org/service/local
-          description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
+#  create_staging_repository:
+  #    runs-on: ubuntu-latest
+  #    name: Create staging repository
+  #    outputs:
+  #      repository_id: ${{ steps.create.outputs.repository_id }}
+  #    steps:
+  #      - id: create
+  #        uses: nexus-actions/create-nexus-staging-repo@10a43a22d0278ed006f1293214b99184c60fbdff
+  #        with:
+  #          username: ${{ secrets.OSSRH_USERNAME }}
+  #          password: ${{ secrets.OSSRH_PASSWORD }}
+  #          staging_profile_id: 84d5b7be34ff06
+  #          base_url: https://s01.oss.sonatype.org/service/local
+  #          description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
   build:
-    needs: create_staging_repository
+    #    needs: create_staging_repository
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository
+            name: publish Kotlin Multiplatform
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishMingwX64PublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository
+            name: publish JVM
+            gradle_args: publishJvmPublicationToSonatypeRepository
+          - os: ubuntu-latest
+            name: publish Windows x64
+            gradle_args: publishMingwX64PublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishLinuxX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishMacosX64PublicationToSonatypeRepository publishMacosArm64PublicationToSonatypeRepository publishIosX64PublicationToSonatypeRepository publishIosArm64PublicationToSonatypeRepository
+            gradle_args: publishMacosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishMacosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishIosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            name: build iOS ARM x64
+            gradle_args: publishIosArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
@@ -41,7 +55,7 @@ jobs:
       - name: Build using gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: ${{ matrix.gradle_args }}
+          arguments: stacktrace --debug ${{ matrix.gradle_args }}
         env:
           OSSRH_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
           SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
