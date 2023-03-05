@@ -55,7 +55,7 @@ jobs:
       - name: Build using gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: stacktrace --info ${{ matrix.gradle_args }}
+          arguments: ${{ matrix.gradle_args }}
         env:
           OSSRH_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
           SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
