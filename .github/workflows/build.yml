@@ -12,11 +12,11 @@ jobs:
       repository_id: ${{ steps.create.outputs.repository_id }}
     steps:
       - id: create
-        uses: nexus-actions/create-nexus-staging-repo@main
+        uses: nexus-actions/create-nexus-staging-repo@10a43a22d0278ed006f1293214b99184c60fbdff
         with:
           username: ${{ secrets.OSSRH_USERNAME }}
           password: ${{ secrets.OSSRH_PASSWORD }}
-          staging_profile_id: org.ton
+          staging_profile_id: 84d5b7be34ff06
           base_url: https://s01.oss.sonatype.org/service/local
           description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
   build:
