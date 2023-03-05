@@ -3,17 +3,32 @@ on:
   push:
     branches:
       - main
+
 jobs:
+  create_staging_repository:
+    runs-on: ubuntu-latest
+    name: Create staging repository
+    outputs:
+      repository_id: ${{ steps.create.outputs.repository_id }}
+    steps:
+      - id: create
+        uses: nexus-actions/create-nexus-staging-repo@main
+        with:
+          username: ${{ secrets.OSSRH_USERNAME }}
+          password: ${{ secrets.OSSRH_PASSWORD }}
+          staging_profile_od: org.ton
+          description: ${{ github.repository }}/${{ github.workflow }}#${{ github.run_number }}
   build:
+    needs: create_staging_repository
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToMavenLocal publishJvmPublicationToMavenLocal
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishMingwX64PublicationToMavenLocal publishLinuxX64PublicationToMavenLocal
+            gradle_args: publishMingwX64PublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: publishMacosX64PublicationToMavenLocal publishMacosArm64PublicationToMavenLocal publishIosX64PublicationToMavenLocal publishIosArm64PublicationToMavenLocal
+            gradle_args: publishMacosX64PublicationToSonatypeRepository publishMacosArm64PublicationToSonatypeRepository publishIosX64PublicationToSonatypeRepository publishIosArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
@@ -26,37 +41,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: ${{ matrix.gradle_args }}
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build
-          path: build/**/*
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
-      SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Checkout project sources
-        uses: actions/checkout@v3
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: build/
-      - name: show files
-        run: ls -la
-      - name: show files build
-        run: ls -la build
-      - uses: actions/setup-java@v3
-        with:
-          distribution: liberica
-          java-version: 17
-      - name: Publish to staging repo
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publishAllPublicationsToSonatypeRepository
+        env:
+          OSSRH_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
+          SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
