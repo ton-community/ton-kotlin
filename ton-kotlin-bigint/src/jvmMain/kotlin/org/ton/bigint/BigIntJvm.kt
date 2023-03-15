@@ -46,7 +46,7 @@ public actual infix fun BigInt.pow(pow: Int): BigInt = pow(pow)
 public actual fun BigInt.not(): BigInt =
     this.not()
 
-public actual infix fun BigInt.divRem(other: BigInt): Pair<BigInt,BigInt> {
+public actual infix fun BigInt.divRem(other: BigInt): Pair<BigInt, BigInt> {
     val result = divideAndRemainder(other)
     return result[0] to result[1]
 }

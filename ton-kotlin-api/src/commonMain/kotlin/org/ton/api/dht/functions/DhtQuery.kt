@@ -1,6 +1,5 @@
 package org.ton.api.dht.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.dht.DhtNode

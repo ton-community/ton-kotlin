@@ -19,7 +19,7 @@ class HashMapEdgeTest {
                 .beginParse()
         val hashMapEdge = codec.loadTlb(cellSlice)
 
-        val keys = hashMapEdge.nodes().map { CellSlice(it.first).loadInt(32).toInt() }.toList()
+        val keys = hashMapEdge.map { CellSlice(it.first).loadInt(32).toInt() }.toList()
         assertEquals(
             listOf(0, 1, 9, 10, 12, 14, 15, 16, 17, 32, 34, 36, -1001, -1000),
             keys
@@ -72,7 +72,7 @@ class HashMapEdgeTest {
             )
         )
 
-        val nodes = e.nodes().toMap()
+        val nodes = e.toMap()
 
         assertEquals(
             Cell.of("42424242"),

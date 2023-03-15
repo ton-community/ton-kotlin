@@ -2,13 +2,15 @@
 
 package org.ton.api.adnl
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.Bits256
 import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.tl.*
+import org.ton.tl.TlCombinator
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @JsonClassDiscriminator("@type")
 public interface AdnlProxy {

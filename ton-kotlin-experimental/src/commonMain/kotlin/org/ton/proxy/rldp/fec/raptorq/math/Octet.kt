@@ -2,7 +2,6 @@ package org.ton.proxy.rldp.fec.raptorq.math
 
 import kotlin.jvm.JvmInline
 
-@OptIn(ExperimentalUnsignedTypes::class)
 private val LOG_TABLE = ubyteArrayOf(
     0u,
     1u,
@@ -261,7 +260,6 @@ private val LOG_TABLE = ubyteArrayOf(
     175u
 )
 
-@OptIn(ExperimentalUnsignedTypes::class)
 private val EXP_TABLE = ubyteArrayOf(
     1u,
     2u,
@@ -775,7 +773,6 @@ private val EXP_TABLE = ubyteArrayOf(
     142u
 )
 
-@OptIn(ExperimentalUnsignedTypes::class)
 @JvmInline
 value class Octet(
     val value: UByte

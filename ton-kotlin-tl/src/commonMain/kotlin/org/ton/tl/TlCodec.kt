@@ -1,7 +1,5 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
-
 public interface TlCodec<T> : TlDecoder<T>, TlEncoder<T>
 
 public interface TlObject<T> where T : TlObject<T> {

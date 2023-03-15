@@ -1,6 +1,5 @@
 package org.ton.api.adnl.message
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader

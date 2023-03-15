@@ -1,11 +1,8 @@
 package org.ton.tonlib
 
 import io.ktor.utils.io.core.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.lite.api.LiteApiClient
@@ -49,6 +46,10 @@ internal class TonlibClient(
     override suspend operator fun invoke(sync: Sync): TonBlockIdExt {
         val lastBlock = requireNotNull(rawLastBlock).sync()
         return lastBlock.lastBlockId.toTonlibApi()
+    }
+
+    override suspend fun getAccountState(accountAddress: String): FullAccountState = coroutineScope {
+        TODO()
     }
 
     private fun validateConfig(config: Config): FullConfig {
@@ -157,6 +158,6 @@ private fun BlockIdExt.toTonlibApi(): TonBlockIdExt =
         workchain = workchain,
         shard = shard,
         seqno = seqno,
-        rootHash = rootHash.toByteArray(),
-        fileHash = fileHash.toByteArray()
+        rootHash = rootHash.base64(),
+        fileHash = fileHash.base64()
     )

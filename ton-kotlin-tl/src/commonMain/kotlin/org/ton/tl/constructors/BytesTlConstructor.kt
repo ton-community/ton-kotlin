@@ -2,8 +2,6 @@
 
 package org.ton.tl.constructors
 
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter

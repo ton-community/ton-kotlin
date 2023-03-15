@@ -15,7 +15,6 @@ import org.ton.contract.SmartContract
 import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.crypto.base64
 import org.ton.lite.api.LiteApi
-import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
@@ -99,9 +98,13 @@ public class WalletV4R2Contract private constructor(
         }
 
         @JvmStatic
-        suspend fun loadContract(liteClient: LiteClient, blockId: TonNodeBlockIdExt, address: AddrStd): WalletV4R2Contract? {
-            val accountInfo = liteClient.getAccount(LiteServerAccountId(address.workchainId, address.address), blockId) ?: return null
-            return WalletV4R2Contract(accountInfo)
+        suspend fun loadContract(
+            liteClient: LiteClient,
+            blockId: TonNodeBlockIdExt,
+            address: AddrStd
+        ): WalletV4R2Contract? {
+            val accountInfo = liteClient.getAccount(address, blockId) ?: return null
+            return WalletV4R2Contract(accountInfo.info)
         }
 
         @JvmStatic
@@ -176,7 +179,7 @@ public class WalletV4R2Contract private constructor(
                     storeRef(MessageRelaxed.tlbCodec(AnyTlbConstructor), intMsg)
                 }
             }
-            val signature = BitString(privateKey.sign(unsignedBody.hash()))
+            val signature = BitString(privateKey.sign(unsignedBody.hash().toByteArray()))
 
             return CellBuilder.createCell {
                 storeBits(signature)

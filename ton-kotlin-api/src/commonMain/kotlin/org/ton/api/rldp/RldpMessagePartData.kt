@@ -1,13 +1,11 @@
 package org.ton.api.rldp
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.fec.FecType
 import org.ton.bitstring.Bits256
 import org.ton.crypto.encodeHex
 import org.ton.tl.*
-import org.ton.tl.constructors.*
 
 @Serializable
 @SerialName("rldp.messagePart")

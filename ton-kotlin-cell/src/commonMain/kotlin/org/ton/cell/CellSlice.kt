@@ -72,7 +72,9 @@ public interface CellSlice {
 
     public companion object {
         @JvmStatic
-        public fun beginParse(cell: Cell): CellSlice = of(cell.bits, cell.refs)
+        public fun beginParse(cell: Cell): CellSlice {
+            return of(cell.bits, cell.refs)
+        }
 
         @JvmStatic
         public fun of(bits: BitString, refs: List<Cell> = emptyList()): CellSlice {

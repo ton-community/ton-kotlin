@@ -2,12 +2,14 @@
 
 package org.ton.lite.api.liteserver.functions
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.*
+import org.ton.tl.TlCodec
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @Serializable
 @SerialName("liteServer.query")

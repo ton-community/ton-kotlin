@@ -3,30 +3,15 @@ package org.ton.lite.api.liteserver
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
+import org.ton.crypto.base64
 import org.ton.tl.*
 
 @Serializable
 @SerialName("liteServer.transactionList")
 public data class LiteServerTransactionList(
-    val ids: Collection<TonNodeBlockIdExt>,
-    val transactions: ByteArray
+    val ids: List<TonNodeBlockIdExt>,
+    val transactions: String
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerTransactionList) return false
-
-        if (ids != other.ids) return false
-        if (!transactions.contentEquals(other.transactions)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = ids.hashCode()
-        result = 31 * result + transactions.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
 }
 
@@ -37,7 +22,7 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
         val ids = reader.readVector {
             read(TonNodeBlockIdExt)
         }
-        val transactions = reader.readBytes()
+        val transactions = base64(reader.readBytes())
         return LiteServerTransactionList(ids, transactions)
     }
 
@@ -45,6 +30,6 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
         writer.writeVector(value.ids) {
             write(TonNodeBlockIdExt, it)
         }
-        writer.writeBytes(value.transactions)
+        writer.writeBytes(base64(value.transactions))
     }
 }

@@ -42,10 +42,10 @@ public interface TonNodeBlockId {
 
         @JvmStatic
         public fun parse(string: String): TonNodeBlockId {
-            require(string.getOrNull(0) == '(')
-            require(string.getOrNull(string.lastIndex) == ')')
-            val (rawWorkchain, rawShard, rawSeqno) = string.substring(1, string.lastIndex - 1).split(':')
-            return TonNodeBlockIdImpl(rawWorkchain.toInt(), rawShard.toLong(), rawSeqno.toInt())
+            require(string.getOrNull(0) == '(') { "Can't parse string: '$string'" }
+            require(string.getOrNull(string.lastIndex) == ')') { "Can't parse string: '$string'" }
+            val (rawWorkchain, rawShard, rawSeqno) = string.substring(1, string.lastIndex).split(':')
+            return TonNodeBlockIdImpl(rawWorkchain.toInt(), rawShard.toULong(16).toLong(), rawSeqno.toInt())
         }
 
         @JvmStatic

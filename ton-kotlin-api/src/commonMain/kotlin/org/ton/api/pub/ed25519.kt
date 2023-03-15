@@ -2,15 +2,19 @@
 
 package org.ton.api.pub
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bitstring.Bits256
-import org.ton.crypto.*
-import org.ton.tl.*
+import org.ton.crypto.Ed25519
+import org.ton.crypto.Encryptor
+import org.ton.crypto.EncryptorEd25519
+import org.ton.tl.TlCodec
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import kotlin.jvm.JvmStatic
 
 public inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519): PublicKeyEd25519 = PublicKeyEd25519.of(privateKey)

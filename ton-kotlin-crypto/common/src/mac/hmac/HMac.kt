@@ -1,7 +1,7 @@
 package org.ton.crypto.mac.hmac
 
 import org.ton.crypto.digest.Digest
-import org.ton.crypto.mac.*
+import org.ton.crypto.mac.Mac
 
 /**
  * HMAC implementation based on RFC2104

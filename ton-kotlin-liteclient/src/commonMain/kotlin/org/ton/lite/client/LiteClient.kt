@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
-
 package org.ton.lite.client
 
 import io.ktor.utils.io.core.*
@@ -14,12 +12,12 @@ import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.bitstring.Bits256
-import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
+import org.ton.crypto.base64
 import org.ton.crypto.crc16
 import org.ton.crypto.digest.sha256
 import org.ton.lite.api.LiteApiClient
@@ -32,12 +30,10 @@ import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
 private const val BLOCK_ID_CACHE_SIZE = 100
 
@@ -337,41 +333,91 @@ public class LiteClient(
     }
 
     public suspend fun getAccount(
-        address: String, mode: Int = 0
-    ): AccountInfo? {
-        return getAccount(parseAccountId(address) ?: return null, mode)
+        address: String
+    ): AccountState? {
+        return getAccount(parseAddrStd(address) ?: return null)
     }
 
     public suspend fun getAccount(
-        address: LiteServerAccountId, mode: Int = 0
-    ): AccountInfo? {
-        return getAccount(address, getCachedLastMasterchainBlockId(), mode)
+        address: String, blockId: TonNodeBlockIdExt
+    ): AccountState? {
+        return getAccount(parseAddrStd(address) ?: return null, blockId)
     }
 
     public suspend fun getAccount(
-        address: String, blockId: TonNodeBlockIdExt, mode: Int = 0
-    ): AccountInfo? {
-        return getAccount(parseAccountId(address) ?: return null, blockId, mode)
+        address: AddrStd
+    ): AccountState? {
+        val lastBlock = getCachedLastMasterchainBlockId()
+        return getAccount(address, lastBlock)
     }
 
     public suspend fun getAccount(
-        address: LiteServerAccountId, blockId: TonNodeBlockIdExt, mode: Int = 0
-    ): AccountInfo? {
-        logger.debug {
-            "requesting account state for ${address.workchain}:${
-                address.id
-            } with respect to $blockId with mode $mode"
+        address: AddrStd, blockId: TonNodeBlockIdExt
+    ): AccountState? {
+        val rawAccountState = liteApi(LiteServerGetAccountState(blockId, address.toLiteServer()))
+        val root = try {
+            BagOfCells(rawAccountState.state).first()
+        } catch (e: Exception) {
+            throw IllegalStateException("Can't deserialize account state", e)
         }
-        val accountState = liteApi(LiteServerGetAccountState(blockId, address))
-        val shardBlock = accountState.shardBlock
-        logger.debug {
-            "got account state for ${address.workchain}:${
-                address.id
-            } with respect to blocks ${blockId}${if (shardBlock == blockId) "" else " and $shardBlock"}"
+
+        check(rawAccountState.id == blockId || rawAccountState.id.seqno == 0) {
+            "Obtained different reference block: ${rawAccountState.id} instead of requested $blockId"
         }
-        val stateBoc = BagOfCells(accountState.state)
-        val account = stateBoc.first().parse { loadTlb(Account) }
-        return account as? AccountInfo
+        check(rawAccountState.shardBlock.isValidFull()) {
+            "Shard block id: ${rawAccountState.shardBlock} in answer is invalid"
+        }
+        check(Shard.containsShard(rawAccountState.shardBlock.shard, Shard.extractShard(address.address))) {
+            "Received data from shard block ${rawAccountState.shardBlock.shard} that can't contain requested account: ${address.address}"
+        }
+
+        return CheckProofUtils.checkAccountProof(
+            rawAccountState.proof,
+            rawAccountState.shardBlock,
+            address,
+            root
+        )
+    }
+
+    public suspend fun getLastTransactions(
+        account: String,
+        lt: Long,
+        hash: Bits256
+    ): List<TransactionInfo> {
+        return getLastTransactions(parseAddrStd(account) ?: return emptyList(), lt, hash)
+    }
+
+    public suspend fun getLastTransactions(
+        account: String,
+        lt: Long,
+        hash: Bits256,
+        count: Int
+    ): List<TransactionInfo> {
+        return getLastTransactions(parseAddrStd(account) ?: return emptyList(), lt, hash, count)
+    }
+
+    public suspend fun getLastTransactions(
+        account: AddrStd,
+        lt: Long,
+        hash: Bits256
+    ): List<TransactionInfo> = getLastTransactions(account, lt, hash, 10)
+
+    public suspend fun getLastTransactions(
+        account: AddrStd,
+        lt: Long,
+        hash: Bits256,
+        count: Int,
+    ): List<TransactionInfo> {
+        val rawTransactionList = liteApi(LiteServerGetTransactions(count, account.toLiteServer(), lt, hash))
+        val transactionsCells = BagOfCells(base64(rawTransactionList.transactions)).roots
+        check(rawTransactionList.ids.size == transactionsCells.size)
+        return List(transactionsCells.size) { index ->
+            TransactionInfo(
+                blockId = rawTransactionList.ids[index],
+                hash = transactionsCells[index].hash(),
+                transaction = Transaction.loadTlb(transactionsCells[index])
+            )
+        }
     }
 
     public suspend fun runSmcMethod(
@@ -487,14 +533,13 @@ public class LiteClient(
         }
     }
 
-    private fun parseAccountId(string: String) = when (string) {
+    private fun parseAddrStd(string: String) = when (string) {
         "none", "root" -> null
         "config" -> TODO()
         "elector" -> TODO()
         "dnsroot" -> TODO()
         else -> {
-            val addrStd = AddrStd(string)
-            LiteServerAccountId(addrStd.workchainId, addrStd.address)
+            AddrStd(string)
         }
     }
 
@@ -506,4 +551,5 @@ public class LiteClient(
         knownBlockIds.addLast(blockIdExt)
     }
 
+    private fun AddrStd.toLiteServer() = LiteServerAccountId(workchainId, address)
 }

@@ -1,7 +1,6 @@
 package org.ton.tlb
 
 import org.ton.bitstring.Bits256
-import org.ton.bitstring.toBits256
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -20,7 +19,7 @@ public interface CellRef<out T> : TlbObject {
     public fun toCell(codec: TlbCodec<@UnsafeVariance T>? = null): Cell
 
     public fun hash(): Bits256 = hash(null)
-    public fun hash(codec: TlbCodec<@UnsafeVariance T>?): Bits256 = toCell().hash().toBits256()
+    public fun hash(codec: TlbCodec<@UnsafeVariance T>?): Bits256 = toCell().hash()
 
     public operator fun getValue(thisRef: Any?, property: Any?): T = value
 
@@ -40,7 +39,7 @@ public interface CellRef<out T> : TlbObject {
         public fun <T> valueOf(cell: Cell, codec: TlbCodec<T>): CellRef<T> = CellRefImpl(cell, codec)
 
         @JvmStatic
-        public fun  <T> valueOf(value: T): CellRef<T> = CellRefValue(value, null)
+        public fun <T> valueOf(value: T): CellRef<T> = CellRefValue(value, null)
 
         @JvmStatic
         public fun <T> valueOf(value: T, codec: TlbCodec<T>?): CellRef<T> = CellRefValue(value, codec)

@@ -1,7 +1,6 @@
 package org.ton.adnl.network
 
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import platform.posix.INVALID_SOCKET

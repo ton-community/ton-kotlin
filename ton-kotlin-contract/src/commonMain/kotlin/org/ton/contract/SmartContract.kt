@@ -12,11 +12,9 @@ import org.ton.lite.api.liteserver.functions.LiteServerGetAccountState
 import org.ton.lite.api.liteserver.functions.LiteServerGetMasterchainInfo
 import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
 import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
-import org.ton.tlb.CellRef
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
@@ -109,7 +107,6 @@ public data class SmartContractQuery(
     val stack: VmStack
 )
 
-@OptIn(ExperimentalContracts::class)
 public inline fun SmartContractQuery(builderAction: SmartContractQueryBuilder.() -> Unit): SmartContractQuery {
     contract {
         callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE)
@@ -145,7 +142,6 @@ public class SmartContractQueryBuilder {
     public fun build(): SmartContractQuery = SmartContractQuery(methodId, stack)
 }
 
-@OptIn(ExperimentalContracts::class)
 public suspend fun SmartContract<*>.runGetMethod(
     liteApi: LiteApi,
     builderAction: SmartContractQueryBuilder.() -> Unit
@@ -156,7 +152,6 @@ public suspend fun SmartContract<*>.runGetMethod(
     return runGetMethod(liteApi, SmartContractQueryBuilder().apply(builderAction).build())
 }
 
-@OptIn(ExperimentalContracts::class)
 public suspend fun SmartContract<*>.runGetMethod(
     liteApi: LiteApi,
     blockId: TonNodeBlockIdExt,

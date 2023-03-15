@@ -3,7 +3,6 @@
 package org.ton.bitstring
 
 import kotlinx.serialization.Serializable
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
 
@@ -148,7 +147,6 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     }
 }
 
-@OptIn(ExperimentalContracts::class)
 public inline fun BitString?.isNullOrEmpty(): Boolean {
     contract {
         returns(false) implies (this@isNullOrEmpty != null)

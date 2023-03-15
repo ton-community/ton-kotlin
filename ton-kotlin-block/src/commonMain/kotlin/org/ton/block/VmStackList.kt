@@ -6,7 +6,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.*
-import org.ton.tlb.*
+import org.ton.tlb.TlbCodec
+import org.ton.tlb.TlbConstructor
+import org.ton.tlb.loadTlb
+import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
 inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)

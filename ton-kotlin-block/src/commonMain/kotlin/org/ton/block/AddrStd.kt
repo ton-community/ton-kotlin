@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package org.ton.block
 
 import io.ktor.utils.io.bits.*
@@ -17,7 +15,6 @@ import org.ton.tlb.*
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.JvmStatic
 
 public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
@@ -64,7 +61,6 @@ public data class AddrStd(
         @JvmStatic
         public fun tlbCodec(): TlbConstructor<AddrStd> = AddrStdTlbConstructor
 
-        @OptIn(ExperimentalEncodingApi::class)
         @JvmStatic
         public fun toString(
             address: AddrStd,
@@ -119,7 +115,6 @@ public data class AddrStd(
             )
         }
 
-        @OptIn(ExperimentalEncodingApi::class)
         @JvmStatic
         public fun parseUserFriendly(address: String): AddrStd {
             val addressBytes = ByteArray(36)
@@ -143,9 +138,9 @@ public data class AddrStd(
                 check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
                     "unknown address tag"
                 }
-                workchainId = it.loadIntAt(1)
-                rawAddress = addressBytes.copyInto(rawAddress, startIndex = 5, endIndex = 5 + 32)
-                expectedChecksum = it.loadUShortAt(5 + 32).toInt()
+                workchainId = it.loadAt(1).toInt()
+                rawAddress = addressBytes.copyInto(rawAddress, startIndex = 2, endIndex = 2 + 32)
+                expectedChecksum = it.loadUShortAt(2 + 32).toInt()
             }
 
             val actualChecksum = checksum(tag, workchainId, rawAddress)

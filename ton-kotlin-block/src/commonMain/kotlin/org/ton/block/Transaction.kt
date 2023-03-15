@@ -6,7 +6,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.Bits256
-import org.ton.cell.*
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
+import org.ton.cell.invoke
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
@@ -33,7 +36,7 @@ public data class Transaction(
         storeTlb(Transaction, this@Transaction)
     }
 
-    public fun hash(): ByteArray = toCell().hash()
+    public fun hash(): Bits256 = toCell().hash()
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("transaction") {

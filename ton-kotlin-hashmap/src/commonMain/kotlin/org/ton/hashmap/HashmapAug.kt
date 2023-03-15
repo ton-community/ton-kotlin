@@ -72,6 +72,7 @@ private data class AhmeEdgeImpl<X, Y>(
                     }
                     return node
                 }
+
                 is HashmapAugNode.AhmnFork -> {
                     edge = if (k[commonPrefix.size]) {
                         node.loadRight()

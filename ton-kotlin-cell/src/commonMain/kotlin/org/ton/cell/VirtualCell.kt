@@ -1,5 +1,7 @@
 package org.ton.cell
 
+import org.ton.bitstring.Bits256
+
 internal class VirtualCell(
     val cell: Cell,
     val offset: Int
@@ -13,5 +15,17 @@ internal class VirtualCell(
     override fun virtualize(offset: Int): Cell {
         return if (this.offset == offset) this
         else VirtualCell(cell, offset)
+    }
+
+    override fun hash(level: Int): Bits256 {
+        return cell.hash(levelMask.apply(level).level)
+    }
+
+    override fun depth(level: Int): Int {
+        return cell.depth(levelMask.apply(level).level)
+    }
+
+    override fun beginParse(): CellSlice {
+        return CellSlice.beginParse(this)
     }
 }

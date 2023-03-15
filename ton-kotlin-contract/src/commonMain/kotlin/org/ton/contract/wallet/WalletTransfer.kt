@@ -2,7 +2,6 @@ package org.ton.contract.wallet
 
 import org.ton.block.*
 import org.ton.cell.Cell
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -32,7 +31,6 @@ public class WalletTransferBuilder {
         WalletTransfer(destination, bounceable, currencyCollection, sendMode, body, stateInit)
 }
 
-@OptIn(ExperimentalContracts::class)
 public inline fun WalletTransfer(builderAction: WalletTransferBuilder.() -> Unit): WalletTransfer {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
     return WalletTransferBuilder().apply(builderAction).build()

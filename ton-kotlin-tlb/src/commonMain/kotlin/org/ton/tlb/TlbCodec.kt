@@ -22,8 +22,9 @@ public interface TlbNegatedStorer<T> : TlbStorer<T> {
 }
 
 public interface TlbLoader<T> {
-    public fun loadTlb(cell: Cell): T = cell.parse {
-        loadTlb(this)
+    public fun loadTlb(cell: Cell): T {
+        val cellSlice = cell.beginParse()
+        return loadTlb(cellSlice)
     }
 
     public fun loadTlb(cellSlice: CellSlice): T

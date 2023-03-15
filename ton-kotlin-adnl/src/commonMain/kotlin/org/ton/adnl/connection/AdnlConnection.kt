@@ -1,6 +1,5 @@
 package org.ton.adnl.connection
 
-import io.ktor.util.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.errors.*

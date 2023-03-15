@@ -1,13 +1,11 @@
 [versions]
-coroutines = "1.6.4" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+coroutines = "1.7.0-Beta" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
 datetime = "0.4.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-datetime
-atomicfu = "0.18.5" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
+atomicfu = "0.20.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
 benchmark = "0.4.7" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-benchmark-runtime
-serialization = "1.4.1" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
-ktor = "2.2.1" # https://search.maven.org/artifact/io.ktor/ktor
-bouncycastle = "1.70" # https://search.maven.org/artifact/org.bouncycastle/bcprov-jdk15on
+serialization = "1.5.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
+ktor = "2.2.4" # https://search.maven.org/artifact/io.ktor/ktor
 curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
-mockk = "1.12.4"
 
 [libraries]
 coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
@@ -26,4 +24,3 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 curve25519 = { module = "io.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

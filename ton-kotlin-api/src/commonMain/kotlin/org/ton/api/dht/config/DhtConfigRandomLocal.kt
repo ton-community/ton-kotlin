@@ -2,12 +2,13 @@
 
 package org.ton.api.dht.config
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tl.*
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 
 @SerialName("dht.config.random.local")
 @Polymorphic

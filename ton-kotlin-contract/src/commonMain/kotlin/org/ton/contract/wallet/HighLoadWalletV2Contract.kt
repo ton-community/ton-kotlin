@@ -48,7 +48,12 @@ public class HighLoadWalletV2Contract(
 
     public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey)
 
-    public suspend fun <X: Any> sendQuery(liteApi: LiteApi, codec: TlbCodec<X>, query: Query<X>, stateInit: StateInit? = null) {
+    public suspend fun <X : Any> sendQuery(
+        liteApi: LiteApi,
+        codec: TlbCodec<X>,
+        query: Query<X>,
+        stateInit: StateInit? = null
+    ) {
         val externalMessage = Message(
             info = ExtInMsgInfo(
                 src = AddrNone,

@@ -2,8 +2,6 @@
 
 package org.ton.api.adnl
 
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import org.ton.api.overlay.OverlayNode
 import org.ton.api.overlay.OverlayNodeToSign

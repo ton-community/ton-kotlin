@@ -1,14 +1,10 @@
-@file:OptIn(ExperimentalTime::class)
-
 package org.ton.adnl.network
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlin.time.ExperimentalTime
 
 public actual class TcpClientImpl actual constructor(
 ) : TcpClient {

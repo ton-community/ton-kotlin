@@ -4,7 +4,6 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.digest.Digest
-import org.ton.crypto.hex
 import org.ton.crypto.kdf.PKCSS2ParametersGenerator
 import org.ton.crypto.mac.hmac.HMac
 import org.ton.mnemonic.Mnemonic.DEFAULT_BASIC_ITERATIONS
@@ -16,8 +15,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
-import kotlin.time.ExperimentalTime
-import kotlin.time.TimeSource
 
 private val MnemonicGeneratorCoroutineName = CoroutineName("mnemonic-generator")
 private val DEFAULT_BASIC_SALT_BYTES = DEFAULT_BASIC_SALT.encodeToByteArray()
@@ -74,9 +71,13 @@ public object Mnemonic {
                     }
                     val mnemonicBytes = mnemonic.joinToString(" ").toByteArray()
 
-                    if (password.isNotEmpty() ) {
+                    if (password.isNotEmpty()) {
                         entropy(hMac, mnemonicBytes, EMPTY_BYTES, nonPasswordEntropy)
-                        if (!(passwordValidation(generator, nonPasswordEntropy) && !basicValidation(generator, nonPasswordEntropy))) {
+                        if (!(passwordValidation(generator, nonPasswordEntropy) && !basicValidation(
+                                generator,
+                                nonPasswordEntropy
+                            ))
+                        ) {
                             continue
                         }
                     }

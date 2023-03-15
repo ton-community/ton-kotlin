@@ -132,7 +132,6 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) : CoroutineScope {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     fun payloadFlow(address: AdnlIdShort, id: BitString) = flow {
         var isLast = false
         var seqno = 0
@@ -173,7 +172,6 @@ class ProxyClient(configGlobal: LiteClientConfigGlobal) : CoroutineScope {
         return rldp.query(address, request, 120.seconds)
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun ApplicationCall.respondRldpPayload(
         address: AdnlIdShort,
         rldpRequest: HttpRequest,

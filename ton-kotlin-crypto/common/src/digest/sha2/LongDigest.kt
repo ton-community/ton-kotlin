@@ -1,7 +1,6 @@
 package org.ton.crypto.digest.sha2
 
-import io.ktor.utils.io.bits.*
-import org.ton.crypto.digest.*
+import org.ton.crypto.digest.Digest
 
 /**
  * Base class for SHA-384 and SHA-512.
@@ -211,7 +210,6 @@ private fun Long.sigma1(): Long =
  * (represent the first 64 bits of the fractional parts of the
  * cube roots of the first sixty-four prime numbers)
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 private val k = ulongArrayOf(
     0x428a2f98d728ae22uL, 0x7137449123ef65cduL, 0xb5c0fbcfec4d3b2fuL, 0xe9b5dba58189dbbcuL,
     0x3956c25bf348b538uL, 0x59f111f1b605d019uL, 0x923f82a4af194f9buL, 0xab1c5ed5da6d8118uL,

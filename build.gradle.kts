@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -19,7 +20,7 @@ val isCI = System.getenv("CI") == "true"
 
 allprojects {
     group = "org.ton"
-    version = "0.2.15"
+    version = "0.2.16"
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -48,33 +49,50 @@ allprojects {
             }
         }
 
-        nativeTargets(NativeState.ALL) {
-            common("darwin") {
-                target("macosX64")
-                target("macosArm64")
-                target("iosX64")
-                target("iosArm64")
-                target("iosSimulatorArm64")
-//                target("watchosArm64")
-//                target("watchosX86")
-//                target("watchosX64")
-//                target("watchosSimulatorArm64")
-//                target("tvosArm64")
-//                target("tvosX64")
-//                target("tvosSimulatorArm64")
-            }
-            common("mingw") {
-                target("mingwX64")
-            }
-            common("linux") {
-                target("linuxX64")
-            }
+        sourceSets.create("nativeMain").dependsOn(sourceSets["commonMain"])
+        sourceSets.create("nativeTest").dependsOn(sourceSets["commonTest"])
+
+        sourceSets.create("linuxMain").dependsOn(sourceSets["nativeMain"])
+        sourceSets.create("linuxTest").dependsOn(sourceSets["nativeTest"])
+        linuxX64 {
+            compilations["main"].defaultSourceSet.dependsOn(sourceSets["linuxMain"])
+            compilations["test"].defaultSourceSet.dependsOn(sourceSets["linuxTest"])
+        }
+
+        sourceSets.create("mingwMain").dependsOn(sourceSets["nativeMain"])
+        sourceSets.create("mingwTest").dependsOn(sourceSets["nativeTest"])
+        mingwX64 {
+            compilations["main"].defaultSourceSet.dependsOn(sourceSets["mingwMain"])
+            compilations["test"].defaultSourceSet.dependsOn(sourceSets["mingwTest"])
+        }
+
+        sourceSets.create("darwinMain").dependsOn(sourceSets["nativeMain"])
+        sourceSets.create("darwinTest").dependsOn(sourceSets["nativeTest"])
+        macosArm64 {
+            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+        }
+        macosX64 {
+            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+        }
+        ios {
+            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
         }
 
         sourceSets {
+            val commonMain by getting
             val commonTest by getting {
                 dependencies {
                     implementation(kotlin("test"))
+                }
+            }
+            all {
+                languageSettings {
+                    optIn("kotlin.ExperimentalUnsignedTypes")
+                    optIn("kotlin.contracts.ExperimentalContracts")
+                    optIn("kotlin.io.encoding.ExperimentalEncodingApi")
                 }
             }
         }
@@ -156,5 +174,15 @@ nexusPublishing {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
+    }
+}
+
+fun Project.formatSourceSets() {
+    kotlinExtension.sourceSets.all {
+        val suffixIndex = name.indexOfLast { it.isUpperCase() }
+        val targetName = name.substring(0, suffixIndex)
+        val suffix = name.substring(suffixIndex).lowercase().takeIf { it != "main" }
+        kotlin.srcDir("$targetName/${suffix ?: "src"}")
+        resources.srcDir("$targetName/${suffix?.let { it + "Resources" } ?: "resources"}")
     }
 }

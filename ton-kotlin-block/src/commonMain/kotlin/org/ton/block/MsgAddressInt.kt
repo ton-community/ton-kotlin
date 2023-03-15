@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
 
@@ -42,9 +41,8 @@ public sealed interface MsgAddressInt : MsgAddress {
         fun parseRaw(address: String): MsgAddressInt = AddrStd.parseRaw(address)
 
         @JvmStatic
-        fun parseUserFriendly(address: String): MsgAddressInt = AddrStd.parseUserFriendly(address)
+        public fun parseUserFriendly(address: String): MsgAddressInt = AddrStd.parseUserFriendly(address)
 
-        @OptIn(ExperimentalContracts::class)
         private fun checkAddressStd(value: MsgAddressInt) {
             contract {
                 returns() implies (value is AddrStd)

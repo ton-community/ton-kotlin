@@ -7,7 +7,6 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
-import kotlin.jvm.JvmStatic
 
 @SerialName("storage_used_short")
 @Serializable

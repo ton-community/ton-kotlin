@@ -1,6 +1,5 @@
 package org.ton.api.dht
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlNodes

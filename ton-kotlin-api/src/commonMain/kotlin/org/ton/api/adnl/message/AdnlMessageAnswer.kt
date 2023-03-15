@@ -3,8 +3,11 @@ package org.ton.api.adnl.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.Bits256
-import org.ton.tl.*
-import org.ton.tl.constructors.*
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
+import org.ton.tl.constructors.BytesTlConstructor
+import org.ton.tl.invoke
 
 @SerialName("adnl.message.answer")
 @Serializable

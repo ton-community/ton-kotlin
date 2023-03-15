@@ -1,8 +1,6 @@
 package org.ton.crypto
 
 import kotlinx.cinterop.*
-import platform.Security.SecRandomCopyBytes
-import platform.Security.kSecRandomDefault
 import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fread

@@ -4,38 +4,20 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
+import org.ton.bitstring.Bits256
 import kotlin.jvm.JvmStatic
-
-public inline fun Cell(hex: String, vararg refs: Cell, isExotic: Boolean = false): Cell =
-    Cell.of(BitString(hex), refs = refs.toList(), isExotic)
-
-public inline fun Cell(hex: String, refs: Iterable<Cell> = emptyList(), isExotic: Boolean = false): Cell =
-    Cell.of(BitString(hex), refs, isExotic)
-
-public inline fun Cell(
-    bits: BitString = BitString.empty(),
-    refs: Iterable<Cell> = emptyList(),
-    isExotic: Boolean = false
-): Cell =
-    Cell.of(bits, refs, isExotic)
-
-public inline fun Cell(bits: BitString, vararg refs: Cell, isExotic: Boolean = false): Cell =
-    Cell.of(bits, refs = refs, isExotic)
 
 @JsonClassDiscriminator("@type")
 public interface Cell {
     public val bits: BitString
     public val refs: List<Cell>
-    public val type: CellType
-
-    public val isExotic: Boolean get() = type.isExotic
-    public val isMerkle: Boolean get() = type.isMerkle
-    public val isPruned: Boolean get() = type.isPruned
-    public val levelMask: LevelMask
+    public val descriptor: CellDescriptor
+    public val type: CellType get() = descriptor.cellType
+    public val levelMask: LevelMask get() = descriptor.levelMask
 
     public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    public fun hash(level: Int = MAX_LEVEL): ByteArray
+    public fun hash(level: Int = MAX_LEVEL): Bits256
     public fun depth(level: Int = MAX_LEVEL): Int
 
     public fun treeWalk(): Sequence<Cell> = sequence {
@@ -54,10 +36,6 @@ public interface Cell {
         return result
     }
 
-    public fun descriptors(): ByteArray = byteArrayOf(getRefsDescriptor(), getBitsDescriptor())
-    public fun getBitsDescriptor(): Byte = Companion.getBitsDescriptor(bits)
-    public fun getRefsDescriptor(): Byte = Companion.getRefsDescriptor(refs.size, isExotic, levelMask)
-
     /**
      * Creates a virtualized cell
      */
@@ -75,47 +53,19 @@ public interface Cell {
         public const val MAX_BITS_SIZE: Int = 1023
 
         @JvmStatic
-        public fun empty() : Cell = CellImpl.of(BitString.empty(), emptyList())
+        public fun empty(): Cell = EmptyCell
 
         @JvmStatic
-        public fun of(hex: String): Cell =
-            CellImpl.of(BitString(hex), emptyList())
+        public fun of(hex: String, vararg refs: Cell): Cell = buildCell {
+            storeBits(BitString(hex))
+            storeRefs(*refs)
+        }
 
         @JvmStatic
-        public fun of(hex: String, vararg refs: Cell): Cell =
-            CellImpl.of(BitString(hex), refs.toList())
-
-        @JvmStatic
-        public fun of(hex: String, vararg refs: Cell, isExotic: Boolean): Cell =
-            CellImpl.of(BitString(hex), refs.toList(), isExotic)
-
-        @JvmStatic
-        public fun of(hex: String, refs: Iterable<Cell>): Cell =
-            CellImpl.of(BitString(hex), refs.toList())
-
-        @JvmStatic
-        public fun of(hex: String, refs: Iterable<Cell>, isExotic: Boolean): Cell =
-            CellImpl.of(BitString(hex), refs.toList(), isExotic)
-
-        @JvmStatic
-        public fun of(bits: BitString): Cell =
-            CellImpl.of(bits, emptyList())
-
-        @JvmStatic
-        public fun of(bits: BitString, vararg refs: Cell): Cell =
-            CellImpl.of(bits, refs.toList())
-
-        @JvmStatic
-        public fun of(bits: BitString, vararg refs: Cell, isExotic: Boolean): Cell =
-            CellImpl.of(bits, refs.toList(), isExotic)
-
-        @JvmStatic
-        public fun of(bits: BitString, refs: Iterable<Cell>): Cell =
-            CellImpl.of(bits, refs.toList())
-
-        @JvmStatic
-        public fun of(bits: BitString, refs: Iterable<Cell>, isExotic: Boolean): Cell =
-            CellImpl.of(bits, refs.toList(), isExotic)
+        public fun of(bits: BitString, vararg refs: Cell): Cell = buildCell {
+            storeBits(bits)
+            storeRefs(*refs)
+        }
 
         @JvmStatic
         public fun toString(cell: Cell): String = buildString {
@@ -129,7 +79,7 @@ public interface Cell {
             indent: String = ""
         ) {
             appendable.append(indent)
-            if (cell.isExotic) {
+            if (cell.type.isExotic) {
                 appendable.append(cell.type.toString())
                 appendable.append(' ')
             }
@@ -157,3 +107,9 @@ public interface Cell {
         }
     }
 }
+
+public inline fun Cell(): Cell = Cell.empty()
+
+public inline fun Cell(hex: String, vararg refs: Cell): Cell = Cell.of(hex, *refs)
+
+public inline fun Cell(bits: BitString, vararg refs: Cell): Cell = Cell.of(bits, *refs)

@@ -19,7 +19,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 class RldpTest {
-    @OptIn(ExperimentalTime::class)
     @Test
     fun test() = runBlocking {
         val output = newSingleThreadContext("RLDP output")

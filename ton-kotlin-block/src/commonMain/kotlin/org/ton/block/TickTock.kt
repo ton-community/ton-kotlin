@@ -5,12 +5,10 @@ import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
-import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
 public inline fun Pair<Boolean, Boolean>.toTickTock(): TickTock = TickTock(first, second)

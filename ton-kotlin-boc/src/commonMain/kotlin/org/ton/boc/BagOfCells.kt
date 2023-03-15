@@ -10,7 +10,7 @@ public fun BagOfCells(roots: Collection<Cell>): BagOfCells = BagOfCells.of(roots
 public fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
 
 public interface BagOfCells : Iterable<Cell> {
-    public val roots: Collection<Cell>
+    public val roots: List<Cell>
 
     public fun toByteArray(): ByteArray = buildPacket {
         writeBagOfCells(this@BagOfCells)

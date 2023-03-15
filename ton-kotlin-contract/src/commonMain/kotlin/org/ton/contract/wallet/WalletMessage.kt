@@ -27,10 +27,10 @@ public interface WalletMessage<X : Any> {
     }
 }
 
-public inline fun <X : Any> WalletMessage(mode: Int, msg: CellRef<MessageRelaxed<X>>) : WalletMessage<X> =
+public inline fun <X : Any> WalletMessage(mode: Int, msg: CellRef<MessageRelaxed<X>>): WalletMessage<X> =
     WalletMessage.of(mode, msg)
 
-public inline fun <X : Any> WalletMessage(mode: Int, msg: MessageRelaxed<X>) : WalletMessage<X> =
+public inline fun <X : Any> WalletMessage(mode: Int, msg: MessageRelaxed<X>): WalletMessage<X> =
     WalletMessage.of(mode, msg)
 
 private data class WalletMessageImpl<X : Any>(

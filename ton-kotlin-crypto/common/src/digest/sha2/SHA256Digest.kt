@@ -183,7 +183,6 @@ public class SHA256Digest : GeneralDigest() {
  * (represent the first 32 bits of the fractional parts of the
  * cube roots of the first sixty-four prime numbers)
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 private var k = uintArrayOf(
     0x428a2f98u, 0x71374491u, 0xb5c0fbcfu, 0xe9b5dba5u, 0x3956c25bu, 0x59f111f1u, 0x923f82a4u, 0xab1c5ed5u,
     0xd807aa98u, 0x12835b01u, 0x243185beu, 0x550c7dc3u, 0x72be5d74u, 0x80deb1feu, 0x9bdc06a7u, 0xc19bf174u,

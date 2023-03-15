@@ -2,7 +2,6 @@
 
 package org.ton.api.adnl.message
 
-import io.ktor.utils.io.core.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,7 +9,6 @@ import org.ton.bitstring.Bits256
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
-import org.ton.tl.constructors.*
 
 @SerialName("adnl.message.confirmChannel")
 @Serializable

@@ -1,7 +1,6 @@
 package org.ton.tonlib.block
 
 import org.ton.bitstring.Bits256
-import org.ton.bitstring.toBitString
 import org.ton.block.Block
 import org.ton.block.BlockInfo
 import org.ton.block.ShardStateUnsplit

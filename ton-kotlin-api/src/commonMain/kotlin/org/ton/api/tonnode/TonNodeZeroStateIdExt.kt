@@ -2,7 +2,6 @@
 
 package org.ton.api.tonnode
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

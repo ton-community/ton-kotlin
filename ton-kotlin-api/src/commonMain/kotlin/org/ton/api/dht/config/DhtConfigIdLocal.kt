@@ -2,7 +2,6 @@
 
 package org.ton.api.dht.config
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.tl.*

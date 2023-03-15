@@ -7,7 +7,7 @@ public abstract class PBEParametersGenerator(
 ) {
     public constructor() : this(ByteArray(0), ByteArray(0), 0)
 
-    public var password: ByteArray =password
+    public var password: ByteArray = password
         protected set
     public var salt: ByteArray = salt
         protected set

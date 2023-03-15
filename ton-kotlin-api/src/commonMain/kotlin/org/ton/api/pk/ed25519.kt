@@ -2,7 +2,6 @@
 
 package org.ton.api.pk
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,7 +12,10 @@ import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorEd25519
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
-import org.ton.tl.*
+import org.ton.tl.TlCodec
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 

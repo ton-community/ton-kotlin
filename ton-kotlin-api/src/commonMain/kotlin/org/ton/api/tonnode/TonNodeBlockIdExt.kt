@@ -3,14 +3,16 @@
 
 package org.ton.api.tonnode
 
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.Bits256
-import org.ton.crypto.*
-import org.ton.tl.*
-import org.ton.tl.constructors.*
+import org.ton.crypto.HexByteArraySerializer
+import org.ton.crypto.hex
+import org.ton.tl.TlCodec
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import kotlin.jvm.JvmStatic
 
 @Serializable
@@ -35,20 +37,20 @@ public data class TonNodeBlockIdExt(
         workchain: Int,
         shard: Long,
         seqno: Int,
-        root_hash: ByteArray,
-        file_hash: ByteArray
-    ) : this(workchain, shard, seqno, Bits256(root_hash), Bits256(file_hash))
+        rootHash: ByteArray,
+        fileHash: ByteArray
+    ) : this(workchain, shard, seqno, Bits256(rootHash), Bits256(fileHash))
 
     public constructor(
         tonNodeBlockId: TonNodeBlockId,
-        root_hash: Bits256,
-        file_hash: Bits256,
+        rootHash: Bits256,
+        fileHash: Bits256,
     ) : this(
         tonNodeBlockId.workchain,
         tonNodeBlockId.shard,
-        tonNodeBlockId.workchain,
-        root_hash,
-        file_hash
+        tonNodeBlockId.seqno,
+        rootHash,
+        fileHash
     )
 
     override fun toString(): String = buildString {
@@ -68,11 +70,12 @@ public data class TonNodeBlockIdExt(
     public companion object : TlCodec<TonNodeBlockIdExt> by TonNodeBlockIdExtTlConstructor {
         @JvmStatic
         public fun parse(string: String): TonNodeBlockIdExt {
-            require(string.getOrNull(0) == '(')
+            require(string.getOrNull(0) == '(') { "Can't parse string: '$string'" }
             val closeParenIndex = string.indexOfFirst { it == ')' }
-            require(closeParenIndex != -1)
-            val tonNodeBlockId = TonNodeBlockId.parse(string.substring(1, closeParenIndex))
-            val (rawRootHash, rawFileHash) = string.substring(closeParenIndex, string.lastIndex).split(':')
+            require(closeParenIndex != -1) { "Can't parse string: '$string'" }
+            val tonNodeBlockId = TonNodeBlockId.parse(string.substring(0, closeParenIndex + 1))
+            val hashes = string.substring(closeParenIndex + 2, string.lastIndex + 1)
+            val (rawRootHash, rawFileHash) = hashes.split(':')
             return TonNodeBlockIdExt(tonNodeBlockId, Bits256(hex(rawRootHash)), Bits256(hex(rawFileHash)))
         }
 

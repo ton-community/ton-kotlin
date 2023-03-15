@@ -52,7 +52,7 @@ class CellTest {
     }
 
     @Test
-    fun `cell traversing with treeWalk()`() {
+    fun `cell traversing with treeWalk`() {
         val cell = Cell(
             "0",
             Cell(
@@ -78,38 +78,38 @@ class CellTest {
     }
 
     @Test
-    fun `computation of cell descriptors d1, d2`() {
+    fun `computation of cell descriptors d1 d2`() {
         val cell0 = Cell("_")
         assertContentEquals(
-            sequenceOf(
+            listOf(
                 (0 + 8 * 0 + 16 * 0 + 32 * 0).toByte(), // references descriptor
                 (0).toByte(), // bits descriptor
-            ), cell0.descriptors().asSequence()
+            ), cell0.descriptor.let { listOf(it.d1, it.d2) }
         )
 
         val cell1 = Cell("1")
         assertContentEquals(
-            sequenceOf(
+            listOf(
                 (0 + 8 * 0 + 16 * 0 + 32 * 0).toByte(), // references descriptor
                 (1 + 0).toByte(), // bits descriptor
-            ), cell1.descriptors().asSequence()
+            ), cell1.descriptor.let { listOf(it.d1, it.d2) }
         )
 
 
         val cell2 = Cell("23", cell1)
         assertContentEquals(
-            sequenceOf(
+            listOf(
                 (1 + 8 * 0 + 16 * 0 + 32 * 0).toByte(), // references descriptor
                 (1 + 1).toByte(), // bits descriptor
-            ), cell2.descriptors().asSequence()
+            ), cell2.descriptor.let { listOf(it.d1, it.d2) }
         )
 
         val cell3 = Cell("4567", cell0, cell1, cell2)
         assertContentEquals(
-            sequenceOf(
+            listOf(
                 (3 + 8 * 0 + 16 * 0 + 32 * 0).toByte(), // references descriptor
                 (2 + 2).toByte(), // bits descriptor
-            ), cell3.descriptors().asSequence()
+            ), cell3.descriptor.let { listOf(it.d1, it.d2) }
         )
     }
 }

@@ -15,6 +15,7 @@ public class PKCSS2ParametersGenerator(
         salt,
         iterationCount
     )
+
     public constructor(hMac: HMac) : this(hMac, ByteArray(0), ByteArray(0), 0)
     public constructor(digest: Digest) : this(digest, ByteArray(0), ByteArray(0), 0)
 

@@ -1,7 +1,6 @@
 package org.ton.bigint
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import com.ionspin.kotlin.bignum.integer.BigIntegerArithmetic
 import com.ionspin.kotlin.bignum.integer.util.fromTwosComplementByteArray
 
 @Suppress("ConvertSecondaryConstructorToPrimary")
@@ -51,50 +50,65 @@ public actual fun Int.toBigInt(): BigInt =
 public actual fun Long.toBigInt(): BigInt =
     BigInt(BigInteger.fromLong(this))
 
-public actual val BigInt.bitLength: Int get() {
-    // TODO: https://github.com/ionspin/kotlin-multiplatform-bignum/pull/254
-    return if (value.isNegative) {
-        if (value == BigInteger.ONE.negate()) 0
-        else (value.abs() - 1).toString(2).length
-    } else {
-        if (value.isZero()) 0
-        else value.toString(2).length
+public actual val BigInt.bitLength: Int
+    get() {
+        // TODO: https://github.com/ionspin/kotlin-multiplatform-bignum/pull/254
+        return if (value.isNegative) {
+            if (value == BigInteger.ONE.negate()) 0
+            else (value.abs() - 1).toString(2).length
+        } else {
+            if (value.isZero()) 0
+            else value.toString(2).length
+        }
     }
-}
 
-public actual val BigInt.sign: Int get() =
-    value.signum()
-public actual val BigInt.isZero: Boolean get() =
-    value.isZero()
+public actual val BigInt.sign: Int
+    get() =
+        value.signum()
+public actual val BigInt.isZero: Boolean
+    get() =
+        value.isZero()
 
 public actual operator fun BigInt.plus(other: BigInt): BigInt =
     BigInt(value + other.value)
+
 public actual operator fun BigInt.minus(other: BigInt): BigInt =
     BigInt(value - other.value)
+
 public actual operator fun BigInt.times(other: BigInt): BigInt =
     BigInt(value * other.value)
+
 public actual operator fun BigInt.div(other: BigInt): BigInt =
     BigInt(value / other.value)
+
 public actual operator fun BigInt.unaryMinus(): BigInt =
     BigInt(-value)
+
 public actual operator fun BigInt.rem(other: BigInt): BigInt =
     BigInt(value % other.value)
+
 public actual infix fun BigInt.shr(shr: Int): BigInt =
     BigInt(value shr shr)
+
 public actual infix fun BigInt.shl(shl: Int): BigInt =
     BigInt(value shl shl)
+
 public actual infix fun BigInt.and(and: BigInt): BigInt =
     BigInt(value and and.value)
+
 public actual infix fun BigInt.or(mod: BigInt): BigInt =
     BigInt(value or mod.value)
+
 public actual infix fun BigInt.xor(mod: BigInt): BigInt =
     BigInt(value xor mod.value)
+
 public actual fun BigInt.not(): BigInt =
     BigInt(value.not())
 
-public actual infix fun BigInt.divRem(other: BigInt): Pair<BigInt,BigInt> {
+public actual infix fun BigInt.divRem(other: BigInt): Pair<BigInt, BigInt> {
     val result = other.value.divideAndRemainder(other.value)
     return BigInt(result.first) to BigInt(result.second)
 }
+
 public actual infix fun BigInt.pow(pow: Int): BigInt =
     BigInt(value.pow(pow))
