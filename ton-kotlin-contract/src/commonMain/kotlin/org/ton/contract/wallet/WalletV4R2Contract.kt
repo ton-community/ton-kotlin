@@ -69,8 +69,8 @@ public class WalletV4R2Contract private constructor(
         validUntil: Instant,
         vararg transfers: WalletTransfer
     ): Unit = coroutineScope {
-        val seqno = getSeqno()
-        val walletId = getSubWalletId()
+        val seqno = if (state !is AccountActive) 0 else getSeqno()
+        val walletId = if (state !is AccountActive) DEFAULT_WALLET_ID else getSubWalletId()
         val message = createTransferMessage(
             address = address,
             stateInit = if (state !is AccountActive) createStateInit(privateKey.publicKey(), walletId) else null,
