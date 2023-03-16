@@ -11,11 +11,13 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmInline
+import kotlin.jvm.JvmName
 
 @JvmInline
 @Serializable
 @SerialName("account_active")
 public value class AccountActive(
+    @get:JvmName("value")
     public val value: StateInit
 ) : AccountState {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {

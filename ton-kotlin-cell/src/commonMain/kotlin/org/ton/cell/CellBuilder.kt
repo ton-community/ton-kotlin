@@ -4,7 +4,7 @@ import org.ton.bigint.*
 import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
-import org.ton.bitstring.toBits256
+import org.ton.bitstring.toBitString
 import org.ton.cell.exception.CellOverflowException
 import org.ton.crypto.digest.sha2.SHA256Digest
 import kotlin.contracts.InvocationKind
@@ -258,7 +258,7 @@ private class CellBuilderImpl(
                 check(hashes.size == 1)
                 val (hash, depth) = hashes[0]
                 PrunedBranchCell(
-                    hash.toBits256(), depth, descriptor, bits
+                    hash.toBitString(), depth, descriptor, bits
                 )
             }
 

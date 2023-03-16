@@ -5,7 +5,7 @@ package org.ton.api.rldp
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlObject
 
@@ -13,8 +13,8 @@ import org.ton.tl.TlObject
 @Serializable
 @JsonClassDiscriminator("@type")
 public sealed interface RldpMessage : TlObject<RldpMessage> {
-    public val id: Bits256
-    public val data: ByteArray
+    public val id: ByteString
+    public val data: ByteString
 
     public companion object : TlCombinator<RldpMessage>(
         RldpMessage::class,

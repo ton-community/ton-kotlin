@@ -1,7 +1,6 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.bitstring.Bits256
 import org.ton.tl.constructors.Bool
 import org.ton.tl.constructors.BoolTlCombinator
 
@@ -22,6 +21,14 @@ public class TlWriter(
 
     public fun writeRaw(value: ByteArray) {
         output.writeFully(value)
+    }
+
+    public fun writeRaw(value: ByteString) {
+        output.writeFully(value.data)
+    }
+
+    public fun writeBytes(value: ByteString, offset: Int = 0, length: Int = value.size) {
+        writeBytes(value.data, offset, length)
     }
 
     public fun writeBytes(value: ByteArray, offset: Int = 0, length: Int = value.size - offset) {
@@ -56,14 +63,6 @@ public class TlWriter(
 
     public fun writeString(value: String) {
         writeBytes(value.encodeToByteArray())
-    }
-
-    public fun writeBits128(value: Bits128) {
-        output.writeFully(value.toByteArray())
-    }
-
-    public fun writeBits256(value: Bits256) {
-        output.writeFully(value.toByteArray())
     }
 
     public inline fun <T> writeVector(value: Collection<T>, block: TlWriter.(T) -> Unit) {

@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -12,13 +12,18 @@ import kotlin.jvm.JvmStatic
 @SerialName("!merkle_update")
 @Serializable
 public data class MerkleUpdate<X>(
-    @SerialName("old_hash") val oldHash: Bits256,
-    @SerialName("new_hash") val newHash: Bits256,
+    @SerialName("old_hash") val oldHash: BitString,
+    @SerialName("new_hash") val newHash: BitString,
     @SerialName("old_depth") val oldDepth: UShort,
     @SerialName("new_depth") val newDepth: UShort,
     val old: CellRef<X>,
     val new: CellRef<X>
 ) : TlbObject {
+    init {
+        require(oldHash.size == 256)
+        require(newHash.size == 256)
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer.type("!merkle_update") {
             field("old_hash", oldHash)
@@ -50,8 +55,8 @@ private class MerkleUpdateTlbConstructor<X>(
         value: MerkleUpdate<X>
     ) = cellBuilder {
         isExotic = true
-        storeBits(value.oldHash.value)
-        storeBits(value.newHash.value)
+        storeBits(value.oldHash)
+        storeBits(value.newHash)
         storeUInt16(value.oldDepth)
         storeUInt16(value.newDepth)
         storeTlb(xCellRef, value.old)
@@ -61,8 +66,8 @@ private class MerkleUpdateTlbConstructor<X>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): MerkleUpdate<X> = cellSlice {
-        val oldHash = Bits256(loadBits(256))
-        val newHash = Bits256(loadBits(256))
+        val oldHash = loadBits(256)
+        val newHash = loadBits(256)
         val oldDepth = loadUInt16()
         val newDepth = loadUInt16()
         val old = loadTlb(xCellRef)

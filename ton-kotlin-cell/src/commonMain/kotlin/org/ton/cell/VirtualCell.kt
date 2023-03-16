@@ -1,6 +1,6 @@
 package org.ton.cell
 
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 
 internal class VirtualCell(
     val cell: Cell,
@@ -17,7 +17,7 @@ internal class VirtualCell(
         else VirtualCell(cell, offset)
     }
 
-    override fun hash(level: Int): Bits256 {
+    override fun hash(level: Int): BitString {
         return cell.hash(levelMask.apply(level).level)
     }
 

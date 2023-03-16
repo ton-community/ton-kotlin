@@ -8,10 +8,12 @@ import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("extra_currencies")
 public data class ExtraCurrencyCollection(
+    @get:JvmName("dict")
     val dict: HashMapE<VarUInteger> = HashMapE.of()
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {

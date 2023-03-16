@@ -5,7 +5,7 @@ package org.ton.api.adnl.message
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -13,17 +13,16 @@ import org.ton.tl.TlWriter
 @SerialName("adnl.message.confirmChannel")
 @Serializable
 public data class AdnlMessageConfirmChannel(
-    val key: Bits256,
+    val key: ByteString,
     @SerialName("peer_key")
-    val peerKey: Bits256,
+    val peerKey: ByteString,
     val date: Int
 ) : AdnlMessage {
     public constructor(
-        key: Bits256,
-        peerKey: Bits256,
+        key: ByteString,
+        peerKey: ByteString,
         date: Instant
     ) : this(key, peerKey, date.epochSeconds.toInt())
-
 
     public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
 
@@ -49,14 +48,14 @@ public data class AdnlMessageConfirmChannel(
         public const val SIZE_BYTES: Int = (256 / Byte.SIZE_BYTES) * 2 + Int.SIZE_BYTES
 
         override fun encode(output: TlWriter, value: AdnlMessageConfirmChannel) {
-            output.writeBits256(value.key)
-            output.writeBits256(value.peerKey)
+            output.writeRaw(value.key)
+            output.writeRaw(value.peerKey)
             output.writeInt(value.date)
         }
 
         override fun decode(input: TlReader): AdnlMessageConfirmChannel {
-            val key = input.readBits256()
-            val peerKey = input.readBits256()
+            val key = input.readByteString(32)
+            val peerKey = input.readByteString(32)
             val date = input.readInt()
             return AdnlMessageConfirmChannel(key, peerKey, date)
         }

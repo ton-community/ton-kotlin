@@ -3,13 +3,12 @@ package org.ton.api.http.functions
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.http.HttpPayloadPart
-import org.ton.bitstring.Bits256
 import org.ton.tl.*
 
 @SerialName("http.getNextPayloadPart")
 @Serializable
 public data class HttpGetNextPayloadPart(
-    val id: Bits256,
+    val id: ByteString,
     val seqno: Int,
     @SerialName("max_chunk_size")
     val maxChunkSize: Int
@@ -42,14 +41,14 @@ private object HttpGetNextPayloadPartTlConstructor : TlConstructor<HttpGetNextPa
     schema = "http.getNextPayloadPart id:int256 seqno:int max_chunk_size:int = http.PayloadPart"
 ) {
     override fun decode(input: TlReader): HttpGetNextPayloadPart {
-        val id = input.readBits256()
+        val id = input.readByteString(32)
         val seqno = input.readInt()
         val max_chunk_size = input.readInt()
         return HttpGetNextPayloadPart(id, seqno, max_chunk_size)
     }
 
     override fun encode(output: TlWriter, value: HttpGetNextPayloadPart) {
-        output.writeBits256(value.id)
+        output.writeRaw(value.id)
         output.writeInt(value.seqno)
         output.writeInt(value.maxChunkSize)
     }

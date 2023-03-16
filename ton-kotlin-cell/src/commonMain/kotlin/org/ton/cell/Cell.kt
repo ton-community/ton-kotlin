@@ -4,7 +4,6 @@ package org.ton.cell
 
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 import kotlin.jvm.JvmStatic
 
 @JsonClassDiscriminator("@type")
@@ -17,7 +16,7 @@ public interface Cell {
 
     public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
 
-    public fun hash(level: Int = MAX_LEVEL): Bits256
+    public fun hash(level: Int = MAX_LEVEL): BitString
     public fun depth(level: Int = MAX_LEVEL): Int
 
     public fun treeWalk(): Sequence<Cell> = sequence {

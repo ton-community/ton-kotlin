@@ -5,7 +5,7 @@ import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -15,6 +15,7 @@ import org.ton.tlb.*
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.io.encoding.Base64
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
@@ -22,23 +23,32 @@ public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 @Serializable
 @SerialName("addr_std")
 public data class AddrStd(
+    @get:JvmName("anycast")
     val anycast: Maybe<Anycast>,
+
+    @get:JvmName("workchainId")
     override val workchainId: Int,
-    val address: Bits256
+
+    @get:JvmName("address")
+    val address: BitString
 ) : MsgAddressInt {
     public constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
     public constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
     public constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
         anycast.toMaybe(),
         workchainId,
-        Bits256(address)
+        address.toBitString()
     )
 
     public constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
         anycast.toMaybe(),
         workchainId,
-        Bits256(address)
+        address.toBitString()
     )
+
+    init {
+        require(address.size == 256) { "expected address.size == 256, actual: ${address.size}" }
+    }
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("addr_std") {
@@ -88,7 +98,7 @@ public data class AddrStd(
                     Base64.encode(data)
                 }
             } else {
-                "${address.workchainId}:${address.address}"
+                "${address.workchainId}:${address.address.toHex()}"
             }
         }
 
@@ -183,7 +193,7 @@ private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
     ): AddrStd = cellSlice {
         val anycast = loadTlb(MaybeAnycast)
         val workchainId = loadInt(8).toInt()
-        val address = loadBits256()
+        val address = loadBits(256)
         AddrStd(anycast, workchainId, address)
     }
 }

@@ -1,7 +1,6 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 
 public class DataCell(
     override val descriptor: CellDescriptor,
@@ -9,9 +8,9 @@ public class DataCell(
     override val refs: List<Cell>,
     private val hashes: List<Pair<ByteArray, Int>>
 ) : Cell {
-    override fun hash(level: Int): Bits256 {
+    override fun hash(level: Int): BitString {
         val hashIndex = levelMask.apply(level).hashIndex
-        return Bits256(hashes[hashIndex].first)
+        return BitString(hashes[hashIndex].first)
     }
 
     override fun depth(level: Int): Int {

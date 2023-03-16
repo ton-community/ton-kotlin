@@ -72,6 +72,7 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     override fun toString(): String
 
     public fun toBinary(): String = joinToString("") { if (it) "1" else "0" }
+    public fun toHex(): String
 
     public companion object {
         @JvmStatic

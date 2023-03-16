@@ -16,7 +16,7 @@ import org.ton.tl.*
 public data class ConfigGlobal(
     val adnl: AdnlConfigGlobal = AdnlConfigGlobal(),
     val dht: DhtConfigGlobal = DhtConfigGlobal(),
-    val validator: ValidatorConfigGlobal = ValidatorConfigGlobal()
+    val validator: ValidatorConfigGlobal
 ) : TlObject<ConfigGlobal> {
     override fun tlCodec(): TlCodec<ConfigGlobal> = Companion
 

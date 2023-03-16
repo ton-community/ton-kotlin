@@ -7,11 +7,15 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @SerialName("currencies")
 @Serializable
 public data class CurrencyCollection(
+    @get:JvmName("coins")
     val coins: Coins, // coins: Coins
+
+    @get:JvmName("other")
     val other: ExtraCurrencyCollection // other: ExtraCurrencyCollection
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("currencies") {

@@ -1,10 +1,14 @@
 package org.ton.lite.client
 
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.lite.client.internal.BlockHeaderResult
+import org.ton.lite.client.internal.FullAccountState
+import org.ton.lite.client.internal.TransactionId
+import org.ton.tlb.CellRef
 
 internal object CheckProofUtils {
     fun checkBlockHeaderProof(
@@ -19,7 +23,7 @@ internal object CheckProofUtils {
         val block = Block.loadTlb(root)
         val time = block.info.value.genUtime.toInt()
         val lt = block.info.value.endLt.toLong()
-        var stateHash: Bits256? = null
+        var stateHash: BitString? = null
 
         if (storeStateHash) {
             val stateUpdateCell = block.stateUpdate.toCell()
@@ -34,8 +38,8 @@ internal object CheckProofUtils {
         shardBlock: TonNodeBlockIdExt,
         address: AddrStd,
         root: Cell
-    ): AccountState? {
-        val accountInfo = Account.loadTlb(root) as? AccountInfo ?: return null
+    ): FullAccountState {
+        val account = CellRef(root, Account)
 
         val qRoots = BagOfCells(proof).roots.toList()
         check(qRoots.size == 2) {
@@ -58,6 +62,6 @@ internal object CheckProofUtils {
             "Account state hash mismatch, expected: ${shardAccount.account.hash()}, actual: ${root.hash()}"
         }
 
-        return AccountState(accountInfo, shardAccount.lastTransHash, shardAccount.lastTransLt.toLong())
+        return FullAccountState(shardBlock,address, TransactionId( shardAccount.lastTransHash, shardAccount.lastTransLt.toLong()), account)
     }
 }

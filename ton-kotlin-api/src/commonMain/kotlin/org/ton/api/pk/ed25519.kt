@@ -7,15 +7,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.bitstring.Bits256
 import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorEd25519
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 
@@ -26,7 +23,7 @@ public inline fun PrivateKeyEd25519(random: Random = SecureRandom): PrivateKeyEd
     PrivateKeyEd25519.generate(random)
 
 public interface PrivateKeyEd25519 : PrivateKey {
-    public val key: Bits256
+    public val key: ByteString
 
     override fun publicKey(): PublicKeyEd25519
 
@@ -55,9 +52,13 @@ public interface PrivateKeyEd25519 : PrivateKey {
 @SerialName("pk.ed25519")
 @Serializable
 private class PrivateKeyEd25519Impl(
-    override val key: Bits256
+    override val key: ByteString
 ) : PrivateKeyEd25519, Decryptor by DecryptorEd25519(key.toByteArray()) {
-    constructor(key: ByteArray) : this(Bits256(key))
+    constructor(key: ByteArray) : this(key.toByteString())
+
+    init {
+        require(key.size == 32) { "key must be 32 byte long" }
+    }
 
     private val _publicKey: PublicKeyEd25519 by lazy(LazyThreadSafetyMode.PUBLICATION) {
         PublicKeyEd25519(Ed25519.publicKey(key.toByteArray()))
@@ -75,11 +76,11 @@ private object PrivateKeyEd25519TlConstructor : TlConstructor<PrivateKeyEd25519>
     schema = "pk.ed25519 key:int256 = PrivateKey"
 ) {
     override fun encode(writer: TlWriter, value: PrivateKeyEd25519) {
-        writer.writeBits256(value.key)
+        writer.writeRaw(value.key)
     }
 
     override fun decode(reader: TlReader): PrivateKeyEd25519 {
-        val key = reader.readBits256()
+        val key = reader.readByteString(32)
         return PrivateKeyEd25519Impl(key)
     }
 }

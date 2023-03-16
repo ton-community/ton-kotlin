@@ -2,7 +2,6 @@ package org.ton.dht
 
 import org.ton.api.dht.DhtNode
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 
 class DhtBucket(
     k: Int

@@ -17,7 +17,6 @@ internal object EmptyBitString : BitString {
 
     override fun plus(bytes: ByteArray, bits: Int): BitString = BitString(bytes, bits)
 
-
     override fun slice(indices: IntRange): BitString {
         if (indices.first == 0 && indices.last == 0) return this
         throw IndexOutOfBoundsException(indices.toString())
@@ -39,7 +38,9 @@ internal object EmptyBitString : BitString {
 
     override fun or(other: BitString): BitString = other
 
-    override fun toString(): String = ""
+    override fun toString(): String = "x{}"
+
+    override fun toHex(): String = ""
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -19,7 +19,7 @@ suspend fun main(args: Array<String>) {
     val privateKey =
         PrivateKeyEd25519(Mnemonic.toSeed(mnemonics))
 
-    val wallet = WalletV4R2Contract(privateKey.publicKey())
+    val wallet = WalletV4R2Contract(0,privateKey.publicKey())
     println(wallet.address)
     wallet.transfer(liteApi, privateKey, WalletTransfer {
         destination = AddrStd(0, BitString("0ab558f4db84fd31f61a273535c670c091ffc619b1cdbbe5769a0bf28d3b8fea"))

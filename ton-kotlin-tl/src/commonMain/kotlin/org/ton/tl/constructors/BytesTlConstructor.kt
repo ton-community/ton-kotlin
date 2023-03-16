@@ -2,6 +2,7 @@
 
 package org.ton.tl.constructors
 
+import org.ton.tl.ByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -9,6 +10,8 @@ import org.ton.tl.TlWriter
 public object BytesTlConstructor : TlConstructor<ByteArray>(
     schema = "bytes data:string = Bytes"
 ) {
+    public fun sizeOf(value: ByteString): Int = sizeOf(value)
+
     public fun sizeOf(value: ByteArray): Int {
         var size = value.size
         size += if (size < 254) {

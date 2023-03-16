@@ -11,6 +11,6 @@ import org.ton.api.validator.config.ValidatorConfigGlobal
 public data class LiteClientConfigGlobal(
     val dht: DhtConfigGlobal = DhtConfigGlobal(),
     @SerialName("liteservers")
-    val liteServers: Collection<LiteServerDesc> = emptyList(),
+    val liteServers: Collection<LiteServerDesc>,
     val validator: ValidatorConfigGlobal = ValidatorConfigGlobal()
 )

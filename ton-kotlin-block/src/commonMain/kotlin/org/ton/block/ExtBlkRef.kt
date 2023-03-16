@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -16,9 +16,14 @@ import org.ton.tlb.TlbPrettyPrinter
 public data class ExtBlkRef(
     @SerialName("end_lt") val endLt: ULong, // end_lt : uint64
     @SerialName("seq_no") val seqNo: UInt, // seq_no : uint32
-    @SerialName("root_hash") val rootHash: Bits256, // root_hash : bits256
-    @SerialName("file_hash") val fileHash: Bits256 // file_hash : bits256
+    @SerialName("root_hash") val rootHash: BitString, // root_hash : bits256
+    @SerialName("file_hash") val fileHash: BitString // file_hash : bits256
 ) : TlbObject {
+    init {
+        require(rootHash.size == 256)
+        require(fileHash.size == 256)
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("ext_blk_ref") {
         field("end_lt", endLt)
         field("seq_no", seqNo)
@@ -42,8 +47,8 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
     ) = cellBuilder {
         storeUInt64(value.endLt)
         storeUInt32(value.seqNo)
-        storeBits(value.rootHash.value)
-        storeBits(value.fileHash.value)
+        storeBits(value.rootHash)
+        storeBits(value.fileHash)
     }
 
     override fun loadTlb(
@@ -51,8 +56,8 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
     ): ExtBlkRef = cellSlice {
         val endLt = loadUInt64()
         val seqNo = loadUInt32()
-        val rootHash = Bits256(loadBits(256))
-        val fileHash = Bits256(loadBits(256))
+        val rootHash = loadBits(256)
+        val fileHash = loadBits(256)
         ExtBlkRef(endLt, seqNo, rootHash, fileHash)
     }
 }

@@ -20,6 +20,8 @@ public inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
 public sealed interface Maybe<X> : TlbObject {
     public val value: X?
 
+    public fun get(): X? = value
+
     public companion object {
         @JvmStatic
         public fun <X> of(value: X?): Maybe<X> = if (value != null) Just(value) else Nothing()

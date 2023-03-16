@@ -1,7 +1,6 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.bitstring.Bits256
 import org.ton.tl.constructors.BoolTlCombinator
 
 public class TlReader(
@@ -11,6 +10,15 @@ public class TlReader(
     public fun readInt(): Int = input.readIntLittleEndian()
     public fun readLong(): Long = input.readLongLittleEndian()
     public fun readRaw(size: Int): ByteArray = input.readBytes(size)
+
+    public fun readByteString(size: Int): ByteString {
+        return ByteString(input.readBytes(size))
+    }
+
+    public fun readByteString(): ByteString {
+        return ByteString(readBytes())
+    }
+
     public fun readBytes(): ByteArray {
         var resultLength = input.readUByte().toInt()
         var resultAlignedLength: Int
@@ -43,10 +51,6 @@ public class TlReader(
     }
 
     public fun readString(): String = readBytes().decodeToString()
-
-    public fun readBits128(): Bits128 = Bits128(input.readBytes(16))
-
-    public fun readBits256(): Bits256 = Bits256(input.readBytes(32))
 
     public fun <T> readVector(block: TlReader.() -> T): List<T> {
         val size = readInt()

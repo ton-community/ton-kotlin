@@ -5,8 +5,8 @@ package org.ton.api.tonnode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.Bits256
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.tl.ByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -15,9 +15,9 @@ import org.ton.tl.TlWriter
 public data class TonNodeZeroStateIdExt(
     val workchain: Int,
     @SerialName("root_hash")
-    val rootHash: Bits256,
+    val rootHash: ByteString,
     @SerialName("file_hash")
-    val fileHash: Bits256
+    val fileHash: ByteString
 ) {
     public constructor(tonNodeBlockIdExt: TonNodeBlockIdExt) : this(
         tonNodeBlockIdExt.workchain,
@@ -35,15 +35,15 @@ public data class TonNodeZeroStateIdExt(
     ) {
         override fun decode(reader: TlReader): TonNodeZeroStateIdExt {
             val workchain = reader.readInt()
-            val rootHash = reader.readBits256()
-            val fileHash = reader.readBits256()
+            val rootHash = reader.readByteString(32)
+            val fileHash = reader.readByteString(32)
             return TonNodeZeroStateIdExt(workchain, rootHash, fileHash)
         }
 
         override fun encode(writer: TlWriter, value: TonNodeZeroStateIdExt) {
             writer.writeInt(value.workchain)
-            writer.writeBits256(value.rootHash)
-            writer.writeBits256(value.fileHash)
+            writer.writeRaw(value.rootHash)
+            writer.writeRaw(value.fileHash)
         }
     }
 }

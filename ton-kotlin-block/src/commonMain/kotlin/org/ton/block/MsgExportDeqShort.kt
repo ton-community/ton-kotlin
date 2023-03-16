@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -13,7 +13,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @Serializable
 @SerialName("msg_export_deq_short")
 public data class MsgExportDeqShort(
-    val msgEnvHash: Bits256,
+    val msgEnvHash: BitString,
     val nextWorkchain: Int,
     val nextAddrPfx: ULong,
     val importBlockLt: ULong
@@ -50,7 +50,7 @@ private object MsgExportDeqShortTlbConstructor : TlbConstructor<MsgExportDeqShor
     override fun loadTlb(
         cellSlice: CellSlice
     ): MsgExportDeqShort = cellSlice {
-        val msgEnvHash = loadBits256()
+        val msgEnvHash = loadBits(256)
         val nextWorkchain = loadTinyInt(32).toInt()
         val nextAddrPfx = loadUInt64()
         val importBlockLt = loadUInt64()

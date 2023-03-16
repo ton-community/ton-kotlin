@@ -1,6 +1,6 @@
 package org.ton.adnl.node
 
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
 import org.ton.api.adnl.AdnlProxy as AdnlProxyType
 
 public class AdnlProxy(
@@ -10,7 +10,7 @@ public class AdnlProxy(
         TODO()
     }
 
-    public val id: Bits256 get() = type.id
+    public val id: ByteString get() = type.id
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

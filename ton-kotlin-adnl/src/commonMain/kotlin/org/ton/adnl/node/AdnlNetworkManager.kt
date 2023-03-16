@@ -8,8 +8,8 @@ import org.ton.adnl.network.UdpServer
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
 import org.ton.api.adnl.AdnlIdShort
-import org.ton.bitstring.Bits256
 import org.ton.logger.Logger
+import org.ton.tl.ByteString
 import kotlin.coroutines.CoroutineContext
 
 public class AdnlNetworkManager(
@@ -26,7 +26,7 @@ public class AdnlNetworkManager(
     private var sentDatagrams = 0
     private val inputDesc = ArrayList<InputDesc>()
     private val outputDesc = HashMap<Int, ArrayList<OutputDesc>>()
-    private val proxyAddrs = HashMap<Bits256, UdpSocketDesc>()
+    private val proxyAddrs = HashMap<ByteString, UdpSocketDesc>()
 
     public fun addSelfAddress(
         address: AdnlAddressUdp,

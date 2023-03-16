@@ -10,15 +10,25 @@ import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @Serializable
 public data class StateInit(
     @SerialName("split_depth")
+    @get:JvmName("splitDepth")
     val splitDepth: Maybe<UInt>,
+
+    @get:JvmName("special")
     val special: Maybe<TickTock>,
+
+    @get:JvmName("code")
     val code: Maybe<CellRef<Cell>>,
+
+    @get:JvmName("data")
     val data: Maybe<CellRef<Cell>>,
+
+    @get:JvmName("library")
     val library: HashMapE<SimpleLib>
 ) : TlbObject {
     public constructor(

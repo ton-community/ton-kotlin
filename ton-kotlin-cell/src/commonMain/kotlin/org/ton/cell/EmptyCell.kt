@@ -1,11 +1,10 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 import org.ton.crypto.hex
 
 internal object EmptyCell : Cell {
-    private val EMPTY_CELL_HASH = Bits256(
+    private val EMPTY_CELL_HASH = BitString(
         hex("96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7")
     )
 
@@ -13,7 +12,7 @@ internal object EmptyCell : Cell {
     override val refs: List<Cell> = emptyList()
     override val descriptor: CellDescriptor = CellDescriptor(0, 0)
 
-    override fun hash(level: Int): Bits256 = EMPTY_CELL_HASH
+    override fun hash(level: Int): BitString = EMPTY_CELL_HASH
 
     override fun depth(level: Int): Int = 0
 

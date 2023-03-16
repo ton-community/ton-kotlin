@@ -7,12 +7,19 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @SerialName("account_storage")
 @Serializable
 public data class AccountStorage(
-    @SerialName("last_trans_lt") val lastTransLt: ULong, // last_trans_lt : uint64
+    @SerialName("last_trans_lt")
+    @get:JvmName("lastTransLt")
+    val lastTransLt: ULong, // last_trans_lt : uint64
+
+    @get:JvmName("balance")
     val balance: CurrencyCollection, // balance : CurrencyCollection
+
+    @get:JvmName("state")
     val state: AccountState // state : AccountState
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_storage") {

@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -13,7 +13,7 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 @Serializable
 @SerialName("acc_trans")
 public data class AccountBlock(
-    @SerialName("account_addr") val accountAddr: Bits256,
+    @SerialName("account_addr") val accountAddr: BitString,
     val transactions: HashmapAug<CellRef<Transaction>, CurrencyCollection>,
     @SerialName("state_update") val stateUpdate: CellRef<HashUpdate>
 ) : TlbObject {
@@ -59,7 +59,7 @@ private object AccountBlockTlbConstructor : TlbConstructor<AccountBlock>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountBlock = cellSlice {
-        val accountAddr = loadBits256()
+        val accountAddr = loadBits(256)
         val transactions = loadTlb(augDictionaryEdge)
         val stateUpdate = loadRef(HashUpdate)
         AccountBlock(accountAddr, transactions, stateUpdate)

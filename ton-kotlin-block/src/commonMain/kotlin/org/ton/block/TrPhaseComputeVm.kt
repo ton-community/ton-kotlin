@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -69,8 +69,8 @@ public data class TrComputePhaseAux(
     @SerialName("exit_code") val exitCode: Int,
     @SerialName("exit_arg") val exitArg: Maybe<Int>,
     @SerialName("vm_steps") val vmSteps: UInt,
-    @SerialName("vm_init_state_hash") val vmInitStateHash: Bits256,
-    @SerialName("vm_final_state_hash") val vmFinalStateHash: Bits256,
+    @SerialName("vm_init_state_hash") val vmInitStateHash: BitString,
+    @SerialName("vm_final_state_hash") val vmFinalStateHash: BitString,
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer {
@@ -118,8 +118,8 @@ private object TrComputePhaseAuxTlbConstructor : TlbConstructor<TrComputePhaseAu
             exitCode = cellSlice.loadInt(32).toInt(),
             exitArg = cellSlice.loadTlb(MaybeInt32),
             vmSteps = cellSlice.loadUInt32(),
-            vmInitStateHash = cellSlice.loadBits256(),
-            vmFinalStateHash = cellSlice.loadBits256()
+            vmInitStateHash = cellSlice.loadBits(256),
+            vmFinalStateHash = cellSlice.loadBits(256)
         )
     }
 

@@ -1,7 +1,6 @@
 package org.ton.tlb
 
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 
 public class TlbPrettyPrinter(
     private val stringBuilder: StringBuilder = StringBuilder(),
@@ -62,7 +61,6 @@ public class TlbPrettyPrinter(
                     if (!dummy) {
                         when (type) {
                             is Boolean -> append(if (type) 1 else 0)
-                            is Bits256 -> append(type.toString())
                             is BitString -> append("x{$type}")
                             else -> append(type)
                         }

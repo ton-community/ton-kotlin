@@ -1,13 +1,13 @@
 package org.ton.api.rldp
 
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlObject
 
 @Serializable
 public sealed interface RldpMessagePart : TlObject<RldpMessagePart> {
-    public val transferId: Bits256
+    public val transferId: ByteString
     public val part: Int
 
     public companion object : TlCombinator<RldpMessagePart>(

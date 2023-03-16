@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -14,9 +14,13 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 public data class ConfigParams(
-    @SerialName("config_addr") val configAddr: Bits256,
+    @SerialName("config_addr") val configAddr: BitString,
     val config: CellRef<HmEdge<Cell>>
 ) : TlbObject {
+    init {
+        require(configAddr.size == 256)
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type {
         field("config_addr", configAddr)
         field("config", config)
@@ -36,14 +40,14 @@ private object ConfigParamsTlbConstructor : TlbConstructor<ConfigParams>(
         cellBuilder: CellBuilder,
         value: ConfigParams
     ) = cellBuilder {
-        storeBits(value.configAddr.value)
+        storeBits(value.configAddr)
         storeRef(hashmap, value.config)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): ConfigParams = cellSlice {
-        val configAddr = Bits256(loadBits(256))
+        val configAddr = loadBits(256)
         val config = loadRef(hashmap)
         ConfigParams(configAddr, config)
     }

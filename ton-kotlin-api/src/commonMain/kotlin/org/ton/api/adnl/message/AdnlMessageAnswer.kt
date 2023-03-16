@@ -2,7 +2,8 @@ package org.ton.api.adnl.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -13,9 +14,15 @@ import org.ton.tl.invoke
 @Serializable
 public data class AdnlMessageAnswer(
     @SerialName("query_id")
-    val queryId: Bits256,
+    val queryId: BitString,
     val answer: ByteArray
 ) : AdnlMessage {
+    public constructor(queryId: ByteArray, answer: ByteArray) : this(queryId.toBitString(), answer)
+
+    init {
+        require(queryId.size == 256)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AdnlMessageAnswer) return false
@@ -37,12 +44,12 @@ public data class AdnlMessageAnswer(
             256 / 8 + BytesTlConstructor.sizeOf(value.answer)
 
         override fun encode(writer: TlWriter, value: AdnlMessageAnswer): Unit = writer {
-            writeBits256(value.queryId)
+            writeRaw(value.queryId.toByteArray())
             writeBytes(value.answer)
         }
 
         override fun decode(reader: TlReader): AdnlMessageAnswer = reader {
-            val queryId = readBits256()
+            val queryId = readRaw(32)
             val answer = readBytes()
             AdnlMessageAnswer(queryId, answer)
         }

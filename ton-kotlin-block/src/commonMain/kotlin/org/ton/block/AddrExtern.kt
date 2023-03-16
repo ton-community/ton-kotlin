@@ -10,12 +10,17 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("addr_extern")
 public data class AddrExtern(
+    @SerialName("len")
     val len: Int, // len : ## 9
-    @SerialName("external_address") val externalAddress: BitString // external_address : bits len
+
+    @SerialName("external_address")
+    @get:JvmName("externalAddress")
+    val externalAddress: BitString // external_address : bits len
 ) : MsgAddressExt {
     init {
         require(externalAddress.size == len) { "required: external_address.size == len, actual: ${externalAddress.size}" }

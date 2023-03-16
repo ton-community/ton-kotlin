@@ -78,7 +78,9 @@ public open class ByteBackedBitString protected constructor(
         }
     }
 
-    override fun toString(): String {
+    override fun toString(): String = "x{${toHex()}}"
+
+    override fun toHex(): String {
         if (size == 0) return ""
         val data = appendTag(bytes, size)
         val result = StringBuilder(hex(data))

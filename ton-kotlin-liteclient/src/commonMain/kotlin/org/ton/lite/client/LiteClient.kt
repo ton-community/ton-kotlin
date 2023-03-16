@@ -11,7 +11,7 @@ import org.ton.api.exception.TvmException
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
@@ -26,6 +26,9 @@ import org.ton.lite.api.exception.LiteServerNotReadyException
 import org.ton.lite.api.exception.LiteServerUnknownException
 import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
+import org.ton.lite.client.internal.FullAccountState
+import org.ton.lite.client.internal.TransactionId
+import org.ton.lite.client.internal.TransactionInfo
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.tlb.CellRef
@@ -40,7 +43,7 @@ private const val BLOCK_ID_CACHE_SIZE = 100
 public class LiteClient(
     coroutineContext: CoroutineContext,
     liteClientConfigGlobal: LiteClientConfigGlobal
-) : Closeable, CoroutineScope {
+) : Closeable, CoroutineScope, LiteClientApi {
     public constructor(
         coroutineContext: CoroutineContext,
         liteServers: Collection<LiteServerDesc>
@@ -60,7 +63,6 @@ public class LiteClient(
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
     private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(
         TonNodeBlockIdExt(
-            0, 0, 0
         )
     )
     private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
@@ -275,7 +277,7 @@ public class LiteClient(
         val actualRootHash = blockProofCell.refs.firstOrNull()?.hash(level = 0)?.toBitString()
         check(
             blockProofCell.type == CellType.MERKLE_PROOF &&
-                    blockHeader.id.rootHash.toBitString() == actualRootHash
+                    blockHeader.id.rootHash.toByteArray().toBitString() == actualRootHash
         ) {
             "Root hash mismatch:" +
                     "\n expected: ${blockHeader.id.rootHash}" +
@@ -309,7 +311,7 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
-        val actualFileHash = Bits256(sha256(blockData.data))
+        val actualFileHash = sha256(blockData.data).toBitString()
         check(blockId.fileHash == actualFileHash) {
             "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
         }
@@ -332,29 +334,13 @@ public class LiteClient(
         return block
     }
 
-    public suspend fun getAccount(
-        address: String
-    ): AccountState? {
-        return getAccount(parseAddrStd(address) ?: return null)
-    }
+    override suspend fun getAccountState(accountAddress: AddrStd): FullAccountState =
+        getAccountState(accountAddress, getLastBlockId())
 
-    public suspend fun getAccount(
-        address: String, blockId: TonNodeBlockIdExt
-    ): AccountState? {
-        return getAccount(parseAddrStd(address) ?: return null, blockId)
-    }
-
-    public suspend fun getAccount(
-        address: AddrStd
-    ): AccountState? {
-        val lastBlock = getCachedLastMasterchainBlockId()
-        return getAccount(address, lastBlock)
-    }
-
-    public suspend fun getAccount(
-        address: AddrStd, blockId: TonNodeBlockIdExt
-    ): AccountState? {
-        val rawAccountState = liteApi(LiteServerGetAccountState(blockId, address.toLiteServer()))
+    public override suspend fun getAccountState(
+        accountAddress: AddrStd, blockId: TonNodeBlockIdExt
+    ): FullAccountState {
+        val rawAccountState = liteApi(LiteServerGetAccountState(blockId, accountAddress.toLiteServer()), blockId.seqno)
         val root = try {
             BagOfCells(rawAccountState.state).first()
         } catch (e: Exception) {
@@ -367,55 +353,32 @@ public class LiteClient(
         check(rawAccountState.shardBlock.isValidFull()) {
             "Shard block id: ${rawAccountState.shardBlock} in answer is invalid"
         }
-        check(Shard.containsShard(rawAccountState.shardBlock.shard, Shard.extractShard(address.address))) {
-            "Received data from shard block ${rawAccountState.shardBlock.shard} that can't contain requested account: ${address.address}"
+        check(Shard.containsShard(rawAccountState.shardBlock.shard, Shard.extractShard(accountAddress.address))) {
+            "Received data from shard block ${rawAccountState.shardBlock.shard} that can't contain requested account: ${accountAddress.address}"
         }
 
         return CheckProofUtils.checkAccountProof(
             rawAccountState.proof,
             rawAccountState.shardBlock,
-            address,
+            accountAddress,
             root
         )
     }
 
-    public suspend fun getLastTransactions(
-        account: String,
-        lt: Long,
-        hash: Bits256
-    ): List<TransactionInfo> {
-        return getLastTransactions(parseAddrStd(account) ?: return emptyList(), lt, hash)
-    }
-
-    public suspend fun getLastTransactions(
-        account: String,
-        lt: Long,
-        hash: Bits256,
-        count: Int
-    ): List<TransactionInfo> {
-        return getLastTransactions(parseAddrStd(account) ?: return emptyList(), lt, hash, count)
-    }
-
-    public suspend fun getLastTransactions(
-        account: AddrStd,
-        lt: Long,
-        hash: Bits256
-    ): List<TransactionInfo> = getLastTransactions(account, lt, hash, 10)
-
-    public suspend fun getLastTransactions(
-        account: AddrStd,
-        lt: Long,
-        hash: Bits256,
+    public override suspend fun getTransactions(
+        accountAddress: AddrStd,
+        fromTransactionId: TransactionId,
         count: Int,
     ): List<TransactionInfo> {
-        val rawTransactionList = liteApi(LiteServerGetTransactions(count, account.toLiteServer(), lt, hash))
+        val rawTransactionList = liteApi(LiteServerGetTransactions(count, accountAddress.toLiteServer(), fromTransactionId.lt, fromTransactionId.hash))
         val transactionsCells = BagOfCells(base64(rawTransactionList.transactions)).roots
         check(rawTransactionList.ids.size == transactionsCells.size)
         return List(transactionsCells.size) { index ->
+            val transaction = CellRef(transactionsCells[index], Transaction)
             TransactionInfo(
                 blockId = rawTransactionList.ids[index],
-                hash = transactionsCells[index].hash(),
-                transaction = Transaction.loadTlb(transactionsCells[index])
+                id = TransactionId(transaction.hash(), transaction.value.lt.toLong()),
+                transaction = transaction
             )
         }
     }
@@ -522,24 +485,6 @@ public class LiteClient(
             getLastBlockId()
         } else {
             cachedLastMasterchainBlockId
-        }
-    }
-
-    private fun parseBlockIdExt(string: String): TonNodeBlockIdExt {
-        return if (string.endsWith(')')) {
-            TonNodeBlockIdExt(TonNodeBlockId.parse(string))
-        } else {
-            TonNodeBlockIdExt.parse(string)
-        }
-    }
-
-    private fun parseAddrStd(string: String) = when (string) {
-        "none", "root" -> null
-        "config" -> TODO()
-        "elector" -> TODO()
-        "dnsroot" -> TODO()
-        else -> {
-            AddrStd(string)
         }
     }
 

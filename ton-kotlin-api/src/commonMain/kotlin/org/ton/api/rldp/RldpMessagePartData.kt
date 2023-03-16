@@ -3,14 +3,13 @@ package org.ton.api.rldp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.fec.FecType
-import org.ton.bitstring.Bits256
 import org.ton.crypto.encodeHex
 import org.ton.tl.*
 
 @Serializable
 @SerialName("rldp.messagePart")
 public data class RldpMessagePartData(
-    override val transferId: Bits256,
+    override val transferId: ByteString,
     @SerialName("fec_type")
     val fecType: FecType,
     override val part: Int,
@@ -51,7 +50,7 @@ public data class RldpMessagePartData(
         schema = "rldp.messagePart transfer_id:int256 fec_type:fec.Type part:int total_size:long seqno:int data:bytes = rldp.MessagePart",
     ) {
         override fun encode(output: TlWriter, value: RldpMessagePartData) {
-            output.writeBits256(value.transferId)
+            output.writeRaw(value.transferId)
             output.write(FecType, value.fecType)
             output.writeInt(value.part)
             output.writeLong(value.totalSize)
@@ -60,7 +59,7 @@ public data class RldpMessagePartData(
         }
 
         override fun decode(input: TlReader): RldpMessagePartData {
-            val transfer_id = input.readBits256()
+            val transfer_id = input.readByteString(32)
             val fec_type = input.read(FecType)
             val part = input.readInt()
             val total_size = input.readLong()

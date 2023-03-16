@@ -10,13 +10,17 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @SerialName("var_uint")
 @Serializable
 public data class VarUInteger(
+    @get:JvmName("len")
     val len: Int,
+
     @Serializable(BigIntSerializer::class)
+    @get:JvmName("value")
     val value: BigInt
 ) : TlbObject {
     constructor(int: Int) : this(int.toBigInt())

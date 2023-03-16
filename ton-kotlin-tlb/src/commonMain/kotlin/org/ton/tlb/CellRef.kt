@@ -1,6 +1,6 @@
 package org.ton.tlb
 
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -18,8 +18,8 @@ public interface CellRef<out T> : TlbObject {
 
     public fun toCell(codec: TlbCodec<@UnsafeVariance T>? = null): Cell
 
-    public fun hash(): Bits256 = hash(null)
-    public fun hash(codec: TlbCodec<@UnsafeVariance T>?): Bits256 = toCell().hash()
+    public fun hash(): BitString = hash(null)
+    public fun hash(codec: TlbCodec<@UnsafeVariance T>?): BitString = toCell().hash()
 
     public operator fun getValue(thisRef: Any?, property: Any?): T = value
 

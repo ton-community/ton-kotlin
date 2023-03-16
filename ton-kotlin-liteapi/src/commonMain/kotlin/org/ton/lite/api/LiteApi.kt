@@ -20,7 +20,12 @@ public interface LiteApi {
     public suspend operator fun invoke(function: LiteServerGetState): LiteServerBlockState
     public suspend operator fun invoke(function: LiteServerGetBlockHeader): LiteServerBlockHeader
     public suspend operator fun invoke(function: LiteServerSendMessage): LiteServerSendMsgStatus
-    public suspend operator fun invoke(function: LiteServerGetAccountState): LiteServerAccountState
+
+    public suspend operator fun invoke(
+        function: LiteServerGetAccountState,
+        waitMasterchainSeqno: Int = -1
+    ): LiteServerAccountState
+
     public suspend operator fun invoke(function: LiteServerRunSmcMethod): LiteServerRunMethodResult
     public suspend operator fun invoke(function: LiteServerGetShardInfo): LiteServerShardInfo
     public suspend operator fun invoke(function: LiteServerGetOneTransaction): LiteServerTransactionInfo

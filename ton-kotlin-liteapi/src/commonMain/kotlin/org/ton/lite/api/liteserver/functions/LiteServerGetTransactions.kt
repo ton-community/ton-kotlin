@@ -5,7 +5,8 @@ package org.ton.lite.api.liteserver.functions
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionList
@@ -17,8 +18,16 @@ public data class LiteServerGetTransactions(
     val count: Int,
     val account: LiteServerAccountId,
     val lt: Long,
-    val hash: Bits256
+    val hash: BitString
 ) : TLFunction<LiteServerGetTransactions, LiteServerTransactionList> {
+    public constructor(count: Int, account: LiteServerAccountId, lt: Long, hash: ByteArray) : this(
+        count, account, lt, hash.toBitString()
+    )
+
+    init {
+        require(hash.size == 256)
+    }
+
     override fun tlCodec(): TlCodec<LiteServerGetTransactions> = LiteServerGetTransactionsTlConstructor
 
     override fun resultTlCodec(): TlCodec<LiteServerTransactionList> = LiteServerTransactionList
@@ -33,7 +42,7 @@ public object LiteServerGetTransactionsTlConstructor : TlConstructor<LiteServerG
         val count = reader.readInt()
         val account = reader.read(LiteServerAccountId)
         val lt = reader.readLong()
-        val hash = reader.readBits256()
+        val hash = reader.readRaw(32)
         return LiteServerGetTransactions(count, account, lt, hash)
     }
 
@@ -41,6 +50,6 @@ public object LiteServerGetTransactionsTlConstructor : TlConstructor<LiteServerG
         writer.writeInt(value.count)
         writer.write(LiteServerAccountId, value.account)
         writer.writeLong(value.lt)
-        writer.writeBits256(value.hash)
+        writer.writeRaw(value.hash.toByteArray())
     }
 }

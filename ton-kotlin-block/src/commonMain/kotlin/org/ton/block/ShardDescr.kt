@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -27,8 +27,8 @@ public data class ShardDescrOld(
     @SerialName("reg_mc_seqno") val regMcSeqno: UInt,
     @SerialName("start_lt") val startLt: ULong,
     @SerialName("end_lt") val endLt: ULong,
-    @SerialName("root_hash") val rootHash: Bits256,
-    @SerialName("file_hash") val fileHash: Bits256,
+    @SerialName("root_hash") val rootHash: BitString,
+    @SerialName("file_hash") val fileHash: BitString,
     @SerialName("before_split") val beforeSplit: Boolean,
     @SerialName("before_merge") val beforeMerge: Boolean,
     @SerialName("want_split") val wantSplit: Boolean,
@@ -43,6 +43,11 @@ public data class ShardDescrOld(
     @SerialName("fees_collected") val feesCollected: CurrencyCollection,
     @SerialName("funds_created") val fundsCreated: CurrencyCollection
 ) : ShardDescr {
+    init {
+        require(rootHash.size == 256) { "expected rootHash.size == 256, actual: ${rootHash.size}" }
+        require(fileHash.size == 256) { "expected fileHash.size == 256, actual: ${fileHash.size}" }
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("shard_descr_old") {
             field("seq_no", seqNo)
@@ -95,8 +100,8 @@ public data class ShardDescrNew(
     @SerialName("reg_mc_seqno") val regMcSeqno: UInt,
     @SerialName("start_lt") val startLt: ULong,
     @SerialName("end_lt") val endLt: ULong,
-    @SerialName("root_hash") val rootHash: Bits256,
-    @SerialName("file_hash") val fileHash: Bits256,
+    @SerialName("root_hash") val rootHash: BitString,
+    @SerialName("file_hash") val fileHash: BitString,
     @SerialName("before_split") val beforeSplit: Boolean,
     @SerialName("before_merge") val beforeMerge: Boolean,
     @SerialName("want_split") val wantSplit: Boolean,
@@ -110,6 +115,11 @@ public data class ShardDescrNew(
     @SerialName("split_merge_at") val splitMergeAt: FutureSplitMerge,
     val r1: CellRef<ShardDescrAux>
 ) : ShardDescr {
+    init {
+        require(rootHash.size == 256) { "expected rootHash.size == 256, actual: ${rootHash.size}" }
+        require(fileHash.size == 256) { "expected fileHash.size == 256, actual: ${fileHash.size}" }
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("shard_descr_new") {
             field("seq_no", seqNo)
@@ -156,8 +166,8 @@ private object ShardDescrOldTlbConstructor : TlbConstructor<ShardDescrOld>(
         val regMcSeqno = cellSlice.loadUInt32()
         val startLt = cellSlice.loadUInt64()
         val endLt = cellSlice.loadUInt64()
-        val rootHash = cellSlice.loadBits256()
-        val fileHash = cellSlice.loadBits256()
+        val rootHash = cellSlice.loadBits(256)
+        val fileHash = cellSlice.loadBits(256)
         val beforeSplit = cellSlice.loadBit()
         val beforeMerge = cellSlice.loadBit()
         val wantSplit = cellSlice.loadBit()
@@ -251,8 +261,8 @@ private object ShardDescrNewTlbConstructor : TlbConstructor<ShardDescrNew>(
         val regMcSeqno = cellSlice.loadUInt32()
         val startLt = cellSlice.loadUInt64()
         val endLt = cellSlice.loadUInt64()
-        val rootHash = cellSlice.loadBits256()
-        val fileHash = cellSlice.loadBits256()
+        val rootHash = cellSlice.loadBits(256)
+        val fileHash = cellSlice.loadBits(256)
         val beforeSplit = cellSlice.loadBit()
         val beforeMerge = cellSlice.loadBit()
         val wantSplit = cellSlice.loadBit()

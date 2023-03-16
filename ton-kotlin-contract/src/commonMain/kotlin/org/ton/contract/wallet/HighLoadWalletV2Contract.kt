@@ -2,7 +2,6 @@ package org.ton.contract.wallet
 
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
@@ -69,7 +68,7 @@ public class HighLoadWalletV2Contract(
     public interface Data {
         public val subWalletId: Int
         public val lastCleaned: Long
-        public val publicKey: Bits256
+        public val publicKey: BitString
         public val oldQueries: HashMapE<WalletMessage<Cell>>
 
         public companion object : TlbConstructorProvider<Data> by HighLoadWalletV2DataTlbConstructor {
@@ -116,7 +115,7 @@ public class HighLoadWalletV2Contract(
         public fun data(
             subWalletId: Int,
             lastCleaned: Long,
-            publicKey: Bits256,
+            publicKey: BitString,
             oldQueries: HashMapE<WalletMessage<Cell>>
         ): Data = HighLoadWalletV2DataImpl(subWalletId, lastCleaned, publicKey, oldQueries)
 
@@ -199,7 +198,7 @@ private class HighLoadWalletV2QueryPayloadTlbConstructor<X : Any>(
 private data class HighLoadWalletV2DataImpl(
     override val subWalletId: Int,
     override val lastCleaned: Long,
-    override val publicKey: Bits256,
+    override val publicKey: BitString,
     override val oldQueries: HashMapE<WalletMessage<Cell>>
 ) : HighLoadWalletV2Contract.Data
 
@@ -209,7 +208,7 @@ private object HighLoadWalletV2DataTlbConstructor : TlbConstructor<HighLoadWalle
     override fun loadTlb(cellSlice: CellSlice): HighLoadWalletV2Contract.Data {
         val subWalletId = cellSlice.loadInt(32).toInt()
         val lastCleaned = cellSlice.loadInt(64).toLong()
-        val publicKey = cellSlice.loadBits256()
+        val publicKey = cellSlice.loadBits(256)
         val oldQueries = cellSlice.loadTlb(HighLoadWalletV2QueriesTlbConstructor)
         return HighLoadWalletV2DataImpl(subWalletId, lastCleaned, publicKey, oldQueries)
     }

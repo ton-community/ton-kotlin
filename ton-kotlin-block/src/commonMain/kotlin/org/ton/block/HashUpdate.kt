@@ -5,7 +5,7 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -15,8 +15,8 @@ import org.ton.tlb.*
 @Serializable
 @SerialName("update_hashes")
 public data class HashUpdate(
-    @SerialName("old_hash") val oldHash: Bits256, // old_hash : bits256
-    @SerialName("new_hash") val newHash: Bits256 // new_hash : bits256
+    @SerialName("old_hash") val oldHash: BitString, // old_hash : bits256
+    @SerialName("new_hash") val newHash: BitString // new_hash : bits256
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("update_hashes") {
@@ -37,15 +37,15 @@ private object HashUpdateTlbConstructor : TlbConstructor<HashUpdate>(
         cellBuilder: CellBuilder,
         value: HashUpdate
     ) = cellBuilder {
-        storeBits(value.oldHash.value)
-        storeBits(value.newHash.value)
+        storeBits(value.oldHash)
+        storeBits(value.newHash)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): HashUpdate = cellSlice {
-        val oldHash = Bits256(loadBits(256))
-        val newHash = Bits256(loadBits(256))
+        val oldHash = loadBits(256)
+        val newHash = loadBits(256)
         HashUpdate(oldHash, newHash)
     }
 }

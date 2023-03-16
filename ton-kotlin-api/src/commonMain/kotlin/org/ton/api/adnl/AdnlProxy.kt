@@ -5,16 +5,11 @@ package org.ton.api.adnl
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.Bits256
-import org.ton.crypto.Base64ByteArraySerializer
-import org.ton.tl.TlCombinator
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
 
 @JsonClassDiscriminator("@type")
 public interface AdnlProxy {
-    public val id: Bits256
+    public val id: ByteString
 
     public companion object : TlCombinator<AdnlProxy>(
         AdnlProxy::class,
@@ -26,17 +21,17 @@ public interface AdnlProxy {
 @SerialName("adnl.proxy.none")
 @Serializable
 public data class AdnlProxyNone(
-    override val id: Bits256
+    override val id: ByteString
 ) : AdnlProxy {
     public companion object : TlConstructor<AdnlProxyNone>(
         schema = "adnl.proxy.none id:int256 = adnl.Proxy"
     ) {
         override fun encode(writer: TlWriter, value: AdnlProxyNone) {
-            writer.writeBits256(value.id)
+            writer.writeRaw(value.id)
         }
 
         override fun decode(reader: TlReader): AdnlProxyNone {
-            val id = reader.readBits256()
+            val id = reader.readByteString(32)
             return AdnlProxyNone(id)
         }
     }
@@ -45,39 +40,21 @@ public data class AdnlProxyNone(
 @SerialName("adnl.proxy.fast")
 @Serializable
 public data class AdnlProxyFast(
-    override val id: Bits256,
-    @SerialName("shared_secret")
-    @Serializable(Base64ByteArraySerializer::class)
-    val sharedSecret: ByteArray
+    override val id: ByteString,
+    val sharedSecret: ByteString
 ) : AdnlProxy {
     public companion object : TlConstructor<AdnlProxyFast>(
         schema = "adnl.proxy.fast id:int256 shared_secret:bytes = adnl.Proxy"
     ) {
         override fun encode(writer: TlWriter, value: AdnlProxyFast) {
-            writer.writeBits256(value.id)
+            writer.writeRaw(value.id)
             writer.writeBytes(value.sharedSecret)
         }
 
         override fun decode(reader: TlReader): AdnlProxyFast {
-            val id = reader.readBits256()
-            val sharedSecret = reader.readBytes()
+            val id = reader.readByteString(32)
+            val sharedSecret = reader.readByteString()
             return AdnlProxyFast(id, sharedSecret)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AdnlProxyFast) return false
-
-        if (id != other.id) return false
-        if (!sharedSecret.contentEquals(other.sharedSecret)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + sharedSecret.contentHashCode()
-        return result
     }
 }

@@ -2,17 +2,13 @@ package org.ton.api.rldp
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
 
 @Serializable
 @SerialName("rldp.confirm")
 public data class RldpConfirm(
     @SerialName("transfer_id")
-    override val transferId: Bits256,
+    override val transferId: ByteString,
     override val part: Int,
     val seqno: Int
 ) : RldpMessagePart {
@@ -22,13 +18,13 @@ public data class RldpConfirm(
         schema = "rldp.confirm transfer_id:int256 part:int seqno:int = rldp.MessagePart",
     ) {
         override fun encode(output: TlWriter, value: RldpConfirm) {
-            output.writeBits256(value.transferId)
+            output.writeRaw(value.transferId)
             output.writeInt(value.part)
             output.writeInt(value.seqno)
         }
 
         override fun decode(input: TlReader): RldpConfirm {
-            val transfer_id = input.readBits256()
+            val transfer_id = input.readByteString(23)
             val part = input.readInt()
             val seqno = input.readInt()
             return RldpConfirm(transfer_id, part, seqno)

@@ -8,18 +8,20 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @SerialName("nanocoins")
 @Serializable
 public data class Coins(
+    @get:JvmName("amount")
     val amount: VarUInteger = VarUInteger(0)
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("nanocoins") {
         field("amount", amount)
     }
 
-    override fun toString() = toString(decimals = DECIMALS)
+    override fun toString(): String = toString(decimals = DECIMALS)
 
     fun toString(decimals: Int): String =
         amount.value.toString().let {

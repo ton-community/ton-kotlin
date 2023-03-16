@@ -5,7 +5,7 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -29,9 +29,13 @@ public data class TrActionPhase(
     @SerialName("spec_actions") val specActions: Int,
     @SerialName("skipped_actions") val skippedActions: Int,
     @SerialName("msgs_created") val msgsCreated: Int,
-    @SerialName("action_list_hash") val actionListHash: Bits256,
+    @SerialName("action_list_hash") val actionListHash: BitString,
     @SerialName("tot_msg_size") val totMsgSize: StorageUsedShort
 ) : TlbObject {
+    init {
+        require(actionListHash.size == 256) { "expected actionListHash.size == 256, actual: ${actionListHash.size}" }
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("tr_phase_action") {
             field("success", success)
@@ -103,7 +107,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val specActions = loadUInt(16).toInt()
         val skippedActions = loadUInt(16).toInt()
         val msgCreated = loadUInt(16).toInt()
-        val actionListHash = loadBits256()
+        val actionListHash = loadBits(256)
         val totMsgSize = loadTlb(StorageUsedShort)
         TrActionPhase(
             success,

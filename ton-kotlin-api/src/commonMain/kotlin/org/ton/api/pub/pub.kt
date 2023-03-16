@@ -8,7 +8,6 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
-import org.ton.bitstring.Bits256
 import org.ton.crypto.*
 import org.ton.tl.*
 
@@ -71,8 +70,7 @@ public data class PublicKeyUnencrypted(
 @SerialName("pub.aes")
 @Serializable
 public data class PublicKeyAes(
-    @Serializable(Base64ByteArraySerializer::class)
-    val key: Bits256
+    val key: ByteString
 ) : PublicKey, Encryptor by EncryptorAes(key.toByteArray()) {
     private val _adnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
         AdnlIdShort(hash(this))
@@ -84,11 +82,11 @@ public data class PublicKeyAes(
         schema = "pub.aes key:int256 = PublicKey"
     ) {
         override fun encode(writer: TlWriter, value: PublicKeyAes) {
-            writer.writeBits256(value.key)
+            writer.writeRaw(value.key)
         }
 
         override fun decode(reader: TlReader): PublicKeyAes {
-            val key = reader.readBits256()
+            val key = reader.readByteString(32)
             return PublicKeyAes(key)
         }
     }

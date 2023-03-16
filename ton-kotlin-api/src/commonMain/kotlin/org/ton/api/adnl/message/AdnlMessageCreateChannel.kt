@@ -3,8 +3,8 @@ package org.ton.api.adnl.message
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -12,13 +12,13 @@ import org.ton.tl.TlWriter
 @SerialName("adnl.message.createChannel")
 @Serializable
 public data class AdnlMessageCreateChannel(
-    val key: Bits256,
+    val key: ByteString,
     val date: Int
 ) : AdnlMessage {
     public constructor(
-        key: BitString,
+        key: ByteArray,
         date: Instant
-    ) : this(Bits256(key), date.epochSeconds.toUInt().toInt())
+    ) : this(key.toByteString(), date.epochSeconds.toUInt().toInt())
 
     public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
 
@@ -42,12 +42,12 @@ public data class AdnlMessageCreateChannel(
         public const val SIZE_BYTES: Int = 256 / Byte.SIZE_BYTES + Int.SIZE_BYTES
 
         override fun encode(output: TlWriter, value: AdnlMessageCreateChannel) {
-            output.writeBits256(value.key)
+            output.writeRaw(value.key)
             output.writeInt(value.date)
         }
 
         override fun decode(input: TlReader): AdnlMessageCreateChannel {
-            val key = input.readBits256()
+            val key = input.readByteString(32)
             val date = input.readInt()
             return AdnlMessageCreateChannel(key, date)
         }

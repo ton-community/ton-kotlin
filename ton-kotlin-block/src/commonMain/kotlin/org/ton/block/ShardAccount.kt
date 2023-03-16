@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -13,7 +13,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @SerialName("account_descr")
 public data class ShardAccount(
     val account: CellRef<Account>,
-    @SerialName("last_trans_hash") val lastTransHash: Bits256,
+    @SerialName("last_trans_hash") val lastTransHash: BitString,
     @SerialName("last_trans_lt") val lastTransLt: ULong
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_descr") {
@@ -43,7 +43,7 @@ private object ShardAccountTlbConstructor : TlbConstructor<ShardAccount>(
         cellSlice: CellSlice
     ): ShardAccount = cellSlice {
         val account = loadRef(Account)
-        val lastTransHash = loadBits256()
+        val lastTransHash = loadBits(256)
         val lastTransLt = loadUInt64()
         ShardAccount(account, lastTransHash, lastTransLt)
     }

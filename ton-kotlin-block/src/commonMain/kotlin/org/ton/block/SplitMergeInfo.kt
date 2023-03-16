@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -16,9 +16,14 @@ import org.ton.tlb.TlbPrettyPrinter
 public data class SplitMergeInfo(
     val curShardPfxLen: Int,
     val accSplitDepth: Int,
-    val thisAddr: Bits256,
-    val siblingAddr: Bits256
+    val thisAddr: BitString,
+    val siblingAddr: BitString
 ) : TlbObject {
+    init {
+        require(thisAddr.size == 256)
+        require(siblingAddr.size == 256)
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("split_merge_info") {
             field("cur_shard_pfx_len", curShardPfxLen)
@@ -53,8 +58,8 @@ private object SplitMergeInfoTlbConstructor : TlbConstructor<SplitMergeInfo>(
     ): SplitMergeInfo = cellSlice {
         val curShardPfxLen = loadUInt(6).toInt()
         val accSplitDepth = loadUInt(6).toInt()
-        val thisAddr = loadBits256()
-        val siblingAddr = loadBits256()
+        val thisAddr = loadBits(256)
+        val siblingAddr = loadBits(256)
         SplitMergeInfo(curShardPfxLen, accSplitDepth, thisAddr, siblingAddr)
     }
 }

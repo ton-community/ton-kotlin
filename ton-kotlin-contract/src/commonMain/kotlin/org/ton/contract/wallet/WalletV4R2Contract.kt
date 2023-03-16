@@ -54,7 +54,7 @@ public class WalletV4R2Contract private constructor(
 
     public fun getPublicKey(): PublicKeyEd25519 = requireNotNull(data).beginParse().run {
         skipBits(64)
-        PublicKeyEd25519(loadBits256())
+        PublicKeyEd25519(loadBits(256))
     }
 
     public suspend fun transfer(
@@ -103,8 +103,8 @@ public class WalletV4R2Contract private constructor(
             blockId: TonNodeBlockIdExt,
             address: AddrStd
         ): WalletV4R2Contract? {
-            val accountInfo = liteClient.getAccount(address, blockId) ?: return null
-            return WalletV4R2Contract(accountInfo.info)
+            val accountInfo = liteClient.getAccountState(address, blockId)
+            return WalletV4R2Contract(accountInfo.account.value as? AccountInfo ?: return null)
         }
 
         @JvmStatic

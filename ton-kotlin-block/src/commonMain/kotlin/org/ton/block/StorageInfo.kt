@@ -7,12 +7,18 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("storage_info")
 public data class StorageInfo(
+    @get:JvmName("used")
     val used: StorageUsed,
+
+    @get:JvmName("lastPaid")
     @SerialName("last_paid") val lastPaid: UInt,
+
+    @get:JvmName("duePayment")
     @SerialName("due_payment") val duePayment: Maybe<Coins>
 ) : TlbObject {
     public constructor(used: StorageUsed, lastPaid: UInt, duePayment: Coins? = null) : this(

@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -15,7 +15,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 @SerialName("processed_upto")
 public data class ProcessedUpto(
     @SerialName("last_msg_lt") val lastMsgLt: ULong,
-    @SerialName("last_msg_hash") val lastMsgHash: Bits256
+    @SerialName("last_msg_hash") val lastMsgHash: BitString
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("processed_upto") {
         field("last_msg_lt", lastMsgLt)
@@ -42,7 +42,7 @@ private object ProcessedUptoTlbConstructor : TlbConstructor<ProcessedUpto>(
         cellSlice: CellSlice
     ): ProcessedUpto = cellSlice {
         val lastMsgLt = loadUInt64()
-        val lastMsgHash = loadBits256()
+        val lastMsgHash = loadBits(256)
         ProcessedUpto(lastMsgLt, lastMsgHash)
     }
 }

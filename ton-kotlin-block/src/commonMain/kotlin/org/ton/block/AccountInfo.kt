@@ -10,12 +10,21 @@ import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("account")
 public data class AccountInfo(
+    @SerialName("addr")
+    @get:JvmName("addr")
     val addr: MsgAddressInt, // addr : MsgAddressInt
-    @SerialName("storage_stat") val storageStat: StorageInfo, // storage_stat : StorageInfo
+
+    @SerialName("storage_stat")
+    @get:JvmName("storageStat")
+    val storageStat: StorageInfo, // storage_stat : StorageInfo
+
+    @SerialName("storage")
+    @get:JvmName("storage")
     val storage: AccountStorage // storage : AccountStorage
 ) : Account {
     public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor

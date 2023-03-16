@@ -6,7 +6,7 @@ import kotlinx.coroutines.withTimeout
 import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.liteserver.LiteServerDesc
-import org.ton.bitstring.Bits256
+import org.ton.tl.ByteString
 import kotlin.random.Random
 import kotlin.time.Duration
 
@@ -15,7 +15,7 @@ public class AdnlClientImpl(
 ) : AdnlClient {
     override suspend fun sendQuery(data: ByteReadPacket, timeout: Duration): ByteReadPacket {
         val adnlConnection = connectionPool.selectConnection(liteServerDesc)
-        val queryId = Bits256(Random.nextBytes(32))
+        val queryId = ByteString.of(*Random.nextBytes(32))
         val context = SupervisorJob()
         val queryData = data.readBytes()
         try {

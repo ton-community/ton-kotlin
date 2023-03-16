@@ -2,7 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -15,8 +15,8 @@ public data class BlockExtra(
     @SerialName("in_msg_descr") val inMsgDescr: CellRef<HashmapAugE<InMsg, ImportFees>>,
     @SerialName("out_msg_descr") val outMsgDescr: CellRef<HashmapAugE<OutMsg, CurrencyCollection>>,
     @SerialName("account_blocks") val accountBlocks: CellRef<HashmapAugE<AccountBlock, CurrencyCollection>>,
-    @SerialName("rand_seed") val randSeed: Bits256,
-    @SerialName("created_by") val createdBy: Bits256,
+    @SerialName("rand_seed") val randSeed: BitString,
+    @SerialName("created_by") val createdBy: BitString,
     val custom: Maybe<CellRef<McBlockExtra>>
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
@@ -72,8 +72,8 @@ private object BlockExtraTlbConstructor : TlbConstructor<BlockExtra>(
         val inMsgDescr = cellSlice.loadTlb(inMsgDescr)
         val outMsgDescr = cellSlice.loadTlb(outMsgDescr)
         val accountBlocks = loadTlb(shardAccountBlock)
-        val randSeed = loadBits256()
-        val createdBy = loadBits256()
+        val randSeed = loadBits(256)
+        val createdBy = loadBits(256)
         val custom = loadTlb(maybeMcBlockExtra)
         BlockExtra(inMsgDescr, outMsgDescr, accountBlocks, randSeed, createdBy, custom)
     }

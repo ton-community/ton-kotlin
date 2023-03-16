@@ -1,7 +1,8 @@
 package org.ton.api.adnl
 
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -11,14 +12,18 @@ public data class AdnlProxyToSign(
     val ip: Int,
     val port: Int,
     val date: Int,
-    val signature: Bits256
+    val signature: BitString
 ) {
     public constructor(
         ip: Int,
         port: Int,
         date: Int,
         signature: ByteArray
-    ) : this(ip, port, date, Bits256(signature))
+    ) : this(ip, port, date, signature.toBitString())
+
+    init {
+        require(signature.size == 256)
+    }
 
     public companion object : TlConstructor<AdnlProxyToSign>(
         schema = "adnl.proxyToFast ip:int port:int date:int signature:int256 = adnl.ProxyToSign"
@@ -27,14 +32,14 @@ public data class AdnlProxyToSign(
             writer.writeInt(value.ip)
             writer.writeInt(value.port)
             writer.writeInt(value.date)
-            writer.writeBits256(value.signature)
+            writer.writeRaw(value.signature.toByteArray())
         }
 
         override fun decode(reader: TlReader): AdnlProxyToSign {
             val ip = reader.readInt()
             val port = reader.readInt()
             val date = reader.readInt()
-            val signature = reader.readBits256()
+            val signature = reader.readRaw(32)
             return AdnlProxyToSign(ip, port, date, signature)
         }
     }

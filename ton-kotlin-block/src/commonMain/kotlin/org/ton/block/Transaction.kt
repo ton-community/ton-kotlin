@@ -1,42 +1,78 @@
-@file:UseSerializers(HexByteArraySerializer::class)
-
 package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.Bits256
+import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.crypto.HexByteArraySerializer
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("transaction")
 public data class Transaction(
-    @SerialName("account_addr") val accountAddr: Bits256, // account_addr : bits256
+    @SerialName("account_addr")
+    @get:JvmName("accountAddr")
+    val accountAddr: BitString, // account_addr : bits256
+
+    @SerialName("lt")
+    @get:JvmName("lt")
     val lt: ULong, // lt : uint64
-    @SerialName("prev_trans_hash") val prevTransHash: Bits256, // prev_trans_hash : bits256
-    @SerialName("prev_trans_lt") val prevTransLt: ULong, // prev_trans_lt : uint64
-    @SerialName("now") val now: UInt, // now : uint32
-    @SerialName("outmsg_cnt") val outmsgCnt: Int, // outmsg_cnt : uint15
-    @SerialName("orig_status") val origStatus: AccountStatus, // orig_status : AccountStatus
-    @SerialName("end_status") val endStatus: AccountStatus, // end_status : AccountStatus
+
+    @SerialName("prev_trans_hash")
+    @get:JvmName("prevTransHash")
+    val prevTransHash: BitString, // prev_trans_hash : bits256
+
+    @SerialName("prev_trans_lt")
+    @get:JvmName("prevTransLt")
+    val prevTransLt: ULong, // prev_trans_lt : uint64
+
+    @SerialName("now")
+    @get:JvmName("now")
+    val now: UInt, // now : uint32
+
+    @SerialName("outmsg_cnt")
+    @get:JvmName("outMsgCnt")
+    val outMsgCnt: Int, // outmsg_cnt : uint15
+
+    @SerialName("orig_status")
+    @get:JvmName("origStatus")
+    val origStatus: AccountStatus, // orig_status : AccountStatus
+
+    @SerialName("end_status")
+    @get:JvmName("endStatus")
+    val endStatus: AccountStatus, // end_status : AccountStatus
+
+    @get:JvmName("r1")
     val r1: CellRef<TransactionAux>, // r1 : Aux
-    @SerialName("total_fees") val totalFees: CurrencyCollection, // total_fees : CurrencyCollection
-    @SerialName("state_update") val stateUpdate: CellRef<HashUpdate>, // state_update : ^HashUpdate
+
+    @SerialName("total_fees")
+    @get:JvmName("totalFees")
+    val totalFees: CurrencyCollection, // total_fees : CurrencyCollection
+
+    @SerialName("state_update")
+    @get:JvmName("stateUpdate")
+    val stateUpdate: CellRef<HashUpdate>, // state_update : ^HashUpdate
+
+    @SerialName("description")
+    @get:JvmName("description")
     val description: CellRef<TransactionDescr> // description : ^TransactionDescr
 ) : TlbObject {
-    private fun toCell(): Cell = CellBuilder.createCell {
+    init {
+        require(accountAddr.size == 256) { "expected accountAddr.size == 256, actual: ${accountAddr.size}" }
+        require(prevTransHash.size == 256) { "expected prevTransHash.size == 256, actual: ${accountAddr.size}" }
+    }
+
+    public fun toCell(): Cell = CellBuilder.createCell {
         storeTlb(Transaction, this@Transaction)
     }
 
-    public fun hash(): Bits256 = toCell().hash()
+    public fun hash(): BitString = toCell().hash()
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("transaction") {
@@ -45,7 +81,7 @@ public data class Transaction(
             field("prev_trans_hash", prevTransHash)
             field("prev_trans_lt", prevTransLt)
             field("now", now)
-            field("outmsg_cnt", outmsgCnt)
+            field("outmsg_cnt", outMsgCnt)
             field("orig_status", origStatus)
             field("end_status", endStatus)
             field(r1)
@@ -62,8 +98,13 @@ public data class Transaction(
 
 @Serializable
 public data class TransactionAux(
-    @SerialName("in_msg") val inMsg: Maybe<CellRef<Message<Cell>>>,
-    @SerialName("out_msgs") val outMsgs: HashMapE<CellRef<Message<Cell>>>,
+    @SerialName("in_msg")
+    @get:JvmName("inMsg")
+    val inMsg: Maybe<CellRef<Message<Cell>>>,
+
+    @SerialName("out_msgs")
+    @get:JvmName("outMsgs")
+    val outMsgs: HashMapE<CellRef<Message<Cell>>>,
 ) : TlbObject {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer.type {
@@ -92,9 +133,9 @@ private object TransactionTlConstructor : TlbConstructor<Transaction>(
             "  description:^TransactionDescr = Transaction;"
 ) {
     override fun loadTlb(cellSlice: CellSlice): Transaction = cellSlice {
-        val accountAddr = loadBits256()
+        val accountAddr = loadBits(256)
         val lt = loadUInt64()
-        val prevTransHash = loadBits256()
+        val prevTransHash = loadBits(256)
         val prevTransLt = loadUInt64()
         val now = loadUInt32()
         val outmsgCnt = loadUInt(15).toInt()
@@ -126,7 +167,7 @@ private object TransactionTlConstructor : TlbConstructor<Transaction>(
         storeBits(value.prevTransHash)
         storeUInt64(value.prevTransLt)
         storeUInt32(value.now)
-        storeUInt(value.outmsgCnt, 15)
+        storeUInt(value.outMsgCnt, 15)
         storeTlb(AccountStatus, value.origStatus)
         storeTlb(AccountStatus, value.endStatus)
         storeRef(TransactionAux, value.r1)
