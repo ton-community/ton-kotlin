@@ -54,7 +54,7 @@ public class WalletV4R2Contract private constructor(
 
     public fun getPublicKey(): PublicKeyEd25519 = requireNotNull(data).beginParse().run {
         skipBits(64)
-        PublicKeyEd25519(loadBits(256))
+        PublicKeyEd25519(loadBits(256).toByteArray())
     }
 
     public suspend fun transfer(
@@ -147,7 +147,7 @@ public class WalletV4R2Contract private constructor(
             val data = CellBuilder.createCell {
                 storeUInt(0, 32) // seqno
                 storeUInt(walletId, 32)
-                storeBits(publicKey.key)
+                storeBytes(publicKey.key.toByteArray())
                 storeBit(false) // plugins
             }
             return StateInit(

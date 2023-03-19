@@ -45,7 +45,7 @@ public class HighLoadWalletV2Contract(
 
     public fun getLastCleaned(): Long = requireNotNull(loadData()).lastCleaned
 
-    public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey)
+    public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey.toByteArray())
 
     public suspend fun <X : Any> sendQuery(
         liteApi: LiteApi,

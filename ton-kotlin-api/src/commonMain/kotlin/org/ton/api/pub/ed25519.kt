@@ -7,15 +7,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.crypto.Ed25519
 import org.ton.crypto.Encryptor
 import org.ton.crypto.EncryptorEd25519
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmStatic
 
 public inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519): PublicKeyEd25519 = PublicKeyEd25519.of(privateKey)
@@ -24,9 +20,9 @@ public inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519): PublicKeyEd25
 @SerialName("pub.ed25519")
 @Polymorphic
 public data class PublicKeyEd25519(
-    val key: BitString
+    val key: ByteString
 ) : PublicKey, Encryptor by EncryptorEd25519(key.toByteArray()) {
-    public constructor(key: ByteArray) : this(key.toBitString())
+    public constructor(key: ByteArray) : this(key.toByteString())
 
     private val _adnlIdShort: AdnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
         AdnlIdShort(PublicKeyEd25519.hash(this))
@@ -48,11 +44,11 @@ private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
     schema = "pub.ed25519 key:int256 = PublicKey",
 ) {
     override fun encode(writer: TlWriter, value: PublicKeyEd25519) {
-        writer.writeRaw(value.key.toByteArray())
+        writer.writeRaw(value.key)
     }
 
     override fun decode(reader: TlReader): PublicKeyEd25519 {
-        val key = reader.readRaw(32)
+        val key = reader.readByteString(32)
         return PublicKeyEd25519(key)
     }
 }
