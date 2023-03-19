@@ -1,5 +1,7 @@
 package org.ton.lite.client.internal
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
@@ -15,25 +17,29 @@ internal data class BlockHeaderResult(
     val stateHash: BitString?
 )
 
-public class FullAccountState(
+@Serializable
+public data class FullAccountState(
+    @SerialName("block_id")
     @get:JvmName("blockId")
     public val blockId: TonNodeBlockIdExt,
 
     @get:JvmName("address")
     public val address: AddrStd,
 
+    @SerialName("last_transaction_id")
     @get:JvmName("lastTransactionId")
     public val lastTransactionId: TransactionId?,
 
-    @get:JvmName("accountInfo")
+    @get:JvmName("account")
     public val account: CellRef<Account>
 )
 
+@Serializable
 public data class TransactionId(
     @get:JvmName("hash")
     val hash: BitString,
 
-    @get:JvmName("id")
+    @get:JvmName("lt")
     val lt: Long
 ) {
     public constructor(hash: ByteArray, lt: Long) : this(hash.toBitString(), lt)
@@ -43,7 +49,9 @@ public data class TransactionId(
     }
 }
 
+@Serializable
 public data class TransactionInfo(
+    @SerialName("block_id")
     @get:JvmName("blockId")
     val blockId: TonNodeBlockIdExt,
 

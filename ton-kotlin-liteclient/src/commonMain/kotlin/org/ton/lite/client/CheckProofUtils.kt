@@ -2,6 +2,7 @@ package org.ton.lite.client
 
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
+import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
@@ -17,7 +18,7 @@ internal object CheckProofUtils {
         storeStateHash: Boolean = false,
     ): BlockHeaderResult {
         val virtualHash = root.hash()
-        check(virtualHash == blockId.rootHash) {
+        check(virtualHash == blockId.rootHash.toByteArray().toBitString()) {
             "Invalid hash for block: $blockId, expected: ${blockId.rootHash}, actual: $virtualHash"
         }
         val block = Block.loadTlb(root)

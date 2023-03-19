@@ -82,9 +82,7 @@ public interface Cell {
                 appendable.append(cell.type.toString())
                 appendable.append(' ')
             }
-            appendable.append("x{")
             appendable.append(cell.bits.toString())
-            appendable.append("}")
             cell.refs.forEach { reference ->
                 appendable.append('\n')
                 toString(reference, appendable, "$indent    ")
