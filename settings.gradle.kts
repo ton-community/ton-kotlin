@@ -8,7 +8,7 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("multiplatform") version "1.8.20-Beta"
+        kotlin("multiplatform") version "1.8.20-RC"
         kotlin("plugin.serialization") version "1.8.20-Beta"
     }
 }
