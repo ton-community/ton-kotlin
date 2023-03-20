@@ -6,8 +6,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.crypto.HexByteArraySerializer
+import org.ton.tl.ByteString
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -19,9 +20,10 @@ public data class LiteServerAccountId(
     @get:JvmName("workchain")
     val workchain: Int,
     @get:JvmName("id")
-    val id: BitString
+    val id: ByteString
 ) {
-    public constructor(workchain: Int, id: ByteArray) : this(workchain, id.toBitString())
+    public constructor(workchain: Int, id: ByteArray) : this(workchain, id.toByteString())
+    public constructor(workchain: Int, id: BitString) : this(workchain, id.toByteArray())
 
     public companion object : TlConstructor<LiteServerAccountId>(
         schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
