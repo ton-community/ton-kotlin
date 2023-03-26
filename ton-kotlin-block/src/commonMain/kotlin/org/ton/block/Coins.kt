@@ -50,8 +50,7 @@ public data class Coins(
         fun of(coins: Double, decimals: Int = DECIMALS): Coins =
             Coins(
                 VarUInteger(
-                    (coins.toLong().toBigInt() * 10L.toBigInt().pow(decimals)) +
-                            ((coins - coins.toLong()).toLong().toBigInt() * 10.toBigInt().pow(decimals))
+                    (coins * 10.0.pow(decimals)).toLong().toBigInt()
                 )
             )
 
