@@ -6,6 +6,9 @@
 [![Telegram][telegram-svg]][telegram]
 [![Based on TON][ton-svg]][ton]
 
+## TON Awards 2022 winner
+EQAKtVj024T9MfYaJzU1xnDAkf_GGbHNu-V2mgvyjTuP6rvC
+
 ## Gradle Kotlin DSL
 
 ```kotlin
