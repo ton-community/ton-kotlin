@@ -1,10 +1,10 @@
 package org.ton.hashmap
 
+import io.ktor.util.*
 import org.ton.bitstring.BitString
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellSlice
-import org.ton.crypto.base64
 import org.ton.tlb.constructor.UIntTlbConstructor
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,7 +14,7 @@ class HashMapEdgeTest {
     fun `1 - keys are correctly determined when iterating over nodes`() {
         val codec = HmEdge.tlbCodec(32, UIntTlbConstructor.int(1))
         val cellSlice =
-            BagOfCells(base64("te6cckEBEwEAVwACASABAgIC2QMEAgm3///wYBESAgEgBQYCAWIODwIBIAcIAgHODQ0CAdQNDQIBIAkKAgEgCxACASAQDAABWAIBIA0NAAEgAgEgEBAAAdQAAUgAAfwAAdwXk+eF"))
+            BagOfCells(("te6cckEBEwEAVwACASABAgIC2QMEAgm3///wYBESAgEgBQYCAWIODwIBIAcIAgHODQ0CAdQNDQIBIAkKAgEgCxACASAQDAABWAIBIA0NAAEgAgEgEBAAAdQAAUgAAfwAAdwXk+eF").decodeBase64Bytes())
                 .first()
                 .beginParse()
         val hashMapEdge = codec.loadTlb(cellSlice)
