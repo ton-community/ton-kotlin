@@ -22,32 +22,22 @@ kotlin {
                 implementation(projects.tonKotlinCrypto)
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                api(libs.ktor.network)
-            }
+        findByName("jvmMain")?.dependencies {
+            api(libs.ktor.network)
         }
-        val darwinMain by getting {
-            dependencies {
-                api(libs.ktor.network)
-            }
+        findByName("darwinMain")?.dependencies {
+            api(libs.ktor.network)
         }
-        val linuxMain by getting {
-            dependencies {
-                api(libs.ktor.network)
-            }
+        findByName("linuxMain")?.dependencies {
+            api(libs.ktor.network)
         }
-        val mingwMain by getting {
-            dependencies {
-                api(libs.ktor.utils)
-            }
+        findByName("mingwMain")?.dependencies {
+            api(libs.ktor.utils)
         }
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.coroutines.jvm)
-                implementation(libs.ktor.client.cio)
-                implementation(libs.ktor.utils)
-            }
+        findByName("jvmTest")?.dependencies {
+            implementation(libs.coroutines.jvm)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.utils)
         }
     }
 }
