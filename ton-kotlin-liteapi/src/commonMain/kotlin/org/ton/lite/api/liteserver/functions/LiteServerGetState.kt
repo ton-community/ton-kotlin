@@ -5,10 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockState
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getState")
 public data class LiteServerGetState(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
 ) : TLFunction<LiteServerGetState, LiteServerBlockState> {
     public companion object : TlCodec<LiteServerGetState> by LiteServerGetStateTlConstructor

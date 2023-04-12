@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     kotlin("multiplatform")
@@ -10,6 +9,7 @@ plugins {
 }
 
 val isCI = System.getenv("CI") == "true"
+val isSnapshot = System.getenv("TON_KOTLIN_SNAPSHOT") == "true"
 
 //val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
 //if (isCI) {
@@ -20,7 +20,11 @@ val isCI = System.getenv("CI") == "true"
 
 allprojects {
     group = "org.ton"
-    version = "0.2.16"
+    version = "0.3.0-SNAPSHOT".let {
+        if (isSnapshot && !it.endsWith("-SNAPSHOT")) {
+            "$it-SNAPSHOT"
+        } else it
+    }
 
     apply(plugin = "kotlin-multiplatform")
     apply(plugin = "kotlinx-serialization")
@@ -32,10 +36,6 @@ allprojects {
     }
 
     buildDir = File(rootDir, "build/${project.name}")
-
-    tasks.withType<KotlinCompilationTask<*>> {
-        compilerOptions.freeCompilerArgs.add("-opt-in=kotlin.io.encoding.ExperimentalEncodingApi")
-    }
 
     kotlin {
         if (!isCI) {
@@ -92,7 +92,6 @@ allprojects {
                 languageSettings {
                     optIn("kotlin.ExperimentalUnsignedTypes")
                     optIn("kotlin.contracts.ExperimentalContracts")
-                    optIn("kotlin.io.encoding.ExperimentalEncodingApi")
                 }
             }
         }

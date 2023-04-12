@@ -5,11 +5,15 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerConfigInfo
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getConfigAll")
 public data class LiteServerGetConfigAll(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt
 ) : TLFunction<LiteServerGetConfigAll, LiteServerConfigInfo> {
     override fun tlCodec(): TlCodec<LiteServerGetConfigAll> = Companion

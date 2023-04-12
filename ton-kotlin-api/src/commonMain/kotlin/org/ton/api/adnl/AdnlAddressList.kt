@@ -2,21 +2,28 @@ package org.ton.api.adnl
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
-@SerialName("adnl.addressList")
 @Serializable
-@JsonClassDiscriminator("@type")
 public data class AdnlAddressList(
-    val addrs: Collection<AdnlAddress> = emptyList(),
+    @get:JvmName("addrs")
+    val addrs: List<AdnlAddress> = emptyList(),
+
+    @get:JvmName("version")
     val version: Int = 0,
+
     @SerialName("reinit_date")
+    @get:JvmName("reinitDate")
     val reinitDate: Int = 0,
+
+    @get:JvmName("priority")
     val priority: Int = 0,
+
     @SerialName("expire_at")
+    @get:JvmName("expireAt")
     val expireAt: Int = 0
-) : TlObject<AdnlAddressList>, Collection<AdnlAddress> by addrs {
+) : TlObject<AdnlAddressList> {
     public constructor(vararg addrs: AdnlAddress) : this(addrs.toList())
 
     override fun tlCodec(): TlCodec<AdnlAddressList> = Companion

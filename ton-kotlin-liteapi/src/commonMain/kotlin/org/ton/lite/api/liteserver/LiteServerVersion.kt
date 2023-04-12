@@ -6,13 +6,21 @@ import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.version")
 public data class LiteServerVersion(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("version")
     val version: Int,
+
+    @get:JvmName("capabilities")
     val capabilities: Long,
+
+    @get:JvmName("now")
     val now: Int
 ) {
     public companion object : TlCodec<LiteServerVersion> by LiteServerVersionTlConstructor

@@ -3,16 +3,22 @@ package org.ton.lite.api.liteserver
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.signatureSet")
 public data class LiteServerSignatureSet(
     @SerialName("validator_set_hash")
+    @get:JvmName("validatorSetHash")
     val validatorSetHash: Int,
+
     @SerialName("catchain_seqno")
+    @get:JvmName("catchainSeqno")
     val catchainSeqno: Int,
+
+    @get:JvmName("signatures")
     val signatures: List<LiteServerSignature>
-) : Collection<LiteServerSignature> by signatures {
+) {
     public companion object : TlCodec<LiteServerSignatureSet> by LiteServerSignatureSetTlConstructor
 }
 

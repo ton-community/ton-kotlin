@@ -4,38 +4,26 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.shardInfo")
 public data class LiteServerShardInfo(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
     @SerialName("shardblk")
+    @get:JvmName("shardBlock")
     val shardBlock: TonNodeBlockIdExt,
+
     @SerialName("shard_proof")
-    val shardProof: ByteArray,
+    @get:JvmName("shardProof")
+    val shardProof: ByteString,
+
     @SerialName("shard_descr")
-    val shardDescr: ByteArray
+    @get:JvmName("shardDescr")
+    val shardDescr: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerShardInfo) return false
-
-        if (id != other.id) return false
-        if (shardBlock != other.shardBlock) return false
-        if (!shardProof.contentEquals(other.shardProof)) return false
-        if (!shardDescr.contentEquals(other.shardDescr)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + shardBlock.hashCode()
-        result = 31 * result + shardProof.contentHashCode()
-        result = 31 * result + shardDescr.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<LiteServerShardInfo> by LiteServerShardInfoTlConstructor
 }
 
@@ -45,8 +33,8 @@ private object LiteServerShardInfoTlConstructor : TlConstructor<LiteServerShardI
     override fun decode(reader: TlReader): LiteServerShardInfo {
         val id = reader.read(TonNodeBlockIdExt)
         val shardblk = reader.read(TonNodeBlockIdExt)
-        val shardProof = reader.readBytes()
-        val shardDescr = reader.readBytes()
+        val shardProof = reader.readByteString()
+        val shardDescr = reader.readByteString()
         return LiteServerShardInfo(id, shardblk, shardProof, shardDescr)
     }
 

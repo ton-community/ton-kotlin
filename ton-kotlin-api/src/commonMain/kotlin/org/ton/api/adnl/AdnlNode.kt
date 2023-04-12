@@ -4,16 +4,21 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
+@SerialName("adnl.node")
 public data class AdnlNode(
+    @get:JvmName("id")
     val id: PublicKey,
+
     @SerialName("addr_list")
+    @get:JvmName("addrList")
     val addrList: AdnlAddressList
 ) {
     public constructor(
         id: PublicKey,
-        addrList: Collection<AdnlAddress>
+        addrList: List<AdnlAddress>
     ) : this(id, AdnlAddressList(addrList))
 
     public companion object : TlConstructor<AdnlNode>(

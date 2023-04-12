@@ -5,6 +5,7 @@ import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.tl.TlCodec
+import org.ton.tl.asByteString
 
 public interface LiteApiClient : LiteApi {
     public suspend fun <Q, A> sendQuery(
@@ -22,7 +23,7 @@ public interface LiteApiClient : LiteApi {
             }
             queryCodec.encodeBoxed(this, query)
         }.readBytes()
-        val liteServerQuery = LiteServerQuery(rawQuery)
+        val liteServerQuery = LiteServerQuery(rawQuery.asByteString())
         val result = sendRawQuery(buildPacket {
             LiteServerQuery.encodeBoxed(this, liteServerQuery)
         })

@@ -4,12 +4,18 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerConfigInfo
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 public data class LiteServerGetConfigParams(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
-    val paramList: Collection<Int>
+
+    @get:JvmName("paramList")
+    val paramList: List<Int>
 ) : TLFunction<LiteServerGetConfigParams, LiteServerConfigInfo> {
     override fun tlCodec(): TlCodec<LiteServerGetConfigParams> = LiteServerGetConfigParams
     override fun resultTlCodec(): TlCodec<LiteServerConfigInfo> = LiteServerConfigInfo

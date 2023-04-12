@@ -5,10 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.sendMsgStatus")
 public data class LiteServerSendMsgStatus(
+    @get:JvmName("status")
     val status: Int
 ) {
     public companion object : TlConstructor<LiteServerSendMsgStatus>(

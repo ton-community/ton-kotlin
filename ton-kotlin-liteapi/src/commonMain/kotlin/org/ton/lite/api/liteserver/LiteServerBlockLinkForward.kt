@@ -4,44 +4,33 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("liteServer.blockLinkForward")
 public data class LiteServerBlockLinkForward(
     @SerialName("to_key_block")
+    @get:JvmName("toKeyBlock")
     override val toKeyBlock: Boolean,
+
+    @get:JvmName("from")
     override val from: TonNodeBlockIdExt,
+
+    @get:JvmName("to")
     override val to: TonNodeBlockIdExt,
+
     @SerialName("dest_proof")
-    val destProof: ByteArray,
+    @get:JvmName("destProof")
+    val destProof: ByteString,
+
     @SerialName("config_proof")
-    val configProof: ByteArray,
+    @get:JvmName("configProof")
+    val configProof: ByteString,
+
+    @get:JvmName("signatures")
     val signatures: LiteServerSignatureSet
 ) : LiteServerBlockLink {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerBlockLinkForward) return false
-
-        if (toKeyBlock != other.toKeyBlock) return false
-        if (from != other.from) return false
-        if (to != other.to) return false
-        if (!destProof.contentEquals(other.destProof)) return false
-        if (!configProof.contentEquals(other.configProof)) return false
-        if (signatures != other.signatures) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = toKeyBlock.hashCode()
-        result = 31 * result + from.hashCode()
-        result = 31 * result + to.hashCode()
-        result = 31 * result + destProof.contentHashCode()
-        result = 31 * result + configProof.contentHashCode()
-        result = 31 * result + signatures.hashCode()
-        return result
-    }
 
     public companion object : TlCodec<LiteServerBlockLinkForward> by LiteServerBlockLinkForwardTlConstructor {
         @JvmStatic
@@ -56,8 +45,8 @@ private object LiteServerBlockLinkForwardTlConstructor : TlConstructor<LiteServe
         val toKeyBlock = reader.readBoolean()
         val from = reader.read(TonNodeBlockIdExt)
         val to = reader.read(TonNodeBlockIdExt)
-        val destProof = reader.readBytes()
-        val configProof = reader.readBytes()
+        val destProof = reader.readByteString()
+        val configProof = reader.readByteString()
         val signatures = LiteServerSignatureSet.decodeBoxed(reader)
         return LiteServerBlockLinkForward(toKeyBlock, from, to, destProof, configProof, signatures)
     }

@@ -14,6 +14,7 @@ import org.ton.crypto.AesCtr
 import org.ton.crypto.SecureRandom
 import org.ton.crypto.digest.Digest
 import org.ton.crypto.digest.sha256
+import org.ton.tl.writeByteString
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -66,7 +67,7 @@ public class AdnlConnection(
             }
 
             connection.output.writePacket {
-                writeFully(liteServerDesc.id.toAdnlIdShort().id)
+                writeByteString(liteServerDesc.id.toAdnlIdShort().id)
                 writeFully(liteServerDesc.id.encrypt(nonce))
             }
             connection.output.flush()

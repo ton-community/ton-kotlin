@@ -3,14 +3,17 @@ package org.ton.lite.api.liteserver
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.crypto.base64
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.transactionList")
 public data class LiteServerTransactionList(
+    @get:JvmName("ids")
     val ids: List<TonNodeBlockIdExt>,
-    val transactions: String
+
+    @get:JvmName("transactions")
+    val transactions: ByteString
 ) {
     public companion object : TlCodec<LiteServerTransactionList> by LiteServerTransactionListTlConstructor
 }
@@ -22,7 +25,7 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
         val ids = reader.readVector {
             read(TonNodeBlockIdExt)
         }
-        val transactions = base64(reader.readBytes())
+        val transactions = reader.readByteString()
         return LiteServerTransactionList(ids, transactions)
     }
 
@@ -30,6 +33,6 @@ private object LiteServerTransactionListTlConstructor : TlConstructor<LiteServer
         writer.writeVector(value.ids) {
             write(TonNodeBlockIdExt, it)
         }
-        writer.writeBytes(base64(value.transactions))
+        writer.writeBytes(value.transactions)
     }
 }

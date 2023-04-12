@@ -1,7 +1,5 @@
 package org.ton.block
 
-import io.ktor.utils.io.bits.*
-import io.ktor.utils.io.core.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
@@ -10,11 +8,12 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.crypto.crc16
+import org.ton.crypto.encoding.base64
+import org.ton.crypto.encoding.base64url
 import org.ton.crypto.hex
 import org.ton.tlb.*
 import kotlin.experimental.and
 import kotlin.experimental.or
-import kotlin.io.encoding.Base64
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -30,8 +29,9 @@ public data class AddrStd(
     override val workchainId: Int,
 
     @get:JvmName("address")
-    val address: BitString
+    override val address: BitString
 ) : MsgAddressInt {
+    public constructor() : this(0, BitString(256))
     public constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
     public constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
     public constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
@@ -85,17 +85,17 @@ public data class AddrStd(
                 val rawAddress = address.address.toByteArray()
                 val checksum = checksum(tag, workchain, rawAddress)
 
-                val data = buildPacket {
-                    writeByte(tag)
-                    writeByte(workchain.toByte())
-                    writeFully(rawAddress)
-                    writeShort(checksum.toShort())
-                }.readBytes()
+                val data = ByteArray(36)
+                data[0] = tag
+                data[1] = workchain.toByte()
+                rawAddress.copyInto(data, 2)
+                data[32 + 2] = (checksum ushr 8).toByte()
+                data[32 + 2 + 1] = (checksum).toByte()
 
                 if (urlSafe) {
-                    Base64.UrlSafe.encode(data)
+                    base64url(data)
                 } else {
-                    Base64.encode(data)
+                    base64(data)
                 }
             } else {
                 "${address.workchainId}:${address.address.toHex()}"
@@ -130,28 +130,22 @@ public data class AddrStd(
             val addressBytes = ByteArray(36)
 
             try {
-                Base64.UrlSafe.decodeIntoByteArray(address, addressBytes)
+                base64url(address).copyInto(addressBytes)
             } catch (e: Exception) {
                 try {
-                    Base64.Default.decodeIntoByteArray(address, addressBytes)
+                    base64(address).copyInto(addressBytes)
                 } catch (e: Exception) {
                     throw IllegalArgumentException("Can't parse address: $address", e)
                 }
             }
-            var tag: Byte = 0
-            var workchainId = 0
-            var rawAddress = ByteArray(32)
-            var expectedChecksum = 0
-            addressBytes.useMemory(0, addressBytes.size) {
-                tag = it.loadAt(0)
-                val cleanTestOnly = tag and 0x7F.toByte()
-                check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
-                    "unknown address tag"
-                }
-                workchainId = it.loadAt(1).toInt()
-                rawAddress = addressBytes.copyInto(rawAddress, startIndex = 2, endIndex = 2 + 32)
-                expectedChecksum = it.loadUShortAt(2 + 32).toInt()
+            val tag = addressBytes[0]
+            val cleanTestOnly = tag and 0x7F.toByte()
+            check((cleanTestOnly == 0x11.toByte()) or (cleanTestOnly == 0x51.toByte())) {
+                "unknown address tag"
             }
+            var workchainId = addressBytes[1].toInt()
+            var rawAddress = addressBytes.copyOfRange(fromIndex = 2, toIndex = 2 + 32)
+            var expectedChecksum = ((addressBytes[2 + 32].toInt() and 0xFF) shl 8) or (addressBytes[2 + 32 + 1].toInt() and 0xFF)
 
             val actualChecksum = checksum(tag, workchainId, rawAddress)
             check(expectedChecksum == actualChecksum) {

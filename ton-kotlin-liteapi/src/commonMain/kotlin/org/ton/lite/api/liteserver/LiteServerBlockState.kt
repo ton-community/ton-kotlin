@@ -4,40 +4,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.blockState")
 public data class LiteServerBlockState(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
     @SerialName("root_hash")
-    val rootHash: ByteArray,
+    @get:JvmName("rootHash")
+    val rootHash: ByteString,
+
     @SerialName("file_hash")
-    val fileHash: ByteArray,
-    val data: ByteArray
+    @get:JvmName("fileHash")
+    val fileHash: ByteString,
+
+    @get:JvmName("data")
+    val data: ByteString
 ) {
     init {
         require(rootHash.size == 32) { "rootHash must be 32 bytes long" }
         require(fileHash.size == 32) { "fileHash must be 32 bytes long" }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerBlockState) return false
-
-        if (id != other.id) return false
-        if (!rootHash.contentEquals(other.rootHash)) return false
-        if (!fileHash.contentEquals(other.fileHash)) return false
-        if (!data.contentEquals(other.data)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + rootHash.contentHashCode()
-        result = 31 * result + fileHash.contentHashCode()
-        result = 31 * result + data.contentHashCode()
-        return result
     }
 
     public companion object : TlCodec<LiteServerBlockState> by LiteServerBlockStateTlConstructor
@@ -48,9 +36,9 @@ private object LiteServerBlockStateTlConstructor : TlConstructor<LiteServerBlock
 ) {
     override fun decode(reader: TlReader): LiteServerBlockState {
         val id = reader.read(TonNodeBlockIdExt)
-        val rootHash = reader.readRaw(32)
-        val fileHash = reader.readRaw(32)
-        val data = reader.readBytes()
+        val rootHash = reader.readByteString(32)
+        val fileHash = reader.readByteString(32)
+        val data = reader.readByteString()
         return LiteServerBlockState(id, rootHash, fileHash, data)
     }
 

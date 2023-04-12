@@ -5,13 +5,21 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerShardInfo
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getShardInfo")
 public data class LiteServerGetShardInfo(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("workchain")
     val workchain: Int,
+
+    @get:JvmName("shard")
     val shard: Long,
+
+    @get:JvmName("exact")
     val exact: Boolean
 ) : TLFunction<LiteServerGetShardInfo, LiteServerShardInfo> {
     override fun tlCodec(): TlCodec<LiteServerGetShardInfo> = LiteServerGetShardInfo

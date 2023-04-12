@@ -10,32 +10,22 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.api.tonnode.TonNodeZeroStateIdExt
 import org.ton.crypto.HexByteArraySerializer
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.masterchainInfo")
 public data class LiteServerMasterchainInfo(
+    @get:JvmName("last")
     public val last: TonNodeBlockIdExt,
-    public val stateRootHash: ByteArray,
+
+    @get:JvmName("stateRootHash")
+    public val stateRootHash: ByteString,
+
+    @get:JvmName("init")
     public val init: TonNodeZeroStateIdExt
 ) {
     init {
         require(stateRootHash.size == 32) { "Invalid stateRootHash size: ${stateRootHash.size}, expected: 32" }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerMasterchainInfo) return false
-        if (last != other.last) return false
-        if (!stateRootHash.contentEquals(other.stateRootHash)) return false
-        if (init != other.init) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = last.hashCode()
-        result = 31 * result + stateRootHash.contentHashCode()
-        result = 31 * result + init.hashCode()
-        return result
     }
 
     public companion object : TlCodec<LiteServerMasterchainInfo> by LiteServerMasterchainInfoTlbConstructor
@@ -46,7 +36,7 @@ private object LiteServerMasterchainInfoTlbConstructor : TlConstructor<LiteServe
 ) {
     override fun decode(reader: TlReader): LiteServerMasterchainInfo {
         val last = reader.read(TonNodeBlockIdExt)
-        val stateRootHash = reader.readRaw(32)
+        val stateRootHash = reader.readByteString(32)
         val init = reader.read(TonNodeZeroStateIdExt)
         return LiteServerMasterchainInfo(last, stateRootHash, init)
     }

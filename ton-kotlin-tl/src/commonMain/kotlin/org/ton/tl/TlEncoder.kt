@@ -15,6 +15,9 @@ public interface TlEncoder<in T> {
         return output.build().readBytes()
     }
 
+    public fun encodeToByteString(value: T, boxed: Boolean = true): ByteString =
+        ByteString.of(*encodeToByteArray(value, boxed))
+
     public fun hash(value: T): ByteArray =
         sha256(encodeToByteArray(value))
 }

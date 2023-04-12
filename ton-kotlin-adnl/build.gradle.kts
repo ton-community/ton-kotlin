@@ -9,6 +9,7 @@ kotlin {
                 implementation(libs.datetime)
                 implementation(libs.coroutines.core)
                 implementation(libs.ktor.utils)
+                api("io.github.reactivecircus.cache4k:cache4k:0.9.0")
             }
         }
         val commonTest by getting {

@@ -21,6 +21,7 @@ public interface CellBuilder {
     public var isExotic: Boolean
 
     public val bitsPosition: Int
+    public val remainingBits: Int
 
     /**
      * Converts a builder into an ordinary cell.
@@ -152,8 +153,8 @@ private class CellBuilderImpl(
     override var levelMask: LevelMask? = null,
     override var isExotic: Boolean = false
 ) : CellBuilder {
-    private val remainder: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
     override val bitsPosition: Int get() = bits.size
+    override val remainingBits: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
 
     override fun storeBit(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
@@ -391,8 +392,8 @@ private class CellBuilderImpl(
 
     override fun toString(): String = endCell().toString()
 
-    private fun checkBitsOverflow(length: Int) = require(length <= remainder) {
-        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainder bits left. - ${bits.size}")
+    private fun checkBitsOverflow(length: Int) = require(length <= remainingBits) {
+        throw CellOverflowException("Bits overflow. Can't add $length bits. $remainingBits bits left. - ${bits.size}")
     }
 
     private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {

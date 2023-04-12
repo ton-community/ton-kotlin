@@ -7,8 +7,8 @@ import org.ton.tl.*
 @Serializable
 @SerialName("overlay.nodes")
 public class OverlayNodes(
-    public val nodes: Collection<OverlayNode>
-) : TlObject<OverlayNodes>, Collection<OverlayNode> by nodes {
+    public val nodes: List<OverlayNode>
+) : TlObject<OverlayNodes> {
     public constructor(vararg nodes: OverlayNode) : this(nodes.toList())
 
     override fun tlCodec(): TlCodec<OverlayNodes> = Companion

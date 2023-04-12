@@ -1,28 +1,38 @@
 package org.ton.api.adnl
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
+import org.ton.tl.ByteString
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
+@SerialName("adnl.proxyToFast")
 public data class AdnlProxyToSign(
+    @get:JvmName("ip")
     val ip: Int,
+
+    @get:JvmName("port")
     val port: Int,
+
+    @get:JvmName("date")
     val date: Int,
-    val signature: BitString
+
+    @get:JvmName("signature")
+    val signature: ByteString
 ) {
     public constructor(
         ip: Int,
         port: Int,
         date: Int,
         signature: ByteArray
-    ) : this(ip, port, date, signature.toBitString())
+    ) : this(ip, port, date, signature.toByteString())
 
     init {
-        require(signature.size == 256)
+        require(signature.size == 32)
     }
 
     public companion object : TlConstructor<AdnlProxyToSign>(

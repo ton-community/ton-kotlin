@@ -17,20 +17,20 @@ public sealed interface CommonMsgInfoRelaxed : TlbObject {
     @SerialName("int_msg_info")
     public data class IntMsgInfoRelaxed(
         val ihrDisabled: Boolean = true,
-        val bounce: Boolean,
+        val bounce: Boolean = true,
         val bounced: Boolean = false,
         val src: MsgAddress = MsgAddressExt(),
-        val dest: MsgAddressInt,
-        val value: CurrencyCollection,
+        val dest: MsgAddressInt = AddrStd(),
+        val value: CurrencyCollection = CurrencyCollection(),
         val ihrFee: Coins = Coins(),
         val fwdFee: Coins = Coins(),
         val createdLt: ULong = 0u,
         val createdAt: UInt = 0u
     ) : CommonMsgInfoRelaxed {
-        public constructor(dest: MsgAddressInt, bounce: Boolean, coins: Coins) : this(
+        public constructor(dest: MsgAddressInt, bounce: Boolean, value: Coins) : this(
             dest = dest,
             bounce = bounce,
-            value = CurrencyCollection(coins, ExtraCurrencyCollection())
+            value = CurrencyCollection(value, ExtraCurrencyCollection())
         )
 
         public constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(

@@ -8,8 +8,8 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("multiplatform") version "1.8.20-Beta"
-        kotlin("plugin.serialization") version "1.8.20-Beta"
+        kotlin("multiplatform") version "1.8.0"
+        kotlin("plugin.serialization") version "1.8.0"
     }
 }
 
@@ -40,6 +40,7 @@ include(":ton-kotlin-liteapi")
 include(":ton-kotlin-liteclient")
 include(":ton-kotlin-logger")
 include(":ton-kotlin-mnemonic")
+include(":ton-kotlin-rldp")
 //include(":ton-kotlin-experimental")
 include(":ton-kotlin-contract")
 include(":ton-kotlin-tl")

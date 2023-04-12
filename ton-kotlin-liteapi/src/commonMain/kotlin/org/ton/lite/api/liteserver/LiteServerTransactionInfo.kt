@@ -4,30 +4,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.transactionInfo")
 public data class LiteServerTransactionInfo(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
-    val proof: ByteArray,
-    val transaction: ByteArray
+
+    @get:JvmName("proof")
+    val proof: ByteString,
+
+    @get:JvmName("transaction")
+    val transaction: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerTransactionInfo) return false
-        if (id != other.id) return false
-        if (!proof.contentEquals(other.proof)) return false
-        if (!transaction.contentEquals(other.transaction)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + proof.contentHashCode()
-        result = 31 * result + transaction.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<LiteServerTransactionInfo> by LiteServerTransactionInfoTlConstructor
 }
 
@@ -36,8 +26,8 @@ private object LiteServerTransactionInfoTlConstructor : TlConstructor<LiteServer
 ) {
     override fun decode(reader: TlReader): LiteServerTransactionInfo {
         val id = reader.read(TonNodeBlockIdExt)
-        val proof = reader.readBytes()
-        val transaction = reader.readBytes()
+        val proof = reader.readByteString()
+        val transaction = reader.readByteString()
         return LiteServerTransactionInfo(id, proof, transaction)
     }
 

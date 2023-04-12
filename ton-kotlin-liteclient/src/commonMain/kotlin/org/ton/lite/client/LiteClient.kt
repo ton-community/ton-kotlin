@@ -17,9 +17,7 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
-import org.ton.crypto.base64
 import org.ton.crypto.crc16
-import org.ton.crypto.digest.sha256
 import org.ton.lite.api.LiteApiClient
 import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.exception.LiteServerNotReadyException
@@ -31,6 +29,8 @@ import org.ton.lite.client.internal.TransactionId
 import org.ton.lite.client.internal.TransactionInfo
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
+import org.ton.tl.ByteReadPacket
+import org.ton.tl.asByteString
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
@@ -170,7 +170,7 @@ public class LiteClient(
             setServerVersion(ext.version, ext.capabilities)
             setServerTime(ext.now)
             val serverNow = Instant.fromEpochSeconds(ext.now.toLong())
-            val lastUtime = Instant.fromEpochSeconds(ext.lastUtime.toLong())
+            val lastUtime = Instant.fromEpochSeconds(ext.lastUTime.toLong())
             createdAt = lastUtime
             if (lastUtime > serverNow) {
                 logger.warn {
@@ -270,7 +270,7 @@ public class LiteClient(
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
-            BagOfCells(blockHeader.headerProof).first()
+            BagOfCells.read(ByteReadPacket(blockHeader.headerProof)).first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't parse block proof", e)
         }
@@ -311,13 +311,13 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
-        val actualFileHash = sha256(blockData.data).toBitString()
+        val actualFileHash = blockData.data.hashSha256()
         check(blockId.fileHash == actualFileHash) {
             "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
         }
         registerBlockId(blockId)
         val root = try {
-            BagOfCells(blockData.data).first()
+            BagOfCells.read(ByteReadPacket(blockData.data)).first()
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
@@ -334,17 +334,20 @@ public class LiteClient(
         return block
     }
 
-    override suspend fun getAccountState(accountAddress: AddrStd): FullAccountState =
+    override suspend fun getAccountState(accountAddress: MsgAddressInt): FullAccountState =
         getAccountState(accountAddress, getLastBlockId())
 
     public override suspend fun getAccountState(
-        accountAddress: AddrStd, blockId: TonNodeBlockIdExt
+        accountAddress: MsgAddressInt, blockId: TonNodeBlockIdExt
     ): FullAccountState {
         val rawAccountState = liteApi(LiteServerGetAccountState(blockId, accountAddress.toLiteServer()), blockId.seqno)
         val root = try {
-            BagOfCells(rawAccountState.state).first()
+            BagOfCells(rawAccountState.state.toByteArray()).first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't deserialize account state", e)
+        }
+        if (root.isEmpty()) {
+            return FullAccountState(rawAccountState.shardBlock, accountAddress, null, CellRef(AccountNone, Account))
         }
 
         check(rawAccountState.id == blockId || rawAccountState.id.seqno == 0) {
@@ -358,7 +361,7 @@ public class LiteClient(
         }
 
         return CheckProofUtils.checkAccountProof(
-            rawAccountState.proof,
+            rawAccountState.proof.toByteArray(),
             rawAccountState.shardBlock,
             accountAddress,
             root
@@ -366,12 +369,12 @@ public class LiteClient(
     }
 
     public override suspend fun getTransactions(
-        accountAddress: AddrStd,
+        accountAddress: MsgAddressInt,
         fromTransactionId: TransactionId,
         count: Int,
     ): List<TransactionInfo> {
         val rawTransactionList = liteApi(LiteServerGetTransactions(count, accountAddress.toLiteServer(), fromTransactionId.lt, fromTransactionId.hash.toByteArray()))
-        val transactionsCells = BagOfCells(base64(rawTransactionList.transactions)).roots
+        val transactionsCells = BagOfCells.read(ByteReadPacket(rawTransactionList.transactions)).roots
         check(rawTransactionList.ids.size == transactionsCells.size)
         return List(transactionsCells.size) { index ->
             val transaction = CellRef(transactionsCells[index], Transaction)
@@ -427,14 +430,14 @@ public class LiteClient(
         logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi(
             LiteServerRunSmcMethod(
-                0b100, blockId, address, method, smcCreateParams(params).toByteArray()
+                0b100, blockId, address, method, smcCreateParams(params).toByteArray().asByteString()
             )
         )
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
-        val boc = BagOfCells(
-            checkNotNull(result.result) { "result is null, but 0b100 mode provided" }
+        val boc = BagOfCells.read(
+            ByteReadPacket(checkNotNull(result.result) { "result is null, but 0b100 mode provided" })
         )
         // TODO: check proofs
         val exitCode = result.exitCode
@@ -453,7 +456,7 @@ public class LiteClient(
 
     public suspend fun sendMessage(cell: Cell): LiteServerSendMsgStatus = sendMessage(BagOfCells(cell))
     public suspend fun sendMessage(boc: BagOfCells): LiteServerSendMsgStatus {
-        return liteApi(LiteServerSendMessage(boc.toByteArray()))
+        return liteApi(LiteServerSendMessage(boc.toByteArray().asByteString()))
     }
 
     private fun smcMethodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
@@ -496,5 +499,5 @@ public class LiteClient(
         knownBlockIds.addLast(blockIdExt)
     }
 
-    private fun AddrStd.toLiteServer() = LiteServerAccountId(workchainId, address.toByteArray())
+    private fun MsgAddressInt.toLiteServer() = LiteServerAccountId(workchainId, address.toByteArray())
 }

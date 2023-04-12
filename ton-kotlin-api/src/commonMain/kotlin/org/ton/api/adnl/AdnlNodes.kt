@@ -1,12 +1,16 @@
 package org.ton.api.adnl
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
+@SerialName("adnl.nodes")
 public data class AdnlNodes(
-    val nodes: Collection<AdnlNode> = emptyList()
-) : Collection<AdnlNode> by nodes {
+    @get:JvmName("nodes")
+    val nodes: List<AdnlNode> = emptyList()
+) {
     public companion object : TlCodec<AdnlNodes> by AdnlNodesTlConstructor
 }
 

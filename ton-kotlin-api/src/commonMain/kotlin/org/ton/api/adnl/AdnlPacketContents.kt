@@ -7,6 +7,7 @@ import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 import kotlin.random.Random
 
 // total packet length:
@@ -18,37 +19,69 @@ import kotlin.random.Random
 //     32 (channel id) + 32 (encryption overhead) + 4 (magic) + 4 + M (sum of messages) +
 //              + A1 + A2 + 8 + 8 + 4 + 4 + 16(r1) + 16(r2) = 128 + M + A1 + A2
 @Serializable
+@SerialName("adnl.packetContents")
 public data class AdnlPacketContents(
-    val rand1: ByteArray,
+    @get:JvmName("rand1")
+    val rand1: ByteString,
+
+    @get:JvmName("flags")
     val flags: Int,
+
+    @get:JvmName("from")
     val from: PublicKey?,
+
     @SerialName("from_short")
+    @get:JvmName("fromShort")
     val fromShort: AdnlIdShort?,
+
+    @get:JvmName("message")
     val message: AdnlMessage?,
-    val messages: Collection<AdnlMessage>?,
+
+    @get:JvmName("messages")
+    val messages: List<AdnlMessage>?,
+
+    @get:JvmName("address")
     val address: AdnlAddressList?,
+
     @SerialName("priority_address")
+    @get:JvmName("priorityAddress")
     val priorityAddress: AdnlAddressList?,
+
+    @get:JvmName("seqno")
     val seqno: Long?,
+
     @SerialName("confirm_seqno")
+    @get:JvmName("confirmSeqno")
     val confirmSeqno: Long?,
+
     @SerialName("recv_addr_list_version")
+    @get:JvmName("recvAddrListVersion")
     val recvAddrListVersion: Int?,
+
     @SerialName("recv_priority_addr_list_version")
+    @get:JvmName("recvPriorityAddrListVersion")
     val recvPriorityAddrListVersion: Int?,
+
     @SerialName("reinit_date")
+    @get:JvmName("reinitDate")
     val reinitDate: Int?,
+
     @SerialName("dst_reinit_date")
+    @get:JvmName("dstReinitDate")
     val dstReinitDate: Int?,
-    override val signature: ByteArray?,
-    val rand2: ByteArray
+
+    @get:JvmName("signature")
+    override val signature: ByteString?,
+
+    @get:JvmName("rand2")
+    val rand2: ByteString
 ) : SignedTlObject<AdnlPacketContents> {
     public constructor(
-        rand1: ByteArray = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15),
+        rand1: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString(),
         from: PublicKey? = null,
         from_short: AdnlIdShort? = null,
         message: AdnlMessage? = null,
-        messages: Collection<AdnlMessage>? = null,
+        messages: List<AdnlMessage>? = null,
         address: AdnlAddressList? = null,
         priority_address: AdnlAddressList? = null,
         seqno: Long? = null,
@@ -57,8 +90,8 @@ public data class AdnlPacketContents(
         recv_priority_addr_list_version: Int? = null,
         reinit_date: Int? = null,
         dst_reinit_date: Int? = null,
-        signature: ByteArray? = null,
-        rand2: ByteArray = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15)
+        signature: ByteString? = null,
+        rand2: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString()
     ) : this(
         rand1 = rand1,
         flags = flags(
@@ -106,7 +139,7 @@ public data class AdnlPacketContents(
         }
     }
 
-    public fun messages(): Collection<AdnlMessage> = message?.let { listOf(it) } ?: messages ?: emptyList()
+    public fun collectMessages(): List<AdnlMessage> = message?.let { listOf(it) } ?: messages ?: emptyList()
 
     override fun signed(privateKey: PrivateKey): AdnlPacketContents {
         val encoded = tlCodec().encodeToByteArray(
@@ -143,7 +176,7 @@ public data class AdnlPacketContents(
             recv_priority_addr_list_version = recvPriorityAddrListVersion,
             reinit_date = reinitDate,
             dst_reinit_date = dstReinitDate,
-            signature = signature,
+            signature = signature.asByteString(),
             rand2 = rand2
         )
     }
@@ -168,7 +201,7 @@ public data class AdnlPacketContents(
                 rand2 = rand2
             )
         )
-        return publicKey.verify(encoded, signature)
+        return publicKey.verify(encoded, signature?.toByteArray())
     }
 
     override fun tlCodec(): TlCodec<AdnlPacketContents> = AdnlPacketContentsTlConstructor
@@ -207,6 +240,32 @@ public data class AdnlPacketContents(
     }
 }
 
+//public class AdnlPacketContentsBuilder() {
+//    public var flags: Int = 0
+//    public var from: PublicKey? = null
+//    public var fromShort: AdnlIdShort? = null
+//    public var rand1: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString()
+//    public var rand2: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString()
+//    public var messages: MutableList<AdnlMessage> = ArrayList()
+//    public var addresses: AdnlAddressList = AdnlAddressList()
+//
+//    fun build() {
+//        AdnlPacketContents(
+//            rand1 = rand1,
+//            flags = 0,
+//            from = from,
+//            fromShort = fromShort,
+//            message = if (messages.size <= 1) messages.firstOrNull() else null,
+//            messages = if (messages.size > 1) messages else null,
+//            address =addresses,
+//            priorityAddress = AdnlAddressList(),
+//            seqno = 0,
+//            confirmSeqno = 0,
+//            recvAddrListVersion = 0,
+//        )
+//    }
+//}
+
 private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContents>(
     schema = "adnl.packetContents" +
             " rand1:bytes" +
@@ -229,7 +288,7 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
     id = -784151159
 ) {
     override fun decode(reader: TlReader): AdnlPacketContents {
-        val rand1 = reader.readBytes()
+        val rand1 = reader.readByteString()
         val flags = reader.readInt()
         val from = reader.readNullable(flags, 0) { read(PublicKey) }
         val from_short = reader.readNullable(flags, 1) { read(AdnlIdShort) }
@@ -243,8 +302,8 @@ private object AdnlPacketContentsTlConstructor : TlConstructor<AdnlPacketContent
         val recv_priority_addr_list_version = reader.readNullable(flags, 9) { readInt() }
         val reinit_date = reader.readNullable(flags, 10) { readInt() }
         val dst_reinit_date = reader.readNullable(flags, 10) { readInt() }
-        val signature = reader.readNullable(flags, 11) { readBytes() }
-        val rand2 = reader.readBytes()
+        val signature = reader.readNullable(flags, 11) { readByteString() }
+        val rand2 = reader.readByteString()
 
         return AdnlPacketContents(
             rand1,

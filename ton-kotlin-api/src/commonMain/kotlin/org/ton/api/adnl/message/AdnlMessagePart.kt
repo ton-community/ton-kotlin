@@ -5,15 +5,23 @@ import kotlinx.serialization.Serializable
 import org.ton.tl.*
 import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.constructors.BytesTlConstructor
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @SerialName("adnl.message.part")
 @Serializable
 public data class AdnlMessagePart(
+    @get:JvmName("hash")
     val hash: ByteString,
+
     @SerialName("total_size")
+    @get:JvmName("totalSize")
     val totalSize: Int,
+
+    @get:JvmName("offset")
     val offset: Int,
+
+    @get:JvmName("data")
     val data: ByteString
 ) : AdnlMessage {
     public constructor(
@@ -22,6 +30,10 @@ public data class AdnlMessagePart(
         offset: Int,
         data: ByteArray,
     ) : this(hash.toByteString(), totalSize, offset, data.toByteString())
+
+    init {
+        check(hash.size == 32) { "hash size expected: 32, actual: ${hash.size}" }
+    }
 
     public companion object : TlCodec<AdnlMessagePart> by AdnlMessagePartTlConstructor {
         @JvmStatic

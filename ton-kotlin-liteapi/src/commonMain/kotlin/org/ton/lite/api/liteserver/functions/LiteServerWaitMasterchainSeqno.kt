@@ -6,12 +6,16 @@ import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.waitMasterchainSeqno")
 public data class LiteServerWaitMasterchainSeqno(
+    @get:JvmName("seqno")
     val seqno: Int,
+
     @SerialName("timeout_ms")
+    @get:JvmName("timeoutMs")
     val timeoutMs: Int
 ) {
     public companion object : TlCodec<LiteServerWaitMasterchainSeqno> by LiteServerWaitMasterchainSeqnoTlConstructor

@@ -9,13 +9,19 @@ import org.ton.api.adnl.config.AdnlConfigGlobal
 import org.ton.api.dht.config.DhtConfigGlobal
 import org.ton.api.validator.config.ValidatorConfigGlobal
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("config.global")
 @JsonClassDiscriminator("@type")
 public data class ConfigGlobal(
+    @get:JvmName("adnl")
     val adnl: AdnlConfigGlobal = AdnlConfigGlobal(),
+
+    @get:JvmName("dht")
     val dht: DhtConfigGlobal = DhtConfigGlobal(),
+
+    @get:JvmName("validator")
     val validator: ValidatorConfigGlobal
 ) : TlObject<ConfigGlobal> {
     override fun tlCodec(): TlCodec<ConfigGlobal> = Companion

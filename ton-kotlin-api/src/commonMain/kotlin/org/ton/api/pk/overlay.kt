@@ -17,7 +17,7 @@ import org.ton.tl.TlWriter
 public data class PrivateKeyOverlay(
     val name: ByteString
 ) : PrivateKey, Decryptor by DecryptorFail {
-    override fun publicKey(): PublicKeyOverlay = PublicKeyOverlay(name.toByteArray())
+    override fun publicKey(): PublicKeyOverlay = PublicKeyOverlay(name)
 
     override fun toString(): String = toAdnlIdShort().toString()
 
@@ -28,8 +28,8 @@ public data class PrivateKeyOverlay(
             writer.writeBytes(value.name)
         }
 
-        override fun decode(input: TlReader): PrivateKeyOverlay {
-            val name = input.readByteString()
+        override fun decode(reader: TlReader): PrivateKeyOverlay {
+            val name = reader.readByteString()
             return PrivateKeyOverlay(name)
         }
     }

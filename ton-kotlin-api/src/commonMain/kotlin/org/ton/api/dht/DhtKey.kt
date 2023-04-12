@@ -2,9 +2,8 @@ package org.ton.api.dht
 
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
@@ -13,7 +12,7 @@ import kotlin.jvm.JvmStatic
 public data class DhtKey
 @JvmOverloads constructor(
     @get:JvmName("id")
-    val id: BitString,
+    val id: ByteString,
 
     @get:JvmName("name")
     val name: String,
@@ -22,7 +21,7 @@ public data class DhtKey
     val idx: Int = 0
 ) : TlObject<DhtKey> {
     @JvmOverloads
-    public constructor(id: ByteArray, name: String, idx: Int = 0) : this(id.toBitString(), name, idx)
+    public constructor(id: ByteArray, name: String, idx: Int = 0) : this(id.toByteString(), name, idx)
 
     @JvmOverloads
     public constructor(id: AdnlIdShort, name: String, idx: Int = 0) : this(id.id, name, idx)

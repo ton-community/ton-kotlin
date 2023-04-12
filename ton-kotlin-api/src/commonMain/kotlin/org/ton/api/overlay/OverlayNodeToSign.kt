@@ -9,7 +9,7 @@ import org.ton.tl.*
 @SerialName("overlay.node.toSign")
 public data class OverlayNodeToSign(
     val id: AdnlIdShort,
-    val overlay: ByteArray,
+    val overlay: ByteString,
     val version: Int
 ) : TlObject<OverlayNodeToSign> {
     override fun tlCodec(): TlCodec<OverlayNodeToSign> = Companion
@@ -25,7 +25,7 @@ public data class OverlayNodeToSign(
 
         override fun decode(reader: TlReader): OverlayNodeToSign {
             val id = reader.read(AdnlIdShort)
-            val overlay = reader.readRaw(32)
+            val overlay = reader.readByteString(32)
             val version = reader.readInt()
             return OverlayNodeToSign(id, overlay, version)
         }

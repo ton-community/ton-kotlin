@@ -8,8 +8,8 @@ import org.ton.tl.*
 @Serializable
 @JsonClassDiscriminator("@type")
 public data class DhtNodes(
-    val nodes: Collection<DhtNode> = emptyList()
-) : TlObject<DhtNodes>, Collection<DhtNode> by nodes {
+    val nodes: List<DhtNode> = emptyList()
+) : TlObject<DhtNodes> {
     public fun toAdnlNodes(): AdnlNodes = AdnlNodes(nodes.map { it.toAdnlNode() })
 
     override fun tlCodec(): TlCodec<DhtNodes> = Companion

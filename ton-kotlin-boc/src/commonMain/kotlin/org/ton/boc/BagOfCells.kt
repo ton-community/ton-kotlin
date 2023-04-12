@@ -41,6 +41,9 @@ public interface BagOfCells : Iterable<Cell> {
 
         @JvmStatic
         public fun of(byteArray: ByteArray): BagOfCells {
+            if (byteArray.isEmpty()) {
+                return BagOfCells(Cell())
+            }
             try {
                 return read(ByteReadPacket(byteArray))
             } catch (e: Exception) {
@@ -49,6 +52,10 @@ public interface BagOfCells : Iterable<Cell> {
         }
 
         @JvmStatic
-        public fun read(input: Input): BagOfCells = ByteReadPacket(input.readBytes()).readBagOfCell()
+        public fun read(input: Input): BagOfCells = if (input.canRead()) {
+            input.readBagOfCell()
+        } else {
+            BagOfCells(Cell())
+        }
     }
 }

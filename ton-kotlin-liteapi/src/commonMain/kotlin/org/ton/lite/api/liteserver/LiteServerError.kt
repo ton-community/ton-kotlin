@@ -5,11 +5,15 @@ import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.error")
 public data class LiteServerError(
+    @get:JvmName("code")
     val code: Int,
+
+    @get:JvmName("message")
     val message: String
 ) {
     public companion object : TlConstructor<LiteServerError>(

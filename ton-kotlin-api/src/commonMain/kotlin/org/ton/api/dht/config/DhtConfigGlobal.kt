@@ -8,18 +8,24 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtNodes
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("dht.config.global")
 @JsonClassDiscriminator("@type")
 public data class DhtConfigGlobal(
     @SerialName("static_nodes")
+    @get:JvmName("staticNodes")
     val staticNodes: DhtNodes = DhtNodes(),
+
+    @get:JvmName("k")
     val k: Int = 0,
+
+    @get:JvmName("a")
     val a: Int = 0
 ) : TlObject<DhtConfigGlobal> {
     public constructor(
-        staticNodes: Collection<DhtNode>,
+        staticNodes: List<DhtNode>,
         k: Int,
         a: Int
     ) : this(DhtNodes(staticNodes), k, a)

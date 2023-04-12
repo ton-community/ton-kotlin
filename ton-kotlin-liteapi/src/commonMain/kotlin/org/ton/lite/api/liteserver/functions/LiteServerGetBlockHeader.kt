@@ -5,11 +5,15 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockHeader
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getBlockHeader")
 public data class LiteServerGetBlockHeader(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("mode")
     val mode: Int
 ) : TLFunction<LiteServerGetBlockHeader, LiteServerBlockHeader> {
     override fun tlCodec(): TlCodec<LiteServerGetBlockHeader> = LiteServerGetBlockHeaderTlConstructor

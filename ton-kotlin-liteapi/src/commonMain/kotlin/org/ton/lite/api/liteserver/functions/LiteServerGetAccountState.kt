@@ -6,11 +6,15 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerAccountState
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getAccountState")
 public data class LiteServerGetAccountState(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("account")
     val account: LiteServerAccountId,
 ) : TLFunction<LiteServerGetAccountState, LiteServerAccountState> {
     override fun tlCodec(): TlCodec<LiteServerGetAccountState> = LiteServerGetAccountStateTlConstructor

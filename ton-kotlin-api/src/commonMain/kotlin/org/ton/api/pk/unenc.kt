@@ -18,7 +18,7 @@ import org.ton.tl.TlWriter
 public data class PrivateKeyUnencrypted(
     val data: ByteString
 ) : PrivateKey, Decryptor by DecryptorNone {
-    override fun publicKey(): PublicKeyUnencrypted = PublicKeyUnencrypted(data.toByteArray())
+    override fun publicKey(): PublicKeyUnencrypted = PublicKeyUnencrypted(data)
 
     override fun toString(): String = toAdnlIdShort().toString()
 

@@ -5,10 +5,12 @@ import kotlinx.serialization.Serializable
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.currentTime")
 public data class LiteServerCurrentTime(
+    @get:JvmName("now")
     val now: Int
 ) {
     public companion object : TlConstructor<LiteServerCurrentTime>(

@@ -4,11 +4,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlNodes
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @SerialName("adnl.config.global")
 @Serializable
 public data class AdnlConfigGlobal(
     @SerialName("static_nodes")
+    @get:JvmName("staticNodes")
     val staticNodes: AdnlNodes = AdnlNodes()
 ) {
     public companion object : TlCodec<AdnlConfigGlobal> by AdnlConfigGlobalTlConstructor

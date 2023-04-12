@@ -16,7 +16,7 @@ public data class AddrVar(
     val anycast: Maybe<Anycast>,
     @SerialName("addr_len") val addrLen: Int,
     @SerialName("workchain_id") override val workchainId: Int,
-    val address: BitString
+    override val address: BitString
 ) : MsgAddressInt {
     init {
         require(address.size == addrLen) { "required: address.size == addr_len, actual: ${address.size}" }

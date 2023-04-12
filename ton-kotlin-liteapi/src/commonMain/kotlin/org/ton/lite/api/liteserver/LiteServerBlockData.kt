@@ -4,19 +4,23 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.blockData")
 public class LiteServerBlockData(
+    @get:JvmName("id")
     public val id: TonNodeBlockIdExt,
-    public val data: ByteArray
+
+    @get:JvmName("data")
+    public val data: ByteString
 ) {
     public companion object : TlConstructor<LiteServerBlockData>(
         schema = "liteServer.blockData id:tonNode.blockIdExt data:bytes = liteServer.BlockData"
     ) {
         override fun decode(reader: TlReader): LiteServerBlockData {
             val id = reader.read(TonNodeBlockIdExt)
-            val data = reader.readBytes()
+            val data = reader.readByteString()
             return LiteServerBlockData(id, data)
         }
 

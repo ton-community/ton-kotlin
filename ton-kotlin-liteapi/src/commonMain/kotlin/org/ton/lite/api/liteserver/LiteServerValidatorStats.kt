@@ -4,43 +4,31 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.validatorStats")
 public data class LiteServerValidatorStats(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("count")
     val count: Int,
+
+    @get:JvmName("complete")
     val complete: Boolean,
+
     @SerialName("state_proof")
-    val stateProof: ByteArray,
+    @get:JvmName("stateProof")
+    val stateProof: ByteString,
+
     @SerialName("data_proof")
-    val dataProof: ByteArray
+    @get:JvmName("dataProof")
+    val dataProof: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerValidatorStats) return false
-
-        if (mode != other.mode) return false
-        if (id != other.id) return false
-        if (count != other.count) return false
-        if (complete != other.complete) return false
-        if (!stateProof.contentEquals(other.stateProof)) return false
-        if (!dataProof.contentEquals(other.dataProof)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = mode
-        result = 31 * result + id.hashCode()
-        result = 31 * result + count
-        result = 31 * result + complete.hashCode()
-        result = 31 * result + stateProof.contentHashCode()
-        result = 31 * result + dataProof.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<LiteServerValidatorStats> by LiteServerValidatorStatsTlConstructor
 }
 
@@ -52,8 +40,8 @@ private object LiteServerValidatorStatsTlConstructor : TlConstructor<LiteServerV
         val id = reader.read(TonNodeBlockIdExt)
         val count = reader.readInt()
         val complete = reader.readBoolean()
-        val stateProofBoc = reader.readBytes()
-        val dataProofBoc = reader.readBytes()
+        val stateProofBoc = reader.readByteString()
+        val dataProofBoc = reader.readByteString()
         return LiteServerValidatorStats(mode, id, count, complete, stateProofBoc, dataProofBoc)
     }
 

@@ -4,12 +4,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
 import org.ton.tl.ByteString.Companion.toByteString
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.signature")
 public data class LiteServerSignature(
     @SerialName("node_id_short")
+    @get:JvmName("nodeIdShort")
     val nodeIdShort: ByteString,
+
+    @get:JvmName("signature")
     val signature: ByteString
 ) {
     public constructor(nodeIdShort: ByteArray, signature: ByteArray) : this(nodeIdShort.toByteString(), signature.toByteString())

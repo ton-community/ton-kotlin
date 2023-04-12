@@ -6,18 +6,31 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.ByteString
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @SerialName("adnl.message.confirmChannel")
 @Serializable
 public data class AdnlMessageConfirmChannel(
+    @get:JvmName("key")
     val key: ByteString,
+
     @SerialName("peer_key")
+    @get:JvmName("peerKey")
     val peerKey: ByteString,
+
+    @get:JvmName("date")
     val date: Int
 ) : AdnlMessage {
+    public constructor(
+        key: ByteArray,
+        peerKey: ByteArray,
+        date: Int
+    ) : this(key.toByteString(), peerKey.toByteString(), date)
+
     public constructor(
         key: ByteString,
         peerKey: ByteString,
@@ -25,22 +38,6 @@ public data class AdnlMessageConfirmChannel(
     ) : this(key, peerKey, date.epochSeconds.toInt())
 
     public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AdnlMessageConfirmChannel) return false
-        if (key != other.key) return false
-        if (peerKey != other.peerKey) return false
-        if (date != other.date) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = key.hashCode()
-        result = 31 * result + peerKey.hashCode()
-        result = 31 * result + date
-        return result
-    }
 
     public companion object : TlConstructor<AdnlMessageConfirmChannel>(
         schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",

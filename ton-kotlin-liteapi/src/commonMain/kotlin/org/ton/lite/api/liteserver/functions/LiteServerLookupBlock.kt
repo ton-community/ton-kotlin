@@ -5,13 +5,21 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockId
 import org.ton.lite.api.liteserver.LiteServerBlockHeader
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.lookupBlock")
 public data class LiteServerLookupBlock(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockId,
+
+    @get:JvmName("lt")
     val lt: Long?,
+
+    @get:JvmName("utime")
     val utime: Int?
 ) : TLFunction<LiteServerLookupBlock, LiteServerBlockHeader> {
     override fun tlCodec(): TlCodec<LiteServerLookupBlock> = LiteServerLookupBlockTlConstructor

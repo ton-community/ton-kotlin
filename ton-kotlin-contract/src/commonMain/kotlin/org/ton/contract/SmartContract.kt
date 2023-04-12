@@ -12,6 +12,8 @@ import org.ton.lite.api.liteserver.functions.LiteServerGetAccountState
 import org.ton.lite.api.liteserver.functions.LiteServerGetMasterchainInfo
 import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod
 import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
+import org.ton.tl.ByteReadPacket
+import org.ton.tl.asByteString
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
@@ -33,7 +35,7 @@ public interface SmartContract<T : Any> {
         })
 
     public suspend fun sendExternalMessage(liteApi: LiteApi, message: Cell): Int =
-        liteApi(LiteServerSendMessage(BagOfCells(message).toByteArray())).status
+        liteApi(LiteServerSendMessage(BagOfCells(message).toByteArray().asByteString())).status
 
     public suspend fun runGetMethod(liteApi: LiteApi, method: String): SmartContractAnswer =
         runGetMethod(liteApi) {
@@ -61,14 +63,14 @@ public interface SmartContract<T : Any> {
                 id = blockId,
                 account = LiteServerAccountId(address.workchainId, address.address),
                 methodId = query.methodId,
-                params = LiteServerRunSmcMethod.params(query.stack)
+                params = LiteServerRunSmcMethod.params(query.stack).asByteString()
             )
         )
         return SmartContractAnswer(
             exitCode = result.exitCode,
             stack = result.result?.let {
-                if (it.isNotEmpty()) { // TODO: research why it is empty sometimes (bug in lite server?)
-                    VmStack.loadTlb(BagOfCells(it).first())
+                if (!it.isEmpty()) { // TODO: research why it is empty sometimes (bug in lite server?)
+                    VmStack.loadTlb(BagOfCells.read(ByteReadPacket(it)).first())
                 } else null
             }
         )
@@ -87,7 +89,7 @@ public interface SmartContract<T : Any> {
         ): AccountInfo? {
             val accountState =
                 liteApi(LiteServerGetAccountState(blockId, LiteServerAccountId(address.workchainId, address.address)))
-            val stateBoc = BagOfCells(accountState.state)
+            val stateBoc = BagOfCells(accountState.state.toByteArray())
             val account = stateBoc.first().parse { loadTlb(Account) }
             return account as? AccountInfo
         }

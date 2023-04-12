@@ -8,7 +8,10 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.dht.DhtKeyDescription
 import org.ton.api.dht.DhtUpdateRule
-import org.ton.crypto.*
+import org.ton.crypto.Encryptor
+import org.ton.crypto.EncryptorAes
+import org.ton.crypto.EncryptorFail
+import org.ton.crypto.EncryptorNone
 import org.ton.tl.*
 
 @Serializable
@@ -30,38 +33,20 @@ public sealed interface PublicKey : Encryptor, TlObject<PublicKey> {
 @SerialName("pub.unenc")
 @Serializable
 public data class PublicKeyUnencrypted(
-    @Serializable(Base64ByteArraySerializer::class)
-    val data: ByteArray
+    val data: ByteString
 ) : PublicKey, Encryptor by EncryptorNone {
 
-    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(PublicKeyUnencrypted.hash(this))
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PublicKeyUnencrypted) return false
-        if (!data.contentEquals(other.data)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return data.contentHashCode()
-    }
-
-    override fun toString(): String = buildString {
-        append("PublicKeyUnencrypted(data=")
-        append(base64(data))
-        append(")")
-    }
+    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(PublicKeyUnencrypted.hash(this).asByteString())
 
     public companion object : TlConstructor<PublicKeyUnencrypted>(
         schema = "pub.unenc data:bytes = PublicKey"
     ) {
-        override fun encode(output: TlWriter, value: PublicKeyUnencrypted) {
-            output.writeBytes(value.data)
+        override fun encode(writer: TlWriter, value: PublicKeyUnencrypted) {
+            writer.writeBytes(value.data)
         }
 
-        override fun decode(input: TlReader): PublicKeyUnencrypted {
-            val data = input.readBytes()
+        override fun decode(reader: TlReader): PublicKeyUnencrypted {
+            val data = reader.readByteString()
             return PublicKeyUnencrypted(data)
         }
     }
@@ -73,7 +58,7 @@ public data class PublicKeyAes(
     val key: ByteString
 ) : PublicKey, Encryptor by EncryptorAes(key.toByteArray()) {
     private val _adnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        AdnlIdShort(hash(this))
+        AdnlIdShort(hash(this).asByteString())
     }
 
     override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
@@ -95,11 +80,11 @@ public data class PublicKeyAes(
 @SerialName("pub.overlay")
 @Serializable
 public data class PublicKeyOverlay(
-    val name: ByteArray
+    val name: ByteString
 ) : PublicKey, Encryptor by EncryptorFail {
 
     override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        PublicKeyOverlay.hash(this)
+        PublicKeyOverlay.hash(this).asByteString()
     )
 
     override fun verify(message: ByteArray, signature: ByteArray?): Boolean {
@@ -110,28 +95,18 @@ public data class PublicKeyOverlay(
             return false
         }
         if (result.updateRule != DhtUpdateRule.OVERLAY_NODES) return false
-        if (result.signature.isNotEmpty()) return false
-        return true
+        return result.signature.isEmpty()
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PublicKeyOverlay) return false
-        if (!name.contentEquals(other.name)) return false
-        return true
-    }
-
-    override fun hashCode(): Int = name.contentHashCode()
 
     public companion object : TlConstructor<PublicKeyOverlay>(
         schema = "pub.overlay name:bytes = PublicKey"
     ) {
-        override fun encode(output: TlWriter, value: PublicKeyOverlay) {
-            output.writeBytes(value.name)
+        override fun encode(writer: TlWriter, value: PublicKeyOverlay) {
+            writer.writeBytes(value.name)
         }
 
-        override fun decode(input: TlReader): PublicKeyOverlay {
-            val name = input.readBytes()
+        override fun decode(reader: TlReader): PublicKeyOverlay {
+            val name = reader.readByteString()
             return PublicKeyOverlay(name)
         }
     }

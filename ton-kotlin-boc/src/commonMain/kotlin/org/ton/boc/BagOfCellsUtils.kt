@@ -9,7 +9,7 @@ import org.ton.cell.buildCell
 import org.ton.crypto.crc32c
 import kotlin.experimental.and
 
-internal fun ByteReadPacket.readBagOfCell(): BagOfCells {
+internal fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
     val hasIdx: Boolean
     val hashCrc32: Boolean

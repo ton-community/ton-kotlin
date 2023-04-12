@@ -5,14 +5,20 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerPartialBlockProof
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getBlockProof")
 public data class LiteServerGetBlockProof(
+    @get:JvmName("mode")
     val mode: Int,
+
     @SerialName("known_block")
+    @get:JvmName("knownBlock")
     val knownBlock: TonNodeBlockIdExt,
+
     @SerialName("target_block")
+    @get:JvmName("targetBlock")
     val targetBlock: TonNodeBlockIdExt?
 ) : TLFunction<LiteServerGetBlockProof, LiteServerPartialBlockProof> {
     public constructor(

@@ -37,7 +37,7 @@ internal object CheckProofUtils {
     fun checkAccountProof(
         proof: ByteArray,
         shardBlock: TonNodeBlockIdExt,
-        address: AddrStd,
+        address: MsgAddressInt,
         root: Cell
     ): FullAccountState {
         val account = CellRef(root, Account)
@@ -63,6 +63,11 @@ internal object CheckProofUtils {
             "Account state hash mismatch, expected: ${shardAccount.account.hash()}, actual: ${root.hash()}"
         }
 
-        return FullAccountState(shardBlock,address, TransactionId( shardAccount.lastTransHash, shardAccount.lastTransLt.toLong()), account)
+        return FullAccountState(
+            shardBlock,
+            address,
+            TransactionId(shardAccount.lastTransHash, shardAccount.lastTransLt.toLong()),
+            account
+        )
     }
 }

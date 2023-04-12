@@ -8,7 +8,7 @@ import org.ton.tl.*
 @Serializable
 public data class DhtDbBucket(
     val nodes: DhtNodes
-) : TlObject<DhtDbBucket>, Collection<DhtNode> by nodes {
+) : TlObject<DhtDbBucket> {
     public constructor(nodes: List<DhtNode>) : this(DhtNodes(nodes))
 
     override fun tlCodec(): TlCodec<DhtDbBucket> = Companion

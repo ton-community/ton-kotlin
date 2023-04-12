@@ -2,39 +2,25 @@ package org.ton.api.adnl.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.constructors.BytesTlConstructor
-import org.ton.tl.invoke
+import kotlin.jvm.JvmName
 
 @SerialName("adnl.message.answer")
 @Serializable
 public data class AdnlMessageAnswer(
     @SerialName("query_id")
-    val queryId: BitString,
-    val answer: ByteArray
+    @get:JvmName("queryId")
+    val queryId: ByteString,
+
+    @get:JvmName("answer")
+    val answer: ByteString
 ) : AdnlMessage {
-    public constructor(queryId: ByteArray, answer: ByteArray) : this(queryId.toBitString(), answer)
+    public constructor(queryId: ByteArray, answer: ByteArray) : this(queryId.toByteString(), answer.toByteString())
 
     init {
-        require(queryId.size == 256)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AdnlMessageAnswer) return false
-        if (queryId != other.queryId) return false
-        if (!answer.contentEquals(other.answer)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = queryId.hashCode()
-        result = 31 * result + answer.contentHashCode()
-        return result
+        require(queryId.size == 32)
     }
 
     public companion object : TlConstructor<AdnlMessageAnswer>(

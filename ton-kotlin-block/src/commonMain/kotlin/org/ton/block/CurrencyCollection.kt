@@ -18,6 +18,8 @@ public data class CurrencyCollection(
     @get:JvmName("other")
     val other: ExtraCurrencyCollection // other: ExtraCurrencyCollection
 ) : TlbObject {
+    public constructor() : this(Coins(), ExtraCurrencyCollection())
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("currencies") {
         field("coins", coins)
         field("other", other)

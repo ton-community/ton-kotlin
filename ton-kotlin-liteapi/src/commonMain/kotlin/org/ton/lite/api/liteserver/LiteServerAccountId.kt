@@ -19,6 +19,7 @@ import kotlin.jvm.JvmName
 public data class LiteServerAccountId(
     @get:JvmName("workchain")
     val workchain: Int,
+
     @get:JvmName("id")
     val id: ByteString
 ) {

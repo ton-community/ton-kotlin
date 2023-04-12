@@ -13,9 +13,10 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.contract.SmartContract
 import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
-import org.ton.crypto.base64
+import org.ton.crypto.encoding.base64
 import org.ton.lite.api.LiteApi
 import org.ton.lite.client.LiteClient
+import org.ton.tl.asByteString
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeRef
@@ -54,7 +55,7 @@ public class WalletV4R2Contract private constructor(
 
     public fun getPublicKey(): PublicKeyEd25519 = requireNotNull(data).beginParse().run {
         skipBits(64)
-        PublicKeyEd25519(loadBits(256).toByteArray())
+        PublicKeyEd25519(loadBits(256).toByteArray().asByteString())
     }
 
     public suspend fun transfer(

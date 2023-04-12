@@ -5,40 +5,24 @@ import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 public data class DhtValue(
+    @get:JvmName("key")
     val key: DhtKeyDescription,
-    val value: ByteArray,
+    val value: ByteString,
     val ttl: Int,
-    override val signature: ByteArray = ByteArray(0)
+    override val signature: ByteString = ByteString.of()
 ) : SignedTlObject<DhtValue> {
 
     override fun signed(privateKey: PrivateKey): DhtValue =
-        copy(signature = privateKey.sign(tlCodec().encodeToByteArray(this)))
+        copy(signature = privateKey.sign(tlCodec().encodeToByteArray(this)).asByteString())
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0))), signature)
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0).asByteString())), signature.toByteArray())
 
     override fun tlCodec(): TlCodec<DhtValue> = DhtValue
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DhtValue) return false
-        if (key != other.key) return false
-        if (!value.contentEquals(other.value)) return false
-        if (ttl != other.ttl) return false
-        if (!signature.contentEquals(other.signature)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = key.hashCode()
-        result = 31 * result + value.contentHashCode()
-        result = 31 * result + ttl
-        result = 31 * result + signature.contentHashCode()
-        return result
-    }
 
     public companion object : TlCodec<DhtValue> by DhtValueTlConstructor
 }
@@ -55,9 +39,9 @@ private object DhtValueTlConstructor : TlConstructor<DhtValue>(
 
     override fun decode(reader: TlReader): DhtValue {
         val key = reader.read(DhtKeyDescription)
-        val value = reader.readBytes()
+        val value = reader.readByteString()
         val ttl = reader.readInt()
-        val signature = reader.readBytes()
+        val signature = reader.readByteString()
         return DhtValue(key, value, ttl, signature)
     }
 }

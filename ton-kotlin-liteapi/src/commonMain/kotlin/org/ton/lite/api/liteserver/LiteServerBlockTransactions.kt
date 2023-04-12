@@ -4,37 +4,27 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.blockTransactions")
 public data class LiteServerBlockTransactions(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
     @SerialName("req_count")
+    @get:JvmName("reqCount")
     val reqCount: Int,
+
+    @get:JvmName("incomplete")
     val incomplete: Boolean,
+
+    @get:JvmName("ids")
     val ids: List<LiteServerTransactionId>,
-    val proof: ByteArray
+
+    @get:JvmName("proof")
+    val proof: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerBlockTransactions) return false
-        if (id != other.id) return false
-        if (reqCount != other.reqCount) return false
-        if (incomplete != other.incomplete) return false
-        if (ids != other.ids) return false
-        if (!proof.contentEquals(other.proof)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + reqCount
-        result = 31 * result + incomplete.hashCode()
-        result = 31 * result + ids.hashCode()
-        result = 31 * result + proof.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<LiteServerBlockTransactions> by LiteServerBlockTransactionsTlConstructor
 }
 
@@ -48,7 +38,7 @@ private object LiteServerBlockTransactionsTlConstructor : TlConstructor<LiteServ
         val ids = List(reader.readInt()) {
             reader.read(LiteServerTransactionId)
         }
-        val proof = reader.readBytes()
+        val proof = reader.readByteString()
         return LiteServerBlockTransactions(id, reqCount, incomplete, ids, proof)
     }
 

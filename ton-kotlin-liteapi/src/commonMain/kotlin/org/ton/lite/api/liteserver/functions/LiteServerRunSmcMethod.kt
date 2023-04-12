@@ -11,42 +11,30 @@ import org.ton.crypto.crc16
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerRunMethodResult
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("liteServer.runSmcMethod")
 public data class LiteServerRunSmcMethod(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("account")
     val account: LiteServerAccountId,
+
     @SerialName("method_id")
+    @get:JvmName("methodId")
     val methodId: Long,
-    val params: ByteArray
+
+    @get:JvmName("params")
+    val params: ByteString
 ) : TLFunction<LiteServerRunSmcMethod, LiteServerRunMethodResult> {
     override fun tlCodec(): TlCodec<LiteServerRunSmcMethod> = LiteServerRunSmcMethod
     override fun resultTlCodec(): TlCodec<LiteServerRunMethodResult> = LiteServerRunMethodResult
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerRunSmcMethod) return false
-
-        if (mode != other.mode) return false
-        if (id != other.id) return false
-        if (account != other.account) return false
-        if (methodId != other.methodId) return false
-        if (!params.contentEquals(other.params)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = mode
-        result = 31 * result + id.hashCode()
-        result = 31 * result + account.hashCode()
-        result = 31 * result + methodId.hashCode()
-        result = 31 * result + params.contentHashCode()
-        return result
-    }
 
     public companion object : TlCodec<LiteServerRunSmcMethod> by LiteServerRunSmcMethodTlConstructor {
         @JvmStatic
@@ -86,7 +74,7 @@ private object LiteServerRunSmcMethodTlConstructor : TlConstructor<LiteServerRun
         val id = reader.read(TonNodeBlockIdExt)
         val account = reader.read(LiteServerAccountId)
         val methodId = reader.readLong()
-        val params = reader.readBytes()
+        val params = reader.readByteString()
         return LiteServerRunSmcMethod(mode, id, account, methodId, params)
     }
 }

@@ -6,10 +6,12 @@ import org.ton.tl.TlCodec
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.debug.verbosity")
 public data class LiteServerDebugVerbosity(
+    @get:JvmName("value")
     val value: Int
 ) {
     public companion object : TlCodec<LiteServerDebugVerbosity> by LiteServerDebugVerbosityTlConstructor

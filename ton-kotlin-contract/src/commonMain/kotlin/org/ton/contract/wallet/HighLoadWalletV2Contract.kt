@@ -9,9 +9,10 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.buildCell
 import org.ton.contract.SmartContract
-import org.ton.crypto.base64
+import org.ton.crypto.encoding.base64
 import org.ton.hashmap.HashMapE
 import org.ton.lite.api.LiteApi
+import org.ton.tl.asByteString
 import org.ton.tlb.*
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -45,7 +46,7 @@ public class HighLoadWalletV2Contract(
 
     public fun getLastCleaned(): Long = requireNotNull(loadData()).lastCleaned
 
-    public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey.toByteArray())
+    public fun getPublicKey(): PublicKeyEd25519 = PublicKeyEd25519(requireNotNull(loadData()).publicKey.toByteArray().asByteString())
 
     public suspend fun <X : Any> sendQuery(
         liteApi: LiteApi,

@@ -6,25 +6,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.query")
 public data class LiteServerQuery(
-    val data: ByteArray
+    @get:JvmName("data")
+    val data: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerQuery) return false
-        if (!data.contentEquals(other.data)) return false
-        return true
-    }
-
-    override fun hashCode(): Int = data.contentHashCode()
-
     public companion object : TlCodec<LiteServerQuery> by LiteServerQueryTlConstructor
 }
 
@@ -32,7 +22,7 @@ private object LiteServerQueryTlConstructor : TlConstructor<LiteServerQuery>(
     schema = "liteServer.query data:bytes = Object"
 ) {
     override fun decode(input: TlReader): LiteServerQuery {
-        val data = input.readBytes()
+        val data = input.readByteString()
         return LiteServerQuery(data)
     }
 

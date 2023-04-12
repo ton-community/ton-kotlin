@@ -6,12 +6,18 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionInfo
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getOneTransaction")
 public data class LiteServerGetOneTransaction(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("account")
     val account: LiteServerAccountId,
+
+    @get:JvmName("lt")
     val lt: Long
 ) : TLFunction<LiteServerGetOneTransaction, LiteServerTransactionInfo> {
     override fun tlCodec(): TlCodec<LiteServerGetOneTransaction> = LiteServerGetOneTransaction

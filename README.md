@@ -43,7 +43,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 [maven-central-svg]: https://img.shields.io/maven-central/v/org.ton/ton-kotlin?color=blue
 
-[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.8.20-blue.svg?logo=kotlin
+[kotlin-svg]: https://img.shields.io/badge/Kotlin-1.8.0-blue.svg?logo=kotlin
 
 [telegram-svg]: https://img.shields.io/badge/Telegram-join%20chat-blue.svg?logo=telegram
 

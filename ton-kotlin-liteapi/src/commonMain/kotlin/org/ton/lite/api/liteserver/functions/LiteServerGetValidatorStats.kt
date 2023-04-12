@@ -5,14 +5,24 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerValidatorStats
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getValidatorStats")
 public data class LiteServerGetValidatorStats(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("limit")
     val limit: Int,
-    val startAfter: ByteArray?,
+
+    @get:JvmName("startAfter")
+    val startAfter: ByteString?,
+
+    @get:JvmName("modifiedAfter")
     val modifiedAfter: Int?
 ) : TLFunction<LiteServerGetValidatorStats, LiteServerValidatorStats> {
     init {
@@ -24,31 +34,6 @@ public data class LiteServerGetValidatorStats(
     override fun tlCodec(): TlCodec<LiteServerGetValidatorStats> = LiteServerGetValidatorStats
 
     override fun resultTlCodec(): TlCodec<LiteServerValidatorStats> = LiteServerValidatorStats
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerGetValidatorStats) return false
-
-        if (mode != other.mode) return false
-        if (id != other.id) return false
-        if (limit != other.limit) return false
-        if (startAfter != null) {
-            if (other.startAfter == null) return false
-            if (!startAfter.contentEquals(other.startAfter)) return false
-        } else if (other.startAfter != null) return false
-        if (modifiedAfter != other.modifiedAfter) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = mode
-        result = 31 * result + id.hashCode()
-        result = 31 * result + limit
-        result = 31 * result + (startAfter?.contentHashCode() ?: 0)
-        result = 31 * result + (modifiedAfter ?: 0)
-        return result
-    }
 }
 
 private object LiteServerGetValidatorStatsTlConstructor : TlConstructor<LiteServerGetValidatorStats>(
@@ -60,7 +45,7 @@ private object LiteServerGetValidatorStatsTlConstructor : TlConstructor<LiteServ
         val id = reader.read(TonNodeBlockIdExt)
         val limit = reader.readInt()
         val startAfter = reader.readNullable(mode, 0) {
-            readRaw(32)
+            readByteString(32)
         }
         val modifiedAfter = reader.readNullable(mode, 2, TlReader::readInt)
         return LiteServerGetValidatorStats(mode, id, limit, startAfter, modifiedAfter)

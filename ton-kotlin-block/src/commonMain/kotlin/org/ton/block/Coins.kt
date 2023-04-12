@@ -2,7 +2,10 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.*
+import org.ton.bigint.BigInt
+import org.ton.bigint.pow
+import org.ton.bigint.times
+import org.ton.bigint.toBigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -10,6 +13,7 @@ import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.math.pow
 
 @SerialName("nanocoins")
 @Serializable
@@ -17,6 +21,9 @@ public data class Coins(
     @get:JvmName("amount")
     val amount: VarUInteger = VarUInteger(0)
 ) : TlbObject {
+    public constructor(amount: Long) : this(VarUInteger(amount))
+    public constructor(amount: BigInt) : this(VarUInteger(amount))
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("nanocoins") {
         field("amount", amount)
     }
@@ -50,8 +57,7 @@ public data class Coins(
         fun of(coins: Double, decimals: Int = DECIMALS): Coins =
             Coins(
                 VarUInteger(
-                    (coins.toLong().toBigInt() * 10L.toBigInt().pow(decimals)) +
-                            ((coins - coins.toLong()).toLong().toBigInt() * 10.toBigInt().pow(decimals))
+                    (coins * 10.0.pow(decimals)).toLong().toBigInt()
                 )
             )
 

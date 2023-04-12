@@ -1,7 +1,11 @@
 package org.ton.mnemonic
 
 import kotlinx.coroutines.runBlocking
+import org.ton.crypto.DecryptorAes
+import org.ton.crypto.EncryptorAes
+import org.ton.crypto.digest.Digest
 import org.ton.crypto.hex
+import org.ton.crypto.mac.hmac.HMac
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -56,5 +60,15 @@ class MnemonicTest {
             "3078a0d183d0f0e88c4f8a5979590612f230a3228912838b66bcc9e9053b2584",
             hex(Mnemonic.toSeed(listOf("deal", "wrap", "runway", "possible"), "password"))
         )
+    }
+
+    @Test
+    fun testa() = runBlocking {
+        val myKey = HMac(Digest.sha512(), "test12121212".encodeToByteArray()).build()
+
+        val encrypted = EncryptorAes(myKey).encrypt("data".encodeToByteArray())
+        println("encrypted: ${encrypted.decodeToString()}")
+        val decrypted = DecryptorAes(myKey).decrypt(encrypted)
+        println("decrypted: ${decrypted.decodeToString()}")
     }
 }

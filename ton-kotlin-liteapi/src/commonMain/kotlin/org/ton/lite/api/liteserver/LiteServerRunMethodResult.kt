@@ -4,27 +4,48 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("liteServer.runMethodResult")
 public data class LiteServerRunMethodResult internal constructor(
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
     @SerialName("shardblk")
+    @get:JvmName("shardBlock")
     val shardBlock: TonNodeBlockIdExt,
+
     @SerialName("shard_proof")
-    val shardProof: ByteArray?,
-    val proof: ByteArray?,
+    @get:JvmName("shardProof")
+    val shardProof: ByteString?,
+
+    @get:JvmName("proof")
+    val proof: ByteString?,
+
     @SerialName("state_proof")
-    val stateProof: ByteArray?,
+    @get:JvmName("stateProof")
+    val stateProof: ByteString?,
+
     @SerialName("init_c7")
-    val initC7: ByteArray?,
+    @get:JvmName("initC7")
+    val initC7: ByteString?,
+
     @SerialName("lib_extras")
-    val libExtras: ByteArray?,
+    @get:JvmName("libExtras")
+    val libExtras: ByteString?,
+
     @SerialName("exit_code")
+    @get:JvmName("exitCode")
     val exitCode: Int,
-    val result: ByteArray?
+
+    @get:JvmName("result")
+    val result: ByteString?
 ) {
     public constructor(
         id: TonNodeBlockIdExt,
@@ -46,64 +67,14 @@ public data class LiteServerRunMethodResult internal constructor(
         ),
         id,
         shardBlock,
-        shardProof,
-        proof,
-        stateProof,
-        initC7,
-        libExtras,
+        shardProof?.toByteString(),
+        proof?.toByteString(),
+        stateProof?.toByteString(),
+        initC7?.toByteString(),
+        libExtras?.toByteString(),
         exitCode,
-        result
+        result?.toByteString()
     )
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LiteServerRunMethodResult) return false
-
-        if (mode != other.mode) return false
-        if (id != other.id) return false
-        if (shardBlock != other.shardBlock) return false
-        if (shardProof != null) {
-            if (other.shardProof == null) return false
-            if (!shardProof.contentEquals(other.shardProof)) return false
-        } else if (other.shardProof != null) return false
-        if (proof != null) {
-            if (other.proof == null) return false
-            if (!proof.contentEquals(other.proof)) return false
-        } else if (other.proof != null) return false
-        if (stateProof != null) {
-            if (other.stateProof == null) return false
-            if (!stateProof.contentEquals(other.stateProof)) return false
-        } else if (other.stateProof != null) return false
-        if (initC7 != null) {
-            if (other.initC7 == null) return false
-            if (!initC7.contentEquals(other.initC7)) return false
-        } else if (other.initC7 != null) return false
-        if (libExtras != null) {
-            if (other.libExtras == null) return false
-            if (!libExtras.contentEquals(other.libExtras)) return false
-        } else if (other.libExtras != null) return false
-        if (exitCode != other.exitCode) return false
-        if (result != null) {
-            if (other.result == null) return false
-            if (!result.contentEquals(other.result)) return false
-        } else if (other.result != null) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result1 = mode
-        result1 = 31 * result1 + id.hashCode()
-        result1 = 31 * result1 + shardBlock.hashCode()
-        result1 = 31 * result1 + (shardProof?.contentHashCode() ?: 0)
-        result1 = 31 * result1 + (proof?.contentHashCode() ?: 0)
-        result1 = 31 * result1 + (stateProof?.contentHashCode() ?: 0)
-        result1 = 31 * result1 + (initC7?.contentHashCode() ?: 0)
-        result1 = 31 * result1 + (libExtras?.contentHashCode() ?: 0)
-        result1 = 31 * result1 + exitCode
-        result1 = 31 * result1 + (result?.contentHashCode() ?: 0)
-        return result1
-    }
 
     public companion object : TlCodec<LiteServerRunMethodResult> by LiteServerRunMethodResultTlConstructor {
         @JvmStatic
@@ -146,13 +117,13 @@ private object LiteServerRunMethodResultTlConstructor : TlConstructor<LiteServer
         val mode = reader.readInt()
         val id = reader.read(TonNodeBlockIdExt)
         val shardblk = reader.read(TonNodeBlockIdExt)
-        val shardProof = reader.readNullable(mode, 0) { readBytes() }
-        val proof = reader.readNullable(mode, 0) { readBytes() }
-        val stateProof = reader.readNullable(mode, 1) { readBytes() }
-        val initC7 = reader.readNullable(mode, 3) { readBytes() }
-        val libExtras = reader.readNullable(mode, 4) { readBytes() }
+        val shardProof = reader.readNullable(mode, 0) { readByteString() }
+        val proof = reader.readNullable(mode, 0) { readByteString() }
+        val stateProof = reader.readNullable(mode, 1) { readByteString() }
+        val initC7 = reader.readNullable(mode, 3) { readByteString() }
+        val libExtras = reader.readNullable(mode, 4) { readByteString() }
         val exitCode = reader.readInt()
-        val result = reader.readNullable(mode, 2) { readBytes() }
+        val result = reader.readNullable(mode, 2) { readByteString() }
         return LiteServerRunMethodResult(
             mode,
             id,

@@ -9,23 +9,25 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
+import kotlin.jvm.JvmName
 
 @SerialName("dht.config.random.local")
 @Polymorphic
 @Serializable
 @JsonClassDiscriminator("@type")
 public class DhtConfigRandomLocal(
+    @get:JvmName("cnt")
     public val cnt: Int
 ) : DhtConfigLocal {
     public companion object : TlConstructor<DhtConfigRandomLocal>(
         schema = "dht.config.random.local cnt:int = dht.config.Local",
     ) {
-        override fun encode(output: TlWriter, value: DhtConfigRandomLocal) {
-            output.writeInt(value.cnt)
+        override fun encode(writer: TlWriter, value: DhtConfigRandomLocal) {
+            writer.writeInt(value.cnt)
         }
 
-        override fun decode(input: TlReader): DhtConfigRandomLocal {
-            val cnt = input.readInt()
+        override fun decode(reader: TlReader): DhtConfigRandomLocal {
+            val cnt = reader.readInt()
             return DhtConfigRandomLocal(cnt)
         }
     }

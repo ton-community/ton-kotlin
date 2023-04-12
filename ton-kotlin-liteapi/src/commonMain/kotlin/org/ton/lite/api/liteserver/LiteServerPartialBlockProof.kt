@@ -4,13 +4,21 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.partialBlockProof")
 public data class LiteServerPartialBlockProof(
+    @get:JvmName("complete")
     val complete: Boolean,
+
+    @get:JvmName("from")
     val from: TonNodeBlockIdExt,
+
+    @get:JvmName("to")
     val to: TonNodeBlockIdExt,
+
+    @get:JvmName("steps")
     val steps: List<LiteServerBlockLink>
 ) {
     public companion object : TlCodec<LiteServerPartialBlockProof> by LiteServerPartialBlockProofTlConstructor

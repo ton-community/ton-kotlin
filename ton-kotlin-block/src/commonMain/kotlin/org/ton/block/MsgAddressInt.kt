@@ -5,6 +5,7 @@ package org.ton.block
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
+import org.ton.bitstring.BitString
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import kotlin.contracts.contract
@@ -17,6 +18,7 @@ inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.parse(a
 @Serializable
 public sealed interface MsgAddressInt : MsgAddress {
     val workchainId: Int
+    val address: BitString
 
     companion object : TlbCodec<MsgAddressInt> by MsgAddressIntTlbCombinator {
         @JvmStatic

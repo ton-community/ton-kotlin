@@ -10,13 +10,21 @@ import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionList
 import org.ton.tl.*
 import org.ton.tl.ByteString.Companion.toByteString
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.getTransactions")
 public data class LiteServerGetTransactions(
+    @get:JvmName("count")
     val count: Int,
+
+    @get:JvmName("account")
     val account: LiteServerAccountId,
+
+    @get:JvmName("lt")
     val lt: Long,
+
+    @get:JvmName("hash")
     val hash: ByteString
 ) : TLFunction<LiteServerGetTransactions, LiteServerTransactionList> {
     public constructor(count: Int, account: LiteServerAccountId, lt: Long, hash: ByteArray) : this(

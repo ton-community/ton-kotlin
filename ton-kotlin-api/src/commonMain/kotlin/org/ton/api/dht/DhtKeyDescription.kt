@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
-import org.ton.crypto.base64
 import org.ton.tl.*
 import kotlin.jvm.JvmStatic
 
@@ -15,49 +14,19 @@ public data class DhtKeyDescription(
     val id: PublicKey,
     @SerialName("update_rule")
     val updateRule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
-    override val signature: ByteArray = ByteArray(0)
+    override val signature: ByteString = ByteString.of()
 ) : SignedTlObject<DhtKeyDescription> {
     override fun signed(privateKey: PrivateKey): DhtKeyDescription =
         copy(
             signature = privateKey.sign(
-                copy(signature = ByteArray(0)).toByteArray()
-            )
+                copy(signature = ByteArray(0).asByteString()).toByteArray()
+            ).asByteString()
         )
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0))), signature)
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0).asByteString())), signature.toByteArray())
 
     override fun tlCodec(): TlCodec<DhtKeyDescription> = DhtKeyDescriptionTlConstructor
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DhtKeyDescription) return false
-        if (key != other.key) return false
-        if (id != other.id) return false
-        if (updateRule != other.updateRule) return false
-        if (!signature.contentEquals(other.signature)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = key.hashCode()
-        result = 31 * result + id.hashCode()
-        result = 31 * result + updateRule.hashCode()
-        result = 31 * result + signature.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String = buildString {
-        append("DhtKeyDescription(key=")
-        append(key)
-        append(", id=")
-        append(id)
-        append(", updateRule=")
-        append(updateRule)
-        append(", signature=")
-        append(base64(signature))
-        append(")")
-    }
 
     public companion object : TlCodec<DhtKeyDescription> by DhtKeyDescriptionTlConstructor {
         @JvmStatic
@@ -85,7 +54,7 @@ private object DhtKeyDescriptionTlConstructor : TlConstructor<DhtKeyDescription>
         val key = reader.read(DhtKey)
         val id = reader.read(PublicKey)
         val updateRule = reader.read(DhtUpdateRule)
-        val signature = reader.readBytes()
+        val signature = reader.readByteString()
         return DhtKeyDescription(key, id, updateRule, signature)
     }
 }

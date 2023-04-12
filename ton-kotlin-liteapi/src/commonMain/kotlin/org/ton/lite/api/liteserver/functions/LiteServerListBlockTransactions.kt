@@ -6,17 +6,29 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.lite.api.liteserver.LiteServerBlockTransactions
 import org.ton.lite.api.liteserver.LiteServerTransactionId3
 import org.ton.tl.*
+import kotlin.jvm.JvmName
 
 @Serializable
 @SerialName("liteServer.listBlockTransactions")
 public data class LiteServerListBlockTransactions(
+    @get:JvmName("id")
     val id: TonNodeBlockIdExt,
+
+    @get:JvmName("mode")
     val mode: Int,
+
+    @get:JvmName("count")
     val count: Int,
+
+    @get:JvmName("after")
     val after: LiteServerTransactionId3?,
+
     @SerialName("reverse_order")
+    @get:JvmName("reverseOrder")
     val reverseOrder: Boolean = true,
+
     @SerialName("want_proof")
+    @get:JvmName("wantProof")
     val wantProof: Boolean = true
 ) : TLFunction<LiteServerListBlockTransactions, LiteServerBlockTransactions> {
     public companion object : TlCodec<LiteServerListBlockTransactions> by LiteServerListBlockTransactionsTlConstructor
