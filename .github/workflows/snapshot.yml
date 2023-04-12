@@ -10,7 +10,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository
+            gradle_args: publishToSonatype
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
@@ -25,6 +25,7 @@ jobs:
           arguments: ${{ matrix.gradle_args }}
         env:
           TON_KOTLIN_SNAPSHOT: true
+          TON_KOTLIN_DISABLE_NATIVE_TARGET: true
           SIGNING_SECRET_KEY: ${{ secrets.SIGNING_SECRET_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}

@@ -10,6 +10,7 @@ plugins {
 
 val isCI = System.getenv("CI") == "true"
 val isSnapshot = System.getenv("TON_KOTLIN_SNAPSHOT") == "true"
+val disableNativeTarget = System.getenv("TON_KOTLIN_DISABLE_NATIVE_TARGET") == "true"
 
 //val githubVersion = System.getenv("GITHUB_REF")?.substring(11)
 //if (isCI) {
@@ -52,33 +53,35 @@ allprojects {
         sourceSets.create("nativeMain").dependsOn(sourceSets["commonMain"])
         sourceSets.create("nativeTest").dependsOn(sourceSets["commonTest"])
 
-        sourceSets.create("linuxMain").dependsOn(sourceSets["nativeMain"])
-        sourceSets.create("linuxTest").dependsOn(sourceSets["nativeTest"])
-        linuxX64 {
-            compilations["main"].defaultSourceSet.dependsOn(sourceSets["linuxMain"])
-            compilations["test"].defaultSourceSet.dependsOn(sourceSets["linuxTest"])
-        }
+        if (!disableNativeTarget) {
+            sourceSets.create("linuxMain").dependsOn(sourceSets["nativeMain"])
+            sourceSets.create("linuxTest").dependsOn(sourceSets["nativeTest"])
+            linuxX64 {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["linuxMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["linuxTest"])
+            }
 
-        sourceSets.create("mingwMain").dependsOn(sourceSets["nativeMain"])
-        sourceSets.create("mingwTest").dependsOn(sourceSets["nativeTest"])
-        mingwX64 {
-            compilations["main"].defaultSourceSet.dependsOn(sourceSets["mingwMain"])
-            compilations["test"].defaultSourceSet.dependsOn(sourceSets["mingwTest"])
-        }
+            sourceSets.create("mingwMain").dependsOn(sourceSets["nativeMain"])
+            sourceSets.create("mingwTest").dependsOn(sourceSets["nativeTest"])
+            mingwX64 {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["mingwMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["mingwTest"])
+            }
 
-        sourceSets.create("darwinMain").dependsOn(sourceSets["nativeMain"])
-        sourceSets.create("darwinTest").dependsOn(sourceSets["nativeTest"])
-        macosArm64 {
-            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
-            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
-        }
-        macosX64 {
-            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
-            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
-        }
-        ios {
-            compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
-            compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+            sourceSets.create("darwinMain").dependsOn(sourceSets["nativeMain"])
+            sourceSets.create("darwinTest").dependsOn(sourceSets["nativeTest"])
+            macosArm64 {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+            }
+            macosX64 {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+            }
+            ios {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+            }
         }
 
         sourceSets {
