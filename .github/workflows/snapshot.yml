@@ -10,7 +10,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle_args: publishJvmPublicationToSonatypeRepository
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
