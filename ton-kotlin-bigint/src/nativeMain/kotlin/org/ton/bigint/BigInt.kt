@@ -42,6 +42,16 @@ public actual class BigInt internal constructor(
 
     override fun toShort(): Short =
         value.shortValue()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BigInt) return false
+        return value == other.value
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
 }
 
 public actual fun Int.toBigInt(): BigInt =
