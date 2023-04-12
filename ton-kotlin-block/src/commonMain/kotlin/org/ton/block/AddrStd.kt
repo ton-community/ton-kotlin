@@ -61,7 +61,7 @@ public data class AddrStd(
     override fun toString(): String = print().toString()
 
     public fun toString(
-        userFriendly: Boolean = true,
+        userFriendly: Boolean,
         urlSafe: Boolean = true,
         testOnly: Boolean = false,
         bounceable: Boolean = true

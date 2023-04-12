@@ -30,31 +30,31 @@ public data class Coins(
 
     override fun toString(): String = toString(decimals = DECIMALS)
 
-    fun toString(decimals: Int): String =
+    public fun toString(decimals: Int): String =
         amount.value.toString().let {
             it.dropLast(decimals).ifEmpty { "0" } + "." + it.takeLast(decimals).padStart(decimals, '0')
         }
 
-    operator fun plus(other: Coins): Coins = Coins(amount + other.amount)
-    operator fun minus(other: Coins): Coins = Coins(amount - other.amount)
-    operator fun times(other: Coins): Coins = Coins(amount * other.amount)
-    operator fun div(other: Coins): Coins = Coins(amount / other.amount)
-    operator fun rem(other: Coins): Coins = Coins(amount % other.amount)
-    operator fun inc(): Coins = Coins(amount + VarUInteger(1, 1.toBigInt()))
-    operator fun dec(): Coins = Coins(amount - VarUInteger(1, 1.toBigInt()))
+    public operator fun plus(other: Coins): Coins = Coins(amount + other.amount)
+    public operator fun minus(other: Coins): Coins = Coins(amount - other.amount)
+    public operator fun times(other: Coins): Coins = Coins(amount * other.amount)
+    public operator fun div(other: Coins): Coins = Coins(amount / other.amount)
+    public operator fun rem(other: Coins): Coins = Coins(amount % other.amount)
+    public operator fun inc(): Coins = Coins(amount + VarUInteger(1, 1.toBigInt()))
+    public operator fun dec(): Coins = Coins(amount - VarUInteger(1, 1.toBigInt()))
 
-    companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
-        private val DECIMALS = 9
-
-        @JvmStatic
-        fun tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor
+    public companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
+        private const val DECIMALS = 9
 
         @JvmStatic
-        fun of(coins: Long, decimals: Int = DECIMALS): Coins =
+        public fun tlbCodec(): TlbCodec<Coins> = CoinsTlbConstructor
+
+        @JvmStatic
+        public fun of(coins: Long, decimals: Int = DECIMALS): Coins =
             Coins(VarUInteger(coins.toBigInt() * 10.toBigInt().pow(decimals)))
 
         @JvmStatic
-        fun of(coins: Double, decimals: Int = DECIMALS): Coins =
+        public fun of(coins: Double, decimals: Int = DECIMALS): Coins =
             Coins(
                 VarUInteger(
                     (coins * 10.0.pow(decimals)).toLong().toBigInt()
@@ -62,10 +62,10 @@ public data class Coins(
             )
 
         @JvmStatic
-        fun ofNano(coins: Long): Coins = Coins(VarUInteger(coins))
+        public fun ofNano(coins: Long): Coins = Coins(VarUInteger(coins))
 
         @JvmStatic
-        fun ofNano(coins: BigInt): Coins = Coins(VarUInteger(coins))
+        public fun ofNano(coins: BigInt): Coins = Coins(VarUInteger(coins))
     }
 }
 

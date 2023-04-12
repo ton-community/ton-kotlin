@@ -5,24 +5,26 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.storeRef
+import org.ton.tl.ByteString
+import org.ton.tl.asByteString
 import org.ton.tlb.TlbConstructor
 import kotlin.math.min
 
-public object CellStringTlbConstructor : TlbConstructor<ByteArray>(
+public object CellStringTlbConstructor : TlbConstructor<ByteString>(
     schema = "", id = null
 ) {
     private const val MAX_BYTES = 1024
     private const val MAX_CHAIN_LENGTH = 16
 
-    override fun loadTlb(cellSlice: CellSlice): ByteArray {
+    override fun loadTlb(cellSlice: CellSlice): ByteString {
         var result = BitString.empty()
         forEach(cellSlice, Cell.MAX_BITS_SIZE) {
             result += it
         }
-        return result.toByteArray()
+        return result.toByteArray().asByteString()
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: ByteArray) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: ByteString) {
         require(value.size <= MAX_BYTES) {
             "String is too long"
         }
@@ -36,16 +38,16 @@ public object CellStringTlbConstructor : TlbConstructor<ByteArray>(
             "String is too long"
         }
         if (head / 8 == value.size) {
-            cellBuilder.storeBytes(value)
+            cellBuilder.storeBytes(value.toByteArray())
         } else {
-            cellBuilder.storeBytes(value.copyOf(head / 8))
+            cellBuilder.storeBytes(value.copyOf(head / 8).toByteArray())
             cellBuilder.storeRef {
                 storeTlb(this, value.copyOfRange(head / 8, value.size))
             }
         }
     }
 
-    private fun forEach(cellSlice: CellSlice, topBits: Int, f: (BitString)->Unit) {
+    private fun forEach(cellSlice: CellSlice, topBits: Int, f: (BitString) -> Unit) {
         val head = min(cellSlice.remainingBits, topBits)
         f(cellSlice.loadBits(head))
         var ref = try {

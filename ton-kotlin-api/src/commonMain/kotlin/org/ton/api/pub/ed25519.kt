@@ -11,6 +11,7 @@ import org.ton.crypto.Ed25519
 import org.ton.crypto.Encryptor
 import org.ton.crypto.EncryptorEd25519
 import org.ton.tl.*
+import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmStatic
 
 public inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519): PublicKeyEd25519 = PublicKeyEd25519.of(privateKey)
@@ -21,6 +22,8 @@ public inline fun PublicKeyEd25519(privateKey: PrivateKeyEd25519): PublicKeyEd25
 public data class PublicKeyEd25519(
     val key: ByteString
 ) : PublicKey, Encryptor {
+    public constructor(byteArray: ByteArray) : this(byteArray.toByteString())
+
     private val _adnlIdShort: AdnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
         AdnlIdShort(PublicKeyEd25519.hash(this).asByteString())
     }
