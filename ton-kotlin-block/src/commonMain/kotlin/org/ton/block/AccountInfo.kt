@@ -11,6 +11,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("account")
@@ -27,7 +28,10 @@ public data class AccountInfo(
     @get:JvmName("storage")
     val storage: AccountStorage // storage : AccountStorage
 ) : Account {
-    public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor
+    public companion object : TlbConstructorProvider<AccountInfo> by AccountInfoTlbConstructor {
+        @JvmStatic
+        override fun tlbConstructor(): TlbConstructor<AccountInfo> = AccountInfoTlbConstructor
+    }
 
     val isActive: Boolean get() = storage.state is AccountActive
     val isFrozen: Boolean get() = storage.state is AccountFrozen

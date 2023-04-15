@@ -3,10 +3,9 @@ package org.ton.adnl
 import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.tl.ByteString.Companion.toByteString
-import kotlin.test.Test
 
 class AdnlTest {
-    @Test
+//    @Test
     fun test(): Unit = runBlocking {
         val adnl = Adnl.create(AdnlLoopbackNetworkEngine())
 

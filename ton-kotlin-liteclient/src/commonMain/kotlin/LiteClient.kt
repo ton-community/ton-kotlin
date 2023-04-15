@@ -373,7 +373,14 @@ public class LiteClient(
         fromTransactionId: TransactionId,
         count: Int,
     ): List<TransactionInfo> {
-        val rawTransactionList = liteApi(LiteServerGetTransactions(count, accountAddress.toLiteServer(), fromTransactionId.lt, fromTransactionId.hash.toByteArray()))
+        val rawTransactionList = liteApi(
+            LiteServerGetTransactions(
+                count,
+                accountAddress.toLiteServer(),
+                fromTransactionId.lt,
+                fromTransactionId.hash.toByteArray()
+            )
+        )
         val transactionsCells = BagOfCells.read(ByteReadPacket(rawTransactionList.transactions)).roots
         check(rawTransactionList.ids.size == transactionsCells.size)
         return List(transactionsCells.size) { index ->

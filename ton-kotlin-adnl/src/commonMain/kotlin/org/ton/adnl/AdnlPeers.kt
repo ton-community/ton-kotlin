@@ -1,12 +1,11 @@
 package org.ton.adnl
 
-import kotlinx.atomicfu.atomic
+import org.ton.adnl.peer.AdnlMessagePartDecoder
+import org.ton.adnl.peer.AdnlMessagePartEncoder
 import org.ton.api.adnl.AdnlIdShort
 import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.adnl.message.*
-import org.ton.crypto.digest.sha256
 import org.ton.tl.ByteString
-import org.ton.tl.asByteString
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -66,33 +65,16 @@ public interface AdnlPeer {
 internal open class AdnlPeerSessionImpl(
     override val adnl: Adnl
 ) : AdnlPeerSession {
-    private var hugeMessageHash: ByteString = ZERO_HASH
-    private var hugeMessage: ByteArray = EMPTY_BYTES
-    private val hugeMessageOffset = atomic(0)
+    private val messagePartDecoder = AdnlMessagePartDecoder(hugePacketMaxSize)
+    private val messagePartEncoder = AdnlMessagePartEncoder(mtu, hugePacketMaxSize)
 
     override suspend fun sendMessages(vararg messages: AdnlMessage) {
         val newMessages = ArrayList<AdnlMessage>()
-        messages.forEach {  message ->
+        messages.forEach { message ->
             if (AdnlMessage.sizeOf(message) <= mtu) {
                 newMessages.add(message)
             } else {
-                val b = AdnlMessage.encodeToByteArray(message, boxed = true)
-                check(b.size <= hugePacketMaxSize)
-                val hash = sha256(b).asByteString()
-                val size = b.size
-                var offset = 0
-                val partSize = adnl.mtu
-                while (offset < size) {
-                    val data = b.copyOfRange(offset, minOf(offset + partSize, b.size))
-                    val partMessage = AdnlMessagePart(
-                        hash,
-                        size,
-                        offset,
-                        data.asByteString()
-                    )
-                    newMessages.add(partMessage)
-                    offset += partSize
-                }
+                newMessages.addAll(messagePartEncoder.encode(message))
             }
         }
         sendRawMessages(newMessages)
@@ -131,39 +113,13 @@ internal open class AdnlPeerSessionImpl(
     }
 
     override fun handleMessage(message: AdnlMessagePart) {
-        check(message.totalSize <= hugePacketMaxSize) { "too big message: size=${message.totalSize}" }
-        check(message.hash == ZERO_HASH) { "zero hash" }
-        if (message.hash != hugeMessageHash) {
-            hugeMessageHash = if (message.offset == 0) message.hash else ZERO_HASH
-            hugeMessage = ByteArray(message.totalSize)
-        }
-        check(message.totalSize == hugeMessage.size) { "invalid size" }
-        check(message.data.size + message.offset <= message.totalSize) { "bad part" }
-
-        if (message.offset == hugeMessageOffset.value) {
-            message.data.copyInto(hugeMessage, message.offset)
-            val totalSize = hugeMessageOffset.addAndGet(message.data.size)
-
-            if (totalSize == hugeMessage.size) {
-                val actualMessageHash = sha256(hugeMessage).asByteString()
-                check(actualMessageHash == hugeMessageHash) {
-                    "hash mismatch, expected: $hugeMessageHash, actual: $actualMessageHash"
-                }
-                hugeMessageHash = ZERO_HASH
-                hugeMessageOffset.value = 0
-                hugeMessage = EMPTY_BYTES
-                val recoveredMessage = AdnlMessage.decodeBoxed(hugeMessage)
-                handleMessage(recoveredMessage)
-            }
+        val decodedMessage = messagePartDecoder.decode(message)
+        if (decodedMessage != null) {
+            handleMessage(decodedMessage)
         }
     }
 
     private suspend fun sendRawMessages(messages: List<AdnlMessage>) {
         adnl
-    }
-
-    companion object {
-        private val ZERO_HASH = ByteArray(32).asByteString()
-        private val EMPTY_BYTES = ByteArray(0)
     }
 }

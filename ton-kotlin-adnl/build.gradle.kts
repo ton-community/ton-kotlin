@@ -38,6 +38,7 @@ kotlin {
             implementation(libs.coroutines.jvm)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.utils)
+            implementation("org.jetbrains.kotlinx:lincheck:2.17")
         }
     }
 }
