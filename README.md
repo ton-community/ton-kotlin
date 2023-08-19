@@ -10,7 +10,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.15")
+    implementation 'org.ton:ton-kotlin:0.2.15'
 }
 ```
 
