@@ -25,6 +25,8 @@ jobs:
             gradle_args: publishIosX64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: publishIosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishIosSimulatorArm64PublicationToSonatypeRepository
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources

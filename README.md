@@ -10,7 +10,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.15")
+    implementation("org.ton:ton-kotlin:0.2.17")
 }
 ```
 
@@ -21,7 +21,7 @@ dependencies {
 <dependency>
     <groupId>org.ton</groupId>
     <artifactId>ton-kotlin-jvm</artifactId>
-    <version>0.2.15</version>
+    <version>0.2.17</version>
 </dependency>
 ```
 

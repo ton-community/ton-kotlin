@@ -21,7 +21,7 @@ val disableNativeTarget = System.getenv("TON_KOTLIN_DISABLE_NATIVE_TARGET") == "
 
 allprojects {
     group = "org.ton"
-    version = "0.3.0-SNAPSHOT".let {
+    version = "0.2.17".let {
         if (isSnapshot && !it.endsWith("-SNAPSHOT")) {
             "$it-SNAPSHOT"
         } else it
@@ -79,6 +79,10 @@ allprojects {
                 compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
             }
             ios {
+                compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
+                compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
+            }
+            iosSimulatorArm64 {
                 compilations["main"].defaultSourceSet.dependsOn(sourceSets["darwinMain"])
                 compilations["test"].defaultSourceSet.dependsOn(sourceSets["darwinTest"])
             }
