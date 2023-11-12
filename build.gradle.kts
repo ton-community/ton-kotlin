@@ -21,7 +21,7 @@ val disableNativeTarget = System.getenv("TON_KOTLIN_DISABLE_NATIVE_TARGET") == "
 
 allprojects {
     group = "org.ton"
-    version = "0.2.17".let {
+    version = "0.2.18".let {
         if (isSnapshot && !it.endsWith("-SNAPSHOT")) {
             "$it-SNAPSHOT"
         } else it

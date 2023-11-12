@@ -10,7 +10,7 @@
 
 ```kotlin
 dependencies {
-    implementation("org.ton:ton-kotlin:0.2.17")
+    implementation("org.ton:ton-kotlin:0.2.18")
 }
 ```
 
@@ -21,7 +21,7 @@ dependencies {
 <dependency>
     <groupId>org.ton</groupId>
     <artifactId>ton-kotlin-jvm</artifactId>
-    <version>0.2.17</version>
+    <version>0.2.18</version>
 </dependency>
 ```
 
@@ -31,7 +31,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin/0.2.15
+[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin/0.2.18
 
 [license]: LICENSE
 
