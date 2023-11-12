@@ -8,7 +8,7 @@ kotlin {
         val commonTest by getting
         val nativeMain by getting {
             dependencies {
-                implementation("com.ionspin.kotlin:bignum:0.3.7")
+                implementation("com.ionspin.kotlin:bignum:0.3.8")
             }
         }
     }
