@@ -18,7 +18,7 @@ profile:
 #    paths:
 #      - <path/where/not/run/inspection>
 
-projectJDK: liberica-19 #(Applied in CI/CD pipeline)
+projectJDK: liberica-17 #(Applied in CI/CD pipeline)
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh
