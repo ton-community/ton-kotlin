@@ -12,7 +12,7 @@ jobs:
           - os: macos-latest
             gradle_args: publishIosX64PublicationToSonatypeRepository publishIosArm64PublicationToSonatypeRepository publishIosSimulatorArm64PublicationToSonatypeRepository publishTvosX64PublicationToSonatypeRepository publishTvosArm64PublicationToSonatypeRepository publishTvosSimulatorArm64PublicationToSonatypeRepository publishTvosSimulatorArm64PublicationToSonatypeRepository publishWatchosArm32PublicationToSonatypeRepository publishWatchosArm64PublicationToSonatypeRepository publishWatchosX64PublicationToSonatypeRepository publishWatchosSimulatorArm64PublicationToSonatypeRepository publishMacosX64PublicationToSonatypeRepository publishMacosArm64PublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository publishArm64PublicationToSonatypeRepository publishMingwX64PublicationToSonatypeRepository
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository publishLinuxArm64PublicationToSonatypeRepository publishMingwX64PublicationToSonatypeRepository
 
     runs-on: ${{ matrix.os }}
     steps:
