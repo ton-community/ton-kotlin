@@ -1,11 +1,15 @@
 [versions]
-coroutines = "1.7.0-Beta" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
-datetime = "0.4.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-datetime
-atomicfu = "0.20.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
+coroutines = "1.7.3" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+datetime = "0.5.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-datetime
+atomicfu = "0.23.1" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
 benchmark = "0.4.7" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-benchmark-runtime
-serialization = "1.5.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
-ktor = "2.2.4" # https://search.maven.org/artifact/io.ktor/ktor
+serialization = "1.6.2" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
+ktor = "2.3.7" # https://search.maven.org/artifact/io.ktor/ktor
 curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
+bignum = "0.3.8" # https://search.maven.org/artifact/com.ionspin.kotlin/bignum
+crypto = "0.0.1"
+cache4k = "0.12.0" # https://central.sonatype.com/namespace/io.github.reactivecircus.cache4k
+bcv = "0.13.2"
 
 [libraries]
 coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
@@ -24,3 +28,8 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 curve25519 = { module = "io.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+crypto = { module = "io.github.andreypfau:kotlinx-crypto", version.ref = "crypto" }
+
+[plugins]
+bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }
