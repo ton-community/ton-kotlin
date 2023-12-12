@@ -10,6 +10,7 @@ public abstract interface class org/ton/api/adnl/AdnlAddress : org/ton/tl/TlObje
 }
 
 public final class org/ton/api/adnl/AdnlAddress$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlAddressList : org/ton/tl/TlObject {
@@ -36,11 +37,23 @@ public final class org/ton/api/adnl/AdnlAddressList : org/ton/tl/TlObject {
 	public final fun version ()I
 }
 
+public final class org/ton/api/adnl/AdnlAddressList$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlAddressList$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlAddressList;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlAddressList;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlAddressList$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlAddressList;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlAddressList;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlAddressTunnel : org/ton/api/adnl/AdnlAddress {
@@ -59,11 +72,23 @@ public final class org/ton/api/adnl/AdnlAddressTunnel : org/ton/api/adnl/AdnlAdd
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlAddressTunnel$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlAddressTunnel$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlAddressTunnel;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlAddressTunnel;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlAddressTunnel$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlAddressTunnel;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlAddressTunnel;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlAddressUdp : org/ton/api/adnl/AdnlAddress, org/ton/api/adnl/AdnlIp {
@@ -80,11 +105,23 @@ public final class org/ton/api/adnl/AdnlAddressUdp : org/ton/api/adnl/AdnlAddres
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlAddressUdp$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlAddressUdp$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlAddressUdp;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlAddressUdp;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlAddressUdp$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlAddressUdp;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlAddressUdp;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlAddressUdp6 : org/ton/api/adnl/AdnlAddress, org/ton/api/adnl/AdnlIp6 {
@@ -102,11 +139,23 @@ public final class org/ton/api/adnl/AdnlAddressUdp6 : org/ton/api/adnl/AdnlAddre
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlAddressUdp6$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlAddressUdp6$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlAddressUdp6;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlAddressUdp6;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlAddressUdp6$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlAddressUdp6;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlAddressUdp6;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlIdShort : java/lang/Comparable, org/ton/tl/TlObject {
@@ -125,6 +174,17 @@ public final class org/ton/api/adnl/AdnlIdShort : java/lang/Comparable, org/ton/
 	public static final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 	public fun toString ()Ljava/lang/String;
 	public final fun verify (Lorg/ton/api/overlay/OverlayNode;)Z
+}
+
+public final class org/ton/api/adnl/AdnlIdShort$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlIdShort$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlIdShort;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlIdShort;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlIdShort$Companion : org/ton/tl/TlCodec {
@@ -158,6 +218,7 @@ public final class org/ton/api/adnl/AdnlIdShort$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/adnl/AdnlIdShort;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/adnl/AdnlIdShort;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
 
@@ -186,11 +247,23 @@ public final class org/ton/api/adnl/AdnlNode {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlNode$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlNode$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlNode;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlNode;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlNode$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlNode;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlNode;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlNodes {
@@ -205,6 +278,17 @@ public final class org/ton/api/adnl/AdnlNodes {
 	public fun hashCode ()I
 	public final fun nodes ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/adnl/AdnlNodes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlNodes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlNodes;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlNodes;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlNodes$Companion : org/ton/tl/TlCodec {
@@ -238,6 +322,7 @@ public final class org/ton/api/adnl/AdnlNodes$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/adnl/AdnlNodes;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/adnl/AdnlNodes;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlPacketContents : org/ton/api/SignedTlObject {
@@ -290,6 +375,17 @@ public final class org/ton/api/adnl/AdnlPacketContents : org/ton/api/SignedTlObj
 	public fun verify (Lorg/ton/api/pub/PublicKey;)Z
 }
 
+public final class org/ton/api/adnl/AdnlPacketContents$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlPacketContents$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlPacketContents;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlPacketContents;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlPacketContents$Companion : org/ton/tl/TlCodec {
 	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
 	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/adnl/AdnlPacketContents;
@@ -323,6 +419,7 @@ public final class org/ton/api/adnl/AdnlPacketContents$Companion : org/ton/tl/Tl
 	public static synthetic fun flags$default (Lorg/ton/api/adnl/AdnlPacketContents$Companion;ZZZZZZZZZZZZILjava/lang/Object;)I
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/adnl/AdnlPacketContents;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlPing {
@@ -337,11 +434,23 @@ public final class org/ton/api/adnl/AdnlPing {
 	public final fun value ()J
 }
 
+public final class org/ton/api/adnl/AdnlPing$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlPing$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlPing;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlPing;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlPing$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlPing;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlPing;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlPong {
@@ -356,11 +465,23 @@ public final class org/ton/api/adnl/AdnlPong {
 	public final fun value ()J
 }
 
+public final class org/ton/api/adnl/AdnlPong$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlPong$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlPong;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlPong;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlPong$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlPong;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlPong;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/adnl/AdnlProxy {
@@ -386,11 +507,23 @@ public final class org/ton/api/adnl/AdnlProxyFast : org/ton/api/adnl/AdnlProxy {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlProxyFast$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlProxyFast$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlProxyFast;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlProxyFast;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlProxyFast$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlProxyFast;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlProxyFast;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlProxyNone : org/ton/api/adnl/AdnlProxy {
@@ -406,11 +539,23 @@ public final class org/ton/api/adnl/AdnlProxyNone : org/ton/api/adnl/AdnlProxy {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlProxyNone$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlProxyNone$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlProxyNone;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlProxyNone;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlProxyNone$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlProxyNone;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlProxyNone;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlProxyTo {
@@ -434,11 +579,23 @@ public final class org/ton/api/adnl/AdnlProxyTo {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlProxyTo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlProxyTo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlProxyTo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlProxyTo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlProxyTo$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlProxyTo;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlProxyTo;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/AdnlProxyToSign {
@@ -460,11 +617,23 @@ public final class org/ton/api/adnl/AdnlProxyToSign {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/AdnlProxyToSign$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/AdnlProxyToSign$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/AdnlProxyToSign;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/AdnlProxyToSign;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/AdnlProxyToSign$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/AdnlProxyToSign;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/AdnlProxyToSign;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/config/AdnlConfigGlobal {
@@ -479,6 +648,17 @@ public final class org/ton/api/adnl/config/AdnlConfigGlobal {
 	public fun hashCode ()I
 	public final fun staticNodes ()Lorg/ton/api/adnl/AdnlNodes;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/adnl/config/AdnlConfigGlobal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/config/AdnlConfigGlobal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/config/AdnlConfigGlobal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/config/AdnlConfigGlobal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/config/AdnlConfigGlobal$Companion : org/ton/tl/TlCodec {
@@ -512,6 +692,7 @@ public final class org/ton/api/adnl/config/AdnlConfigGlobal$Companion : org/ton/
 	public fun encodeToByteString (Lorg/ton/api/adnl/config/AdnlConfigGlobal;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/adnl/config/AdnlConfigGlobal;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/adnl/message/AdnlMessage : org/ton/tl/TlObject {
@@ -520,6 +701,7 @@ public abstract interface class org/ton/api/adnl/message/AdnlMessage : org/ton/t
 }
 
 public final class org/ton/api/adnl/message/AdnlMessage$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun sizeOf (Lorg/ton/api/adnl/message/AdnlMessage;)I
 }
 
@@ -538,11 +720,23 @@ public final class org/ton/api/adnl/message/AdnlMessageAnswer : org/ton/api/adnl
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageAnswer$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageAnswer$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageAnswer;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageAnswer;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageAnswer$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageAnswer;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageAnswer;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun sizeOf (Lorg/ton/api/adnl/message/AdnlMessageAnswer;)I
 }
 
@@ -566,11 +760,23 @@ public final class org/ton/api/adnl/message/AdnlMessageConfirmChannel : org/ton/
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageConfirmChannel$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageConfirmChannel$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageConfirmChannel;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageConfirmChannel;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageConfirmChannel$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageConfirmChannel;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageConfirmChannel;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/message/AdnlMessageCreateChannel : org/ton/api/adnl/message/AdnlMessage {
@@ -590,11 +796,23 @@ public final class org/ton/api/adnl/message/AdnlMessageCreateChannel : org/ton/a
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageCreateChannel$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageCreateChannel$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageCreateChannel;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageCreateChannel;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageCreateChannel$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageCreateChannel;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageCreateChannel;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/adnl/message/AdnlMessageCustom : org/ton/api/adnl/message/AdnlMessage {
@@ -609,11 +827,23 @@ public final class org/ton/api/adnl/message/AdnlMessageCustom : org/ton/api/adnl
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageCustom$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageCustom$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageCustom;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageCustom;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageCustom$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageCustom;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageCustom;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun sizeOf (Lorg/ton/api/adnl/message/AdnlMessageCustom;)I
 }
 
@@ -648,6 +878,17 @@ public final class org/ton/api/adnl/message/AdnlMessagePart : org/ton/api/adnl/m
 	public final fun totalSize ()I
 }
 
+public final class org/ton/api/adnl/message/AdnlMessagePart$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessagePart$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessagePart;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessagePart;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessagePart$Companion : org/ton/tl/TlCodec {
 	public final fun build (Lorg/ton/api/adnl/message/AdnlMessage;I)Ljava/util/List;
 	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
@@ -680,6 +921,7 @@ public final class org/ton/api/adnl/message/AdnlMessagePart$Companion : org/ton/
 	public fun encodeToByteString (Lorg/ton/api/adnl/message/AdnlMessagePart;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/adnl/message/AdnlMessagePart;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun sizeOf (Lorg/ton/api/adnl/message/AdnlMessagePart;)I
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
@@ -698,11 +940,23 @@ public final class org/ton/api/adnl/message/AdnlMessageQuery : org/ton/api/adnl/
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageQuery$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageQuery$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageQuery;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageQuery;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageQuery$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageQuery;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageQuery;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun sizeOf (Lorg/ton/api/adnl/message/AdnlMessageQuery;)I
 }
 
@@ -719,11 +973,23 @@ public final class org/ton/api/adnl/message/AdnlMessageReinit : org/ton/api/adnl
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/adnl/message/AdnlMessageReinit$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/adnl/message/AdnlMessageReinit$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/adnl/message/AdnlMessageReinit;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/adnl/message/AdnlMessageReinit;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/adnl/message/AdnlMessageReinit$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/adnl/message/AdnlMessageReinit;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/adnl/message/AdnlMessageReinit;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/config/ConfigGlobal : org/ton/tl/TlObject {
@@ -742,6 +1008,17 @@ public final class org/ton/api/config/ConfigGlobal : org/ton/tl/TlObject {
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public final fun validator ()Lorg/ton/api/validator/config/ValidatorConfigGlobal;
+}
+
+public final class org/ton/api/config/ConfigGlobal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/config/ConfigGlobal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/config/ConfigGlobal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/config/ConfigGlobal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/config/ConfigGlobal$Companion : org/ton/tl/TlCodec {
@@ -775,9 +1052,11 @@ public final class org/ton/api/config/ConfigGlobal$Companion : org/ton/tl/TlCode
 	public fun encodeToByteString (Lorg/ton/api/config/ConfigGlobal;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/config/ConfigGlobal;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/config/ConfigLocal {
+	public static final field Companion Lorg/ton/api/config/ConfigLocal$Companion;
 	public fun <init> (Ljava/util/Collection;Ljava/util/Collection;Ljava/util/Collection;Ljava/util/Collection;Ljava/util/Collection;)V
 	public final fun component1 ()Ljava/util/Collection;
 	public final fun component2 ()Ljava/util/Collection;
@@ -796,7 +1075,23 @@ public final class org/ton/api/config/ConfigLocal {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/config/ConfigLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/config/ConfigLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/config/ConfigLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/config/ConfigLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/config/ConfigLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/control/ControlConfigLocal {
+	public static final field Companion Lorg/ton/api/control/ControlConfigLocal$Companion;
 	public fun <init> (Lorg/ton/api/pk/PrivateKey;Lorg/ton/tl/ByteString;I)V
 	public final fun component1 ()Lorg/ton/api/pk/PrivateKey;
 	public final fun component2 ()Lorg/ton/tl/ByteString;
@@ -809,6 +1104,21 @@ public final class org/ton/api/control/ControlConfigLocal {
 	public final fun getPub ()Lorg/ton/tl/ByteString;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/control/ControlConfigLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/control/ControlConfigLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/control/ControlConfigLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/control/ControlConfigLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/control/ControlConfigLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtKey : org/ton/tl/TlObject {
@@ -838,6 +1148,17 @@ public final class org/ton/api/dht/DhtKey : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/DhtKey$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtKey$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtKey;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtKey;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/DhtKey$Companion : org/ton/tl/TlConstructor {
 	public final fun address (Lorg/ton/api/adnl/AdnlIdShort;)Lorg/ton/api/dht/DhtKey;
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
@@ -845,6 +1166,7 @@ public final class org/ton/api/dht/DhtKey$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/DhtKey;)V
 	public final fun nodes (Lorg/ton/api/adnl/AdnlIdShort;)Lorg/ton/api/dht/DhtKey;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtKeyDescription : org/ton/api/SignedTlObject {
@@ -869,6 +1191,17 @@ public final class org/ton/api/dht/DhtKeyDescription : org/ton/api/SignedTlObjec
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public fun verify (Lorg/ton/api/pub/PublicKey;)Z
+}
+
+public final class org/ton/api/dht/DhtKeyDescription$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtKeyDescription$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtKeyDescription;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtKeyDescription;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtKeyDescription$Companion : org/ton/tl/TlCodec {
@@ -902,6 +1235,7 @@ public final class org/ton/api/dht/DhtKeyDescription$Companion : org/ton/tl/TlCo
 	public fun encodeToByteString (Lorg/ton/api/dht/DhtKeyDescription;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/DhtKeyDescription;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun signed (Ljava/lang/String;Lorg/ton/api/pk/PrivateKey;)Lorg/ton/api/dht/DhtKeyDescription;
 }
 
@@ -918,11 +1252,23 @@ public final class org/ton/api/dht/DhtMessage : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/DhtMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtMessage$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtMessage;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtMessage;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/DhtMessage$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/DhtMessage;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/DhtMessage;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtNode : org/ton/api/SignedTlObject {
@@ -949,6 +1295,17 @@ public final class org/ton/api/dht/DhtNode : org/ton/api/SignedTlObject {
 	public fun toString ()Ljava/lang/String;
 	public fun verify (Lorg/ton/api/pub/PublicKey;)Z
 	public final fun version ()I
+}
+
+public final class org/ton/api/dht/DhtNode$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtNode$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtNode;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtNode;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtNode$Companion : org/ton/tl/TlCodec {
@@ -982,6 +1339,7 @@ public final class org/ton/api/dht/DhtNode$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/dht/DhtNode;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/DhtNode;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtNodes : org/ton/tl/TlObject {
@@ -1000,11 +1358,23 @@ public final class org/ton/api/dht/DhtNodes : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/DhtNodes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtNodes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtNodes;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtNodes;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/DhtNodes$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/DhtNodes;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/DhtNodes;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtPong : org/ton/tl/TlObject {
@@ -1018,6 +1388,17 @@ public final class org/ton/api/dht/DhtPong : org/ton/tl/TlObject {
 	public fun hashCode ()I
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/dht/DhtPong$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtPong$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtPong;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtPong;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtPong$Companion : org/ton/tl/TlCodec {
@@ -1051,6 +1432,7 @@ public final class org/ton/api/dht/DhtPong$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/dht/DhtPong;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/DhtPong;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtStore : org/ton/tl/TLFunction {
@@ -1121,6 +1503,7 @@ public final class org/ton/api/dht/DhtUpdateRule : java/lang/Enum, org/ton/tl/Tl
 }
 
 public final class org/ton/api/dht/DhtUpdateRule$Companion : org/ton/tl/constructors/EnumTlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtValue : org/ton/api/SignedTlObject {
@@ -1144,6 +1527,17 @@ public final class org/ton/api/dht/DhtValue : org/ton/api/SignedTlObject {
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public fun verify (Lorg/ton/api/pub/PublicKey;)Z
+}
+
+public final class org/ton/api/dht/DhtValue$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtValue$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtValue;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtValue;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtValue$Companion : org/ton/tl/TlCodec {
@@ -1177,6 +1571,7 @@ public final class org/ton/api/dht/DhtValue$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/dht/DhtValue;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/DhtValue;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtValueFound : org/ton/api/dht/DhtValueResult {
@@ -1192,11 +1587,23 @@ public final class org/ton/api/dht/DhtValueFound : org/ton/api/dht/DhtValueResul
 	public fun valueOrNull ()Lorg/ton/api/dht/DhtValue;
 }
 
+public final class org/ton/api/dht/DhtValueFound$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtValueFound$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtValueFound;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtValueFound;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/DhtValueFound$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/DhtValueFound;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/DhtValueFound;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/DhtValueNotFound : org/ton/api/dht/DhtValueResult {
@@ -1212,11 +1619,23 @@ public final class org/ton/api/dht/DhtValueNotFound : org/ton/api/dht/DhtValueRe
 	public fun valueOrNull ()Lorg/ton/api/dht/DhtValue;
 }
 
+public final class org/ton/api/dht/DhtValueNotFound$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/DhtValueNotFound$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/DhtValueNotFound;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/DhtValueNotFound;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/DhtValueNotFound$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/DhtValueNotFound;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/DhtValueNotFound;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/dht/DhtValueResult : org/ton/tl/TlObject {
@@ -1226,6 +1645,7 @@ public abstract interface class org/ton/api/dht/DhtValueResult : org/ton/tl/TlOb
 }
 
 public final class org/ton/api/dht/DhtValueResult$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/config/DhtConfigGlobal : org/ton/tl/TlObject {
@@ -1248,11 +1668,23 @@ public final class org/ton/api/dht/config/DhtConfigGlobal : org/ton/tl/TlObject 
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/config/DhtConfigGlobal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/config/DhtConfigGlobal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/config/DhtConfigGlobal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/config/DhtConfigGlobal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/config/DhtConfigGlobal$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/config/DhtConfigGlobal;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/config/DhtConfigGlobal;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/config/DhtConfigIdLocal : org/ton/api/dht/config/DhtConfigLocal {
@@ -1280,6 +1712,7 @@ public abstract interface class org/ton/api/dht/config/DhtConfigLocal : org/ton/
 }
 
 public final class org/ton/api/dht/config/DhtConfigLocal$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/config/DhtConfigRandomLocal : org/ton/api/dht/config/DhtConfigLocal {
@@ -1288,11 +1721,23 @@ public final class org/ton/api/dht/config/DhtConfigRandomLocal : org/ton/api/dht
 	public final fun cnt ()I
 }
 
+public final class org/ton/api/dht/config/DhtConfigRandomLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/config/DhtConfigRandomLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/config/DhtConfigRandomLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/config/DhtConfigRandomLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/config/DhtConfigRandomLocal$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/config/DhtConfigRandomLocal;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/config/DhtConfigRandomLocal;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/db/DhtDbBucket : org/ton/tl/TlObject {
@@ -1309,11 +1754,23 @@ public final class org/ton/api/dht/db/DhtDbBucket : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/db/DhtDbBucket$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/db/DhtDbBucket$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/db/DhtDbBucket;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/db/DhtDbBucket;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/db/DhtDbBucket$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/db/DhtDbBucket;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/db/DhtDbBucket;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/db/DhtDbKey : org/ton/tl/TlObject {
@@ -1329,11 +1786,23 @@ public final class org/ton/api/dht/db/DhtDbKey : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/db/DhtDbKey$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/db/DhtDbKey$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/db/DhtDbKey;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/db/DhtDbKey;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/db/DhtDbKey$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/dht/db/DhtDbKey;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/dht/db/DhtDbKey;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/functions/DhtFindValue : org/ton/tl/TLFunction {
@@ -1367,6 +1836,17 @@ public final class org/ton/api/dht/functions/DhtPing : org/ton/tl/TLFunction {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/dht/functions/DhtPing$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/functions/DhtPing$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/functions/DhtPing;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/functions/DhtPing;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/dht/functions/DhtPing$Companion : org/ton/tl/TlCodec {
 	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
 	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/dht/functions/DhtPing;
@@ -1398,6 +1878,7 @@ public final class org/ton/api/dht/functions/DhtPing$Companion : org/ton/tl/TlCo
 	public fun encodeToByteString (Lorg/ton/api/dht/functions/DhtPing;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/functions/DhtPing;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/functions/DhtQuery {
@@ -1410,6 +1891,17 @@ public final class org/ton/api/dht/functions/DhtQuery {
 	public final fun getNode ()Lorg/ton/api/dht/DhtNode;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/dht/functions/DhtQuery$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/dht/functions/DhtQuery$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/dht/functions/DhtQuery;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/dht/functions/DhtQuery;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/dht/functions/DhtQuery$Companion : org/ton/tl/TlCodec {
@@ -1443,6 +1935,7 @@ public final class org/ton/api/dht/functions/DhtQuery$Companion : org/ton/tl/TlC
 	public fun encodeToByteString (Lorg/ton/api/dht/functions/DhtQuery;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/dht/functions/DhtQuery;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/dht/functions/DhtQueryFunction {
@@ -1576,11 +2069,23 @@ public final class org/ton/api/fec/FecRaptorQ : org/ton/api/fec/FecType {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/fec/FecRaptorQ$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/fec/FecRaptorQ$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/fec/FecRaptorQ;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/fec/FecRaptorQ;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/fec/FecRaptorQ$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/fec/FecRaptorQ;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/fec/FecRaptorQ;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/fec/FecType : org/ton/tl/TlObject {
@@ -1592,6 +2097,7 @@ public abstract interface class org/ton/api/fec/FecType : org/ton/tl/TlObject {
 
 public final class org/ton/api/fec/FecType$Companion : org/ton/tl/TlCombinator {
 	public final fun check (Lorg/ton/api/fec/FecType;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpHeader {
@@ -1606,6 +2112,17 @@ public final class org/ton/api/http/HttpHeader {
 	public final fun getValue ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/http/HttpHeader$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/HttpHeader$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/HttpHeader;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/HttpHeader;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpHeader$Companion : org/ton/tl/TlCodec {
@@ -1639,6 +2156,7 @@ public final class org/ton/api/http/HttpHeader$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/http/HttpHeader;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/http/HttpHeader;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpHeaderKt {
@@ -1661,6 +2179,17 @@ public final class org/ton/api/http/HttpPayloadPart : org/ton/tl/TlObject {
 	public fun hashCode ()I
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/http/HttpPayloadPart$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/HttpPayloadPart$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/HttpPayloadPart;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/HttpPayloadPart;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpPayloadPart$Companion : org/ton/tl/TlCodec {
@@ -1694,6 +2223,7 @@ public final class org/ton/api/http/HttpPayloadPart$Companion : org/ton/tl/TlCod
 	public fun encodeToByteString (Lorg/ton/api/http/HttpPayloadPart;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/http/HttpPayloadPart;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpResponse : org/ton/tl/TlObject {
@@ -1715,6 +2245,17 @@ public final class org/ton/api/http/HttpResponse : org/ton/tl/TlObject {
 	public fun hashCode ()I
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/http/HttpResponse$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/HttpResponse$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/HttpResponse;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/HttpResponse;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/HttpResponse$Companion : org/ton/tl/TlCodec {
@@ -1748,6 +2289,7 @@ public final class org/ton/api/http/HttpResponse$Companion : org/ton/tl/TlCodec 
 	public fun encodeToByteString (Lorg/ton/api/http/HttpResponse;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/http/HttpResponse;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/functions/HttpGetNextPayloadPart : org/ton/tl/TLFunction {
@@ -1766,6 +2308,17 @@ public final class org/ton/api/http/functions/HttpGetNextPayloadPart : org/ton/t
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/http/functions/HttpGetNextPayloadPart$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/functions/HttpGetNextPayloadPart$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/functions/HttpGetNextPayloadPart;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/functions/HttpGetNextPayloadPart;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/functions/HttpGetNextPayloadPart$Companion : org/ton/tl/TlCodec {
@@ -1799,6 +2352,7 @@ public final class org/ton/api/http/functions/HttpGetNextPayloadPart$Companion :
 	public fun encodeToByteString (Lorg/ton/api/http/functions/HttpGetNextPayloadPart;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/http/functions/HttpGetNextPayloadPart;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/functions/HttpRequest : org/ton/tl/TLFunction {
@@ -1823,11 +2377,23 @@ public final class org/ton/api/http/functions/HttpRequest : org/ton/tl/TLFunctio
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/http/functions/HttpRequest$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/functions/HttpRequest$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/functions/HttpRequest;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/functions/HttpRequest;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/http/functions/HttpRequest$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/http/functions/HttpRequest;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/http/functions/HttpRequest;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/server/HttpServerDnsEntry {
@@ -1842,6 +2408,17 @@ public final class org/ton/api/http/server/HttpServerDnsEntry {
 	public final fun getDomain ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/http/server/HttpServerDnsEntry$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/http/server/HttpServerDnsEntry$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/http/server/HttpServerDnsEntry;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/http/server/HttpServerDnsEntry;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/server/HttpServerDnsEntry$Companion : org/ton/tl/TlCodec {
@@ -1875,6 +2452,7 @@ public final class org/ton/api/http/server/HttpServerDnsEntry$Companion : org/to
 	public fun encodeToByteString (Lorg/ton/api/http/server/HttpServerDnsEntry;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/http/server/HttpServerDnsEntry;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/http/server/HttpServerHost {
@@ -1929,6 +2507,7 @@ public final class org/ton/api/http/server/HttpServerHost$Companion : org/ton/tl
 }
 
 public final class org/ton/api/id/config/IdConfigLocal {
+	public static final field Companion Lorg/ton/api/id/config/IdConfigLocal$Companion;
 	public fun <init> (Lorg/ton/api/pk/PrivateKey;)V
 	public final fun component1 ()Lorg/ton/api/pk/PrivateKey;
 	public final fun copy (Lorg/ton/api/pk/PrivateKey;)Lorg/ton/api/id/config/IdConfigLocal;
@@ -1939,7 +2518,23 @@ public final class org/ton/api/id/config/IdConfigLocal {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/id/config/IdConfigLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/id/config/IdConfigLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/id/config/IdConfigLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/id/config/IdConfigLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/id/config/IdConfigLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/liteclient/config/LiteClientConfigGlobal {
+	public static final field Companion Lorg/ton/api/liteclient/config/LiteClientConfigGlobal$Companion;
 	public fun <init> (Lorg/ton/api/dht/config/DhtConfigGlobal;Ljava/util/Collection;Lorg/ton/api/validator/config/ValidatorConfigGlobal;)V
 	public synthetic fun <init> (Lorg/ton/api/dht/config/DhtConfigGlobal;Ljava/util/Collection;Lorg/ton/api/validator/config/ValidatorConfigGlobal;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lorg/ton/api/dht/config/DhtConfigGlobal;
@@ -1955,7 +2550,23 @@ public final class org/ton/api/liteclient/config/LiteClientConfigGlobal {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/liteclient/config/LiteClientConfigGlobal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/liteclient/config/LiteClientConfigGlobal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/liteclient/config/LiteClientConfigGlobal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/liteclient/config/LiteClientConfigGlobal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/liteclient/config/LiteClientConfigGlobal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/liteserver/LiteServerDesc {
+	public static final field Companion Lorg/ton/api/liteserver/LiteServerDesc$Companion;
 	public fun <init> (Lorg/ton/api/pub/PublicKey;II)V
 	public final fun component1 ()Lorg/ton/api/pub/PublicKey;
 	public final fun component2 ()I
@@ -1970,10 +2581,31 @@ public final class org/ton/api/liteserver/LiteServerDesc {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/liteserver/LiteServerDesc$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/liteserver/LiteServerDesc$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/liteserver/LiteServerDesc;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/liteserver/LiteServerDesc;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/liteserver/LiteServerDesc$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public abstract interface class org/ton/api/liteserver/config/LiteServerConfigLocal {
+	public static final field Companion Lorg/ton/api/liteserver/config/LiteServerConfigLocal$Companion;
+}
+
+public final class org/ton/api/liteserver/config/LiteServerConfigLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/liteserver/config/LiteServerConfigRandomLocal : org/ton/api/liteserver/config/LiteServerConfigLocal {
+	public static final field Companion Lorg/ton/api/liteserver/config/LiteServerConfigRandomLocal$Companion;
 	public fun <init> (I)V
 	public final fun component1 ()I
 	public final fun copy (I)Lorg/ton/api/liteserver/config/LiteServerConfigRandomLocal;
@@ -1982,6 +2614,21 @@ public final class org/ton/api/liteserver/config/LiteServerConfigRandomLocal : o
 	public final fun getPort ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/liteserver/config/LiteServerConfigRandomLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/liteserver/config/LiteServerConfigRandomLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/liteserver/config/LiteServerConfigRandomLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/liteserver/config/LiteServerConfigRandomLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/liteserver/config/LiteServerConfigRandomLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/overlay/OverlayNode : org/ton/api/SignedTlObject {
@@ -2009,11 +2656,23 @@ public final class org/ton/api/overlay/OverlayNode : org/ton/api/SignedTlObject 
 	public fun verify (Lorg/ton/api/pub/PublicKey;)Z
 }
 
+public final class org/ton/api/overlay/OverlayNode$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/overlay/OverlayNode$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/overlay/OverlayNode;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/overlay/OverlayNode;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/overlay/OverlayNode$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/overlay/OverlayNode;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/overlay/OverlayNode;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/overlay/OverlayNodeToSign : org/ton/tl/TlObject {
@@ -2033,11 +2692,23 @@ public final class org/ton/api/overlay/OverlayNodeToSign : org/ton/tl/TlObject {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/overlay/OverlayNodeToSign$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/overlay/OverlayNodeToSign$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/overlay/OverlayNodeToSign;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/overlay/OverlayNodeToSign;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/overlay/OverlayNodeToSign$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/overlay/OverlayNodeToSign;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/overlay/OverlayNodeToSign;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/overlay/OverlayNodes : org/ton/tl/TlObject {
@@ -2048,11 +2719,23 @@ public final class org/ton/api/overlay/OverlayNodes : org/ton/tl/TlObject {
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 }
 
+public final class org/ton/api/overlay/OverlayNodes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/overlay/OverlayNodes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/overlay/OverlayNodes;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/overlay/OverlayNodes;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/overlay/OverlayNodes$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/overlay/OverlayNodes;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/overlay/OverlayNodes;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pk/Ed25519Kt {
@@ -2067,6 +2750,7 @@ public abstract interface class org/ton/api/pk/PrivateKey : org/ton/crypto/Decry
 }
 
 public final class org/ton/api/pk/PrivateKey$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pk/PrivateKeyAes : org/ton/api/pk/PrivateKey, org/ton/crypto/Decryptor {
@@ -2085,11 +2769,23 @@ public final class org/ton/api/pk/PrivateKeyAes : org/ton/api/pk/PrivateKey, org
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/pk/PrivateKeyAes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pk/PrivateKeyAes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pk/PrivateKeyAes;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pk/PrivateKeyAes;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pk/PrivateKeyAes$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyAes;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pk/PrivateKeyAes;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pk/PrivateKeyEd25519 : org/ton/api/pk/PrivateKey, org/ton/crypto/Decryptor {
@@ -2113,6 +2809,17 @@ public final class org/ton/api/pk/PrivateKeyEd25519 : org/ton/api/pk/PrivateKey,
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/pk/PrivateKeyEd25519$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pk/PrivateKeyEd25519$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pk/PrivateKeyEd25519;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pk/PrivateKeyEd25519;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pk/PrivateKeyEd25519$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyEd25519;
@@ -2121,6 +2828,7 @@ public final class org/ton/api/pk/PrivateKeyEd25519$Companion : org/ton/tl/TlCon
 	public final fun generate (Lkotlin/random/Random;)Lorg/ton/api/pk/PrivateKeyEd25519;
 	public static synthetic fun generate$default (Lorg/ton/api/pk/PrivateKeyEd25519$Companion;Lkotlin/random/Random;ILjava/lang/Object;)Lorg/ton/api/pk/PrivateKeyEd25519;
 	public final fun of ([B)Lorg/ton/api/pk/PrivateKeyEd25519;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
 
@@ -2140,11 +2848,23 @@ public final class org/ton/api/pk/PrivateKeyOverlay : org/ton/api/pk/PrivateKey,
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/pk/PrivateKeyOverlay$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pk/PrivateKeyOverlay$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pk/PrivateKeyOverlay;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pk/PrivateKeyOverlay;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pk/PrivateKeyOverlay$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyOverlay;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pk/PrivateKeyOverlay;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pk/PrivateKeyUnencrypted : org/ton/api/pk/PrivateKey, org/ton/crypto/Decryptor {
@@ -2163,11 +2883,23 @@ public final class org/ton/api/pk/PrivateKeyUnencrypted : org/ton/api/pk/Private
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/pk/PrivateKeyUnencrypted$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pk/PrivateKeyUnencrypted$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pk/PrivateKeyUnencrypted;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pk/PrivateKeyUnencrypted;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pk/PrivateKeyUnencrypted$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyUnencrypted;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pk/PrivateKeyUnencrypted;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pub/Ed25519Kt {
@@ -2181,6 +2913,7 @@ public abstract interface class org/ton/api/pub/PublicKey : org/ton/crypto/Encry
 }
 
 public final class org/ton/api/pub/PublicKey$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pub/PublicKeyAes : org/ton/api/pub/PublicKey, org/ton/crypto/Encryptor {
@@ -2198,11 +2931,23 @@ public final class org/ton/api/pub/PublicKeyAes : org/ton/api/pub/PublicKey, org
 	public fun verify ([B[B)Z
 }
 
+public final class org/ton/api/pub/PublicKeyAes$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pub/PublicKeyAes$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pub/PublicKeyAes;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pub/PublicKeyAes;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pub/PublicKeyAes$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyAes;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyAes;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pub/PublicKeyEd25519 : org/ton/api/pub/PublicKey, org/ton/crypto/Encryptor {
@@ -2222,12 +2967,24 @@ public final class org/ton/api/pub/PublicKeyEd25519 : org/ton/api/pub/PublicKey,
 	public fun verify ([B[B)Z
 }
 
+public final class org/ton/api/pub/PublicKeyEd25519$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pub/PublicKeyEd25519$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pub/PublicKeyEd25519;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pub/PublicKeyEd25519;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pub/PublicKeyEd25519$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyEd25519;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyEd25519;)V
 	public final fun of (Lorg/ton/api/pk/PrivateKeyEd25519;)Lorg/ton/api/pub/PublicKeyEd25519;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pub/PublicKeyOverlay : org/ton/api/pub/PublicKey, org/ton/crypto/Encryptor {
@@ -2245,11 +3002,23 @@ public final class org/ton/api/pub/PublicKeyOverlay : org/ton/api/pub/PublicKey,
 	public fun verify ([B[B)Z
 }
 
+public final class org/ton/api/pub/PublicKeyOverlay$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pub/PublicKeyOverlay$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pub/PublicKeyOverlay;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pub/PublicKeyOverlay;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pub/PublicKeyOverlay$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyOverlay;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyOverlay;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/pub/PublicKeyUnencrypted : org/ton/api/pub/PublicKey, org/ton/crypto/Encryptor {
@@ -2267,11 +3036,23 @@ public final class org/ton/api/pub/PublicKeyUnencrypted : org/ton/api/pub/Public
 	public fun verify ([B[B)Z
 }
 
+public final class org/ton/api/pub/PublicKeyUnencrypted$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/pub/PublicKeyUnencrypted$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/pub/PublicKeyUnencrypted;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/pub/PublicKeyUnencrypted;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/pub/PublicKeyUnencrypted$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyUnencrypted;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyUnencrypted;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpAnswer : org/ton/api/rldp/RldpMessage {
@@ -2290,11 +3071,23 @@ public final class org/ton/api/rldp/RldpAnswer : org/ton/api/rldp/RldpMessage {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/rldp/RldpAnswer$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpAnswer$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpAnswer;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpAnswer;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpAnswer$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpAnswer;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpAnswer;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpComplete : org/ton/api/rldp/RldpMessagePart {
@@ -2312,11 +3105,23 @@ public final class org/ton/api/rldp/RldpComplete : org/ton/api/rldp/RldpMessageP
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/rldp/RldpComplete$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpComplete$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpComplete;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpComplete;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpComplete$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpComplete;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpComplete;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpConfirm : org/ton/api/rldp/RldpMessagePart {
@@ -2336,11 +3141,23 @@ public final class org/ton/api/rldp/RldpConfirm : org/ton/api/rldp/RldpMessagePa
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/rldp/RldpConfirm$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpConfirm$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpConfirm;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpConfirm;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpConfirm$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpConfirm;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpConfirm;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/rldp/RldpMessage : org/ton/tl/TlObject {
@@ -2350,6 +3167,7 @@ public abstract interface class org/ton/api/rldp/RldpMessage : org/ton/tl/TlObje
 }
 
 public final class org/ton/api/rldp/RldpMessage$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpMessageData : org/ton/api/rldp/RldpMessage {
@@ -2367,11 +3185,23 @@ public final class org/ton/api/rldp/RldpMessageData : org/ton/api/rldp/RldpMessa
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/rldp/RldpMessageData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpMessageData$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpMessageData;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpMessageData;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpMessageData$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpMessageData;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpMessageData;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/rldp/RldpMessagePart : org/ton/tl/TlObject {
@@ -2381,6 +3211,7 @@ public abstract interface class org/ton/api/rldp/RldpMessagePart : org/ton/tl/Tl
 }
 
 public final class org/ton/api/rldp/RldpMessagePart$Companion : org/ton/tl/TlCombinator {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpMessagePartData : org/ton/api/rldp/RldpMessagePart {
@@ -2408,11 +3239,23 @@ public final class org/ton/api/rldp/RldpMessagePartData : org/ton/api/rldp/RldpM
 	public fun transferId ()Lorg/ton/tl/ByteString;
 }
 
+public final class org/ton/api/rldp/RldpMessagePartData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpMessagePartData$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpMessagePartData;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpMessagePartData;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpMessagePartData$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpMessagePartData;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpMessagePartData;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/rldp/RldpQuery : org/ton/api/rldp/RldpMessage {
@@ -2436,11 +3279,23 @@ public final class org/ton/api/rldp/RldpQuery : org/ton/api/rldp/RldpMessage {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/rldp/RldpQuery$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/rldp/RldpQuery$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/rldp/RldpQuery;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/rldp/RldpQuery;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/rldp/RldpQuery$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/rldp/RldpQuery;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/rldp/RldpQuery;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificate {
@@ -2453,6 +3308,17 @@ public final class org/ton/api/tcp/TcpAuthentificate {
 	public final fun getNonce ()[B
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/tcp/TcpAuthentificate$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tcp/TcpAuthentificate$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tcp/TcpAuthentificate;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tcp/TcpAuthentificate;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificate$Companion : org/ton/tl/TlCodec {
@@ -2486,6 +3352,7 @@ public final class org/ton/api/tcp/TcpAuthentificate$Companion : org/ton/tl/TlCo
 	public fun encodeToByteString (Lorg/ton/api/tcp/TcpAuthentificate;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/tcp/TcpAuthentificate;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificationComplete : org/ton/api/tcp/TcpMessage {
@@ -2500,6 +3367,17 @@ public final class org/ton/api/tcp/TcpAuthentificationComplete : org/ton/api/tcp
 	public final fun getSignature ()[B
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/tcp/TcpAuthentificationComplete$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tcp/TcpAuthentificationComplete$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tcp/TcpAuthentificationComplete;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tcp/TcpAuthentificationComplete;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificationComplete$Companion : org/ton/tl/TlCodec {
@@ -2533,6 +3411,7 @@ public final class org/ton/api/tcp/TcpAuthentificationComplete$Companion : org/t
 	public fun encodeToByteString (Lorg/ton/api/tcp/TcpAuthentificationComplete;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/tcp/TcpAuthentificationComplete;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificationNonce {
@@ -2545,6 +3424,17 @@ public final class org/ton/api/tcp/TcpAuthentificationNonce {
 	public final fun getNonce ()[B
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/tcp/TcpAuthentificationNonce$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tcp/TcpAuthentificationNonce$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tcp/TcpAuthentificationNonce;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tcp/TcpAuthentificationNonce;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpAuthentificationNonce$Companion : org/ton/tl/TlCodec {
@@ -2578,6 +3468,7 @@ public final class org/ton/api/tcp/TcpAuthentificationNonce$Companion : org/ton/
 	public fun encodeToByteString (Lorg/ton/api/tcp/TcpAuthentificationNonce;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/tcp/TcpAuthentificationNonce;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/tcp/TcpMessage {
@@ -2593,6 +3484,17 @@ public final class org/ton/api/tcp/TcpPing {
 	public final fun getRandomId ()J
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/tcp/TcpPing$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tcp/TcpPing$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tcp/TcpPing;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tcp/TcpPing;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpPing$Companion : org/ton/tl/TlCodec {
@@ -2626,6 +3528,7 @@ public final class org/ton/api/tcp/TcpPing$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/tcp/TcpPing;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/tcp/TcpPing;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpPong {
@@ -2638,6 +3541,17 @@ public final class org/ton/api/tcp/TcpPong {
 	public final fun getRandomId ()J
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/tcp/TcpPong$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tcp/TcpPong$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tcp/TcpPong;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tcp/TcpPong;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tcp/TcpPong$Companion : org/ton/tl/TlCodec {
@@ -2671,6 +3585,7 @@ public final class org/ton/api/tcp/TcpPong$Companion : org/ton/tl/TlCodec {
 	public fun encodeToByteString (Lorg/ton/api/tcp/TcpPong;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/tcp/TcpPong;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tonnode/Shard {
@@ -2793,6 +3708,17 @@ public final class org/ton/api/tonnode/TonNodeBlockIdExt : org/ton/api/tonnode/T
 	public fun workchain ()I
 }
 
+public final class org/ton/api/tonnode/TonNodeBlockIdExt$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tonnode/TonNodeBlockIdExt$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tonnode/TonNodeBlockIdExt;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tonnode/TonNodeBlockIdExt;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/tonnode/TonNodeBlockIdExt$Companion : org/ton/tl/TlCodec {
 	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
 	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/tonnode/TonNodeBlockIdExt;
@@ -2826,6 +3752,7 @@ public final class org/ton/api/tonnode/TonNodeBlockIdExt$Companion : org/ton/tl/
 	public fun hash (Lorg/ton/api/tonnode/TonNodeBlockIdExt;)[B
 	public final fun parse (Ljava/lang/String;)Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public final fun parseOrNull (Ljava/lang/String;)Lorg/ton/api/tonnode/TonNodeBlockIdExt;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tonnode/TonNodeBlockIdKt {
@@ -2853,11 +3780,23 @@ public final class org/ton/api/tonnode/TonNodeZeroStateIdExt {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/api/tonnode/TonNodeZeroStateIdExt$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/tonnode/TonNodeZeroStateIdExt$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/tonnode/TonNodeZeroStateIdExt;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/tonnode/TonNodeZeroStateIdExt;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/api/tonnode/TonNodeZeroStateIdExt$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/tonnode/TonNodeZeroStateIdExt;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/tonnode/TonNodeZeroStateIdExt;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/tonnode/Workchain {
@@ -2883,6 +3822,17 @@ public final class org/ton/api/validator/config/ValidatorConfigGlobal {
 	public final fun getZeroState ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/validator/config/ValidatorConfigGlobal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/validator/config/ValidatorConfigGlobal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/validator/config/ValidatorConfigGlobal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/validator/config/ValidatorConfigGlobal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/validator/config/ValidatorConfigGlobal$Companion : org/ton/tl/TlCodec {
@@ -2916,12 +3866,19 @@ public final class org/ton/api/validator/config/ValidatorConfigGlobal$Companion 
 	public fun encodeToByteString (Lorg/ton/api/validator/config/ValidatorConfigGlobal;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/api/validator/config/ValidatorConfigGlobal;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/api/validator/config/ValidatorConfigLocal {
+	public static final field Companion Lorg/ton/api/validator/config/ValidatorConfigLocal$Companion;
+}
+
+public final class org/ton/api/validator/config/ValidatorConfigLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/api/validator/config/ValidatorConfigRandomLocal : org/ton/api/validator/config/ValidatorConfigLocal {
+	public static final field Companion Lorg/ton/api/validator/config/ValidatorConfigRandomLocal$Companion;
 	public fun <init> (Lorg/ton/api/adnl/AdnlAddressList;)V
 	public final fun component1 ()Lorg/ton/api/adnl/AdnlAddressList;
 	public final fun copy (Lorg/ton/api/adnl/AdnlAddressList;)Lorg/ton/api/validator/config/ValidatorConfigRandomLocal;
@@ -2930,5 +3887,20 @@ public final class org/ton/api/validator/config/ValidatorConfigRandomLocal : org
 	public final fun getAddrList ()Lorg/ton/api/adnl/AdnlAddressList;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/api/validator/config/ValidatorConfigRandomLocal$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/api/validator/config/ValidatorConfigRandomLocal$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/api/validator/config/ValidatorConfigRandomLocal;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/api/validator/config/ValidatorConfigRandomLocal;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/api/validator/config/ValidatorConfigRandomLocal$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 

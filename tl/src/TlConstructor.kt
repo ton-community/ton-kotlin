@@ -1,8 +1,8 @@
 package org.ton.tl
 
+import io.github.andreypfau.kotlinx.crypto.crc32.crc32
 import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
-import org.ton.crypto.crc32
 
 public abstract class TlConstructor<T : Any>(
     schema: String,

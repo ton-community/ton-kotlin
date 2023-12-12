@@ -1,11 +1,10 @@
 package org.ton.cell
 
 import org.ton.bitstring.BitString
-import org.ton.crypto.hex
 
 internal object EmptyCell : Cell {
     private val EMPTY_CELL_HASH = BitString(
-        hex("96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7")
+        "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7".hexToByteArray()
     )
 
     override val bits: BitString = BitString.empty()

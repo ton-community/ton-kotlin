@@ -12,6 +12,7 @@ import io.ktor.utils.io.bits.*
  * SHA-384 1024   64    384
  * SHA-512 1024   64    512
  */
+@Suppress("DEPRECATION")
 @Deprecated("Use kotlinx-crypto instead")
 public class SHA512Digest : LongDigest() {
     init {

@@ -8,6 +8,7 @@ import org.ton.crypto.mac.Mac
  *
  * H(K XOR opad, H(K XOR ipad, text))
  */
+@Suppress("DEPRECATION")
 public class HMac private constructor(
     private val digest: Digest,
     private val blockLength: Int

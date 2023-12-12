@@ -5,6 +5,7 @@ import org.ton.crypto.digest.Digest
 /**
  * Base class for SHA-384 and SHA-512.
  */
+@Suppress("DEPRECATION")
 @Deprecated("Use kotlinx-crypto instead")
 public abstract class LongDigest : Digest {
     private val xBuf = ByteArray(8)

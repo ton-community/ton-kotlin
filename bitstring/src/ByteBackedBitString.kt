@@ -1,7 +1,6 @@
 package org.ton.bitstring
 
 import org.ton.bitstring.exception.BitStringUnderflowException
-import org.ton.crypto.hex
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.experimental.xor
@@ -83,7 +82,7 @@ public open class ByteBackedBitString protected constructor(
     override fun toHex(): String {
         if (size == 0) return ""
         val data = appendTag(bytes, size)
-        val result = StringBuilder(hex(data))
+        val result = StringBuilder(data.toHexString())
         when (size % 8) {
             0 -> {
                 result.deleteAt(result.lastIndex)

@@ -8,7 +8,9 @@ kotlin {
         commonMain {
             dependencies {
                 api(libs.ktor.utils)
-//                api(libs.crypto)
+                api(libs.sha2)
+                api(libs.aes)
+                api(libs.crc32)
                 implementation(libs.curve25519)
                 implementation(libs.serialization.core)
             }

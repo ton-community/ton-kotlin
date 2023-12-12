@@ -1,7 +1,6 @@
 package org.ton.block
 
 import org.ton.bitstring.BitString
-import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -104,7 +103,7 @@ class MsgAddressIntTest {
     @Test
     fun `address to raw string`() {
         val addr1 =
-            AddrStd(null, -1, hex("3333333333333333333333333333333333333333333333333333333333333333"))
+            AddrStd(null, -1, "3333333333333333333333333333333333333333333333333333333333333333".hexToByteArray())
         assertEquals(
             "-1:3333333333333333333333333333333333333333333333333333333333333333",
             addr1.toString(userFriendly = false)
@@ -123,14 +122,14 @@ class MsgAddressIntTest {
         )
 
         val addr2 =
-            AddrStd(null, 0, hex("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"))
+            AddrStd(null, 0, "83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8".hexToByteArray())
         assertEquals(
             "0:83DFD552E63729B472FCBCC8C45EBCC6691702558B68EC7527E1BA403A0F31A8",
             addr2.toString(userFriendly = false)
         )
 
         val addr3 =
-            AddrStd(null, -1, hex("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"))
+            AddrStd(null, -1, "dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5".hexToByteArray())
         assertEquals(
             "-1:DD24C4A1F2B88F8B7053513B5CC6C5A31BC44B2A72DCB4D8C0338AF0F0D37EC5",
             addr3.toString(userFriendly = false)
@@ -140,7 +139,7 @@ class MsgAddressIntTest {
     @Test
     fun `address to user-friendly base64url string`() {
         val addr1 =
-            AddrStd(null, -1, hex("3333333333333333333333333333333333333333333333333333333333333333"))
+            AddrStd(null, -1, "3333333333333333333333333333333333333333333333333333333333333333".hexToByteArray())
         assertEquals(
             "Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF",
             addr1.toString(userFriendly = true, urlSafe = true, testOnly = false, bounceable = true)
@@ -159,7 +158,7 @@ class MsgAddressIntTest {
         )
 
         val addr2 =
-            AddrStd(null, 0, hex("83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8"))
+            AddrStd(null, 0, "83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8".hexToByteArray())
         assertEquals(
             "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N",
             addr2.toString(bounceable = true)
@@ -170,7 +169,7 @@ class MsgAddressIntTest {
         )
 
         val addr3 =
-            AddrStd(null, -1, hex("dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5"))
+            AddrStd(null, -1, "dd24c4a1f2b88f8b7053513b5cc6c5a31bc44b2a72dcb4d8c0338af0f0d37ec5".hexToByteArray())
         assertEquals(
             "Ef_dJMSh8riPi3BTUTtcxsWjG8RLKnLctNjAM4rw8NN-xWdr",
             addr3.toString(urlSafe = true, testOnly = false, bounceable = true)
@@ -195,8 +194,8 @@ class MsgAddressIntTest {
 
     @Test
     fun `user friendly address representation`() {
-        val okAddr1 = AddrStd(0, hex("0F3DCC67E2C308314D56D3F0CA042A392CDD560F7B8514A8EA6348E9CADD1665"))
-        val okAddr2 = AddrStd(0, hex("AE94287A412BC6B3CC73FBB6C0D57EAEBF7C24E8D24AC092313A55007137A2F9"))
+        val okAddr1 = AddrStd(0, "0F3DCC67E2C308314D56D3F0CA042A392CDD560F7B8514A8EA6348E9CADD1665".hexToByteArray())
+        val okAddr2 = AddrStd(0, "AE94287A412BC6B3CC73FBB6C0D57EAEBF7C24E8D24AC092313A55007137A2F9".hexToByteArray())
 
         assertEquals("EQAPPcxn4sMIMU1W0_DKBCo5LN1WD3uFFKjqY0jpyt0WZf7D", okAddr1.toString(userFriendly = true))
         assertEquals("EQCulCh6QSvGs8xz-7bA1X6uv3wk6NJKwJIxOlUAcTei-cjj", okAddr2.toString(userFriendly = true))
@@ -206,7 +205,7 @@ class MsgAddressIntTest {
             "EQBLAcMnTcyx-_mWQtrVEC1eyDfK2nHI-A54P5eL7y-uE2Ht"
         )
 
-        val badAddr = AddrStd(0, hex("6C5FADFB25D8F6E55D26537BAC5B90E09ACEB0D447C6EE2DE2A94D93AB34B25D"))
+        val badAddr = AddrStd(0, "6C5FADFB25D8F6E55D26537BAC5B90E09ACEB0D447C6EE2DE2A94D93AB34B25D".hexToByteArray())
 
         assertEquals(AddrStd("EQBsX637Jdj25V0mU3usW5Dgms6w1EfG7i3iqU2TqzSyXf_s"), badAddr)
         // crc = 65516 , user friendly has wrong tail

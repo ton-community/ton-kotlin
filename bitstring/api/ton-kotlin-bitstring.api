@@ -50,6 +50,7 @@ public final class org/ton/bitstring/BitString$Companion {
 	public final fun of ([Z)Lorg/ton/bitstring/BitString;
 	public static synthetic fun of$default (Lorg/ton/bitstring/BitString$Companion;IILjava/lang/Object;)Lorg/ton/bitstring/BitString;
 	public static synthetic fun of$default (Lorg/ton/bitstring/BitString$Companion;[BIILjava/lang/Object;)Lorg/ton/bitstring/BitString;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/bitstring/BitStringKt {

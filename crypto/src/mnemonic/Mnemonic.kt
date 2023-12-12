@@ -3,7 +3,7 @@ package org.ton.mnemonic
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.digest.Digest
+import org.ton.crypto.digest.sha2.SHA512Digest
 import org.ton.crypto.kdf.PKCSS2ParametersGenerator
 import org.ton.crypto.mac.hmac.HMac
 import org.ton.crypto.mnemonic.BIP39_ENGLISH
@@ -23,6 +23,7 @@ private val DEFAULT_PASSWORD_SALT_BYTES = DEFAULT_PASSWORD_SALT.encodeToByteArra
 private val DEFAULT_SALT_BYTES = DEFAULT_SALT.encodeToByteArray()
 private val EMPTY_BYTES = ByteArray(0)
 
+@Suppress("DEPRECATION")
 public object Mnemonic {
     // Number of PBKDF2 iterations used to generate seed
     public const val DEFAULT_ITERATIONS: Int = 100000
@@ -60,7 +61,7 @@ public object Mnemonic {
             try {
                 val mnemonic = Array(wordCount) { "" }
                 val weakRandom = Random(random.nextLong())
-                val digest = Digest.sha512()
+                val digest = SHA512Digest()
                 val hMac = HMac(digest)
                 val passwordEntropy = ByteArray(hMac.macSize)
                 val nonPasswordEntropy = ByteArray(hMac.macSize)
@@ -123,7 +124,7 @@ public object Mnemonic {
     @JvmStatic
     public fun toSeed(mnemonic: List<String>, password: String = ""): ByteArray {
         val pbdkf2Sha512 = PKCSS2ParametersGenerator(
-            digest = Digest.sha512(),
+            digest = SHA512Digest(),
             password = toEntropy(mnemonic, password),
             salt = DEFAULT_SALT_BYTES,
             iterationCount = DEFAULT_ITERATIONS
@@ -133,7 +134,7 @@ public object Mnemonic {
 
     @JvmStatic
     public fun toEntropy(mnemonic: List<String>, password: String = ""): ByteArray {
-        val digest = Digest.sha512()
+        val digest = SHA512Digest()
         val output = ByteArray(digest.digestSize)
         entropy(HMac(digest), mnemonic.joinToString(" ").toByteArray(), password.toByteArray(), output)
         return output
@@ -141,11 +142,11 @@ public object Mnemonic {
 
     @JvmStatic
     public fun isBasicSeed(entropy: ByteArray): Boolean =
-        basicValidation(PKCSS2ParametersGenerator(Digest.sha512()), entropy)
+        basicValidation(PKCSS2ParametersGenerator(SHA512Digest()), entropy)
 
     @JvmStatic
     public fun isPasswordSeed(entropy: ByteArray): Boolean =
-        passwordValidation(PKCSS2ParametersGenerator(Digest.sha512()), entropy)
+        passwordValidation(PKCSS2ParametersGenerator(SHA512Digest()), entropy)
 
 }
 

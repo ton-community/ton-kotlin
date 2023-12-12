@@ -1,6 +1,5 @@
 package org.ton.cell
 
-import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -8,7 +7,7 @@ class PrunedBranchTest {
     @Test
     fun test() {
         val cell = buildCell {
-            storeBytes(hex("000000000000000000deafbeaf123123"))
+            storeBytes("000000000000000000deafbeaf123123".hexToByteArray())
             storeRef(Cell.empty())
         }
 

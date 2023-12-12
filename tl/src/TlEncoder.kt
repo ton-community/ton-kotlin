@@ -1,7 +1,6 @@
 package org.ton.tl
 
 import io.ktor.utils.io.core.*
-import org.ton.crypto.digest.sha256
 
 public interface TlEncoder<in T> {
     public fun encode(output: Output, value: T): Unit = encode(TlWriter(output), value)
@@ -19,7 +18,7 @@ public interface TlEncoder<in T> {
         ByteString.of(*encodeToByteArray(value, boxed))
 
     public fun hash(value: T): ByteArray =
-        sha256(encodeToByteArray(value))
+        io.github.andreypfau.kotlinx.crypto.sha2.sha256(encodeToByteArray(value))
 }
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")

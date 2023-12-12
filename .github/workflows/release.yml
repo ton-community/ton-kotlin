@@ -7,14 +7,39 @@ on:
 jobs:
   build:
     if: "!contains(github.event.commits[0].message, '[skip ci]')"
-
     strategy:
       matrix:
         include:
           - os: macos-latest
-            gradle_args: publishIosX64PublicationToSonatypeRepository publishIosArm64PublicationToSonatypeRepository publishIosSimulatorArm64PublicationToSonatypeRepository publishTvosX64PublicationToSonatypeRepository publishTvosArm64PublicationToSonatypeRepository publishTvosSimulatorArm64PublicationToSonatypeRepository publishTvosSimulatorArm64PublicationToSonatypeRepository publishWatchosArm32PublicationToSonatypeRepository publishWatchosArm64PublicationToSonatypeRepository publishWatchosX64PublicationToSonatypeRepository publishWatchosSimulatorArm64PublicationToSonatypeRepository publishMacosX64PublicationToSonatypeRepository publishMacosArm64PublicationToSonatypeRepository
+            gradle_args: assemble publishIosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishIosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishIosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishIosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishTvosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishTvosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishTvosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishTvosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishWatchosArm32PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishWatchosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishWatchosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishWatchosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishMacosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: assemble publishMacosArm64PublicationToSonatypeRepository
           - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository publishLinuxArm64PublicationToSonatypeRepository publishMingwX64PublicationToSonatypeRepository
+            gradle_args: assemble publishKotlinMultiplatformPublicationToSonatypeRepository publishJvmPublicationToSonatypeRepository publishLinuxX64PublicationToSonatypeRepository publishLinuxArm64PublicationToSonatypeRepository publishMingwX64PublicationToSonatypeRepository
 
     runs-on: ${{ matrix.os }}
     steps:

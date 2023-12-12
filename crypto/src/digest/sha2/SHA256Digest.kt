@@ -13,6 +13,7 @@ import org.ton.crypto.digest.md4.GeneralDigest
  * SHA-384 1024   64    384
  * SHA-512 1024   64    512
  */
+@Suppress("DEPRECATION")
 @Deprecated("Use kotlinx-crypto instead")
 public class SHA256Digest : GeneralDigest() {
     private var h1 = 0

@@ -11,7 +11,7 @@ public final class org/ton/crypto/Crc16Kt {
 	public static final fun crc16 ([[B)I
 }
 
-public final class org/ton/crypto/Crc32JvmKt {
+public final class org/ton/crypto/Crc32Kt {
 	public static final fun crc32 ([BII)I
 	public static synthetic fun crc32$default ([BIIILjava/lang/Object;)I
 	public static final fun crc32c ([BII)I
@@ -117,7 +117,6 @@ public final class org/ton/crypto/SecureRandom : kotlin/random/Random {
 }
 
 public abstract interface class org/ton/crypto/digest/Digest {
-	public static final field Companion Lorg/ton/crypto/digest/Digest$Companion;
 	public fun build ()[B
 	public fun build ([B)[B
 	public abstract fun build ([BI)[B
@@ -129,13 +128,7 @@ public abstract interface class org/ton/crypto/digest/Digest {
 	public abstract fun update ([BII)V
 }
 
-public final class org/ton/crypto/digest/Digest$Companion {
-	public final fun sha256 ()Lorg/ton/crypto/digest/Digest;
-	public final fun sha512 ()Lorg/ton/crypto/digest/Digest;
-}
-
-public final class org/ton/crypto/digest/DigestJvmKt {
-	public static final fun Digest (Ljava/lang/String;)Lorg/ton/crypto/digest/Digest;
+public final class org/ton/crypto/digest/DigestKt {
 	public static final fun sha256 ([B)[B
 	public static final fun sha512 ([B)[B
 }

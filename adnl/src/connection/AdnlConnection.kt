@@ -1,5 +1,8 @@
 package org.ton.adnl.connection
 
+import io.github.andreypfau.kotlinx.crypto.aes.AES
+import io.github.andreypfau.kotlinx.crypto.cipher.CTRBlockCipher
+import io.github.andreypfau.kotlinx.crypto.sha2.SHA256
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.errors.*
@@ -10,10 +13,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.ton.adnl.network.TcpClient
 import org.ton.api.liteserver.LiteServerDesc
-import org.ton.crypto.AesCtr
 import org.ton.crypto.SecureRandom
-import org.ton.crypto.digest.Digest
-import org.ton.crypto.digest.sha256
 import org.ton.tl.writeByteString
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -114,7 +114,7 @@ public class AdnlConnection(
         request: AdnlRequestData,
         callContext: CoroutineContext,
         output: ByteWriteChannel,
-        cipher: AesCtr,
+        cipher: CTRBlockCipher,
         closeChannel: Boolean = true
     ) = withContext(callContext) {
         val scope = CoroutineScope(callContext + CoroutineName("Request body writer"))
@@ -136,7 +136,7 @@ public class AdnlConnection(
     private suspend fun readResponse(
         requestTime: Instant,
         input: ByteReadChannel,
-        cipher: AesCtr,
+        cipher: CTRBlockCipher,
         callContext: CoroutineContext
     ) = withContext(callContext) {
         val packet = readRaw(input, cipher)
@@ -149,17 +149,23 @@ public class AdnlConnection(
 
     private suspend fun readRaw(
         input: ByteReadChannel,
-        cipher: AesCtr
+        cipher: CTRBlockCipher
     ): ByteReadPacket {
         val encryptedLength = input.readPacket(4).readBytes()
-        val length = ByteReadPacket(cipher.update(encryptedLength)).readIntLittleEndian()
+        val plainLength = ByteArray(4)
+        cipher.processBytes(encryptedLength, plainLength)
+
+        val length = ByteReadPacket(plainLength).readIntLittleEndian()
         check(length in 32..(1 shl 24)) { "Invalid length" }
         val encryptedData = input.readPacket(length).readBytes()
-        val data = ByteReadPacket(cipher.update(encryptedData))
+        val plainData = ByteArray(length)
+        cipher.processBytes(encryptedData, plainData)
+
+        val data = ByteReadPacket(plainData)
         val payload = data.readBytes((data.remaining - 32).toInt())
         val hash = data.readBytes(32)
 
-        require(sha256(payload).contentEquals(hash)) {
+        require(io.github.andreypfau.kotlinx.crypto.sha2.sha256(payload).contentEquals(hash)) {
             "sha256 mismatch"
         }
 
@@ -170,34 +176,38 @@ public class AdnlConnection(
 
     private suspend fun writeRaw(
         output: ByteWriteChannel,
-        cipher: AesCtr,
+        cipher: CTRBlockCipher,
         packet: ByteReadPacket
     ) {
         val dataSize = (packet.remaining + 32 + 32).toInt()
         require(dataSize in 32..(1 shl 24)) { "Invalid packet size: $dataSize" }
         val nonce = SecureRandom.nextBytes(32)
         val payload = packet.readBytes()
-        val hash = Digest.sha256().apply {
-            update(nonce)
-            update(payload)
-        }.build()
+
+        val hash = SHA256().apply {
+            write(nonce)
+            write(payload)
+        }.digest()
+
         val data = buildPacket {
             writeIntLittleEndian(dataSize)
             writeFully(nonce)
             writeFully(payload)
             writeFully(hash)
         }
-        val encryptedData = cipher.update(data.readBytes())
+
+        val encryptedData = ByteArray(data.remaining.toInt())
+        cipher.processBytes(data.readBytes(), encryptedData)
         output.writeFully(encryptedData)
     }
 
     private class ChannelCipher(
-        val input: AesCtr,
-        val output: AesCtr
+        val input: CTRBlockCipher,
+        val output: CTRBlockCipher
     ) {
         constructor(
             s1: ByteArray, s2: ByteArray, v1: ByteArray, v2: ByteArray
-        ) : this(AesCtr(s1, v1), AesCtr(s2, v2))
+        ) : this(CTRBlockCipher(AES(s1), v1), CTRBlockCipher(AES(s2), v2))
 
         constructor(
             nonce: ByteArray

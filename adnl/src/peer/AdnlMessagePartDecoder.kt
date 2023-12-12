@@ -2,7 +2,6 @@ package org.ton.adnl.peer
 
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessagePart
-import org.ton.crypto.digest.sha256
 import org.ton.tl.asByteString
 
 public class AdnlMessagePartDecoder(
@@ -29,7 +28,7 @@ public class AdnlMessagePartDecoder(
             val totalSize = currentMessageOffset + message.data.size
             messageOffset = totalSize
             if (totalSize == messagePayload.size) {
-                val actualMessageHash = sha256(messagePayload)
+                val actualMessageHash = io.github.andreypfau.kotlinx.crypto.sha2.sha256(messagePayload)
                 check(actualMessageHash.asByteString() == messageHash) {
                     "hash mismatch, expected: $messageHash, actual: $actualMessageHash"
                 }

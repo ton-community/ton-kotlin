@@ -2,7 +2,6 @@ package org.ton.cell
 
 import org.ton.bigint.BigInt
 import org.ton.bitstring.BitString
-import org.ton.crypto.hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -93,6 +92,6 @@ class CellBuilderTest {
             .storeUInt(1, 8)
             .storeUInt(69, 64)
             .endCell()
-        assertEquals("000001010000000000000045", hex(cell.bits.toByteArray()))
+        assertEquals("000001010000000000000045", cell.bits.toByteArray().toHexString())
     }
 }

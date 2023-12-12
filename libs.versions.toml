@@ -29,7 +29,9 @@ ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
 curve25519 = { module = "io.github.andreypfau:curve25519-kotlin", version.ref = "curve25519" }
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
-crypto = { module = "io.github.andreypfau:kotlinx-crypto", version.ref = "crypto" }
+sha2 = { module = "io.github.andreypfau:kotlinx-crypto-sha2", version.ref = "crypto" }
+aes = { module = "io.github.andreypfau:kotlinx-crypto-aes", version.ref = "crypto" }
+crc32 = { module = "io.github.andreypfau:kotlinx-crypto-crc32", version.ref = "crypto" }
 
 [plugins]
 bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }

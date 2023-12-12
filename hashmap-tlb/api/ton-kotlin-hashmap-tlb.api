@@ -41,6 +41,7 @@ public final class org/ton/hashmap/HashMapE$Companion {
 	public final fun fromMap (Ljava/util/Map;)Lorg/ton/hashmap/HashMapE;
 	public final fun of ()Lorg/ton/hashmap/HashMapE;
 	public final fun root (Lorg/ton/tlb/CellRef;)Lorg/ton/hashmap/HashMapE;
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (ILorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbCodec;
 }
 
@@ -52,6 +53,7 @@ public abstract interface class org/ton/hashmap/HashMapNode : org/ton/tlb/TlbObj
 public final class org/ton/hashmap/HashMapNode$Companion {
 	public final fun fork (Lorg/ton/hashmap/HmEdge;Lorg/ton/hashmap/HmEdge;)Lorg/ton/hashmap/HmnFork;
 	public final fun leaf (Ljava/lang/Object;)Lorg/ton/hashmap/HmnLeaf;
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (ILorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbCodec;
 }
 
@@ -185,7 +187,19 @@ public final class org/ton/hashmap/HmEdge : java/lang/Iterable, kotlin/jvm/inter
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmEdge$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public synthetic fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmEdge;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmEdge;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmEdge$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (ILorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbCodec;
 }
 
@@ -201,6 +215,7 @@ public final class org/ton/hashmap/HmLabel$Companion {
 	public final fun empty ()Lorg/ton/hashmap/HmLabel;
 	public final fun of (Lorg/ton/bitstring/BitString;I)Lorg/ton/hashmap/HmLabel;
 	public static synthetic fun of$default (Lorg/ton/hashmap/HmLabel$Companion;Lorg/ton/bitstring/BitString;IILjava/lang/Object;)Lorg/ton/hashmap/HmLabel;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (I)Lorg/ton/tlb/TlbNegatedCodec;
 }
 
@@ -210,11 +225,27 @@ public final class org/ton/hashmap/HmLabelKt {
 }
 
 public final class org/ton/hashmap/HmeEmpty : org/ton/hashmap/HashMapE {
+	public static final field Companion Lorg/ton/hashmap/HmeEmpty$Companion;
 	public fun <init> ()V
 	public fun iterator ()Ljava/util/Iterator;
 	public fun print (Lorg/ton/tlb/TlbPrettyPrinter;)Lorg/ton/tlb/TlbPrettyPrinter;
 	public fun set (Lorg/ton/bitstring/BitString;Ljava/lang/Object;)Lorg/ton/hashmap/HmeRoot;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/hashmap/HmeEmpty$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public synthetic fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmeEmpty;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmeEmpty;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/hashmap/HmeEmpty$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/hashmap/HmeRoot : org/ton/hashmap/HashMapE {
@@ -235,7 +266,19 @@ public final class org/ton/hashmap/HmeRoot : org/ton/hashmap/HashMapE {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmeRoot$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public synthetic fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmeRoot;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmeRoot;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmeRoot$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbConstructor (ILorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbConstructor;
 }
 
@@ -256,7 +299,19 @@ public final class org/ton/hashmap/HmlLong : org/ton/hashmap/HmLabel {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmlLong$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/hashmap/HmlLong$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmlLong;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmlLong;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmlLong$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (I)Lorg/ton/tlb/TlbNegatedConstructor;
 }
 
@@ -278,9 +333,21 @@ public final class org/ton/hashmap/HmlSame : org/ton/hashmap/HmLabel {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmlSame$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/hashmap/HmlSame$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmlSame;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmlSame;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmlSame$Companion {
 	public final fun of (Lorg/ton/bitstring/BitString;I)Lorg/ton/hashmap/HmlSame;
 	public static synthetic fun of$default (Lorg/ton/hashmap/HmlSame$Companion;Lorg/ton/bitstring/BitString;IILjava/lang/Object;)Lorg/ton/hashmap/HmlSame;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (I)Lorg/ton/tlb/TlbNegatedConstructor;
 }
 
@@ -303,8 +370,20 @@ public final class org/ton/hashmap/HmlShort : org/ton/hashmap/HmLabel {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmlShort$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/hashmap/HmlShort$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmlShort;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmlShort;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmlShort$Companion {
 	public final fun empty ()Lorg/ton/hashmap/HmlShort;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec ()Lorg/ton/tlb/TlbNegatedConstructor;
 }
 
@@ -325,7 +404,19 @@ public final class org/ton/hashmap/HmnFork : org/ton/hashmap/HashMapNode {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmnFork$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public synthetic fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmnFork;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmnFork;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmnFork$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (ILorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbCodec;
 }
 
@@ -342,14 +433,28 @@ public final class org/ton/hashmap/HmnLeaf : org/ton/hashmap/HashMapNode {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/HmnLeaf$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public synthetic fun <init> (Lkotlinx/serialization/KSerializer;)V
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/HmnLeaf;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/HmnLeaf;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/HmnLeaf$Companion {
+	public final fun serializer (Lkotlinx/serialization/KSerializer;)Lkotlinx/serialization/KSerializer;
 	public final fun tlbCodec (Lorg/ton/tlb/TlbCodec;)Lorg/ton/tlb/TlbCodec;
 }
 
 public abstract class org/ton/hashmap/Unary : org/ton/tlb/TlbObject {
 	public static final field Companion Lorg/ton/hashmap/Unary$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
 	public static final fun of (I)Lorg/ton/hashmap/Unary;
 	public static final fun tlbCodec ()Lorg/ton/tlb/TlbNegatedCodec;
+	public static final synthetic fun write$Self (Lorg/ton/hashmap/Unary;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
 }
 
 public final class org/ton/hashmap/Unary$Companion : org/ton/tlb/TlbNegatedCodec {
@@ -362,6 +467,7 @@ public final class org/ton/hashmap/Unary$Companion : org/ton/tlb/TlbNegatedCodec
 	public synthetic fun loadTlb (Lorg/ton/cell/CellSlice;)Ljava/lang/Object;
 	public fun loadTlb (Lorg/ton/cell/CellSlice;)Lorg/ton/hashmap/Unary;
 	public final fun of (I)Lorg/ton/hashmap/Unary;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public synthetic fun storeNegatedTlb (Lorg/ton/cell/CellBuilder;Ljava/lang/Object;)I
 	public fun storeNegatedTlb (Lorg/ton/cell/CellBuilder;Lorg/ton/hashmap/Unary;)I
 	public synthetic fun storeTlb (Lorg/ton/cell/CellBuilder;Ljava/lang/Object;)V
@@ -374,6 +480,7 @@ public final class org/ton/hashmap/UnaryKt {
 }
 
 public final class org/ton/hashmap/UnarySuccess : org/ton/hashmap/Unary {
+	public static final field Companion Lorg/ton/hashmap/UnarySuccess$Companion;
 	public fun <init> (Lorg/ton/hashmap/Unary;)V
 	public final fun component1 ()Lorg/ton/hashmap/Unary;
 	public final fun copy (Lorg/ton/hashmap/Unary;)Lorg/ton/hashmap/UnarySuccess;
@@ -385,9 +492,25 @@ public final class org/ton/hashmap/UnarySuccess : org/ton/hashmap/Unary {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/hashmap/UnarySuccess$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/hashmap/UnarySuccess$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/hashmap/UnarySuccess;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/hashmap/UnarySuccess;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class org/ton/hashmap/UnarySuccess$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/hashmap/UnaryZero : org/ton/hashmap/Unary {
 	public static final field INSTANCE Lorg/ton/hashmap/UnaryZero;
 	public fun print (Lorg/ton/tlb/TlbPrettyPrinter;)Lorg/ton/tlb/TlbPrettyPrinter;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public fun toString ()Ljava/lang/String;
 }
 

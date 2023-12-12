@@ -167,11 +167,23 @@ public final class org/ton/lite/api/liteserver/LiteServerAccountId {
 	public final fun workchain ()I
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerAccountId$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerAccountId$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerAccountId;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerAccountId;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerAccountId$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerAccountId;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerAccountId;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerAccountState {
@@ -194,11 +206,23 @@ public final class org/ton/lite/api/liteserver/LiteServerAccountState {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerAccountState$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerAccountState$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerAccountState;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerAccountState;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerAccountState$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerAccountState;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerAccountState;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerAllShardsInfo {
@@ -215,6 +239,17 @@ public final class org/ton/lite/api/liteserver/LiteServerAllShardsInfo {
 	public final fun id ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public final fun proof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerAllShardsInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerAllShardsInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerAllShardsInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerAllShardsInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerAllShardsInfo$Companion : org/ton/tl/TlCodec {
@@ -248,6 +283,7 @@ public final class org/ton/lite/api/liteserver/LiteServerAllShardsInfo$Companion
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerAllShardsInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerAllShardsInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockData {
@@ -257,11 +293,23 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockData {
 	public final fun id ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerBlockData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockData$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockData;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockData;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerBlockData$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerBlockData;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerBlockData;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockHeader {
@@ -278,6 +326,17 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockHeader {
 	public final fun id ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public final fun mode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerBlockHeader$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockHeader$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockHeader;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockHeader;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockHeader$Companion : org/ton/tl/TlCodec {
@@ -311,6 +370,7 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockHeader$Companion :
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerBlockHeader;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerBlockHeader;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public abstract interface class org/ton/lite/api/liteserver/LiteServerBlockLink {
@@ -379,6 +439,17 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockLinkBack : org/ton
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerBlockLinkBack$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerBlockLinkBack$Companion : org/ton/tl/TlCodec {
 	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
 	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack;
@@ -410,6 +481,7 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockLinkBack$Companion
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerBlockLinkBack;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
 
@@ -437,6 +509,17 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockLinkForward : org/
 	public fun to ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public fun toKeyBlock ()Z
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerBlockLinkForward$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockLinkForward$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockLinkForward;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockLinkForward;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockLinkForward$Companion : org/ton/tl/TlCodec {
@@ -470,6 +553,7 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockLinkForward$Compan
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerBlockLinkForward;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerBlockLinkForward;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
 
@@ -489,6 +573,17 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockState {
 	public final fun id ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public final fun rootHash ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerBlockState$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockState$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockState;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockState;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockState$Companion : org/ton/tl/TlCodec {
@@ -522,6 +617,7 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockState$Companion : 
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerBlockState;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerBlockState;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockTransactions {
@@ -542,6 +638,17 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockTransactions {
 	public final fun proof ()Lorg/ton/tl/ByteString;
 	public final fun reqCount ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerBlockTransactions$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerBlockTransactions$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerBlockTransactions;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerBlockTransactions;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerBlockTransactions$Companion : org/ton/tl/TlCodec {
@@ -575,6 +682,7 @@ public final class org/ton/lite/api/liteserver/LiteServerBlockTransactions$Compa
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerBlockTransactions;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerBlockTransactions;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerConfigInfo {
@@ -593,6 +701,17 @@ public final class org/ton/lite/api/liteserver/LiteServerConfigInfo {
 	public final fun mode ()I
 	public final fun stateProof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerConfigInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerConfigInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerConfigInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerConfigInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerConfigInfo$Companion : org/ton/tl/TlCodec {
@@ -626,6 +745,7 @@ public final class org/ton/lite/api/liteserver/LiteServerConfigInfo$Companion : 
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerConfigInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerConfigInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerCurrentTime {
@@ -640,11 +760,23 @@ public final class org/ton/lite/api/liteserver/LiteServerCurrentTime {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerCurrentTime$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerCurrentTime$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerCurrentTime;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerCurrentTime;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerCurrentTime$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerCurrentTime;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerCurrentTime;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerDebugVerbosity {
@@ -657,6 +789,17 @@ public final class org/ton/lite/api/liteserver/LiteServerDebugVerbosity {
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 	public final fun value ()I
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerDebugVerbosity$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerDebugVerbosity$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerDebugVerbosity;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerDebugVerbosity;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerDebugVerbosity$Companion : org/ton/tl/TlCodec {
@@ -690,6 +833,7 @@ public final class org/ton/lite/api/liteserver/LiteServerDebugVerbosity$Companio
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerDebugVerbosity;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerDebugVerbosity;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerError {
@@ -706,11 +850,23 @@ public final class org/ton/lite/api/liteserver/LiteServerError {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerError$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerError$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerError;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerError;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerError$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerError;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerError;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfo {
@@ -727,6 +883,17 @@ public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfo {
 	public final fun last ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public final fun stateRootHash ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfo$Companion : org/ton/tl/TlCodec {
@@ -760,6 +927,7 @@ public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfo$Compani
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfoExt {
@@ -788,11 +956,23 @@ public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfoExt {
 	public final fun version ()I
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfoExt$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfoExt$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfoExt;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfoExt;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerMasterchainInfoExt$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfoExt;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerMasterchainInfoExt;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerPartialBlockProof {
@@ -811,6 +991,17 @@ public final class org/ton/lite/api/liteserver/LiteServerPartialBlockProof {
 	public final fun steps ()Ljava/util/List;
 	public final fun to ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerPartialBlockProof$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerPartialBlockProof$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerPartialBlockProof;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerPartialBlockProof;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerPartialBlockProof$Companion : org/ton/tl/TlCodec {
@@ -844,6 +1035,7 @@ public final class org/ton/lite/api/liteserver/LiteServerPartialBlockProof$Compa
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerPartialBlockProof;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerPartialBlockProof;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerQueryPrefix : org/ton/tl/TlCodec {
@@ -878,6 +1070,7 @@ public final class org/ton/lite/api/liteserver/LiteServerQueryPrefix : org/ton/t
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerQueryPrefix;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerQueryPrefix;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerRunMethodResult {
@@ -909,6 +1102,17 @@ public final class org/ton/lite/api/liteserver/LiteServerRunMethodResult {
 	public final fun shardProof ()Lorg/ton/tl/ByteString;
 	public final fun stateProof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerRunMethodResult$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerRunMethodResult$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerRunMethodResult;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerRunMethodResult;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerRunMethodResult$Companion : org/ton/tl/TlCodec {
@@ -944,6 +1148,7 @@ public final class org/ton/lite/api/liteserver/LiteServerRunMethodResult$Compani
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerRunMethodResult;)[B
 	public final fun mode (ZZZZZ)I
 	public static synthetic fun mode$default (Lorg/ton/lite/api/liteserver/LiteServerRunMethodResult$Companion;ZZZZZILjava/lang/Object;)I
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerSendMsgStatus {
@@ -958,11 +1163,23 @@ public final class org/ton/lite/api/liteserver/LiteServerSendMsgStatus {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class org/ton/lite/api/liteserver/LiteServerSendMsgStatus$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerSendMsgStatus$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerSendMsgStatus;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerSendMsgStatus;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
 public final class org/ton/lite/api/liteserver/LiteServerSendMsgStatus$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/lite/api/liteserver/LiteServerSendMsgStatus;
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/lite/api/liteserver/LiteServerSendMsgStatus;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerShardInfo {
@@ -981,6 +1198,17 @@ public final class org/ton/lite/api/liteserver/LiteServerShardInfo {
 	public final fun shardDescr ()Lorg/ton/tl/ByteString;
 	public final fun shardProof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerShardInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerShardInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerShardInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerShardInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerShardInfo$Companion : org/ton/tl/TlCodec {
@@ -1014,6 +1242,7 @@ public final class org/ton/lite/api/liteserver/LiteServerShardInfo$Companion : o
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerShardInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerShardInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerSignature {
@@ -1029,6 +1258,17 @@ public final class org/ton/lite/api/liteserver/LiteServerSignature {
 	public final fun nodeIdShort ()Lorg/ton/tl/ByteString;
 	public final fun signature ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerSignature$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerSignature$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerSignature;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerSignature;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerSignature$Companion : org/ton/tl/TlCodec {
@@ -1062,6 +1302,7 @@ public final class org/ton/lite/api/liteserver/LiteServerSignature$Companion : o
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerSignature;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerSignature;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerSignatureSet {
@@ -1078,6 +1319,17 @@ public final class org/ton/lite/api/liteserver/LiteServerSignatureSet {
 	public final fun signatures ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
 	public final fun validatorSetHash ()I
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerSignatureSet$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerSignatureSet$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerSignatureSet;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerSignatureSet;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerSignatureSet$Companion : org/ton/tl/TlCodec {
@@ -1111,6 +1363,7 @@ public final class org/ton/lite/api/liteserver/LiteServerSignatureSet$Companion 
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerSignatureSet;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerSignatureSet;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionId {
@@ -1130,6 +1383,17 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionId {
 	public fun hashCode ()I
 	public static final fun mode (ZZZ)I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerTransactionId$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerTransactionId$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerTransactionId;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerTransactionId;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionId$Companion : org/ton/tl/TlCodec {
@@ -1164,6 +1428,7 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionId$Companion
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerTransactionId;)[B
 	public final fun mode (ZZZ)I
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionId3 {
@@ -1178,6 +1443,17 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionId3 {
 	public fun hashCode ()I
 	public final fun lt ()J
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerTransactionId3$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerTransactionId3$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerTransactionId3;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerTransactionId3;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionId3$Companion : org/ton/tl/TlCodec {
@@ -1211,6 +1487,7 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionId3$Companio
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerTransactionId3;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerTransactionId3;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionInfo {
@@ -1227,6 +1504,17 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionInfo {
 	public final fun proof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
 	public final fun transaction ()Lorg/ton/tl/ByteString;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerTransactionInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerTransactionInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerTransactionInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerTransactionInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionInfo$Companion : org/ton/tl/TlCodec {
@@ -1260,6 +1548,7 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionInfo$Compani
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerTransactionInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerTransactionInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionList {
@@ -1274,6 +1563,17 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionList {
 	public final fun ids ()Ljava/util/List;
 	public fun toString ()Ljava/lang/String;
 	public final fun transactions ()Lorg/ton/tl/ByteString;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerTransactionList$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerTransactionList$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerTransactionList;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerTransactionList;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerTransactionList$Companion : org/ton/tl/TlCodec {
@@ -1307,6 +1607,7 @@ public final class org/ton/lite/api/liteserver/LiteServerTransactionList$Compani
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerTransactionList;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerTransactionList;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerValidatorStats {
@@ -1329,6 +1630,17 @@ public final class org/ton/lite/api/liteserver/LiteServerValidatorStats {
 	public final fun mode ()I
 	public final fun stateProof ()Lorg/ton/tl/ByteString;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerValidatorStats$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerValidatorStats$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerValidatorStats;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerValidatorStats;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerValidatorStats$Companion : org/ton/tl/TlCodec {
@@ -1362,6 +1674,7 @@ public final class org/ton/lite/api/liteserver/LiteServerValidatorStats$Companio
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerValidatorStats;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerValidatorStats;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerVersion {
@@ -1380,6 +1693,17 @@ public final class org/ton/lite/api/liteserver/LiteServerVersion {
 	public final fun now ()I
 	public fun toString ()Ljava/lang/String;
 	public final fun version ()I
+}
+
+public final class org/ton/lite/api/liteserver/LiteServerVersion$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/LiteServerVersion$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/LiteServerVersion;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/LiteServerVersion;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/LiteServerVersion$Companion : org/ton/tl/TlCodec {
@@ -1413,6 +1737,7 @@ public final class org/ton/lite/api/liteserver/LiteServerVersion$Companion : org
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/LiteServerVersion;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/LiteServerVersion;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetAccountState : org/ton/tl/TLFunction {
@@ -1429,6 +1754,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetAccountSta
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetAccountState$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetAccountState$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetAccountState;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetAccountState;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetAccountState$Companion : org/ton/tl/TlCodec {
@@ -1462,6 +1798,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetAccountSta
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetAccountState;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetAccountState;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo : org/ton/tl/TLFunction {
@@ -1476,6 +1813,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetAllShardsI
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo$Companion : org/ton/tl/TlCodec {
@@ -1509,6 +1857,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetAllShardsI
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetAllShardsInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlock : org/ton/tl/TLFunction {
@@ -1523,6 +1872,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlock : or
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlock$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlock;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlock;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlock$Companion : org/ton/tl/TlCodec {
@@ -1556,6 +1916,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlock$Comp
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlock;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlock;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader : org/ton/tl/TLFunction {
@@ -1572,6 +1933,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockHeade
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader$Companion : org/ton/tl/TlCodec {
@@ -1605,6 +1977,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockHeade
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockHeader;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockProof : org/ton/tl/TLFunction {
@@ -1625,6 +1998,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockProof
 	public final fun targetBlock ()Lorg/ton/api/tonnode/TonNodeBlockIdExt;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockProof$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockProof$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockProof;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockProof;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockProof$Companion : org/ton/tl/TlCodec {
@@ -1658,6 +2042,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetBlockProof
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockProof;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetBlockProof;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigAll : org/ton/tl/TLFunction {
@@ -1674,6 +2059,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigAll 
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigAll$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigAll$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigAll;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigAll;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigAll$Companion : org/ton/tl/TlCodec {
@@ -1707,6 +2103,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigAll$
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigAll;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigAll;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigParams : org/ton/tl/TLFunction {
@@ -1725,6 +2122,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigPara
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigParams$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigParams$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigParams;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigParams;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigParams$Companion : org/ton/tl/TlCodec {
@@ -1758,6 +2166,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetConfigPara
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigParams;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetConfigParams;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfo : org/ton/tl/TLFunction, org/ton/tl/TlCodec {
@@ -1793,6 +2202,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchai
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfo;)[B
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 }
 
@@ -1808,6 +2218,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchai
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt$Companion : org/ton/tl/TlCodec {
@@ -1841,6 +2262,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetMasterchai
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetMasterchainInfoExt;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction : org/ton/tl/TLFunction {
@@ -1859,6 +2281,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetOneTransac
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction$Companion : org/ton/tl/TlCodec {
@@ -1892,6 +2325,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetOneTransac
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetOneTransaction;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetShardInfo : org/ton/tl/TLFunction {
@@ -1912,6 +2346,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetShardInfo 
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public final fun workchain ()I
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetShardInfo$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetShardInfo$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetShardInfo;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetShardInfo;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetShardInfo$Companion : org/ton/tl/TlCodec {
@@ -1945,6 +2390,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetShardInfo$
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetShardInfo;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetShardInfo;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetState : org/ton/tl/TLFunction {
@@ -1959,6 +2405,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetState : or
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetState$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetState$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetState;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetState;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetState$Companion : org/ton/tl/TlCodec {
@@ -1992,6 +2449,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetState$Comp
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetState;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetState;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetTime : org/ton/tl/TLFunction, org/ton/tl/TlCodec {
@@ -2027,6 +2485,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetTime : org
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetTime;)[B
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 }
 
@@ -2049,6 +2508,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetTransactio
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetTransactions$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetTransactions$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetTransactions;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetTransactions;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetTransactions$Companion : org/ton/tl/TlCodec {
@@ -2082,6 +2552,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetTransactio
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetTransactions;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetTransactions;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetTransactionsTlConstructor : org/ton/tl/TlConstructor {
@@ -2112,6 +2583,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetValidatorS
 	public final fun startAfter ()Lorg/ton/tl/ByteString;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats$Companion : org/ton/tl/TlCodec {
@@ -2145,6 +2627,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetValidatorS
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetValidatorStats;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerGetVersion : org/ton/tl/TLFunction, org/ton/tl/TlCodec {
@@ -2180,6 +2663,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerGetVersion : 
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerGetVersion;)[B
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 }
 
@@ -2206,6 +2690,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerListBlockTran
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public final fun wantProof ()Z
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions$Companion : org/ton/tl/TlCodec {
@@ -2239,6 +2734,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerListBlockTran
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerListBlockTransactions;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerLookupBlock : org/ton/tl/TLFunction {
@@ -2262,6 +2758,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerLookupBlock :
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
 	public final fun utime ()Ljava/lang/Integer;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerLookupBlock$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerLookupBlock$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerLookupBlock;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerLookupBlock;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerLookupBlock$Companion : org/ton/tl/TlCodec {
@@ -2295,6 +2802,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerLookupBlock$C
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerLookupBlock;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerLookupBlock;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerQuery {
@@ -2307,6 +2815,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerQuery {
 	public fun equals (Ljava/lang/Object;)Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerQuery$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerQuery$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerQuery;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerQuery;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerQuery$Companion : org/ton/tl/TlCodec {
@@ -2340,6 +2859,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerQuery$Compani
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerQuery;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerQuery;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod : org/ton/tl/TLFunction {
@@ -2367,6 +2887,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod 
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod$Companion : org/ton/tl/TlCodec {
@@ -2405,6 +2936,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerRunSmcMethod$
 	public final fun params (Lorg/ton/block/VmStack;)[B
 	public final fun params (Lorg/ton/block/VmStackList;)[B
 	public final fun params ([Lorg/ton/block/VmStackValue;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerSendMessage : org/ton/tl/TLFunction {
@@ -2419,6 +2951,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerSendMessage :
 	public fun resultTlCodec ()Lorg/ton/tl/TlCodec;
 	public fun tlCodec ()Lorg/ton/tl/TlCodec;
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerSendMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerSendMessage$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerSendMessage;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerSendMessage;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerSendMessage$Companion : org/ton/tl/TlCodec {
@@ -2452,6 +2995,7 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerSendMessage$C
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerSendMessage;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerSendMessage;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno {
@@ -2466,6 +3010,17 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerWaitMastercha
 	public final fun seqno ()I
 	public final fun timeoutMs ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class org/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lorg/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno$$serializer;
+	public fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lorg/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lorg/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno$Companion : org/ton/tl/TlCodec {
@@ -2499,5 +3054,6 @@ public final class org/ton/lite/api/liteserver/functions/LiteServerWaitMastercha
 	public fun encodeToByteString (Lorg/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno;Z)Lorg/ton/tl/ByteString;
 	public synthetic fun hash (Ljava/lang/Object;)[B
 	public fun hash (Lorg/ton/lite/api/liteserver/functions/LiteServerWaitMasterchainSeqno;)[B
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 

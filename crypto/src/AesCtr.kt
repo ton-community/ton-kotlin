@@ -1,6 +1,6 @@
 package org.ton.crypto
 
-import org.ton.crypto.digest.sha256
+import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 
 @Deprecated("Use kotlinx-crypto instead")
 public expect class AesCtr(key: ByteArray, iv: ByteArray) {

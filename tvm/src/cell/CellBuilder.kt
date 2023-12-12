@@ -1,12 +1,12 @@
 package org.ton.cell
 
+import io.github.andreypfau.kotlinx.crypto.sha2.SHA256
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.exception.CellOverflowException
-import org.ton.crypto.digest.sha2.SHA256Digest
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -352,7 +352,7 @@ private class CellBuilderImpl(
 
         var (d1, d2) = descriptor
         repeat(levels) { level ->
-            val hasher = SHA256Digest()
+            val hasher = SHA256()
             val levelMask = if (descriptor.cellType == CellType.PRUNED_BRANCH) {
                 descriptor.levelMask
             } else {
@@ -360,14 +360,14 @@ private class CellBuilderImpl(
             }
             d1 = d1 and (CellDescriptor.LEVEL_MASK or CellDescriptor.HAS_HASHES_MASK).inv().toByte()
             d1 = d1 or (levelMask.mask shl 5).toByte()
-            hasher.update(d1)
-            hasher.update(d2)
+            hasher.writeByte(d1)
+            hasher.writeByte(d2)
 
             if (level == 0) {
-                hasher.update(data)
+                hasher.write(data)
             } else {
                 val prevHash = hashes[level - 1].first
-                hasher.update(prevHash)
+                hasher.write(prevHash)
             }
 
             var depth = 0
@@ -375,16 +375,16 @@ private class CellBuilderImpl(
                 val childDepth = child.depth(level + levelOffset)
                 depth = max(depth, childDepth + 1)
 
-                hasher.update((childDepth ushr Byte.SIZE_BITS).toByte())
-                hasher.update(childDepth.toByte())
+                hasher.writeByte((childDepth ushr Byte.SIZE_BITS).toByte())
+                hasher.writeByte(childDepth.toByte())
             }
 
             refs.forEach { child ->
                 val childHash = child.hash(level + levelOffset).toByteArray()
-                hasher.update(childHash)
+                hasher.write(childHash)
             }
 
-            val hash = hasher.build()
+            val hash = hasher.digest()
             hashes.add(hash to depth)
         }
 

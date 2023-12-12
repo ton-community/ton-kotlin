@@ -2,7 +2,6 @@ package org.ton.boc
 
 import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
-import org.ton.crypto.encodeHex
 import kotlin.jvm.JvmStatic
 
 public fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
@@ -47,7 +46,7 @@ public interface BagOfCells : Iterable<Cell> {
             try {
                 return read(ByteReadPacket(byteArray))
             } catch (e: Exception) {
-                throw IllegalArgumentException("Can't load BoC: (${byteArray.size}) ${byteArray.encodeHex()}", e)
+                throw IllegalArgumentException("Can't load BoC: (${byteArray.size}) ${byteArray.toHexString()}", e)
             }
         }
 

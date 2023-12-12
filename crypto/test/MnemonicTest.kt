@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import org.ton.crypto.DecryptorAes
 import org.ton.crypto.EncryptorAes
 import org.ton.crypto.digest.Digest
-import org.ton.crypto.hex
 import org.ton.crypto.mac.hmac.HMac
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -50,15 +49,15 @@ class MnemonicTest {
     fun `mnemonic to seed`() = runBlocking {
         assertEquals(
             "a356fc9b35cb9b463adf65b2414bbebcec1d0d0d99fc4fc14e259395c128022d",
-            hex(Mnemonic.toSeed(listOf("kangaroo", "hen", "toddler", "resist")))
+            Mnemonic.toSeed(listOf("kangaroo", "hen", "toddler", "resist")).toHexString()
         )
         assertEquals(
             "fb1df381306619a2128295e73e05c6013211f589e8bebd602469cdf1fc04a1cb",
-            hex(Mnemonic.toSeed(listOf("disease", "adult", "device", "grit")))
+            Mnemonic.toSeed(listOf("disease", "adult", "device", "grit")).toHexString()
         )
         assertEquals(
             "3078a0d183d0f0e88c4f8a5979590612f230a3228912838b66bcc9e9053b2584",
-            hex(Mnemonic.toSeed(listOf("deal", "wrap", "runway", "possible"), "password"))
+            Mnemonic.toSeed(listOf("deal", "wrap", "runway", "possible"), "password").toHexString()
         )
     }
 

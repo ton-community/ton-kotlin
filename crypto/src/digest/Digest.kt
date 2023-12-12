@@ -15,18 +15,16 @@ public interface Digest {
     public fun build(output: ByteArray, offset: Int): ByteArray
 
     public fun reset()
-
-    public companion object {
-        public fun sha256(): Digest = Digest("SHA-256")
-        public fun sha512(): Digest = Digest("SHA-512")
-    }
 }
 
-@Deprecated("Use kotlinx-crypto instead")
-public expect fun Digest(algorithm: String): Digest
+@Deprecated(
+    "Use kotlinx-crypto instead",
+    replaceWith = ReplaceWith("io.github.andreypfau.kotlinx.crypto.sha2.sha256(bytes)")
+)
+public fun sha256(bytes: ByteArray): ByteArray = io.github.andreypfau.kotlinx.crypto.sha2.sha256(bytes)
 
-@Deprecated("Use kotlinx-crypto instead")
-public expect fun sha256(bytes: ByteArray): ByteArray
-
-@Deprecated("Use kotlinx-crypto instead")
-public expect fun sha512(bytes: ByteArray): ByteArray
+@Deprecated(
+    "Use kotlinx-crypto instead",
+    replaceWith = ReplaceWith("io.github.andreypfau.kotlinx.crypto.sha2.sha512(bytes)")
+)
+public fun sha512(bytes: ByteArray): ByteArray = io.github.andreypfau.kotlinx.crypto.sha2.sha512(bytes)

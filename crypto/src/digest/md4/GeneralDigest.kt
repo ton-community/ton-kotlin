@@ -6,6 +6,7 @@ import org.ton.crypto.digest.Digest
  * base implementation of MD4 family style digest as outlined in "Handbook of Applied Cryptography",
  * pages 344 - 347.
  */
+@Suppress("DEPRECATION")
 @Deprecated("Use kotlinx-crypto instead")
 public abstract class GeneralDigest : Digest {
     private val xBuf = ByteArray(4)

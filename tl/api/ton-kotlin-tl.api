@@ -58,6 +58,7 @@ public final class org/ton/tl/ByteString$Companion {
 	public final fun of ([B)Lorg/ton/tl/ByteString;
 	public final fun of ([BII)Lorg/ton/tl/ByteString;
 	public static synthetic fun of$default (Lorg/ton/tl/ByteString$Companion;[BIIILjava/lang/Object;)Lorg/ton/tl/ByteString;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
 public final class org/ton/tl/ByteStringKt {

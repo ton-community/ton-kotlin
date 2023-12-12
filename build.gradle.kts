@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") apply false
+    kotlin("plugin.serialization") apply false
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0-rc-1"
 
     alias(libs.plugins.bcv)
@@ -14,10 +15,13 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven("https://s01.oss.sonatype.org/service/local/repositories/releases/content")
     }
 }
 
 subprojects {
+    apply(plugin = "kotlinx-serialization")
+
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
 //            allWarningsAsErrors = true

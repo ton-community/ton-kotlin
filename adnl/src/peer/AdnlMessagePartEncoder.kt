@@ -1,8 +1,8 @@
 package org.ton.adnl.peer
 
+import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 import org.ton.api.adnl.message.AdnlMessage
 import org.ton.api.adnl.message.AdnlMessagePart
-import org.ton.crypto.digest.sha256
 import org.ton.tl.asByteString
 
 public class AdnlMessagePartEncoder(

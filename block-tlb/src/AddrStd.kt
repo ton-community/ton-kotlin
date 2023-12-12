@@ -8,12 +8,10 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.crypto.crc16
-import org.ton.crypto.encoding.base64
-import org.ton.crypto.encoding.base64url
-import org.ton.crypto.hex
 import org.ton.tlb.*
 import kotlin.experimental.and
 import kotlin.experimental.or
+import kotlin.io.encoding.Base64
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -93,9 +91,9 @@ public data class AddrStd(
                 data[32 + 2 + 1] = (checksum).toByte()
 
                 if (urlSafe) {
-                    base64url(data)
+                    Base64.UrlSafe.encode(data)
                 } else {
-                    base64(data)
+                    Base64.encode(data)
                 }
             } else {
                 "${address.workchainId}:${address.address.toHex()}"
@@ -121,7 +119,7 @@ public data class AddrStd(
             return AddrStd(
                 // toByte() to make sure it fits into 8 bits
                 workchainId = address.substringBefore(':').toByte().toInt(),
-                address = hex(address.substringAfter(':'))
+                address = address.substringAfter(':').hexToByteArray()
             )
         }
 
@@ -130,10 +128,10 @@ public data class AddrStd(
             val addressBytes = ByteArray(36)
 
             try {
-                base64url(address).copyInto(addressBytes)
+                Base64.UrlSafe.decode(address).copyInto(addressBytes)
             } catch (e: Exception) {
                 try {
-                    base64(address).copyInto(addressBytes)
+                    Base64.decode(address).copyInto(addressBytes)
                 } catch (e: Exception) {
                     throw IllegalArgumentException("Can't parse address: $address", e)
                 }
@@ -145,7 +143,8 @@ public data class AddrStd(
             }
             var workchainId = addressBytes[1].toInt()
             var rawAddress = addressBytes.copyOfRange(fromIndex = 2, toIndex = 2 + 32)
-            var expectedChecksum = ((addressBytes[2 + 32].toInt() and 0xFF) shl 8) or (addressBytes[2 + 32 + 1].toInt() and 0xFF)
+            var expectedChecksum =
+                ((addressBytes[2 + 32].toInt() and 0xFF) shl 8) or (addressBytes[2 + 32 + 1].toInt() and 0xFF)
 
             val actualChecksum = checksum(tag, workchainId, rawAddress)
             check(expectedChecksum == actualChecksum) {

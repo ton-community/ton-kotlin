@@ -9,9 +9,8 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.ton.crypto.digest.sha256
-import org.ton.crypto.encoding.base64
 import kotlin.experimental.and
+import kotlin.io.encoding.Base64
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -49,16 +48,21 @@ public open class ByteString internal constructor(
 
     public fun copyOfRange(fromIndex: Int, toIndex: Int): ByteString = ByteString(data.copyOfRange(fromIndex, toIndex))
 
-    public fun copyInto(destination: ByteArray, destinationOffset: Int = 0, startIndex: Int = 0, endIndex: Int = size): ByteArray =
+    public fun copyInto(
+        destination: ByteArray,
+        destinationOffset: Int = 0,
+        startIndex: Int = 0,
+        endIndex: Int = size
+    ): ByteArray =
         data.copyInto(destination, destinationOffset, startIndex, endIndex)
 
-    public fun encodeHex(): String = org.ton.crypto.hex(data).uppercase()
+    public fun encodeHex(): String = data.toHexString().uppercase()
 
-    public fun encodeBase64(): String = base64(data)
+    public fun encodeBase64(): String = Base64.encode(data)
 
     public fun decodeToString(): String = data.decodeToString()
 
-    public fun hashSha256(): ByteString = sha256(data).asByteString()
+    public fun hashSha256(): ByteString = io.github.andreypfau.kotlinx.crypto.sha2.sha256(data).asByteString()
 
     override fun isEmpty(): Boolean = data.isEmpty()
 
@@ -118,7 +122,7 @@ public open class ByteString internal constructor(
         public fun String.decodeFromHex(): ByteString = ByteString(hex(this))
 
         @JvmStatic
-        public fun String.decodeFromBase64(): ByteString = ByteString(base64(this))
+        public fun String.decodeFromBase64(): ByteString = ByteString(Base64.decode(this))
     }
 }
 

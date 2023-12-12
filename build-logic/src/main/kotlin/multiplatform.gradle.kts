@@ -21,7 +21,9 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
+                optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlin.contracts.ExperimentalContracts")
+                optIn("kotlin.io.encoding.ExperimentalEncodingApi")
             }
         }
 
