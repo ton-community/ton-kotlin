@@ -12,11 +12,11 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("signed_certificate")
-data class SignedCertificate(
+public data class SignedCertificate(
     val certificate: Certificate,
     val certificate_signature: CryptoSignature
 ) {
-    companion object : TlbConstructorProvider<SignedCertificate> by SignedCertificatedTlbConstructor
+    public companion object : TlbConstructorProvider<SignedCertificate> by SignedCertificatedTlbConstructor
 }
 
 private object SignedCertificatedTlbConstructor : TlbConstructor<SignedCertificate>(

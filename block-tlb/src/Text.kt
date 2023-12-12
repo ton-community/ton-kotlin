@@ -9,11 +9,11 @@ import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
-data class Text(
+public data class Text(
     val chunks: UByte,
     val rest: TextChunks
 ) {
-    companion object : TlbConstructorProvider<Text> by TextTlbConstructor
+    public companion object : TlbConstructorProvider<Text> by TextTlbConstructor
 }
 
 private object TextTlbConstructor : TlbConstructor<Text>(

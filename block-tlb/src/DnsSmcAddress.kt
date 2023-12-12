@@ -8,12 +8,12 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
-data class DnsSmcAddress(
+public data class DnsSmcAddress(
     val smc_address: MsgAddressInt,
     val flags: BitString,
     val cap_list: SmcCapList?
 ) : DnsRecord {
-    companion object : TlbConstructorProvider<DnsSmcAddress> by DnsSmcAddressTlbConstructor
+    public companion object : TlbConstructorProvider<DnsSmcAddress> by DnsSmcAddressTlbConstructor
 }
 
 private object DnsSmcAddressTlbConstructor : TlbConstructor<DnsSmcAddress>(

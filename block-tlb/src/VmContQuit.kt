@@ -9,11 +9,11 @@ import org.ton.tlb.TlbConstructor
 
 @SerialName("vmc_quit")
 @Serializable
-data class VmContQuit(
+public data class VmContQuit(
     val exit_code: Int
 ) : VmCont {
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmContQuit> = VmContQuitTlbConstructor
+    public companion object {
+        public fun tlbConstructor(): TlbConstructor<VmContQuit> = VmContQuitTlbConstructor
     }
 }
 

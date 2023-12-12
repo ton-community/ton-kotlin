@@ -10,10 +10,10 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
-data class ChunkedData(
+public data class ChunkedData(
     val data: HashMapE<SnakeDataTail>
 ) {
-    companion object : TlbConstructorProvider<ChunkedData> by ChunkedDataConstructor
+    public companion object : TlbConstructorProvider<ChunkedData> by ChunkedDataConstructor
 }
 
 private object ChunkedDataConstructor : TlbConstructor<ChunkedData>(

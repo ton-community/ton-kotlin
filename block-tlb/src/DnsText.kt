@@ -10,11 +10,11 @@ import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @Serializable
-class DnsText(
+public class DnsText(
     @SerialName("_")
-    val value: Text
+    public val value: Text
 ) : DnsRecord {
-    companion object : TlbConstructorProvider<DnsText> by DnsTextTlbConstructor
+    public companion object : TlbConstructorProvider<DnsText> by DnsTextTlbConstructor
 }
 
 private object DnsTextTlbConstructor : TlbConstructor<DnsText>(

@@ -8,18 +8,18 @@ import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 import kotlin.jvm.JvmStatic
 
-inline fun SmcCapList(capabilities: Iterable<SmcCapability>) = SmcCapList.of(capabilities)
-inline fun SmcCapList(vararg capabilities: SmcCapability) = SmcCapList.of(capabilities.toList())
+public inline fun SmcCapList(capabilities: Iterable<SmcCapability>): SmcCapList = SmcCapList.of(capabilities)
+public inline fun SmcCapList(vararg capabilities: SmcCapability): SmcCapList = SmcCapList.of(capabilities.toList())
 
-inline fun Iterable<SmcCapability>.toSmcCapList() = SmcCapList.of(this)
-inline fun Array<SmcCapability>.toSmcCapList() = SmcCapList.of(*this)
+public inline fun Iterable<SmcCapability>.toSmcCapList(): SmcCapList = SmcCapList.of(this)
+public inline fun Array<SmcCapability>.toSmcCapList(): SmcCapList = SmcCapList.of(*this)
 
-sealed interface SmcCapList : Iterable<SmcCapability> {
-    object Nil : SmcCapList {
+public sealed interface SmcCapList : Iterable<SmcCapability> {
+    public object Nil : SmcCapList {
         override fun iterator(): Iterator<SmcCapability> = iterator {}
     }
 
-    data class Next(
+    public data class Next(
         val head: SmcCapability,
         val tail: SmcCapList
     ) : SmcCapList {
@@ -29,15 +29,15 @@ sealed interface SmcCapList : Iterable<SmcCapability> {
         }
     }
 
-    companion object : TlbCombinatorProvider<SmcCapList> by SmcCapListTlbCombinator {
+    public companion object : TlbCombinatorProvider<SmcCapList> by SmcCapListTlbCombinator {
         @JvmStatic
-        fun of(capability: Iterable<SmcCapability>): SmcCapList =
+        public fun of(capability: Iterable<SmcCapability>): SmcCapList =
             capability.reversed().fold(Nil as SmcCapList) { acc, cap ->
                 Next(cap, acc)
             }
 
         @JvmStatic
-        fun of(vararg capability: SmcCapability) = of(capability.asIterable())
+        public fun of(vararg capability: SmcCapability): SmcCapList = of(capability.asIterable())
     }
 }
 

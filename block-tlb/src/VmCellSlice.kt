@@ -29,7 +29,7 @@ public data class VmCellSlice(
     override fun toString(): String =
         "(vm_stk_slice cell:${if (stRef == 0 && endRef == 0) cell.bits.toString() else cell.toString()} st_bits:$stBits end_bits:$endBits st_ref:$stRef end_ref:$endRef)"
 
-    companion object : TlbConstructorProvider<VmCellSlice> by VmCellSliceTlbConstructor
+    public companion object : TlbConstructorProvider<VmCellSlice> by VmCellSliceTlbConstructor
 }
 
 private object VmCellSliceTlbConstructor : TlbConstructor<VmCellSlice>(

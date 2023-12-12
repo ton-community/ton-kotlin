@@ -7,10 +7,6 @@ plugins {
 }
 
 publishing {
-    repositories {
-        configureMavenPublication(project)
-    }
-
     val javadocJar = project.configureEmptyJavadocArtifact()
     publications.withType(MavenPublication::class).all {
         pom.configureMavenCentralMetadata(project)
@@ -81,8 +77,8 @@ fun RepositoryHandler.configureMavenPublication(project: Project) {
     maven {
         url = mavenRepositoryUri()
         credentials {
-            username = project.getSensitiveProperty("SONATYPE_USERNAME")
-            password = project.getSensitiveProperty("SONATYPE_PASSWORD")
+            username = project.getSensitiveProperty("OSSRH_USERNAME")
+            password = project.getSensitiveProperty("OSSRH_PASSWORD")
         }
     }
 
@@ -98,8 +94,8 @@ fun Project.configureEmptyJavadocArtifact(): Jar {
 }
 
 fun signPublicationIfKeyPresent(project: Project, publication: MavenPublication) {
-    val signingKey = project.getSensitiveProperty("SIGN_KEY_PRIVATE")
-    val signingKeyPassphrase = project.getSensitiveProperty("SIGN_PASSPHRASE")
+    val signingKey = project.getSensitiveProperty("SIGNING_SECRET_KEY")
+    val signingKeyPassphrase = project.getSensitiveProperty("SIGNING_PASSWORD")
     if (!signingKey.isNullOrBlank()) {
         project.extensions.configure<SigningExtension>("signing") {
             useInMemoryPgpKeys(signingKey, signingKeyPassphrase)

@@ -11,14 +11,14 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("ed25519_pubkey")
-data class SigPubKey(
+public data class SigPubKey(
     val pubkey: BitString
 ) {
     init {
         require(pubkey.size == 256) { "required: pubkey.size == 256, actual: ${pubkey.size}" }
     }
 
-    companion object : TlbConstructorProvider<SigPubKey> by SigPubKeyTlbConstructor
+    public companion object : TlbConstructorProvider<SigPubKey> by SigPubKeyTlbConstructor
 }
 
 private object SigPubKeyTlbConstructor : TlbConstructor<SigPubKey>(

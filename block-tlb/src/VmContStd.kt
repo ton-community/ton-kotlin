@@ -13,13 +13,13 @@ import kotlin.jvm.JvmStatic
 
 @SerialName("vmc_std")
 @Serializable
-data class VmContStd(
+public data class VmContStd(
     val cdata: VmControlData,
     val code: VmCellSlice
 ) : VmCont {
-    companion object : TlbCodec<VmContStd> by VmContStdTlbConstructor {
+    public companion object : TlbCodec<VmContStd> by VmContStdTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmContStd> = VmContStdTlbConstructor
+        public fun tlbCodec(): TlbConstructor<VmContStd> = VmContStdTlbConstructor
     }
 }
 

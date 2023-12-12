@@ -5,7 +5,7 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-object TextChunkEmpty : TextChunks, TlbConstructorProvider<TextChunkEmpty> by TextChunkEmptyTlbConstructor
+public object TextChunkEmpty : TextChunks, TlbConstructorProvider<TextChunkEmpty> by TextChunkEmptyTlbConstructor
 
 private object TextChunkEmptyTlbConstructor : TlbConstructor<TextChunkEmpty>(
     schema = "chunk_empty\$_ = TextChunks 0;"

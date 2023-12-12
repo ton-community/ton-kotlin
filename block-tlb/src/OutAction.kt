@@ -7,4 +7,4 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Serializable
 @JsonClassDiscriminator("@type")
-sealed interface OutAction
+public sealed interface OutAction

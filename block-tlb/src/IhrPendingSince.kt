@@ -10,10 +10,10 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("ihr_pending")
-data class IhrPendingSince(
+public data class IhrPendingSince(
     val import_lt: ULong
 ) {
-    companion object : TlbConstructorProvider<IhrPendingSince> by IhrPendingSinceTlbConstructor
+    public companion object : TlbConstructorProvider<IhrPendingSince> by IhrPendingSinceTlbConstructor
 }
 
 private object IhrPendingSinceTlbConstructor : TlbConstructor<IhrPendingSince>(

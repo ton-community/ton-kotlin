@@ -15,12 +15,12 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
-inline fun VmStack(depth: Int, stack: VmStackList): VmStack = VmStackImpl(depth, stack)
-inline fun VmStack(stack: VmStackList): VmStack = VmStackImpl(stack)
+public inline fun VmStack(depth: Int, stack: VmStackList): VmStack = VmStackImpl(depth, stack)
+public inline fun VmStack(stack: VmStackList): VmStack = VmStackImpl(stack)
 
-interface VmStack : Collection<VmStackValue> {
-    val depth: Int
-    val stack: VmStackList
+public interface VmStack : Collection<VmStackValue> {
+    public val depth: Int
+    public val stack: VmStackList
 
     override fun iterator(): Iterator<VmStackValue> = stack.iterator()
     override fun contains(element: VmStackValue): Boolean = stack.contains(element)
@@ -31,9 +31,9 @@ interface VmStack : Collection<VmStackValue> {
     override val size: Int get() = depth
     override fun isEmpty(): Boolean = depth <= 0
 
-    fun toMutableVmStack(): MutableVmStack
+    public fun toMutableVmStack(): MutableVmStack
 
-    operator fun get(index: Int): VmStackValue {
+    public operator fun get(index: Int): VmStackValue {
         forEachIndexed { currentIndex, vmStackValue ->
             if (currentIndex == index) {
                 return vmStackValue
@@ -42,60 +42,60 @@ interface VmStack : Collection<VmStackValue> {
         throw IllegalArgumentException("index: $index")
     }
 
-    companion object : TlbCodec<VmStack> by VmStackTlbConstructor {
+    public companion object : TlbCodec<VmStack> by VmStackTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmStack> = VmStackTlbConstructor
+        public fun tlbCodec(): TlbConstructor<VmStack> = VmStackTlbConstructor
     }
 }
 
-interface MutableVmStack : VmStack {
-    fun pop(): VmStackValue
-    fun popNull() = pop() as VmStackNull
-    fun popTinyInt() = popNumber().toLong()
-    fun popBool() = popTinyInt() != 0L
-    fun popInt() = popNumber().toBigInt()
-    fun popNumber() = (pop() as VmStackNumber)
-    fun popCell() = (pop() as VmStackCell).cell
-    fun popSlice() = (pop() as VmStackSlice).toCellSlice()
-    fun popBuilder() = (pop() as VmStackBuilder).toCellBuilder()
-    fun popCont() = (pop() as VmStackCont).cont
-    fun popTuple() = (pop() as VmStackTuple).data
+public interface MutableVmStack : VmStack {
+    public fun pop(): VmStackValue
+    public fun popNull(): VmStackNull = pop() as VmStackNull
+    public fun popTinyInt(): Long = popNumber().toLong()
+    public fun popBool(): Boolean = popTinyInt() != 0L
+    public fun popInt(): BigInt = popNumber().toBigInt()
+    public fun popNumber(): VmStackNumber = (pop() as VmStackNumber)
+    public fun popCell(): Cell = (pop() as VmStackCell).cell
+    public fun popSlice(): CellSlice = (pop() as VmStackSlice).toCellSlice()
+    public fun popBuilder(): CellBuilder = (pop() as VmStackBuilder).toCellBuilder()
+    public fun popCont(): VmCont = (pop() as VmStackCont).cont
+    public fun popTuple(): VmTuple = (pop() as VmStackTuple).data
 
-    fun push(stackValue: VmStackValue)
-    fun pushNull() = push(VmStackNull)
-    fun pushTinyInt(tinyInt: Boolean) = push(VmStackValue(tinyInt))
-    fun pushTinyInt(tinyInt: Int) = push(VmStackValue(tinyInt))
-    fun pushTinyInt(tinyInt: Long) = push(VmStackValue(tinyInt))
-    fun pushBool(boolean: Boolean) = push(VmStackValue(boolean))
-    fun pushInt(int: BigInt) = push(VmStackValue(int))
-    fun pushNan() = push(VmStackNan)
-    fun pushCell(cell: Cell) = push(VmStackValue(cell))
-    fun pushSlice(cellSlice: CellSlice) = push(VmStackValue(cellSlice))
-    fun pushBuilder(cellBuilder: CellBuilder) = push(VmStackValue(cellBuilder))
-    fun pushCont(vmCont: VmCont) = push(VmStackValue(vmCont))
-    fun pushTuple(vmTuple: VmTuple) = push(VmStackValue(vmTuple))
+    public fun push(stackValue: VmStackValue)
+    public fun pushNull(): Unit = push(VmStackNull)
+    public fun pushTinyInt(tinyInt: Boolean): Unit = push(VmStackValue(tinyInt))
+    public fun pushTinyInt(tinyInt: Int): Unit = push(VmStackValue(tinyInt))
+    public fun pushTinyInt(tinyInt: Long): Unit = push(VmStackValue(tinyInt))
+    public fun pushBool(boolean: Boolean): Unit = push(VmStackValue(boolean))
+    public fun pushInt(int: BigInt): Unit = push(VmStackValue(int))
+    public fun pushNan(): Unit = push(VmStackNan)
+    public fun pushCell(cell: Cell): Unit = push(VmStackValue(cell))
+    public fun pushSlice(cellSlice: CellSlice): Unit = push(VmStackValue(cellSlice))
+    public fun pushBuilder(cellBuilder: CellBuilder): Unit = push(VmStackValue(cellBuilder))
+    public fun pushCont(vmCont: VmCont): Unit = push(VmStackValue(vmCont))
+    public fun pushTuple(vmTuple: VmTuple): Unit = push(VmStackValue(vmTuple))
 
-    fun interchange(i: Int, j: Int)
-    fun interchange(i: Int) = interchange(0, i)
-    fun swap() = interchange(0, 1)
+    public fun interchange(i: Int, j: Int)
+    public fun interchange(i: Int): Unit = interchange(0, i)
+    public fun swap(): Unit = interchange(0, 1)
 }
 
 @SerialName("vm_stack")
 @Serializable
-data class VmStackImpl(
+public data class VmStackImpl(
     override val depth: Int,
     override val stack: VmStackList
 ) : VmStack {
-    constructor(stack: VmStackList) : this(stack.count(), stack)
+    public constructor(stack: VmStackList) : this(stack.count(), stack)
 
     override fun toMutableVmStack(): MutableVmStack = MutableVmStackImpl(stack)
 
     override fun toString(): String = "(vm_stack depth:$depth stack:$stack)"
 }
 
-inline fun MutableVmStack(): MutableVmStack = MutableVmStackImpl()
+public inline fun MutableVmStack(): MutableVmStack = MutableVmStackImpl()
 
-class MutableVmStackImpl(
+public class MutableVmStackImpl(
     iterable: Iterable<VmStackValue> = emptyList()
 ) : MutableVmStack {
     private val _stack = ArrayDeque<VmStackValue>().also { it.addAll(iterable) }

@@ -2,9 +2,9 @@ package org.ton.block
 
 import org.ton.tlb.TlbCodec
 
-sealed interface TextChunks {
-    companion object {
-        fun tlbCodec(n: Int): TlbCodec<TextChunks> = if (n == 0) {
+public sealed interface TextChunks {
+    public companion object {
+        public fun tlbCodec(n: Int): TlbCodec<TextChunks> = if (n == 0) {
             TextChunkEmpty
         } else {
             TextChunk.tlbConstructor(n)

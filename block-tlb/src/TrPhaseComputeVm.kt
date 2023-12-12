@@ -40,7 +40,7 @@ public object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>(
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: TrPhaseComputeVm
-    ) = cellBuilder {
+    ): Unit = cellBuilder {
         storeBit(value.success)
         storeBit(value.msgStateUsed)
         storeBit(value.accountActivated)

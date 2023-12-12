@@ -31,8 +31,8 @@ public sealed interface Either<X, Y> : TlbObject {
         override val x: X? = value
         override val y: Y? = null
 
-        operator fun component1() = x
-        operator fun component2() = y
+        public operator fun component1(): X? = x
+        public operator fun component2(): Y? = y
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -60,8 +60,8 @@ public sealed interface Either<X, Y> : TlbObject {
         override val x: X? = null
         override val y: Y? = value
 
-        operator fun component1() = x
-        operator fun component2() = y
+        public operator fun component1(): X? = x
+        public operator fun component2(): Y? = y
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -83,7 +83,7 @@ public sealed interface Either<X, Y> : TlbObject {
 
     public companion object {
         @JvmStatic
-        fun <X, Y> of(left: X?, right: Y?): Either<X, Y> {
+        public fun <X, Y> of(left: X?, right: Y?): Either<X, Y> {
             if (left != null) {
                 return Left(left)
             }
@@ -95,12 +95,13 @@ public sealed interface Either<X, Y> : TlbObject {
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
+        public fun <X, Y> tlbCodec(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
             EitherTlbCombinator(x, y) as TlbCodec<Either<X, Y>>
     }
 }
 
-operator fun <X, Y> Either.Companion.invoke(x: TlbCodec<X>, y: TlbCodec<Y>) = tlbCodec(x, y)
+public operator fun <X, Y> Either.Companion.invoke(x: TlbCodec<X>, y: TlbCodec<Y>): TlbCodec<Either<X, Y>> =
+    tlbCodec(x, y)
 
 private class EitherTlbCombinator<X, Y>(
     x: TlbCodec<X>, y: TlbCodec<Y>,

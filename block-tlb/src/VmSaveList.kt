@@ -12,12 +12,12 @@ import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
 @Serializable
-data class VmSaveList(
+public data class VmSaveList(
     val cregs: HashMapE<VmStackValue>
 ) {
-    companion object : TlbCodec<VmSaveList> by VmSaveListTlbConstructor {
+    public companion object : TlbCodec<VmSaveList> by VmSaveListTlbConstructor {
         @JvmStatic
-        fun tlbCodec(): TlbConstructor<VmSaveList> = VmSaveListTlbConstructor
+        public fun tlbCodec(): TlbConstructor<VmSaveList> = VmSaveListTlbConstructor
     }
 }
 

@@ -2,14 +2,14 @@ package org.ton.block
 
 import org.ton.bigint.BigInt
 
-sealed interface VmStackNumber : VmStackValue {
-    fun toInt(): Int
-    fun toLong(): Long
-    fun toBoolean(): Boolean
-    fun toBigInt(): BigInt
+public sealed interface VmStackNumber : VmStackValue {
+    public fun toInt(): Int
+    public fun toLong(): Long
+    public fun toBoolean(): Boolean
+    public fun toBigInt(): BigInt
 
-    operator fun plus(other: VmStackNumber): VmStackNumber
-    operator fun minus(other: VmStackNumber): VmStackNumber
-    operator fun times(other: VmStackNumber): VmStackNumber
-    operator fun div(other: VmStackNumber): VmStackNumber
+    public operator fun plus(other: VmStackNumber): VmStackNumber
+    public operator fun minus(other: VmStackNumber): VmStackNumber
+    public operator fun times(other: VmStackNumber): VmStackNumber
+    public operator fun div(other: VmStackNumber): VmStackNumber
 }

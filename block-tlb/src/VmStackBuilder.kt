@@ -11,16 +11,16 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @Serializable
 @SerialName("vm_stk_builder")
-class VmStackBuilder(
-    val cell: Cell
+public class VmStackBuilder(
+    public val cell: Cell
 ) : VmStackValue {
-    constructor(cellBuilder: CellBuilder) : this(cellBuilder.endCell())
+    public constructor(cellBuilder: CellBuilder) : this(cellBuilder.endCell())
 
-    fun toCellBuilder(): CellBuilder = CellBuilder(cell)
+    public fun toCellBuilder(): CellBuilder = CellBuilder(cell)
 
     override fun toString(): String = "(vm_stk_builder cell:$cell)"
 
-    companion object : TlbConstructorProvider<VmStackBuilder> by VmStackValueBuilderTlbConstructor
+    public companion object : TlbConstructorProvider<VmStackBuilder> by VmStackValueBuilderTlbConstructor
 }
 
 private object VmStackValueBuilderTlbConstructor : TlbConstructor<VmStackBuilder>(

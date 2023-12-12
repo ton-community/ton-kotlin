@@ -12,13 +12,13 @@ import org.ton.tlb.storeTlb
 
 @SerialName("vmc_repeat")
 @Serializable
-data class VmContRepeat(
+public data class VmContRepeat(
     val count: Long,
     val body: CellRef<VmCont>,
     val after: CellRef<VmCont>
 ) : VmCont {
-    companion object {
-        fun tlbConstructor(): TlbConstructor<VmContRepeat> = VmContRepeatTlbConstructor
+    public companion object {
+        public fun tlbConstructor(): TlbConstructor<VmContRepeat> = VmContRepeatTlbConstructor
     }
 }
 

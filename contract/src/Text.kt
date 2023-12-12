@@ -7,10 +7,10 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
-data class Text(
+public data class Text(
     val data: SnakeData
 ) {
-    companion object : TlbConstructorProvider<Text> by TextConstructor
+    public companion object : TlbConstructorProvider<Text> by TextConstructor
 }
 
 private object TextConstructor : TlbConstructor<Text>(

@@ -5,7 +5,8 @@ plugins {
 }
 
 kotlin {
-    explicitApiWarning()
+//    explicitApiWarning()
+    explicitApi()
 
     //optin
 

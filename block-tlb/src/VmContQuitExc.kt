@@ -8,8 +8,8 @@ import org.ton.tlb.TlbConstructor
 
 @SerialName("vmc_quit_exc")
 @Serializable
-object VmContQuitExc : VmCont {
-    fun tlbConstructor(): TlbConstructor<VmContQuitExc> = VmContQuitExcTlbConstructor
+public object VmContQuitExc : VmCont {
+    public fun tlbConstructor(): TlbConstructor<VmContQuitExc> = VmContQuitExcTlbConstructor
 }
 
 private object VmContQuitExcTlbConstructor : TlbConstructor<VmContQuitExc>(

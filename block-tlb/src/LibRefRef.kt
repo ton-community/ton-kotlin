@@ -6,6 +6,6 @@ import org.ton.cell.Cell
 
 @Serializable
 @SerialName("libref_ref")
-data class LibRefRef(
+public data class LibRefRef(
     val library: Cell
 ) : LibRef

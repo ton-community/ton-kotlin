@@ -44,11 +44,11 @@ public data class SnakeDataTail(
     }
 }
 
-data class SnakeDataCons(
+public data class SnakeDataCons(
     val bits: BitString,
     val next: SnakeData
 ) : SnakeData {
-    companion object : TlbConstructorProvider<SnakeDataCons> by SnakeDataConsTlbConstructor
+    public companion object : TlbConstructorProvider<SnakeDataCons> by SnakeDataConsTlbConstructor
 
     private object SnakeDataConsTlbConstructor : TlbConstructor<SnakeDataCons>(
         schema = "cons#_ {bn:#} {n:#} b:(bits bn) next:^(SnakeData ~n) = SnakeData (n + 1);"

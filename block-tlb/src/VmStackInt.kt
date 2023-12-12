@@ -12,12 +12,12 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_stk_int")
 @Serializable
-data class VmStackInt(
+public data class VmStackInt(
     @Serializable(BigIntSerializer::class)
     val value: BigInt
 ) : VmStackValue, VmStackNumber {
-    constructor(int: Int) : this(int.toBigInt())
-    constructor(long: Long) : this(long.toBigInt())
+    public constructor(int: Int) : this(int.toBigInt())
+    public constructor(long: Long) : this(long.toBigInt())
 
     override fun toInt(): Int = value.toInt()
     override fun toLong(): Long = value.toLong()
@@ -50,7 +50,7 @@ data class VmStackInt(
 
     override fun toString(): String = "(vm_stk_int value:$value)"
 
-    companion object : TlbConstructorProvider<VmStackInt> by VmStackIntTlbConstructor
+    public companion object : TlbConstructorProvider<VmStackInt> by VmStackIntTlbConstructor
 }
 
 private object VmStackIntTlbConstructor : TlbConstructor<VmStackInt>(

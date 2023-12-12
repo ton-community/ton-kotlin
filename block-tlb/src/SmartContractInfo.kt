@@ -6,7 +6,7 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("smc_info")
-data class SmartContractInfo(
+public data class SmartContractInfo(
     val actions: Int,
     val msgs_sent: Int,
     val unixtime: Long,

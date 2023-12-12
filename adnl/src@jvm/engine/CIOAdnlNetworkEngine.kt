@@ -13,7 +13,7 @@ import org.ton.api.adnl.AdnlAddressUdp
 public class CIOAdnlNetworkEngine(
     localAddress: AdnlAddressUdp = AdnlAddressUdp(ipv4("0.0.0.0"), 0)
 ) : AdnlNetworkEngine {
-    constructor(port: Int) : this(AdnlAddressUdp(ipv4("0.0.0.0"), port))
+    public constructor(port: Int) : this(AdnlAddressUdp(ipv4("0.0.0.0"), port))
 
     public val socket: BoundDatagramSocket =
         aSocket(ActorSelectorManager(DISPATCHER)).udp().bind(localAddress.toSocketAddress())

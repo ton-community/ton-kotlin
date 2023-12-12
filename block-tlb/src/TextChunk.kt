@@ -7,13 +7,13 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 
-class TextChunk(
-    val len: UByte,
-    val data: BitString,
-    val next: TextChunkRef
+public class TextChunk(
+    public val len: UByte,
+    public val data: BitString,
+    public val next: TextChunkRef
 ) : TextChunks {
-    companion object {
-        fun tlbConstructor(n: Int): TlbConstructor<TextChunk> = TextChunkTlbConstructor(n)
+    public companion object {
+        public fun tlbConstructor(n: Int): TlbConstructor<TextChunk> = TextChunkTlbConstructor(n)
     }
 }
 

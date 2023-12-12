@@ -36,7 +36,7 @@ public data class Message<X>(
     }
 }
 
-operator fun <X : Any> Message.Companion.invoke(x: TlbCodec<X>) = tlbCodec(x)
+public operator fun <X : Any> Message.Companion.invoke(x: TlbCodec<X>): TlbConstructor<Message<X>> = tlbCodec(x)
 
 private class MessageTlbConstructor<X : Any>(
     x: TlbCodec<X>

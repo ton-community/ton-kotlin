@@ -13,24 +13,24 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface VmCont {
+public sealed interface VmCont {
 
     @SerialName("vmc_until")
     @Serializable
-    data class Until(
+    public data class Until(
         val body: CellRef<VmCont>,
         val after: CellRef<VmCont>
     ) : VmCont
 
     @SerialName("vmc_again")
     @Serializable
-    data class Again(
+    public data class Again(
         val body: CellRef<VmCont>
     ) : VmCont
 
     @SerialName("vmc_while_cond")
     @Serializable
-    data class WhileCond(
+    public data class WhileCond(
         val cond: CellRef<VmCont>,
         val body: CellRef<VmCont>,
         val after: CellRef<VmCont>
@@ -38,7 +38,7 @@ sealed interface VmCont {
 
     @SerialName("vmc_while_body")
     @Serializable
-    data class WhileBody(
+    public data class WhileBody(
         val cond: CellRef<VmCont>,
         val body: CellRef<VmCont>,
         val after: CellRef<VmCont>
@@ -46,12 +46,12 @@ sealed interface VmCont {
 
     @SerialName("vmc_pushint")
     @Serializable
-    data class PushInt(
+    public data class PushInt(
         val value: Int,
         val next: CellRef<VmCont>
     ) : VmCont
 
-    companion object : TlbCombinatorProvider<VmCont> by VmContTlbCombinator
+    public companion object : TlbCombinatorProvider<VmCont> by VmContTlbCombinator
 }
 
 private object VmContTlbCombinator : TlbCombinator<VmCont>(

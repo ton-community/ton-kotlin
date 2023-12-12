@@ -8,7 +8,7 @@ import org.ton.tlb.storeTlb
 
 @SerialName("proto_list_next")
 @Serializable
-data class ProtoListNext(
+public data class ProtoListNext(
     val head: Protocol,
     val tail: ProtoList
 ) : ProtoList {
@@ -17,7 +17,7 @@ data class ProtoListNext(
         yieldAll(tail)
     }
 
-    companion object : TlbConstructorProvider<ProtoListNext> by ProtoListNextTlbConstructor
+    public companion object : TlbConstructorProvider<ProtoListNext> by ProtoListNextTlbConstructor
 }
 
 private object ProtoListNextTlbConstructor : org.ton.tlb.TlbConstructor<ProtoListNext>(

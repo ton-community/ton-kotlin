@@ -53,31 +53,31 @@ public class LiteServerProtoviolationException(
     }
 }
 
-class LiteServerNotReadyException(
+public class LiteServerNotReadyException(
     message: String
 ) : LiteServerException(ERROR_CODE, message) {
-    companion object {
-        const val ERROR_CODE = 651
+    public companion object {
+        public const val ERROR_CODE: Int = 651
     }
 }
 
-class LiteServerTimeoutException(
+public class LiteServerTimeoutException(
     message: String
 ) : LiteServerException(ERROR_CODE, message) {
-    companion object {
-        const val ERROR_CODE = 652
+    public companion object {
+        public const val ERROR_CODE: Int = 652
     }
 }
 
-class LiteServerCancelledException(
+public class LiteServerCancelledException(
     message: String
 ) : LiteServerException(ERROR_CODE, message) {
-    companion object {
-        const val ERROR_CODE = 653
+    public companion object {
+        public const val ERROR_CODE: Int = 653
     }
 }
 
-class LiteServerUnknownException(
+public class LiteServerUnknownException(
     code: Int,
     message: String
 ) : LiteServerException(code, message)

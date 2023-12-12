@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("validator_base_info")
-data class ValidatorBaseInfo(
+public data class ValidatorBaseInfo(
     val validator_list_hash_short: Long,
     val catchain_seqno: Long
 )

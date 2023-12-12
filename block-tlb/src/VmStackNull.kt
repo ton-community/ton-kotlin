@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_stk_null")
 @Serializable
-object VmStackNull : VmStackValue, TlbConstructorProvider<VmStackNull> by VmStackValueNullConstructor {
+public object VmStackNull : VmStackValue, TlbConstructorProvider<VmStackNull> by VmStackValueNullConstructor {
     override fun toString(): String = "vm_stk_null"
 }
 

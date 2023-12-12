@@ -12,15 +12,15 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmStatic
 
-inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)
-inline fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)
+public inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)
+public inline fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface VmStackList : Iterable<VmStackValue> {
+public sealed interface VmStackList : Iterable<VmStackValue> {
     @SerialName("vm_stk_cons")
     @Serializable
-    data class Cons(
+    public data class Cons(
         val rest: VmStackList,
         val tos: VmStackValue
     ) : VmStackList {
@@ -30,7 +30,7 @@ sealed interface VmStackList : Iterable<VmStackValue> {
 
     @SerialName("vm_stk_nil")
     @Serializable
-    object Nil : VmStackList {
+    public object Nil : VmStackList {
         private val iterator = ListIterator(this)
         override fun iterator(): Iterator<VmStackValue> = iterator
         override fun toString(): String = "vm_stk_nil"
@@ -49,12 +49,12 @@ sealed interface VmStackList : Iterable<VmStackValue> {
         }
     }
 
-    companion object {
+    public companion object {
         @JvmStatic
-        fun of(vararg stackValues: VmStackValue) = of(stackValues.toList())
+        public fun of(vararg stackValues: VmStackValue): VmStackList = of(stackValues.toList())
 
         @JvmStatic
-        fun of(stackValues: Iterable<VmStackValue>): VmStackList {
+        public fun of(stackValues: Iterable<VmStackValue>): VmStackList {
             var stackList: VmStackList = Nil
             stackValues.forEach { value ->
                 stackList = Cons(stackList, value)
@@ -64,7 +64,7 @@ sealed interface VmStackList : Iterable<VmStackValue> {
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun tlbCodec(n: Int): TlbCodec<VmStackList> =
+        public fun tlbCodec(n: Int): TlbCodec<VmStackList> =
             when (n) {
                 0 -> VmStackListNilConstructor
                 else -> VmStackListConsConstructor(n)

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @SerialName("out_list")
-data class OutListLink(
+public data class OutListLink(
     val prev: OutList,
     val action: OutAction
 ) : OutList

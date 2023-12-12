@@ -6,7 +6,7 @@ import org.ton.bitstring.BitString
 
 @Serializable
 @SerialName("libref_hash")
-data class LibRefHash(
+public data class LibRefHash(
     val lib_hash: BitString
 ) : LibRef {
     init {

@@ -11,16 +11,16 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.storeTlb
 
-sealed interface FullContent {
-    data class OnChain(
+public sealed interface FullContent {
+    public data class OnChain(
         val data: HashMapE<ContentData>
     ) : FullContent
 
-    data class OffChain(
+    public data class OffChain(
         val uri: Text
     ) : FullContent
 
-    companion object : TlbCombinatorProvider<FullContent> by FullContentCombinator
+    public companion object : TlbCombinatorProvider<FullContent> by FullContentCombinator
 }
 
 private object FullContentCombinator : TlbCombinator<FullContent>(

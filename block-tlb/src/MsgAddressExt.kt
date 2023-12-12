@@ -10,15 +10,16 @@ import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import kotlin.jvm.JvmStatic
 
-inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt.of(externalAddress)
-inline fun MsgAddressExt(externalAddress: ByteArray): MsgAddressExt = MsgAddressExt.of(externalAddress)
+public inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressExt = MsgAddressExt.of(externalAddress)
+
+public inline fun MsgAddressExt(externalAddress: ByteArray): MsgAddressExt = MsgAddressExt.of(externalAddress)
 
 @JsonClassDiscriminator("@type")
 @Serializable
-sealed interface MsgAddressExt : MsgAddress {
-    companion object : TlbCodec<MsgAddressExt> by MsgAddressExtTlbCombinator {
+public sealed interface MsgAddressExt : MsgAddress {
+    public companion object : TlbCodec<MsgAddressExt> by MsgAddressExtTlbCombinator {
         @JvmStatic
-        fun of(externalAddress: BitString? = null): MsgAddressExt {
+        public fun of(externalAddress: BitString? = null): MsgAddressExt {
             return if (externalAddress.isNullOrEmpty()) {
                 AddrNone
             } else {
@@ -27,10 +28,10 @@ sealed interface MsgAddressExt : MsgAddress {
         }
 
         @JvmStatic
-        fun of(externalAddress: ByteArray): MsgAddressExt = AddrExtern(externalAddress)
+        public fun of(externalAddress: ByteArray): MsgAddressExt = AddrExtern(externalAddress)
 
         @JvmStatic
-        fun tlbCodec(): TlbCombinator<MsgAddressExt> = MsgAddressExtTlbCombinator
+        public fun tlbCodec(): TlbCombinator<MsgAddressExt> = MsgAddressExtTlbCombinator
     }
 }
 

@@ -8,12 +8,12 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.storeTlb
 
-sealed interface ContentData {
-    data class Snake(val data: SnakeData) : ContentData
+public sealed interface ContentData {
+    public data class Snake(val data: SnakeData) : ContentData
 
-    data class Chunks(val data: ChunkedData) : ContentData
+    public data class Chunks(val data: ChunkedData) : ContentData
 
-    companion object : TlbCombinatorProvider<ContentData> by ContentDataCombinator
+    public companion object : TlbCombinatorProvider<ContentData> by ContentDataCombinator
 }
 
 private object ContentDataCombinator : TlbCombinator<ContentData>(

@@ -12,12 +12,12 @@ import org.ton.tlb.storeTlb
 
 @Serializable
 @SerialName("vm_stk_cont")
-data class VmStackCont(
+public data class VmStackCont(
     val cont: VmCont
 ) : VmStackValue {
     override fun toString(): String = "(vm_stk_cont cont:$cont)"
 
-    companion object : TlbConstructorProvider<VmStackCont> by VmStackValueContTlbConstructor
+    public companion object : TlbConstructorProvider<VmStackCont> by VmStackValueContTlbConstructor
 }
 
 private object VmStackValueContTlbConstructor : TlbConstructor<VmStackCont>(

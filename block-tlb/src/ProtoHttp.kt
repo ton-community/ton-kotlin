@@ -9,7 +9,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("proto_http")
 @Serializable
-object ProtoHttp : Protocol, TlbConstructorProvider<ProtoHttp> by ProtoHttpTlbConstructor
+public object ProtoHttp : Protocol, TlbConstructorProvider<ProtoHttp> by ProtoHttpTlbConstructor
 
 private object ProtoHttpTlbConstructor : TlbConstructor<ProtoHttp>(
     schema = "proto_http#4854 = Protocol;"

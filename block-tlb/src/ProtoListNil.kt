@@ -8,7 +8,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("proto_list_nil")
 @Serializable
-object ProtoListNil : ProtoList, TlbConstructorProvider<ProtoListNil> by ProtoListNilTlbConstructor {
+public object ProtoListNil : ProtoList, TlbConstructorProvider<ProtoListNil> by ProtoListNilTlbConstructor {
     override fun iterator(): Iterator<Protocol> = iterator {}
 }
 

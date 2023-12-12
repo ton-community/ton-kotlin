@@ -3,8 +3,8 @@ package org.ton.block
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.providers.TlbCombinatorProvider
 
-sealed interface Protocol {
-    companion object : TlbCombinatorProvider<Protocol> by ProtocolTlbCombinator
+public sealed interface Protocol {
+    public companion object : TlbCombinatorProvider<Protocol> by ProtocolTlbCombinator
 }
 
 private object ProtocolTlbCombinator : TlbCombinator<Protocol>(

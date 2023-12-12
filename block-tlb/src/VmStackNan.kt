@@ -6,7 +6,8 @@ import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-object VmStackNan : VmStackValue, VmStackNumber, TlbConstructorProvider<VmStackNan> by VmStackValueNanConstructor {
+public object VmStackNan : VmStackValue, VmStackNumber,
+    TlbConstructorProvider<VmStackNan> by VmStackValueNanConstructor {
     override fun toInt(): Int = throw VmStackNanException()
     override fun toLong(): Long = throw VmStackNanException()
     override fun toBigInt(): BigInt = throw VmStackNanException()
@@ -17,7 +18,7 @@ object VmStackNan : VmStackValue, VmStackNumber, TlbConstructorProvider<VmStackN
     override fun times(other: VmStackNumber): VmStackNumber = throw VmStackNanException()
     override fun div(other: VmStackNumber): VmStackNumber = throw VmStackNanException()
 
-    class VmStackNanException : RuntimeException("NaN exception")
+    public class VmStackNanException : RuntimeException("NaN exception")
 
     override fun toString(): String = "vm_stk_nan"
 }

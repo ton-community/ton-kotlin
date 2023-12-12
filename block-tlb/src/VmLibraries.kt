@@ -5,6 +5,6 @@ import org.ton.cell.Cell
 import org.ton.hashmap.HashMapE
 
 @Serializable
-data class VmLibraries(
+public data class VmLibraries(
     val libraries: HashMapE<Cell>
 )

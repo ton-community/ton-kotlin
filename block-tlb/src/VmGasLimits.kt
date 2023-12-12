@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @SerialName("gas_limits")
 @Serializable
-data class VmGasLimits(
+public data class VmGasLimits(
     val remaining: Long,
     val max_limit: Long,
     val cur_limit: Long,

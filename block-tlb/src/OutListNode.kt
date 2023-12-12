@@ -6,7 +6,7 @@ import org.ton.cell.Cell
 
 @Serializable
 @SerialName("out_list_node")
-data class OutListNode(
+public data class OutListNode(
     val prev: Cell,
     val action: OutAction
 )

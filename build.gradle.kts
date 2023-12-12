@@ -2,7 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-    id("publish") apply false
+    kotlin("multiplatform") apply false
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0-rc-1"
 
     alias(libs.plugins.bcv)
 }
@@ -32,6 +33,14 @@ subprojects {
     }
 }
 
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
+}
 //val isCI = System.getenv("CI") == "true"
 //val isSnapshot = System.getenv("TON_KOTLIN_SNAPSHOT") == "true"
 //val disableNativeTarget = System.getenv("TON_KOTLIN_DISABLE_NATIVE_TARGET") == "true"
@@ -168,16 +177,7 @@ subprojects {
 ////        }
 //    }
 //
-//    nexusPublishing {
-//        repositories {
-//            sonatype {
-//                username.set(project.findProperty("ossrhUsername") as? String ?: System.getenv("OSSRH_USERNAME"))
-//                password.set(project.findProperty("ossrhPassword") as? String ?: System.getenv("OSSRH_PASSWORD"))
-//                nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-//                snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-//            }
-//        }
-//    }
+
 //
 //    signing {
 //        val secretKey = project.findProperty("signing.secretKey") as? String ?: System.getenv("SIGNING_SECRET_KEY")

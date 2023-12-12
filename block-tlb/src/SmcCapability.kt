@@ -6,17 +6,17 @@ import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-sealed interface SmcCapability {
-    object MethodSeqno : SmcCapability, TlbConstructorProvider<MethodSeqno> by methodSeqno
-    object MethodPubKey : SmcCapability, TlbConstructorProvider<MethodPubKey> by methodPubKey
-    object IsWallet : SmcCapability, TlbConstructorProvider<IsWallet> by isWallet
-    data class Name(
+public sealed interface SmcCapability {
+    public object MethodSeqno : SmcCapability, TlbConstructorProvider<MethodSeqno> by methodSeqno
+    public object MethodPubKey : SmcCapability, TlbConstructorProvider<MethodPubKey> by methodPubKey
+    public object IsWallet : SmcCapability, TlbConstructorProvider<IsWallet> by isWallet
+    public data class Name(
         val name: Text
     ) : SmcCapability {
-        companion object : TlbConstructorProvider<Name> by capName
+        public companion object : TlbConstructorProvider<Name> by capName
     }
 
-    companion object : TlbCombinatorProvider<SmcCapability> by SmcCapabilityTlbCombinator
+    public companion object : TlbCombinatorProvider<SmcCapability> by SmcCapabilityTlbCombinator
 }
 
 private val methodSeqno = ObjectTlbConstructor(

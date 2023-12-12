@@ -78,7 +78,6 @@ public class WalletV4R2Contract(
             publicKey,
             HashMapE.empty()
         )
-
         public constructor(seqno: Int, publicKey: PublicKeyEd25519) : this(seqno, DEFAULT_WALLET_ID, publicKey)
 
         public companion object : TlbConstructor<Data>(
@@ -205,7 +204,6 @@ public class WalletV4R2Contract(
                         createdAt = 0u
                     )
                 }
-
                 is MsgAddressExt -> {
                     CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed(
                         src = AddrNone,

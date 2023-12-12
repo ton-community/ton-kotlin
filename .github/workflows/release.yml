@@ -9,24 +9,45 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository
-          - os: ubuntu-latest
-            gradle_args: jvmTest publishJvmPublicationToSonatypeRepository
-          - os: ubuntu-latest
-            gradle_args: publishMingwX64PublicationToSonatypeRepository
-          - os: ubuntu-latest
-            gradle_args: publishLinuxX64PublicationToSonatypeRepository
-          - os: macos-latest
-            gradle_args: publishMacosX64PublicationToSonatypeRepository
-          - os: macos-latest
-            gradle_args: publishMacosArm64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: publishIosX64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: publishIosArm64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: publishIosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishTvosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishTvosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishTvosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishTvosSimulatorArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishWatchosArm32PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishWatchosArm64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishWatchosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishWatchosSimulatorArm64PublicationToSonatypeRepository
+
+          - os: macos-latest
+            gradle_args: publishMacosX64PublicationToSonatypeRepository
+          - os: macos-latest
+            gradle_args: publishMacosArm64PublicationToSonatypeRepository
+
+          - os: ubuntu-latest
+            gradle_args: publishKotlinMultiplatformPublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: jvmTest publishJvmPublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishLinuxX64PublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishArmX64PublicationToSonatypeRepository
+          - os: ubuntu-latest
+            gradle_args: publishMingwX64PublicationToSonatypeRepository
+
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout project sources
