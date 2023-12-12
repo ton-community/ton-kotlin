@@ -6,6 +6,8 @@ on:
 
 jobs:
   build:
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+
     strategy:
       matrix:
         include:
