@@ -9,15 +9,15 @@ plugins {
 }
 
 allprojects {
+    group = "org.ton"
+    version = "0.3.0"
+
     repositories {
         mavenCentral()
     }
 }
 
 subprojects {
-    group = "org.ton"
-    version = "0.3.0"
-
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
 //            allWarningsAsErrors = true
