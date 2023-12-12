@@ -33,13 +33,21 @@ public data class PublicKeyEd25519(
 
     override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
 
-    public companion object : TlCodec<PublicKeyEd25519> by PublicKeyEd25519TlConstructor {
-        @JvmStatic
-        public fun tlConstructor(): TlConstructor<PublicKeyEd25519> = PublicKeyEd25519TlConstructor
-
+    public companion object : TlConstructor<PublicKeyEd25519>(
+        schema = "pub.ed25519 key:int256 = PublicKey",
+    ) {
         @JvmStatic
         public fun of(privateKey: PrivateKeyEd25519): PublicKeyEd25519 =
             PublicKeyEd25519(Ed25519.publicKey(privateKey.key.toByteArray()).asByteString())
+
+        override fun encode(writer: TlWriter, value: PublicKeyEd25519) {
+            writer.writeRaw(value.key)
+        }
+
+        override fun decode(reader: TlReader): PublicKeyEd25519 {
+            val key = reader.readByteString(32)
+            return PublicKeyEd25519(key)
+        }
     }
 
     override fun encrypt(data: ByteArray): ByteArray =
@@ -47,17 +55,4 @@ public data class PublicKeyEd25519(
 
     override fun verify(message: ByteArray, signature: ByteArray?): Boolean =
         _encryptor.verify(message, signature)
-}
-
-private object PublicKeyEd25519TlConstructor : TlConstructor<PublicKeyEd25519>(
-    schema = "pub.ed25519 key:int256 = PublicKey",
-) {
-    override fun encode(writer: TlWriter, value: PublicKeyEd25519) {
-        writer.writeRaw(value.key)
-    }
-
-    override fun decode(reader: TlReader): PublicKeyEd25519 {
-        val key = reader.readByteString(32)
-        return PublicKeyEd25519(key)
-    }
 }

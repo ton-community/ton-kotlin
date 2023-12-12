@@ -16,7 +16,7 @@ public sealed interface PrivateKey : Decryptor {
     public companion object : TlCombinator<PrivateKey>(
         PrivateKey::class,
         PrivateKeyUnencrypted::class to PrivateKeyUnencrypted,
-        PrivateKeyEd25519::class to PrivateKeyEd25519.tlConstructor(),
+        PrivateKeyEd25519::class to PrivateKeyEd25519,
         PrivateKeyAes::class to PrivateKeyAes,
         PrivateKeyOverlay::class to PrivateKeyOverlay,
     )

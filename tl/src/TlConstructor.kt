@@ -14,9 +14,7 @@ public abstract class TlConstructor<T : Any>(
             .replace(")", "")
             .replace(";", "")
     }
-    public val id: Int by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        id ?: crc32(this.schema.toByteArray())
-    }
+    public val id: Int = id ?: crc32(this.schema.toByteArray())
 
     override fun encodeBoxed(writer: TlWriter, value: T) {
         writer.writeInt(id)

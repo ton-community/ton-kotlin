@@ -2113,39 +2113,13 @@ public final class org/ton/api/pk/PrivateKeyEd25519 : org/ton/api/pk/PrivateKey,
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class org/ton/api/pk/PrivateKeyEd25519$Companion : org/ton/tl/TlCodec {
-	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
-	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decode (Lorg/ton/tl/ByteString;)Ljava/lang/Object;
-	public fun decode (Lorg/ton/tl/ByteString;)Lorg/ton/api/pk/PrivateKeyEd25519;
+public final class org/ton/api/pk/PrivateKeyEd25519$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decode ([B)Ljava/lang/Object;
-	public fun decode ([B)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decodeBoxed (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
-	public fun decodeBoxed (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decodeBoxed (Lorg/ton/tl/ByteString;)Ljava/lang/Object;
-	public fun decodeBoxed (Lorg/ton/tl/ByteString;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decodeBoxed (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
-	public fun decodeBoxed (Lorg/ton/tl/TlReader;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun decodeBoxed ([B)Ljava/lang/Object;
-	public fun decodeBoxed ([B)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun encode (Lio/ktor/utils/io/core/Output;Ljava/lang/Object;)V
-	public fun encode (Lio/ktor/utils/io/core/Output;Lorg/ton/api/pk/PrivateKeyEd25519;)V
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pk/PrivateKeyEd25519;)V
-	public synthetic fun encodeBoxed (Lio/ktor/utils/io/core/Output;Ljava/lang/Object;)V
-	public fun encodeBoxed (Lio/ktor/utils/io/core/Output;Lorg/ton/api/pk/PrivateKeyEd25519;)V
-	public synthetic fun encodeBoxed (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
-	public fun encodeBoxed (Lorg/ton/tl/TlWriter;Lorg/ton/api/pk/PrivateKeyEd25519;)V
-	public synthetic fun encodeToByteArray (Ljava/lang/Object;Z)[B
-	public fun encodeToByteArray (Lorg/ton/api/pk/PrivateKeyEd25519;Z)[B
-	public synthetic fun encodeToByteString (Ljava/lang/Object;Z)Lorg/ton/tl/ByteString;
-	public fun encodeToByteString (Lorg/ton/api/pk/PrivateKeyEd25519;Z)Lorg/ton/tl/ByteString;
 	public final fun generate (Lkotlin/random/Random;)Lorg/ton/api/pk/PrivateKeyEd25519;
 	public static synthetic fun generate$default (Lorg/ton/api/pk/PrivateKeyEd25519$Companion;Lkotlin/random/Random;ILjava/lang/Object;)Lorg/ton/api/pk/PrivateKeyEd25519;
-	public synthetic fun hash (Ljava/lang/Object;)[B
-	public fun hash (Lorg/ton/api/pk/PrivateKeyEd25519;)[B
 	public final fun of ([B)Lorg/ton/api/pk/PrivateKeyEd25519;
 	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
@@ -2243,45 +2217,17 @@ public final class org/ton/api/pub/PublicKeyEd25519 : org/ton/api/pub/PublicKey,
 	public final fun getKey ()Lorg/ton/tl/ByteString;
 	public fun hashCode ()I
 	public static final fun of (Lorg/ton/api/pk/PrivateKeyEd25519;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public static final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 	public fun toAdnlIdShort ()Lorg/ton/api/adnl/AdnlIdShort;
 	public fun toString ()Ljava/lang/String;
 	public fun verify ([B[B)Z
 }
 
-public final class org/ton/api/pub/PublicKeyEd25519$Companion : org/ton/tl/TlCodec {
-	public synthetic fun decode (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
-	public fun decode (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decode (Lorg/ton/tl/ByteString;)Ljava/lang/Object;
-	public fun decode (Lorg/ton/tl/ByteString;)Lorg/ton/api/pub/PublicKeyEd25519;
+public final class org/ton/api/pub/PublicKeyEd25519$Companion : org/ton/tl/TlConstructor {
 	public synthetic fun decode (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
 	public fun decode (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decode ([B)Ljava/lang/Object;
-	public fun decode ([B)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decodeBoxed (Lio/ktor/utils/io/core/Input;)Ljava/lang/Object;
-	public fun decodeBoxed (Lio/ktor/utils/io/core/Input;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decodeBoxed (Lorg/ton/tl/ByteString;)Ljava/lang/Object;
-	public fun decodeBoxed (Lorg/ton/tl/ByteString;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decodeBoxed (Lorg/ton/tl/TlReader;)Ljava/lang/Object;
-	public fun decodeBoxed (Lorg/ton/tl/TlReader;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun decodeBoxed ([B)Ljava/lang/Object;
-	public fun decodeBoxed ([B)Lorg/ton/api/pub/PublicKeyEd25519;
-	public synthetic fun encode (Lio/ktor/utils/io/core/Output;Ljava/lang/Object;)V
-	public fun encode (Lio/ktor/utils/io/core/Output;Lorg/ton/api/pub/PublicKeyEd25519;)V
 	public synthetic fun encode (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
 	public fun encode (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyEd25519;)V
-	public synthetic fun encodeBoxed (Lio/ktor/utils/io/core/Output;Ljava/lang/Object;)V
-	public fun encodeBoxed (Lio/ktor/utils/io/core/Output;Lorg/ton/api/pub/PublicKeyEd25519;)V
-	public synthetic fun encodeBoxed (Lorg/ton/tl/TlWriter;Ljava/lang/Object;)V
-	public fun encodeBoxed (Lorg/ton/tl/TlWriter;Lorg/ton/api/pub/PublicKeyEd25519;)V
-	public synthetic fun encodeToByteArray (Ljava/lang/Object;Z)[B
-	public fun encodeToByteArray (Lorg/ton/api/pub/PublicKeyEd25519;Z)[B
-	public synthetic fun encodeToByteString (Ljava/lang/Object;Z)Lorg/ton/tl/ByteString;
-	public fun encodeToByteString (Lorg/ton/api/pub/PublicKeyEd25519;Z)Lorg/ton/tl/ByteString;
-	public synthetic fun hash (Ljava/lang/Object;)[B
-	public fun hash (Lorg/ton/api/pub/PublicKeyEd25519;)[B
 	public final fun of (Lorg/ton/api/pk/PrivateKeyEd25519;)Lorg/ton/api/pub/PublicKeyEd25519;
-	public final fun tlConstructor ()Lorg/ton/tl/TlConstructor;
 }
 
 public final class org/ton/api/pub/PublicKeyOverlay : org/ton/api/pub/PublicKey, org/ton/crypto/Encryptor {

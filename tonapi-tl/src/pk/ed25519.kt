@@ -38,9 +38,11 @@ public data class PrivateKeyEd25519(
     public fun sharedKey(publicKey: PublicKeyEd25519): ByteArray =
         Ed25519.sharedKey(key.toByteArray(), publicKey.key.toByteArray())
 
-    public companion object : TlCodec<PrivateKeyEd25519> by PrivateKeyEd25519TlConstructor {
+    public companion object : TlConstructor<PrivateKeyEd25519>(
+        schema = "pk.ed25519 key:int256 = PrivateKey"
+    ) {
         @JvmStatic
-        public fun tlConstructor(): TlConstructor<PrivateKeyEd25519> = PrivateKeyEd25519TlConstructor
+        public fun tlConstructor(): TlConstructor<PrivateKeyEd25519> = this
 
         @JvmStatic
         public fun generate(random: Random = SecureRandom): PrivateKeyEd25519 =
@@ -53,6 +55,15 @@ public data class PrivateKeyEd25519(
                 Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> decodeBoxed(byteArray)
                 else -> throw IllegalArgumentException("Invalid key size: ${byteArray.size}")
             }
+
+        public override fun encode(writer: TlWriter, value: PrivateKeyEd25519) {
+            writer.writeRaw(value.key)
+        }
+
+        public override fun decode(reader: TlReader): PrivateKeyEd25519 {
+            val key = reader.readByteString(32)
+            return PrivateKeyEd25519(key)
+        }
     }
 
     override fun decrypt(data: ByteArray): ByteArray =
@@ -60,17 +71,4 @@ public data class PrivateKeyEd25519(
 
     override fun sign(message: ByteArray): ByteArray =
         _decryptor.sign(message)
-}
-
-private object PrivateKeyEd25519TlConstructor : TlConstructor<PrivateKeyEd25519>(
-    schema = "pk.ed25519 key:int256 = PrivateKey"
-) {
-    override fun encode(writer: TlWriter, value: PrivateKeyEd25519) {
-        writer.writeRaw(value.key)
-    }
-
-    override fun decode(reader: TlReader): PrivateKeyEd25519 {
-        val key = reader.readByteString(32)
-        return PrivateKeyEd25519(key)
-    }
 }
