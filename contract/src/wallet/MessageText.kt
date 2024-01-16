@@ -47,7 +47,7 @@ private object MessageTextTlbCombinator : TlbCombinator<MessageText>(
 )
 
 private object TextTlbConstructor : TlbConstructor<MessageText.Raw>(
-    "raw#00 text:BitString = MessageText"
+    "raw#00000000 text:BitString = MessageText"
 ) {
     override fun loadTlb(cellSlice: CellSlice): MessageText.Raw {
         val text = cellSlice.loadTlb(CellStringTlbConstructor)
@@ -60,7 +60,7 @@ private object TextTlbConstructor : TlbConstructor<MessageText.Raw>(
 }
 
 private object EncryptedTextTlbConstructor : TlbConstructor<MessageText.Encrypted>(
-    "encrypted#01 text:BitString = MessageText"
+    "encrypted#00000001 text:BitString = MessageText"
 ) {
     override fun loadTlb(cellSlice: CellSlice): MessageText.Encrypted {
         val text = cellSlice.loadTlb(CellStringTlbConstructor)

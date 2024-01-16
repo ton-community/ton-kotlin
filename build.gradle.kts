@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
@@ -11,7 +12,7 @@ plugins {
 
 allprojects {
     group = "org.ton"
-    version = "0.3.0"
+    version = "0.3.1"
 
     repositories {
         mavenCentral()
