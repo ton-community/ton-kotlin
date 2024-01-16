@@ -7,7 +7,7 @@ import kotlin.contracts.contract
 
 public interface WalletContract : SmartContract {
     public companion object {
-        public const val DEFAULT_WALLET_ID: Int = 698983191
+        public const val DEFAULT_WALLET_ID: Int = 698983191 // First 4 bytes of zero state root hash of mainnet (as int32 in Little Endian)
     }
 
     public suspend fun transfer(privateKey: PrivateKeyEd25519, transfer: WalletTransfer)
