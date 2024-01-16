@@ -10,20 +10,20 @@
 
 ### Core components
 
-* `org.ton:ton-kotlin-tvm:0.3.0` - TVM Primitives (Cells, BOC, etc.)
-* `org.ton:ton-kotlin-crypto:0.3.0` - Crypto primitives for TON (ED25519, SHA, etc.)
-* `org.ton:ton-kotlin-adnl:0.3.0` - ADNL (Abstract Datagram Network Layer) TON Network implementation
+* `org.ton:ton-kotlin-tvm:0.3.1` - TVM Primitives (Cells, BOC, etc.)
+* `org.ton:ton-kotlin-crypto:0.3.1` - Crypto primitives for TON (ED25519, SHA, etc.)
+* `org.ton:ton-kotlin-adnl:0.3.1` - ADNL (Abstract Datagram Network Layer) TON Network implementation
 
 ### API Interfaces
 
-* `org.ton:ton-kotlin-contract:0.3.0` - Smart-contracts API interface
-* `org.ton:ton-kotlin-liteclient:0.3.0` - Lite-client API implementation
+* `org.ton:ton-kotlin-contract:0.3.1` - Smart-contracts API interface
+* `org.ton:ton-kotlin-liteclient:0.3.1` - Lite-client API implementation
 
 ### TL-B (TL-Binary)
 
-* `org.ton:ton-kotlin-tlb:0.3.0` - TON TL-B (TL-Binary) serialization/deserialization
-* `org.ton:ton-kotlin-block-tlb:0.3.0` - Pre-generated TL-B schemas for TON Blockchain
-* `org.ton:ton-kotlin-hashmap-tlb:0.3.0` - Pre-generated TL-B schemas for TON Hashmap (also known as Dictionary)
+* `org.ton:ton-kotlin-tlb:0.3.1` - TON TL-B (TL-Binary) serialization/deserialization
+* `org.ton:ton-kotlin-block-tlb:0.3.1` - Pre-generated TL-B schemas for TON Blockchain
+* `org.ton:ton-kotlin-hashmap-tlb:0.3.1` - Pre-generated TL-B schemas for TON Hashmap (also known as Dictionary)
 
 ## Documentation
 
@@ -31,7 +31,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin-tvm/0.3.0
+[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin-tvm/0.3.1
 
 [license]: LICENSE
 

@@ -26,7 +26,7 @@ infix fun <T> Property<T>.by(value: T) {
 
 fun MavenPom.configureMavenCentralMetadata(project: Project) {
     name by project.name
-    description by "A multiplatform Kotlin library providing basic cryptographic functions and primitives"
+    description by "Kotlin/Multiplatform SDK for The Open Network"
     url by "https://github.com/ton-community/ton-kotlin"
 
     licenses {
