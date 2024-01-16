@@ -17,13 +17,9 @@ jobs:
           - os: macos-latest
             gradle_args: assemble publishIosSimulatorArm64PublicationToSonatypeRepository
           - os: macos-latest
-            gradle_args: assemble publishIosSimulatorArm64PublicationToSonatypeRepository
-          - os: macos-latest
             gradle_args: assemble publishTvosX64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: assemble publishTvosArm64PublicationToSonatypeRepository
-          - os: macos-latest
-            gradle_args: assemble publishTvosSimulatorArm64PublicationToSonatypeRepository
           - os: macos-latest
             gradle_args: assemble publishTvosSimulatorArm64PublicationToSonatypeRepository
           - os: macos-latest
