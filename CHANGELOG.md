@@ -1,3 +1,10 @@
+# 0.3.1
+
+### Fixes
+
+* Fixed invalid TL-B constructor prefix for transactions with text (also known as
+  Commentary/Memo)  ([#117](https://github.com/ton-community/ton-kotlin/pull/117))
+
 # 0.3.0
 
 ### New features
@@ -24,7 +31,7 @@
 - `ton-kotlin-fift` removed due to lack of interest
 - `ton-kotlin-logger` removed due uselessness
 
-## Deprecated
+### Deprecated
 
 - [VarUInteger](https://github.com/ton-community/ton-kotlin/blob/main/ton-kotlin-block/src/commonMain/kotlin/org/ton/block/VarUInteger.kt#L18)
   arithmetic operators will be removed in the next release due separation of serialization objects
