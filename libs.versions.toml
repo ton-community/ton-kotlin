@@ -7,7 +7,7 @@ serialization = "1.6.2" # https://search.maven.org/artifact/org.jetbrains.kotlin
 ktor = "2.3.7" # https://search.maven.org/artifact/io.ktor/ktor
 curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
 bignum = "0.3.8" # https://search.maven.org/artifact/com.ionspin.kotlin/bignum
-crypto = "0.0.1"
+crypto = "0.0.2"
 cache4k = "0.12.0" # https://central.sonatype.com/namespace/io.github.reactivecircus.cache4k
 bcv = "0.13.2"
 
@@ -32,6 +32,8 @@ bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 sha2 = { module = "io.github.andreypfau:kotlinx-crypto-sha2", version.ref = "crypto" }
 aes = { module = "io.github.andreypfau:kotlinx-crypto-aes", version.ref = "crypto" }
 crc32 = { module = "io.github.andreypfau:kotlinx-crypto-crc32", version.ref = "crypto" }
+pbkdf2 = { module = "io.github.andreypfau:kotlinx-crypto-pbkdf2", version.ref = "crypto" }
+hmac = { module = "io.github.andreypfau:kotlinx-crypto-hmac", version.ref = "crypto" }
 
 [plugins]
 bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }
