@@ -1,5 +1,6 @@
 package org.ton.api.rldp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.fec.FecType
@@ -10,6 +11,7 @@ import kotlin.jvm.JvmName
 @SerialName("rldp.messagePart")
 public data class RldpMessagePartData(
     @get:JvmName("transferId")
+    @Serializable(ByteStringBase64Serializer::class)
     override val transferId: ByteString,
 
     @SerialName("fec_type")
@@ -27,6 +29,7 @@ public data class RldpMessagePartData(
     val seqno: Int,
 
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) : RldpMessagePart {
     override fun tlCodec(): TlCodec<RldpMessagePartData> = Companion

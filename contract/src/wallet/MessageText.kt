@@ -1,12 +1,12 @@
 package org.ton.contract.wallet
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.decodeToString
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.contract.CellStringTlbConstructor
-import org.ton.tl.ByteString
-import org.ton.tl.asByteString
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.loadTlb
@@ -20,7 +20,7 @@ public sealed interface MessageText {
     ) : MessageText {
         public fun encrypt(publicKey: PublicKey): Encrypted {
             val encrypted = publicKey.encrypt(text.encodeToByteArray())
-            return Encrypted(encrypted.asByteString())
+            return Encrypted(ByteString(*encrypted))
         }
 
         public companion object : TlbConstructorProvider<Raw> by TextTlbConstructor
@@ -55,7 +55,7 @@ private object TextTlbConstructor : TlbConstructor<MessageText.Raw>(
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: MessageText.Raw) {
-        cellBuilder.storeTlb(CellStringTlbConstructor, value.text.encodeToByteArray().asByteString())
+        cellBuilder.storeTlb(CellStringTlbConstructor, ByteString(*value.text.encodeToByteArray()))
     }
 }
 

@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -18,10 +19,12 @@ public data class LiteServerShardInfo(
 
     @SerialName("shard_proof")
     @get:JvmName("shardProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val shardProof: ByteString,
 
     @SerialName("shard_descr")
     @get:JvmName("shardDescr")
+    @Serializable(ByteStringBase64Serializer::class)
     val shardDescr: ByteString
 ) {
     public companion object : TlCodec<LiteServerShardInfo> by LiteServerShardInfoTlConstructor

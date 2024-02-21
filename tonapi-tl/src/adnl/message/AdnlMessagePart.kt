@@ -1,9 +1,9 @@
 package org.ton.api.adnl.message
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.constructors.BytesTlConstructor
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -12,6 +12,7 @@ import kotlin.jvm.JvmStatic
 @Serializable
 public data class AdnlMessagePart(
     @get:JvmName("hash")
+    @Serializable(ByteStringBase64Serializer::class)
     val hash: ByteString,
 
     @SerialName("total_size")
@@ -22,15 +23,9 @@ public data class AdnlMessagePart(
     val offset: Int,
 
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) : AdnlMessage {
-    public constructor(
-        hash: ByteArray,
-        totalSize: Int,
-        offset: Int,
-        data: ByteArray,
-    ) : this(hash.toByteString(), totalSize, offset, data.toByteString())
-
     init {
         check(hash.size == 32) { "hash size expected: 32, actual: ${hash.size}" }
     }
@@ -55,10 +50,10 @@ public data class AdnlMessagePart(
             while (offset < data.size) {
                 val partSize = minOf(maxSize, data.size - offset)
                 val part = AdnlMessagePart(
-                    hash = hash,
+                    hash = ByteString(*hash),
                     totalSize = data.size,
                     offset = offset,
-                    data = data.copyOfRange(offset, offset + partSize)
+                    data = ByteString(*data.copyOfRange(offset, offset + partSize))
                 )
                 parts.add(part)
                 offset += partSize

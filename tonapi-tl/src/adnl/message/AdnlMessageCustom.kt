@@ -1,8 +1,9 @@
 package org.ton.api.adnl.message
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.ByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -13,6 +14,7 @@ import kotlin.jvm.JvmName
 @Serializable
 public data class AdnlMessageCustom(
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) : AdnlMessage {
     public companion object : TlConstructor<AdnlMessageCustom>(

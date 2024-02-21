@@ -2,6 +2,7 @@
 
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -13,6 +14,7 @@ import kotlin.jvm.JvmName
 @SerialName("liteServer.query")
 public data class LiteServerQuery(
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) {
     public companion object : TlCodec<LiteServerQuery> by LiteServerQueryTlConstructor

@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -17,6 +18,7 @@ public data class LiteServerBlockHeader(
 
     @SerialName("header_proof")
     @get:JvmName("headerProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val headerProof: ByteString
 ) {
     public companion object : TlCodec<LiteServerBlockHeader> by LiteServerBlockHeaderTlConstructor

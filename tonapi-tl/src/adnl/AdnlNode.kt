@@ -16,11 +16,6 @@ public data class AdnlNode(
     @get:JvmName("addrList")
     val addrList: AdnlAddressList
 ) {
-    public constructor(
-        id: PublicKey,
-        addrList: List<AdnlAddress>
-    ) : this(id, AdnlAddressList(addrList))
-
     public companion object : TlConstructor<AdnlNode>(
         schema = "adnl.node id:PublicKey addr_list:adnl.addressList = adnl.Node"
     ) {

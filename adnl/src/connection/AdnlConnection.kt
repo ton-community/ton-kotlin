@@ -14,7 +14,6 @@ import kotlinx.datetime.Instant
 import org.ton.adnl.network.TcpClient
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.crypto.SecureRandom
-import org.ton.tl.writeByteString
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -67,7 +66,7 @@ public class AdnlConnection(
             }
 
             connection.output.writePacket {
-                writeByteString(liteServerDesc.id.toAdnlIdShort().id)
+                writeFully(liteServerDesc.id.toAdnlIdShort().id.toByteArray())
                 writeFully(liteServerDesc.id.encrypt(nonce))
             }
             connection.output.flush()
@@ -185,8 +184,8 @@ public class AdnlConnection(
         val payload = packet.readBytes()
 
         val hash = SHA256().apply {
-            write(nonce)
-            write(payload)
+            update(nonce)
+            update(payload)
         }.digest()
 
         val data = buildPacket {

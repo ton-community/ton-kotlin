@@ -1,12 +1,13 @@
 package org.ton.api.pk
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyAes
 import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorAes
-import org.ton.tl.ByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -15,6 +16,7 @@ import org.ton.tl.TlWriter
 @SerialName("pk.aes")
 @Serializable
 public data class PrivateKeyAes(
+    @Serializable(ByteStringBase64Serializer::class)
     val key: ByteString
 ) : PrivateKey, Decryptor by DecryptorAes(key.toByteArray()) {
     override fun publicKey(): PublicKeyAes = PublicKeyAes(key)

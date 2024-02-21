@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -31,6 +32,7 @@ public data class LiteServerRunSmcMethod(
     val methodId: Long,
 
     @get:JvmName("params")
+    @Serializable(ByteStringBase64Serializer::class)
     val params: ByteString
 ) : TLFunction<LiteServerRunSmcMethod, LiteServerRunMethodResult> {
     override fun tlCodec(): TlCodec<LiteServerRunSmcMethod> = LiteServerRunSmcMethod

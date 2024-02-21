@@ -1,11 +1,11 @@
 package org.ton.lite.api
 
-import io.ktor.utils.io.core.*
+import kotlinx.io.Buffer
+import kotlinx.io.readByteString
 import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.tl.TlCodec
-import org.ton.tl.asByteString
 
 public interface LiteApiClient : LiteApi {
     public suspend fun <Q, A> sendQuery(
@@ -14,21 +14,17 @@ public interface LiteApiClient : LiteApi {
         query: Q,
         waitMasterchainSeqno: Int = -1
     ): A {
-        val rawQuery = buildPacket {
-//            println("send query to lite server: $query")
+        val rawQuery = Buffer().apply {
             if (waitMasterchainSeqno > 0) {
                 val wait = LiteServerWaitMasterchainSeqno(waitMasterchainSeqno, 30000)
-//                println("with prefix: $wait")
                 LiteServerWaitMasterchainSeqno.encodeBoxed(this, wait)
             }
             queryCodec.encodeBoxed(this, query)
-        }.readBytes()
-        val liteServerQuery = LiteServerQuery(rawQuery.asByteString())
-        val result = sendRawQuery(buildPacket {
-            LiteServerQuery.encodeBoxed(this, liteServerQuery)
-        })
+        }.readByteString()
+        val liteServerQuery = LiteServerQuery(rawQuery)
+        val result = sendRawQuery(LiteServerQuery.encodeToByteArray(liteServerQuery, true))
         val liteServerError = try {
-            LiteServerError.decodeBoxed(result.copy())
+            LiteServerError.decodeBoxed(result)
         } catch (e: Exception) {
             null
         }
@@ -39,7 +35,7 @@ public interface LiteApiClient : LiteApi {
         return answer
     }
 
-    public suspend fun sendRawQuery(query: ByteReadPacket): ByteReadPacket
+    public suspend fun sendRawQuery(query: ByteArray): ByteArray
 
     override suspend fun invoke(
         function: LiteServerGetMasterchainInfo,

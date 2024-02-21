@@ -2,6 +2,7 @@
 
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,7 +11,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 
 @Polymorphic
@@ -65,11 +65,10 @@ public data class AdnlAddressUdp(
 @SerialName("adnl.address.udp6")
 @Serializable
 public data class AdnlAddressUdp6(
+    @Serializable(ByteStringBase64Serializer::class)
     override val ip: ByteString,
     override val port: Int
 ) : AdnlAddress, AdnlIp6 {
-    public constructor(ip: ByteArray, port: Int) : this(ip.toByteString(), port)
-
     public companion object : TlConstructor<AdnlAddressUdp6>(
         schema = "adnl.address.udp6 ip:int128 port:int = adnl.Address"
     ) {
@@ -91,14 +90,12 @@ public data class AdnlAddressUdp6(
 @Serializable
 public data class AdnlAddressTunnel(
     @get:JvmName("to")
+    @Serializable(ByteStringBase64Serializer::class)
     val to: ByteString,
 
     @get:JvmName("pubKey")
     val pubKey: PublicKey
 ) : AdnlAddress {
-    public constructor(to: ByteArray, pubKey: PublicKey) : this(to.toByteString(), pubKey)
-    public constructor(adnlIdShort: AdnlIdShort, pubKey: PublicKey) : this(adnlIdShort.id, pubKey)
-
     public companion object : TlConstructor<AdnlAddressTunnel>(
         schema = "adnl.address.tunnel to:int256 pubkey:PublicKey = adnl.Address"
     ) {

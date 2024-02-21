@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
@@ -10,6 +11,7 @@ import kotlin.jvm.JvmName
 @SerialName("liteServer.sendMessage")
 public data class LiteServerSendMessage(
     @get:JvmName("body")
+    @Serializable(ByteStringBase64Serializer::class)
     val body: ByteString
 ) : TLFunction<LiteServerSendMessage, LiteServerSendMsgStatus> {
     override fun tlCodec(): TlCodec<LiteServerSendMessage> = LiteServerSendMessageTlConstructor

@@ -1,12 +1,11 @@
 package org.ton.contract
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.storeRef
-import org.ton.tl.ByteString
-import org.ton.tl.asByteString
 import org.ton.tlb.TlbConstructor
 import kotlin.math.min
 
@@ -21,7 +20,7 @@ public object CellStringTlbConstructor : TlbConstructor<ByteString>(
         forEach(cellSlice, Cell.MAX_BITS_SIZE) {
             result += it
         }
-        return result.toByteArray().asByteString()
+        return ByteString(*result.toByteArray())
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: ByteString) {
@@ -40,9 +39,9 @@ public object CellStringTlbConstructor : TlbConstructor<ByteString>(
         if (head / 8 == value.size) {
             cellBuilder.storeBytes(value.toByteArray())
         } else {
-            cellBuilder.storeBytes(value.copyOf(head / 8).toByteArray())
+            cellBuilder.storeBytes(value.substring(0, head / 8).toByteArray())
             cellBuilder.storeRef {
-                storeTlb(this, value.copyOfRange(head / 8, value.size))
+                storeTlb(this, value.substring(head / 8, value.size))
             }
         }
     }

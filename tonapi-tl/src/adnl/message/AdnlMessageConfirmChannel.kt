@@ -2,11 +2,10 @@
 
 package org.ton.api.adnl.message
 
-import kotlinx.datetime.Instant
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.ByteString
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -16,29 +15,17 @@ import kotlin.jvm.JvmName
 @Serializable
 public data class AdnlMessageConfirmChannel(
     @get:JvmName("key")
+    @Serializable(ByteStringBase64Serializer::class)
     val key: ByteString,
 
     @SerialName("peer_key")
     @get:JvmName("peerKey")
+    @Serializable(ByteStringBase64Serializer::class)
     val peerKey: ByteString,
 
     @get:JvmName("date")
     val date: Int
 ) : AdnlMessage {
-    public constructor(
-        key: ByteArray,
-        peerKey: ByteArray,
-        date: Int
-    ) : this(key.toByteString(), peerKey.toByteString(), date)
-
-    public constructor(
-        key: ByteString,
-        peerKey: ByteString,
-        date: Instant
-    ) : this(key, peerKey, date.epochSeconds.toInt())
-
-    public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
-
     public companion object : TlConstructor<AdnlMessageConfirmChannel>(
         schema = "adnl.message.confirmChannel key:int256 peer_key:int256 date:int = adnl.Message",
     ) {

@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -31,6 +32,7 @@ public data class LiteServerMasterchainInfoExt(
 
     @SerialName("state_root_hash")
     @get:JvmName("stateRootHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val stateRootHash: ByteString,
 
     @get:JvmName("init")

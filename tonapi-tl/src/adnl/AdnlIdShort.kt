@@ -2,6 +2,7 @@
 
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.overlay.OverlayNode
@@ -12,6 +13,7 @@ import kotlin.jvm.JvmStatic
 @Serializable
 @SerialName("adnl.id.short")
 public data class AdnlIdShort(
+    @Serializable(ByteStringBase64Serializer::class)
     val id: ByteString
 ) : Comparable<AdnlIdShort>, TlObject<AdnlIdShort> {
     public fun verify(node: OverlayNode): Boolean {

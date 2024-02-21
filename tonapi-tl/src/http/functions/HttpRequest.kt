@@ -1,5 +1,6 @@
 package org.ton.api.http.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.http.HttpHeader
@@ -9,6 +10,7 @@ import org.ton.tl.*
 @SerialName("http.request")
 @Serializable
 public data class HttpRequest(
+    @Serializable(ByteStringBase64Serializer::class)
     val id: ByteString,
     val method: String,
     val url: String,

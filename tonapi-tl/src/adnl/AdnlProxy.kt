@@ -2,6 +2,7 @@
 
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -23,6 +24,7 @@ public interface AdnlProxy {
 @Serializable
 public data class AdnlProxyNone(
     @get:JvmName("id")
+    @Serializable(ByteStringBase64Serializer::class)
     override val id: ByteString
 ) : AdnlProxy {
     public companion object : TlConstructor<AdnlProxyNone>(
@@ -43,9 +45,11 @@ public data class AdnlProxyNone(
 @Serializable
 public data class AdnlProxyFast(
     @get:JvmName("id")
+    @Serializable(ByteStringBase64Serializer::class)
     override val id: ByteString,
 
     @get:JvmName("sharedSecret")
+    @Serializable(ByteStringBase64Serializer::class)
     val sharedSecret: ByteString
 ) : AdnlProxy {
     public companion object : TlConstructor<AdnlProxyFast>(

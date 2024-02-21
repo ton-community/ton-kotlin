@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -20,6 +21,7 @@ public data class LiteServerGetValidatorStats(
     val limit: Int,
 
     @get:JvmName("startAfter")
+    @Serializable(ByteStringBase64Serializer::class)
     val startAfter: ByteString?,
 
     @get:JvmName("modifiedAfter")

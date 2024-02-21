@@ -1,9 +1,9 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 
 @Serializable
@@ -11,13 +11,13 @@ import kotlin.jvm.JvmName
 public data class LiteServerSignature(
     @SerialName("node_id_short")
     @get:JvmName("nodeIdShort")
+    @Serializable(ByteStringBase64Serializer::class)
     val nodeIdShort: ByteString,
 
     @get:JvmName("signature")
+    @Serializable(ByteStringBase64Serializer::class)
     val signature: ByteString
 ) {
-    public constructor(nodeIdShort: ByteArray, signature: ByteArray) : this(nodeIdShort.toByteString(), signature.toByteString())
-
     public companion object : TlCodec<LiteServerSignature> by LiteServerSignatureTlConstructor
 }
 

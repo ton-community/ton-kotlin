@@ -2,6 +2,8 @@
 
 package org.ton.api.pub
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.isEmpty
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -33,10 +35,11 @@ public sealed interface PublicKey : Encryptor, TlObject<PublicKey> {
 @SerialName("pub.unenc")
 @Serializable
 public data class PublicKeyUnencrypted(
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) : PublicKey, Encryptor by EncryptorNone {
 
-    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(PublicKeyUnencrypted.hash(this).asByteString())
+    override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(ByteString(*PublicKeyUnencrypted.hash(this)))
 
     public companion object : TlConstructor<PublicKeyUnencrypted>(
         schema = "pub.unenc data:bytes = PublicKey"
@@ -55,10 +58,11 @@ public data class PublicKeyUnencrypted(
 @SerialName("pub.aes")
 @Serializable
 public data class PublicKeyAes(
+    @Serializable(ByteStringBase64Serializer::class)
     val key: ByteString
 ) : PublicKey, Encryptor by EncryptorAes(key.toByteArray()) {
     private val _adnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        AdnlIdShort(hash(this).asByteString())
+        AdnlIdShort(ByteString(* hash(this)))
     }
 
     override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
@@ -80,11 +84,12 @@ public data class PublicKeyAes(
 @SerialName("pub.overlay")
 @Serializable
 public data class PublicKeyOverlay(
+    @Serializable(ByteStringBase64Serializer::class)
     val name: ByteString
 ) : PublicKey, Encryptor by EncryptorFail {
 
     override fun toAdnlIdShort(): AdnlIdShort = AdnlIdShort(
-        PublicKeyOverlay.hash(this).asByteString()
+        ByteString(*PublicKeyOverlay.hash(this))
     )
 
     override fun verify(message: ByteArray, signature: ByteArray?): Boolean {

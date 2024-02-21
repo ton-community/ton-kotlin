@@ -1,9 +1,9 @@
 package org.ton.api.adnl.message
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tl.constructors.BytesTlConstructor
 import kotlin.jvm.JvmName
 
@@ -12,13 +12,13 @@ import kotlin.jvm.JvmName
 public data class AdnlMessageAnswer(
     @SerialName("query_id")
     @get:JvmName("queryId")
+    @Serializable(ByteStringBase64Serializer::class)
     val queryId: ByteString,
 
     @get:JvmName("answer")
+    @Serializable(ByteStringBase64Serializer::class)
     val answer: ByteString
 ) : AdnlMessage {
-    public constructor(queryId: ByteArray, answer: ByteArray) : this(queryId.toByteString(), answer.toByteString())
-
     init {
         require(queryId.size == 32)
     }
@@ -35,8 +35,8 @@ public data class AdnlMessageAnswer(
         }
 
         override fun decode(reader: TlReader): AdnlMessageAnswer = reader {
-            val queryId = readRaw(32)
-            val answer = readBytes()
+            val queryId = readByteString(32)
+            val answer = readByteString()
             AdnlMessageAnswer(queryId, answer)
         }
     }

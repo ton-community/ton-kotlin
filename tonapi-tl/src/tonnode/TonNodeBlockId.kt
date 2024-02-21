@@ -65,7 +65,7 @@ private data class TonNodeBlockIdImpl(
 ) : TonNodeBlockId {
     override fun withSeqno(seqno: Int): TonNodeBlockId = copy(seqno = seqno)
 
-    override fun toString(): String = "($workchain:${shard.toShard().hex()}:$seqno)"
+    override fun toString(): String = "($workchain:${shard.toHexString(HexFormat.UpperCase)}:$seqno)"
 }
 
 private object TonNodeBlockIdTlbConstructor : TlConstructor<TonNodeBlockId>(

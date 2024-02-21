@@ -2,11 +2,13 @@
 
 package org.ton.api.tonnode
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.ByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -15,8 +17,10 @@ import org.ton.tl.TlWriter
 public data class TonNodeZeroStateIdExt(
     val workchain: Int,
     @SerialName("root_hash")
+    @Serializable(ByteStringBase64Serializer::class)
     val rootHash: ByteString,
     @SerialName("file_hash")
+    @Serializable(ByteStringBase64Serializer::class)
     val fileHash: ByteString
 ) {
     public constructor(tonNodeBlockIdExt: TonNodeBlockIdExt) : this(
@@ -28,7 +32,8 @@ public data class TonNodeZeroStateIdExt(
     public fun isMasterchain(): Boolean = workchain == Workchain.MASTERCHAIN_ID
     public fun isValid(): Boolean = workchain != Workchain.INVALID_WORKCHAIN
 
-    override fun toString(): String = "($workchain:${rootHash}:${fileHash})"
+    override fun toString(): String =
+        "($workchain:${rootHash.toHexString(HexFormat.UpperCase)}:${fileHash.toHexString(HexFormat.UpperCase)})"
 
     public companion object : TlConstructor<TonNodeZeroStateIdExt>(
         schema = "tonNode.zeroStateIdExt workchain:int root_hash:int256 file_hash:int256 = tonNode.ZeroStateIdExt"

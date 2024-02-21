@@ -24,8 +24,6 @@ public data class AdnlAddressList(
     @get:JvmName("expireAt")
     val expireAt: Int = 0
 ) : TlObject<AdnlAddressList> {
-    public constructor(vararg addrs: AdnlAddress) : this(addrs.toList())
-
     override fun tlCodec(): TlCodec<AdnlAddressList> = Companion
 
     public companion object : TlConstructor<AdnlAddressList>(

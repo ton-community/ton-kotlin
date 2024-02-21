@@ -1,26 +1,16 @@
 package org.ton.api.tcp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.TlCodec
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
 
 @SerialName("tcp.authentificationNonce")
 @Serializable
 public data class TcpAuthentificationNonce(
-    val nonce: ByteArray
+    @Serializable(ByteStringBase64Serializer::class)
+    val nonce: ByteString
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TcpAuthentificate) return false
-        if (!nonce.contentEquals(other.nonce)) return false
-        return true
-    }
-
-    override fun hashCode(): Int = nonce.contentHashCode()
-
     public companion object : TlCodec<TcpAuthentificationNonce> by TcpAuthentificationNonceTlConstructor
 }
 
@@ -28,7 +18,7 @@ private object TcpAuthentificationNonceTlConstructor : TlConstructor<TcpAuthenti
     schema = "tcp.authentificationNonce nonce:bytes = tcp.Message"
 ) {
     override fun decode(reader: TlReader): TcpAuthentificationNonce {
-        val nonce = reader.readBytes()
+        val nonce = reader.readByteString()
         return TcpAuthentificationNonce(nonce)
     }
 

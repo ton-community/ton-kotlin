@@ -1,5 +1,6 @@
 package org.ton.api.overlay
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.adnl.AdnlIdShort
@@ -9,6 +10,7 @@ import org.ton.tl.*
 @SerialName("overlay.node.toSign")
 public data class OverlayNodeToSign(
     val id: AdnlIdShort,
+    @Serializable(ByteStringBase64Serializer::class)
     val overlay: ByteString,
     val version: Int
 ) : TlObject<OverlayNodeToSign> {

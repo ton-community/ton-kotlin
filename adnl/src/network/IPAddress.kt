@@ -1,5 +1,6 @@
 package org.ton.adnl.network
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.adnl.ipv4
 import org.ton.api.adnl.AdnlAddress
 import org.ton.api.adnl.AdnlAddressUdp
@@ -54,7 +55,7 @@ public data class IPv6Address(
     override val host: String
         get() = TODO()
 
-    override fun toAdnlAddress(): AdnlAddressUdp6 = AdnlAddressUdp6(address, port)
+    override fun toAdnlAddress(): AdnlAddressUdp6 = AdnlAddressUdp6(ByteString(address), port)
 
     override fun toString(): String = "$host:$port"
 }

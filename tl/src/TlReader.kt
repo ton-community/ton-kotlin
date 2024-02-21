@@ -1,22 +1,23 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
+import kotlinx.io.*
+import kotlinx.io.bytestring.ByteString
 import org.ton.tl.constructors.BoolTlCombinator
 
 public class TlReader(
-    public val input: Input
+    public val input: Source
 ) {
     public fun readBoolean(): Boolean = BoolTlCombinator.decode(this).value
-    public fun readInt(): Int = input.readIntLittleEndian()
-    public fun readLong(): Long = input.readLongLittleEndian()
-    public fun readRaw(size: Int): ByteArray = input.readBytes(size)
+    public fun readInt(): Int = input.readIntLe()
+    public fun readLong(): Long = input.readLongLe()
+    public fun readRaw(size: Int): ByteArray = input.readByteArray(size)
 
     public fun readByteString(size: Int): ByteString {
-        return ByteString(input.readBytes(size))
+        return input.readByteString(size)
     }
 
     public fun readByteString(): ByteString {
-        return ByteString(readBytes())
+        return ByteString(*readBytes())
     }
 
     public fun readBytes(): ByteArray {
@@ -43,7 +44,7 @@ public class TlReader(
             resultLength = resultLengthLong.toInt()
             resultAlignedLength = resultLength + 8
         }
-        val result = input.readBytes(resultLength)
+        val result = input.readByteArray(resultLength)
         while (resultAlignedLength++ % 4 > 0) {
             check(input.readByte() == 0.toByte())
         }

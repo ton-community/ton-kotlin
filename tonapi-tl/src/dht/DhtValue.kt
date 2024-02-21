@@ -1,5 +1,6 @@
 package org.ton.api.dht
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
@@ -11,16 +12,21 @@ import kotlin.jvm.JvmName
 public data class DhtValue(
     @get:JvmName("key")
     val key: DhtKeyDescription,
+    @Serializable(ByteStringBase64Serializer::class)
     val value: ByteString,
     val ttl: Int,
-    override val signature: ByteString = ByteString.of()
+    @Serializable(ByteStringBase64Serializer::class)
+    override val signature: ByteString = ByteString()
 ) : SignedTlObject<DhtValue> {
 
     override fun signed(privateKey: PrivateKey): DhtValue =
-        copy(signature = privateKey.sign(tlCodec().encodeToByteArray(this)).asByteString())
+        copy(signature = ByteString(* privateKey.sign(tlCodec().encodeToByteArray(this))))
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0).asByteString())), signature.toByteArray())
+        publicKey.verify(
+            tlCodec().encodeToByteArray(copy(signature = ByteString())),
+            signature.toByteArray()
+        )
 
     override fun tlCodec(): TlCodec<DhtValue> = DhtValue
 

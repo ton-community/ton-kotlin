@@ -2,10 +2,10 @@
 
 package org.ton.api.rldp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.tl.ByteString
 import org.ton.tl.TlCombinator
 import org.ton.tl.TlObject
 

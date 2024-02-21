@@ -1,5 +1,6 @@
 package org.ton.api.dht
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
@@ -24,16 +25,17 @@ public data class DhtNode(
     val version: Int = 0,
 
     @get:JvmName("signature")
+    @Serializable(ByteStringBase64Serializer::class)
     override val signature: ByteString
 ) : SignedTlObject<DhtNode> {
     public fun toAdnlNode(): AdnlNode = AdnlNode(id, addrList)
     public fun key(): AdnlIdShort = id.toAdnlIdShort()
 
     override fun signed(privateKey: PrivateKey): DhtNode =
-        copy(signature = ByteString.of(*privateKey.sign(tlCodec().encodeToByteArray(this))))
+        copy(signature = ByteString(*privateKey.sign(tlCodec().encodeToByteArray(this))))
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteString.of())), signature.toByteArray())
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteString())), signature.toByteArray())
 
     override fun tlCodec(): TlCodec<DhtNode> = DhtNodeTlConstructor
 

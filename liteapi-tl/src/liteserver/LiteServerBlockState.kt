@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -14,13 +15,16 @@ public data class LiteServerBlockState(
 
     @SerialName("root_hash")
     @get:JvmName("rootHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val rootHash: ByteString,
 
     @SerialName("file_hash")
     @get:JvmName("fileHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val fileHash: ByteString,
 
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     val data: ByteString
 ) {
     init {

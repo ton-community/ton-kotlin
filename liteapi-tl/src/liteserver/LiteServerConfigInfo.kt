@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -16,9 +17,11 @@ public data class LiteServerConfigInfo(
     val id: TonNodeBlockIdExt,
 
     @get:JvmName("stateProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val stateProof: ByteString,
 
     @get:JvmName("configProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val configProof: ByteString
 ) {
     public companion object : TlCodec<LiteServerConfigInfo> by LiteServerConfigInfoTlConstructor

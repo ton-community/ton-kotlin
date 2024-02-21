@@ -1,5 +1,6 @@
 package org.ton.api.dht
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
@@ -14,17 +15,20 @@ public data class DhtKeyDescription(
     val id: PublicKey,
     @SerialName("update_rule")
     val updateRule: DhtUpdateRule = DhtUpdateRule.SIGNATURE,
-    override val signature: ByteString = ByteString.of()
+    @Serializable(ByteStringBase64Serializer::class)
+    override val signature: ByteString = ByteString()
 ) : SignedTlObject<DhtKeyDescription> {
     override fun signed(privateKey: PrivateKey): DhtKeyDescription =
         copy(
-            signature = privateKey.sign(
-                copy(signature = ByteArray(0).asByteString()).toByteArray()
-            ).asByteString()
+            signature = ByteString(
+                * privateKey.sign(
+                    copy(signature = ByteString()).toByteArray()
+                )
+            )
         )
 
     override fun verify(publicKey: PublicKey): Boolean =
-        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteArray(0).asByteString())), signature.toByteArray())
+        publicKey.verify(tlCodec().encodeToByteArray(copy(signature = ByteString())), signature.toByteArray())
 
     override fun tlCodec(): TlCodec<DhtKeyDescription> = DhtKeyDescriptionTlConstructor
 
@@ -33,7 +37,7 @@ public data class DhtKeyDescription(
         public fun signed(name: String, key: PrivateKey): DhtKeyDescription {
             val keyDescription = DhtKeyDescription(
                 id = key.publicKey(),
-                key = DhtKey(key.publicKey().toAdnlIdShort(), name)
+                key = DhtKey(key.publicKey().toAdnlIdShort().id, name)
             )
             return keyDescription.signed(key)
         }

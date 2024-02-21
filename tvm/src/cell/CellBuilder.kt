@@ -360,14 +360,14 @@ private class CellBuilderImpl(
             }
             d1 = d1 and (CellDescriptor.LEVEL_MASK or CellDescriptor.HAS_HASHES_MASK).inv().toByte()
             d1 = d1 or (levelMask.mask shl 5).toByte()
-            hasher.writeByte(d1)
-            hasher.writeByte(d2)
+            hasher.updateByte(d1)
+            hasher.updateByte(d2)
 
             if (level == 0) {
-                hasher.write(data)
+                hasher.update(data)
             } else {
                 val prevHash = hashes[level - 1].first
-                hasher.write(prevHash)
+                hasher.update(prevHash)
             }
 
             var depth = 0
@@ -375,13 +375,13 @@ private class CellBuilderImpl(
                 val childDepth = child.depth(level + levelOffset)
                 depth = max(depth, childDepth + 1)
 
-                hasher.writeByte((childDepth ushr Byte.SIZE_BITS).toByte())
-                hasher.writeByte(childDepth.toByte())
+                hasher.updateByte((childDepth ushr Byte.SIZE_BITS).toByte())
+                hasher.updateByte(childDepth.toByte())
             }
 
             refs.forEach { child ->
                 val childHash = child.hash(level + levelOffset).toByteArray()
-                hasher.write(childHash)
+                hasher.update(childHash)
             }
 
             val hash = hasher.digest()

@@ -1,63 +1,75 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
+import kotlinx.io.*
+import kotlinx.io.bytestring.ByteString
 import org.ton.tl.constructors.Bool
 import org.ton.tl.constructors.BoolTlCombinator
 
 public class TlWriter(
-    public val output: Output = BytePacketBuilder()
+    public val output: Sink
 ) {
     public fun writeBoolean(value: Boolean) {
         BoolTlCombinator.encode(this, Bool[value])
     }
 
     public fun writeInt(value: Int) {
-        output.writeIntLittleEndian(value)
+        output.writeIntLe(value)
     }
 
     public fun writeLong(value: Long) {
-        output.writeLongLittleEndian(value)
+        output.writeLongLe(value)
     }
 
     public fun writeRaw(value: ByteArray) {
-        output.writeFully(value)
+        output.write(value)
     }
 
     public fun writeRaw(value: ByteString) {
-        output.writeFully(value.data)
+        output.write(value)
     }
 
-    public fun writeBytes(value: ByteString, offset: Int = 0, length: Int = value.size) {
-        writeBytes(value.data, offset, length)
-    }
-
-    public fun writeBytes(value: ByteArray, offset: Int = 0, length: Int = value.size - offset) {
-        var totalLength = length
-        if (totalLength < 254) {
-            output.writeUByte(totalLength.toUByte())
-            totalLength++
-        } else if (totalLength < (1 shl 24)) {
-            output.writeUByte(254u)
-            output.writeUByte((totalLength and 255).toUByte())
-            output.writeUByte(((totalLength shr 8) and 255).toUByte())
-            output.writeUByte((totalLength shr 16).toUByte())
-            totalLength += 4
-        } else if (totalLength < Int.MAX_VALUE) {
-            output.writeUByte(255u)
-            output.writeUByte((totalLength and 255).toUByte())
-            output.writeUByte(((totalLength shr 8) and 255).toUByte())
-            output.writeUByte(((totalLength shr 16) and 255).toUByte())
-            output.writeUByte(((totalLength shr 24) and 255).toUByte())
-            output.writeByte(0)
-            output.writeByte(0)
-            output.writeByte(0)
-            totalLength += 8
-        } else {
-            throw IllegalStateException("Too big byte array: $totalLength")
-        }
-        output.writeFully(value, offset, length)
+    public fun writeBytes(value: ByteString, startIndex: Int = 0, endIndex: Int = value.size) {
+        val length = endIndex - startIndex
+        val lengthSize = writeLength(length)
+        var totalLength = length + lengthSize
+        output.write(value, startIndex, endIndex)
         while (totalLength++ % 4 > 0) {
             output.writeByte(0)
+        }
+    }
+
+    public fun writeBytes(value: ByteArray, startIndex: Int = 0, endIndex: Int = value.size) {
+        val length = endIndex - startIndex
+        val lengthSize = writeLength(length)
+        var totalLength = length + lengthSize
+        output.write(value, startIndex, endIndex)
+        while (totalLength++ % 4 > 0) {
+            output.writeByte(0)
+        }
+    }
+
+    private fun writeLength(length: Int): Int {
+        if (length < 254) {
+            output.writeUByte(length.toUByte())
+            return 1
+        } else if (length < (1 shl 24)) {
+            output.writeUByte(254u)
+            output.writeUByte((length and 255).toUByte())
+            output.writeUByte(((length shr 8) and 255).toUByte())
+            output.writeUByte((length shr 16).toUByte())
+            return 4
+        } else if (length < Int.MAX_VALUE) {
+            output.writeUByte(255u)
+            output.writeUByte((length and 255).toUByte())
+            output.writeUByte(((length shr 8) and 255).toUByte())
+            output.writeUByte(((length shr 16) and 255).toUByte())
+            output.writeUByte(((length shr 24) and 255).toUByte())
+            output.writeByte(0)
+            output.writeByte(0)
+            output.writeByte(0)
+            return 8
+        } else {
+            throw IllegalStateException("Too big byte array: $length")
         }
     }
 

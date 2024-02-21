@@ -2,11 +2,12 @@
 
 package org.ton.api.tonnode
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.decodeFromHex
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -26,36 +27,18 @@ public data class TonNodeBlockIdExt(
 
     @SerialName("root_hash")
     @get:JvmName("rootHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val rootHash: ByteString,
 
     @SerialName("file_hash")
     @get:JvmName("fileHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val fileHash: ByteString
 ) : TonNodeBlockId {
     public constructor(
-        workchain: Int,
-        shard: Long,
-        seqno: Int,
-        rootHash: ByteArray,
-        fileHash: ByteArray
-    ) : this(workchain, shard, seqno, rootHash.toByteString(), fileHash.toByteString())
-
-    public constructor(
-        tonNodeBlockId: TonNodeBlockId,
-        rootHash: ByteArray,
-        fileHash: ByteArray,
-    ) : this(
-        tonNodeBlockId.workchain,
-        tonNodeBlockId.shard,
-        tonNodeBlockId.seqno,
-        rootHash,
-        fileHash
-    )
-
-    public constructor(
         tonNodeBlockId: TonNodeBlockId = TonNodeBlockId(),
-        rootHash: ByteString = ByteString.of(*ByteArray(32)),
-        fileHash: ByteString = ByteString.of(*ByteArray(32)),
+        rootHash: ByteString = ByteString(*ByteArray(32)),
+        fileHash: ByteString = ByteString(*ByteArray(32)),
     ) : this(
         tonNodeBlockId.workchain,
         tonNodeBlockId.shard,
@@ -68,14 +51,14 @@ public data class TonNodeBlockIdExt(
         append("(")
         append(workchain)
         append(":")
-        append(shard.toULong().toString(16).uppercase())
+        append(shard.toULong().toHexString(HexFormat.UpperCase))
         append(":")
         append(seqno)
         append(")")
         append(":")
-        append(rootHash.encodeHex())
+        append(rootHash.toHexString(HexFormat.UpperCase))
         append(":")
-        append(fileHash.encodeHex())
+        append(fileHash.toHexString(HexFormat.UpperCase))
     }
 
     public companion object : TlCodec<TonNodeBlockIdExt> by TonNodeBlockIdExtTlConstructor {
@@ -87,7 +70,7 @@ public data class TonNodeBlockIdExt(
             val tonNodeBlockId = TonNodeBlockId.parse(string.substring(0, closeParenIndex + 1))
             val hashes = string.substring(closeParenIndex + 2, string.lastIndex + 1)
             val (rawRootHash, rawFileHash) = hashes.split(':')
-            return TonNodeBlockIdExt(tonNodeBlockId, rawRootHash.decodeFromHex(), rawFileHash.decodeFromHex())
+            return TonNodeBlockIdExt(tonNodeBlockId, rawRootHash.hexToByteString(), rawFileHash.hexToByteString())
         }
 
         @JvmStatic
@@ -107,8 +90,8 @@ private object TonNodeBlockIdExtTlConstructor : TlConstructor<TonNodeBlockIdExt>
         val workchain = reader.readInt()
         val shard = reader.readLong()
         val seqno = reader.readInt()
-        val rootHash = reader.readRaw(32)
-        val fileHash = reader.readRaw(32)
+        val rootHash = reader.readByteString(32)
+        val fileHash = reader.readByteString(32)
         return TonNodeBlockIdExt(workchain, shard, seqno, rootHash, fileHash)
     }
 
@@ -116,7 +99,7 @@ private object TonNodeBlockIdExtTlConstructor : TlConstructor<TonNodeBlockIdExt>
         writer.writeInt(value.workchain)
         writer.writeLong(value.shard)
         writer.writeInt(value.seqno)
-        writer.writeRaw(value.rootHash.toByteArray())
-        writer.writeRaw(value.fileHash.toByteArray())
+        writer.writeRaw(value.rootHash)
+        writer.writeRaw(value.fileHash)
     }
 }

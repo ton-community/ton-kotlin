@@ -1,5 +1,6 @@
 package org.ton.api.rldp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
@@ -8,7 +9,9 @@ import org.ton.tl.*
 @Serializable
 public data class RldpAnswer(
     @SerialName("query_id")
+    @Serializable(ByteStringBase64Serializer::class)
     val queryId: ByteString,
+    @Serializable(ByteStringBase64Serializer::class)
     override val data: ByteString
 ) : RldpMessage {
     override val id: ByteString

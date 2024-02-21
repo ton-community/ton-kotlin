@@ -2,7 +2,7 @@
 
 package org.ton.tl.constructors
 
-import org.ton.tl.ByteString
+import kotlinx.io.bytestring.ByteString
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter

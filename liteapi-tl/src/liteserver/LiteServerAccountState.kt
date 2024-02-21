@@ -2,6 +2,7 @@
 
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -22,12 +23,15 @@ public data class LiteServerAccountState(
 
     @SerialName("shard_proof")
     @get:JvmName("shardProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val shardProof: ByteString,
 
     @get:JvmName("proof")
+    @Serializable(ByteStringBase64Serializer::class)
     val proof: ByteString,
 
     @get:JvmName("state")
+    @Serializable(ByteStringBase64Serializer::class)
     val state: ByteString
 ) {
     public companion object : TlConstructor<LiteServerAccountState>(

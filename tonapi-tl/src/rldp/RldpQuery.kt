@@ -1,28 +1,22 @@
 package org.ton.api.rldp
 
-import kotlinx.datetime.Instant
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 
 @Serializable
 @SerialName("rldp.query")
 public data class RldpQuery(
     @SerialName("query_id")
+    @Serializable(ByteStringBase64Serializer::class)
     val queryId: ByteString,
     @SerialName("max_answer_size")
     val maxAnswerSize: Long,
     val timeout: Int,
+    @Serializable(ByteStringBase64Serializer::class)
     override val data: ByteString
 ) : RldpMessage {
-    public constructor(
-        queryId: ByteArray,
-        maxAnswerSize: Long,
-        timeout: Instant,
-        data: ByteArray
-    ) : this(queryId.toByteString(), maxAnswerSize, timeout.epochSeconds.toInt(), data.toByteString())
-
     override val id: ByteString
         get() = queryId
 

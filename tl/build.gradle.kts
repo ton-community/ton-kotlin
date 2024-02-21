@@ -11,6 +11,7 @@ kotlin {
                 api(projects.tonKotlinBitstring)
                 api(libs.ktor.utils)
                 api(libs.serialization.json)
+                api(libs.kotlinx.io)
             }
         }
     }

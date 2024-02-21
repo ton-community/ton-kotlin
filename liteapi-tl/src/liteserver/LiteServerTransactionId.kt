@@ -1,23 +1,21 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmStatic
 
 @Serializable
 @SerialName("liteServer.transactionId")
 public data class LiteServerTransactionId internal constructor(
     val mode: Int,
+    @Serializable(ByteStringBase64Serializer::class)
     val account: ByteString?,
     val lt: Long?,
+    @Serializable(ByteStringBase64Serializer::class)
     val hash: ByteString?
 ) {
-    public constructor(account: ByteArray?, lt: Long?, hash: ByteArray?) : this(
-        mode(account != null, lt != null, hash != null), account?.toByteString(), lt, hash?.toByteString()
-    )
-
     init {
         require(account == null || account.size == 32) { "account must be 32 bytes long" }
         require(hash == null || hash.size == 32) { "hash must be 32 bytes long" }

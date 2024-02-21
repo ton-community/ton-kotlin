@@ -2,6 +2,7 @@
 
 package org.ton.lite.api.liteserver.functions
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -9,7 +10,6 @@ import org.ton.crypto.HexByteArraySerializer
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerTransactionList
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 
 @Serializable
@@ -25,12 +25,9 @@ public data class LiteServerGetTransactions(
     val lt: Long,
 
     @get:JvmName("hash")
+    @Serializable(ByteStringBase64Serializer::class)
     val hash: ByteString
 ) : TLFunction<LiteServerGetTransactions, LiteServerTransactionList> {
-    public constructor(count: Int, account: LiteServerAccountId, lt: Long, hash: ByteArray) : this(
-        count, account, lt, hash.toByteString()
-    )
-
     init {
         require(hash.size == 32)
     }

@@ -1,9 +1,9 @@
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.ByteString
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -22,6 +22,7 @@ public data class AdnlProxyToSign(
     val date: Int,
 
     @get:JvmName("signature")
+    @Serializable(ByteStringBase64Serializer::class)
     val signature: ByteString
 ) {
     public constructor(
@@ -29,7 +30,7 @@ public data class AdnlProxyToSign(
         port: Int,
         date: Int,
         signature: ByteArray
-    ) : this(ip, port, date, signature.toByteString())
+    ) : this(ip, port, date, ByteString(signature))
 
     init {
         require(signature.size == 32)

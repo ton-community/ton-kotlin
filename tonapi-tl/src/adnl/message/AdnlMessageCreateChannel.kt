@@ -1,10 +1,9 @@
 package org.ton.api.adnl.message
 
-import kotlinx.datetime.Instant
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.ByteString
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -14,18 +13,12 @@ import kotlin.jvm.JvmName
 @Serializable
 public data class AdnlMessageCreateChannel(
     @get:JvmName("key")
+    @Serializable(ByteStringBase64Serializer::class)
     val key: ByteString,
 
     @get:JvmName("date")
     val date: Int
 ) : AdnlMessage {
-    public constructor(
-        key: ByteArray,
-        date: Instant
-    ) : this(key.toByteString(), date.epochSeconds.toUInt().toInt())
-
-    public fun date(): Instant = Instant.fromEpochSeconds(date.toUInt().toLong())
-
     public companion object : TlConstructor<AdnlMessageCreateChannel>(
         schema = "adnl.message.createChannel key:int256 date:int = adnl.Message",
     ) {

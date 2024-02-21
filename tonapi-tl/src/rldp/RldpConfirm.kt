@@ -1,5 +1,6 @@
 package org.ton.api.rldp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
@@ -8,6 +9,7 @@ import org.ton.tl.*
 @SerialName("rldp.confirm")
 public data class RldpConfirm(
     @SerialName("transfer_id")
+    @Serializable(ByteStringBase64Serializer::class)
     override val transferId: ByteString,
     override val part: Int,
     val seqno: Int

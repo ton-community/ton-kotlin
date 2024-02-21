@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -22,10 +23,12 @@ public data class LiteServerBlockLinkForward(
 
     @SerialName("dest_proof")
     @get:JvmName("destProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val destProof: ByteString,
 
     @SerialName("config_proof")
     @get:JvmName("configProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val configProof: ByteString,
 
     @get:JvmName("signatures")

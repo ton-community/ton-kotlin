@@ -1,12 +1,13 @@
 package org.ton.api.pk
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.api.pub.PublicKeyOverlay
 import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorFail
-import org.ton.tl.ByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -15,6 +16,7 @@ import org.ton.tl.TlWriter
 @SerialName("pk.overlay")
 @Serializable
 public data class PrivateKeyOverlay(
+    @Serializable(ByteStringBase64Serializer::class)
     val name: ByteString
 ) : PrivateKey, Decryptor by DecryptorFail {
     override fun publicKey(): PublicKeyOverlay = PublicKeyOverlay(name)

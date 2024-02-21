@@ -1,9 +1,9 @@
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.tl.ByteString
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -23,20 +23,14 @@ public data class AdnlProxyTo(
 
     @SerialName("date_hash")
     @get:JvmName("dateHash")
+    @Serializable(ByteStringBase64Serializer::class)
     val dateHash: ByteString,
 
     @SerialName("shared_secret")
     @get:JvmName("sharedSecret")
+    @Serializable(ByteStringBase64Serializer::class)
     val sharedSecret: ByteString
 ) {
-    public constructor(
-        ip: Int,
-        port: Int,
-        date: Int,
-        dateHash: ByteArray,
-        sharedSecret: ByteArray
-    ) : this(ip, port, date, dateHash.toByteString(), sharedSecret.toByteString())
-
     public companion object : TlConstructor<AdnlProxyTo>(
         schema = "adnl.proxyToFastHash ip:int port:int date:int data_hash:int256 shared_secret:int256 = adnl.ProxyTo"
     ) {
@@ -52,8 +46,8 @@ public data class AdnlProxyTo(
             val ip = reader.readInt()
             val port = reader.readInt()
             val date = reader.readInt()
-            val dateHash = reader.readRaw(32)
-            val sharedSecret = reader.readRaw(32)
+            val dateHash = reader.readByteString(32)
+            val sharedSecret = reader.readByteString(32)
             return AdnlProxyTo(ip, port, date, dateHash, sharedSecret)
         }
     }

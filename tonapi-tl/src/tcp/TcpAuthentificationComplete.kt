@@ -1,5 +1,6 @@
 package org.ton.api.tcp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKey
@@ -9,22 +10,9 @@ import org.ton.tl.*
 @Serializable
 public data class TcpAuthentificationComplete(
     val key: PublicKey,
-    val signature: ByteArray
+    @Serializable(ByteStringBase64Serializer::class)
+    val signature: ByteString
 ) : TcpMessage {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is TcpAuthentificationComplete) return false
-        if (key != other.key) return false
-        if (!signature.contentEquals(other.signature)) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = key.hashCode()
-        result = 31 * result + signature.contentHashCode()
-        return result
-    }
-
     public companion object : TlCodec<TcpAuthentificationComplete> by TcpAuthentificationCompleteTlConstructor
 }
 
@@ -33,7 +21,7 @@ private object TcpAuthentificationCompleteTlConstructor : TlConstructor<TcpAuthe
 ) {
     override fun decode(reader: TlReader): TcpAuthentificationComplete {
         val key = reader.read(PublicKey)
-        val signature = reader.readBytes()
+        val signature = reader.readByteString()
         return TcpAuthentificationComplete(key, signature)
     }
 

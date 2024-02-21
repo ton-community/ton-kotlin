@@ -1,37 +1,31 @@
 package org.ton.api.overlay
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.isEmpty
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
 import org.ton.api.pk.PrivateKey
 import org.ton.api.pub.PublicKey
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 
 @Serializable
 @SerialName("overlay.node")
 public data class OverlayNode(
     val id: PublicKey,
+    @Serializable(ByteStringBase64Serializer::class)
     val overlay: ByteString,
     val version: Int,
-    override val signature: ByteString = ByteString.of()
+    @Serializable(ByteStringBase64Serializer::class)
+    override val signature: ByteString = ByteString()
 ) : SignedTlObject<OverlayNode> {
-    public constructor(
-        id: PublicKey,
-        overlay: ByteArray,
-        version: Int,
-        signature: ByteArray = ByteArray(0)
-    ) : this(
-        id, overlay.toByteString(), version, signature.toByteString()
-    )
 
     override fun signed(privateKey: PrivateKey): OverlayNode =
         copy(
-            signature = ByteString.of(
+            signature = ByteString(
                 *privateKey.sign(
                     tlCodec().encodeToByteArray(
-                        if (signature.isEmpty()) this
-                        else copy(signature = ByteString.of())
+                        copy(signature = ByteString())
                     )
                 )
             )
@@ -40,7 +34,7 @@ public data class OverlayNode(
     override fun verify(publicKey: PublicKey): Boolean {
         if (signature.isEmpty()) return false
         val check = copy(
-            signature = ByteString.of()
+            signature = ByteString()
         )
         return publicKey.verify(tlCodec().encodeToByteArray(check), signature.toByteArray())
     }

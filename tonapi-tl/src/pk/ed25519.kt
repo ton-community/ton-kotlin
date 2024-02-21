@@ -1,5 +1,6 @@
 package org.ton.api.pk
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKeyEd25519
@@ -7,8 +8,10 @@ import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorEd25519
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
-import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
+import org.ton.tl.TlConstructor
+import org.ton.tl.TlReader
+import org.ton.tl.TlWriter
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 
@@ -18,16 +21,17 @@ public inline fun PrivateKeyEd25519(random: Random = SecureRandom): PrivateKeyEd
 @Serializable
 @SerialName("pk.ed25519")
 public data class PrivateKeyEd25519(
+    @Serializable(ByteStringBase64Serializer::class)
     public val key: ByteString
 ) : PrivateKey, Decryptor {
-    public constructor(key: ByteArray) : this(key.toByteString())
+    public constructor(key: ByteArray) : this(ByteString(key))
 
     init {
         require(key.size == 32) { "key must be 32 byte long" }
     }
 
     private val _publicKey: PublicKeyEd25519 by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        PublicKeyEd25519(Ed25519.publicKey(key.toByteArray()).asByteString())
+        PublicKeyEd25519(ByteString(*Ed25519.publicKey(key.toByteArray())))
     }
     private val _decryptor by lazy(LazyThreadSafetyMode.PUBLICATION) {
         DecryptorEd25519(key.toByteArray())
@@ -46,12 +50,12 @@ public data class PrivateKeyEd25519(
 
         @JvmStatic
         public fun generate(random: Random = SecureRandom): PrivateKeyEd25519 =
-            PrivateKeyEd25519(random.nextBytes(32).asByteString())
+            PrivateKeyEd25519(ByteString(*random.nextBytes(32)))
 
         @JvmStatic
         public fun of(byteArray: ByteArray): PrivateKeyEd25519 =
             when (byteArray.size) {
-                Ed25519.KEY_SIZE_BYTES -> PrivateKeyEd25519(byteArray.toByteString())
+                Ed25519.KEY_SIZE_BYTES -> PrivateKeyEd25519(byteArray)
                 Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> decodeBoxed(byteArray)
                 else -> throw IllegalArgumentException("Invalid key size: ${byteArray.size}")
             }

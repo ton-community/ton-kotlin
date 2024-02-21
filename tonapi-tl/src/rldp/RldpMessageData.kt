@@ -1,5 +1,6 @@
 package org.ton.api.rldp
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
@@ -7,7 +8,9 @@ import org.ton.tl.*
 @Serializable
 @SerialName("rldp.message")
 public data class RldpMessageData(
+    @Serializable(ByteStringBase64Serializer::class)
     override val id: ByteString,
+    @Serializable(ByteStringBase64Serializer::class)
     override val data: ByteString
 ) : RldpMessage {
     override fun tlCodec(): TlCodec<RldpMessageData> = Companion

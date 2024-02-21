@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
@@ -9,6 +10,7 @@ import kotlin.jvm.JvmName
 @SerialName("liteServer.transactionId3")
 public data class LiteServerTransactionId3(
     @get:JvmName("account")
+    @Serializable(ByteStringBase64Serializer::class)
     val account: ByteString,
 
     @get:JvmName("lt")

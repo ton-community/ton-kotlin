@@ -1,10 +1,13 @@
 package org.ton.lite.client
 
+import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.contentEquals
 import org.ton.adnl.connection.AdnlClientImpl
 import org.ton.api.exception.TonNotReadyException
 import org.ton.api.exception.TvmException
@@ -27,8 +30,6 @@ import org.ton.lite.api.liteserver.functions.*
 import org.ton.lite.client.internal.FullAccountState
 import org.ton.lite.client.internal.TransactionId
 import org.ton.lite.client.internal.TransactionInfo
-import org.ton.tl.ByteReadPacket
-import org.ton.tl.asByteString
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
@@ -76,16 +77,15 @@ public class LiteClient(
     private var currentServer: Int = 0
 
     public val liteApi: LiteApiClient = object : LiteApiClient {
-        override suspend fun sendRawQuery(query: ByteReadPacket): ByteReadPacket {
+        override suspend fun sendRawQuery(query: ByteArray): ByteArray {
             var attempts = 0
             var exception: Exception? = null
             var liteServer: LiteServerDesc? = null
-            val bytes = query.readBytes()
             while (attempts < maxOf(5, serverList.size)) {
                 try {
                     liteServer = serverList[currentServer++ % serverList.size]
                     val client = AdnlClientImpl(liteServer)
-                    return client.sendQuery(ByteReadPacket(bytes), 10.seconds)
+                    return client.sendQuery(query, 10.seconds)
                 } catch (e: LiteServerException) {
                     exception = e
                     break
@@ -267,7 +267,7 @@ public class LiteClient(
             "block id mismatch, expected: $blockId actual: $actualBlockId"
         }
         val blockProofCell = try {
-            BagOfCells.read(ByteReadPacket(blockHeader.headerProof)).first()
+            BagOfCells.of(blockHeader.headerProof.toByteArray()).first()
         } catch (e: Exception) {
             throw IllegalStateException("Can't parse block proof", e)
         }
@@ -308,13 +308,13 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't get block $blockId from server", e)
         }
-        val actualFileHash = blockData.data.hashSha256()
-        check(blockId.fileHash == actualFileHash) {
+        val actualFileHash = sha256(blockData.data.toByteArray())
+        check(blockId.fileHash.contentEquals(actualFileHash)) {
             "file hash mismatch for block $blockId, expected: ${blockId.fileHash} , actual: $actualFileHash"
         }
         registerBlockId(blockId)
         val root = try {
-            BagOfCells.read(ByteReadPacket(blockData.data)).first()
+            BagOfCells.of(blockData.data.toByteArray()).first()
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
@@ -375,10 +375,10 @@ public class LiteClient(
                 count,
                 accountAddress.toLiteServer(),
                 fromTransactionId.lt,
-                fromTransactionId.hash.toByteArray()
+                ByteString(*fromTransactionId.hash.toByteArray())
             )
         )
-        val transactionsCells = BagOfCells.read(ByteReadPacket(rawTransactionList.transactions)).roots
+        val transactionsCells = BagOfCells.of(rawTransactionList.transactions.toByteArray()).roots
         check(rawTransactionList.ids.size == transactionsCells.size)
         return List(transactionsCells.size) { index ->
             val transaction = CellRef(transactionsCells[index], Transaction)
@@ -434,14 +434,14 @@ public class LiteClient(
 //        logger.debug { "run: $address - ${params.toList()}" }
         val result = liteApi(
             LiteServerRunSmcMethod(
-                0b100, blockId, address, method, smcCreateParams(params).toByteArray().asByteString()
+                0b100, blockId, address, method, ByteString(*smcCreateParams(params).toByteArray())
             )
         )
         check((!blockId.isValid()) || blockId == result.id) {
             "block id mismatch, expected: $blockId actual: $result.id"
         }
-        val boc = BagOfCells.read(
-            ByteReadPacket(checkNotNull(result.result) { "result is null, but 0b100 mode provided" })
+        val boc = BagOfCells.of(
+            checkNotNull(result.result) { "result is null, but 0b100 mode provided" }.toByteArray()
         )
         // TODO: check proofs
         val exitCode = result.exitCode
@@ -460,7 +460,7 @@ public class LiteClient(
 
     public suspend fun sendMessage(cell: Cell): LiteServerSendMsgStatus = sendMessage(BagOfCells(cell))
     public suspend fun sendMessage(boc: BagOfCells): LiteServerSendMsgStatus {
-        return liteApi(LiteServerSendMessage(boc.toByteArray().asByteString()))
+        return liteApi(LiteServerSendMessage(ByteString(*boc.toByteArray())))
     }
 
     private fun smcMethodId(methodName: String): Long = crc16(methodName).toLong() or 0x10000
@@ -503,5 +503,5 @@ public class LiteClient(
         knownBlockIds.addLast(blockIdExt)
     }
 
-    private fun MsgAddressInt.toLiteServer() = LiteServerAccountId(workchainId, address.toByteArray())
+    private fun MsgAddressInt.toLiteServer() = LiteServerAccountId(workchainId, ByteString(*address.toByteArray()))
 }

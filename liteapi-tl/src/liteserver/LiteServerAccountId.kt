@@ -2,13 +2,12 @@
 
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import org.ton.bitstring.BitString
 import org.ton.crypto.HexByteArraySerializer
-import org.ton.tl.ByteString
-import org.ton.tl.ByteString.Companion.toByteString
+import org.ton.tl.ByteStringBase64Serializer
 import org.ton.tl.TlConstructor
 import org.ton.tl.TlReader
 import org.ton.tl.TlWriter
@@ -21,23 +20,21 @@ public data class LiteServerAccountId(
     val workchain: Int,
 
     @get:JvmName("id")
+    @Serializable(ByteStringBase64Serializer::class)
     val id: ByteString
 ) {
-    public constructor(workchain: Int, id: ByteArray) : this(workchain, id.toByteString())
-    public constructor(workchain: Int, id: BitString) : this(workchain, id.toByteArray())
-
     public companion object : TlConstructor<LiteServerAccountId>(
         schema = "liteServer.accountId workchain:int id:int256 = liteServer.AccountId"
     ) {
         override fun decode(reader: TlReader): LiteServerAccountId {
             val workchain = reader.readInt()
-            val id = reader.readRaw(32)
+            val id = reader.readByteString(32)
             return LiteServerAccountId(workchain, id)
         }
 
         override fun encode(writer: TlWriter, value: LiteServerAccountId) {
             writer.writeInt(value.workchain)
-            writer.writeRaw(value.id.toByteArray())
+            writer.writeRaw(value.id)
         }
     }
 }

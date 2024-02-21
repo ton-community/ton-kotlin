@@ -1,5 +1,6 @@
 package org.ton.api.adnl
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.SignedTlObject
@@ -22,6 +23,7 @@ import kotlin.random.Random
 @SerialName("adnl.packetContents")
 public data class AdnlPacketContents(
     @get:JvmName("rand1")
+    @Serializable(ByteStringBase64Serializer::class)
     val rand1: ByteString,
 
     @get:JvmName("flags")
@@ -71,13 +73,15 @@ public data class AdnlPacketContents(
     val dstReinitDate: Int?,
 
     @get:JvmName("signature")
+    @Serializable(ByteStringBase64Serializer::class)
     override val signature: ByteString?,
 
     @get:JvmName("rand2")
+    @Serializable(ByteStringBase64Serializer::class)
     val rand2: ByteString
 ) : SignedTlObject<AdnlPacketContents> {
     public constructor(
-        rand1: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString(),
+        rand1: ByteString = ByteString(*Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15)),
         from: PublicKey? = null,
         from_short: AdnlIdShort? = null,
         message: AdnlMessage? = null,
@@ -91,7 +95,7 @@ public data class AdnlPacketContents(
         reinit_date: Int? = null,
         dst_reinit_date: Int? = null,
         signature: ByteString? = null,
-        rand2: ByteString = Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15).asByteString()
+        rand2: ByteString = ByteString(*Random.Default.nextBytes(if (Random.nextBoolean()) 7 else 15))
     ) : this(
         rand1 = rand1,
         flags = flags(
@@ -176,7 +180,7 @@ public data class AdnlPacketContents(
             recv_priority_addr_list_version = recvPriorityAddrListVersion,
             reinit_date = reinitDate,
             dst_reinit_date = dstReinitDate,
-            signature = signature.asByteString(),
+            signature = ByteString(*signature),
             rand2 = rand2
         )
     }

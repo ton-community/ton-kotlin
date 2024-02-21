@@ -1,5 +1,6 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
@@ -13,6 +14,7 @@ public class LiteServerBlockData(
     public val id: TonNodeBlockIdExt,
 
     @get:JvmName("data")
+    @Serializable(ByteStringBase64Serializer::class)
     public val data: ByteString
 ) {
     public companion object : TlConstructor<LiteServerBlockData>(

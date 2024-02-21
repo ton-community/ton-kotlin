@@ -1,10 +1,10 @@
 package org.ton.lite.api.liteserver
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.tl.*
-import org.ton.tl.ByteString.Companion.toByteString
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
@@ -23,21 +23,26 @@ public data class LiteServerRunMethodResult internal constructor(
 
     @SerialName("shard_proof")
     @get:JvmName("shardProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val shardProof: ByteString?,
 
     @get:JvmName("proof")
+    @Serializable(ByteStringBase64Serializer::class)
     val proof: ByteString?,
 
     @SerialName("state_proof")
     @get:JvmName("stateProof")
+    @Serializable(ByteStringBase64Serializer::class)
     val stateProof: ByteString?,
 
     @SerialName("init_c7")
     @get:JvmName("initC7")
+    @Serializable(ByteStringBase64Serializer::class)
     val initC7: ByteString?,
 
     @SerialName("lib_extras")
     @get:JvmName("libExtras")
+    @Serializable(ByteStringBase64Serializer::class)
     val libExtras: ByteString?,
 
     @SerialName("exit_code")
@@ -45,37 +50,9 @@ public data class LiteServerRunMethodResult internal constructor(
     val exitCode: Int,
 
     @get:JvmName("result")
+    @Serializable(ByteStringBase64Serializer::class)
     val result: ByteString?
 ) {
-    public constructor(
-        id: TonNodeBlockIdExt,
-        shardBlock: TonNodeBlockIdExt,
-        shardProof: ByteArray?,
-        proof: ByteArray?,
-        stateProof: ByteArray?,
-        initC7: ByteArray?,
-        libExtras: ByteArray?,
-        exitCode: Int,
-        result: ByteArray?
-    ) : this(
-        mode(
-            shardProof != null,
-            stateProof != null,
-            result != null,
-            initC7 != null,
-            libExtras != null,
-        ),
-        id,
-        shardBlock,
-        shardProof?.toByteString(),
-        proof?.toByteString(),
-        stateProof?.toByteString(),
-        initC7?.toByteString(),
-        libExtras?.toByteString(),
-        exitCode,
-        result?.toByteString()
-    )
-
     public companion object : TlCodec<LiteServerRunMethodResult> by LiteServerRunMethodResultTlConstructor {
         @JvmStatic
         public fun mode(

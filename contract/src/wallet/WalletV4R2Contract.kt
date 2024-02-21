@@ -1,5 +1,6 @@
 package org.ton.contract.wallet
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.bitstring.BitString
@@ -13,7 +14,6 @@ import org.ton.contract.exception.AccountNotInitializedException
 import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.hashmap.HashMapE
 import org.ton.lite.client.LiteClient
-import org.ton.tl.asByteString
 import org.ton.tlb.*
 import org.ton.tlb.constructor.AnyTlbConstructor
 import kotlin.io.encoding.Base64
@@ -87,7 +87,7 @@ public class WalletV4R2Contract(
             override fun loadTlb(cellSlice: CellSlice): Data {
                 val seqno = cellSlice.loadUInt(32).toInt()
                 val subWalletId = cellSlice.loadUInt(32).toInt()
-                val publicKey = PublicKeyEd25519(cellSlice.loadBits(256).toByteArray().asByteString())
+                val publicKey = PublicKeyEd25519(ByteString(*cellSlice.loadBits(256).toByteArray()))
                 val plugins = cellSlice.loadTlb(HashMapE.tlbCodec(8 + 256, AnyTlbConstructor))
                 return Data(seqno, subWalletId, publicKey, plugins)
             }
