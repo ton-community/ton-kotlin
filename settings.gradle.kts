@@ -29,6 +29,7 @@ dependencyResolutionManagement {
 }
 
 submodule("crypto")
+submodule("connect")
 submodule("bitstring")
 submodule("tl")
 submodule("bigint")

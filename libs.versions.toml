@@ -4,10 +4,10 @@ datetime = "0.5.0" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kot
 atomicfu = "0.23.1" # https://search.maven.org/artifact/org.jetbrains.kotlinx/atomicfu
 benchmark = "0.4.7" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-benchmark-runtime
 serialization = "1.6.2" # https://search.maven.org/artifact/org.jetbrains.kotlinx/kotlinx-serialization-core
-ktor = "2.3.7" # https://search.maven.org/artifact/io.ktor/ktor
+ktor = "3.0.0-beta-1" # https://search.maven.org/artifact/io.ktor/ktor
 curve25519 = "0.0.4" # https://search.maven.org/artifact/io.github.andreypfau/curve25519-kotlin
 bignum = "0.3.8" # https://search.maven.org/artifact/com.ionspin.kotlin/bignum
-crypto = "0.0.2"
+crypto = "0.0.3"
 cache4k = "0.12.0" # https://central.sonatype.com/namespace/io.github.reactivecircus.cache4k
 bcv = "0.13.2"
 kotlinx-io = "0.3.1" # https://central.sonatype.com/artifact/org.jetbrains.kotlinx/kotlinx-io-core/versions
@@ -26,6 +26,7 @@ serialization-json-jvm = { module = "org.jetbrains.kotlinx:kotlinx-serialization
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktor" }
@@ -36,6 +37,8 @@ aes = { module = "io.github.andreypfau:kotlinx-crypto-aes", version.ref = "crypt
 crc32 = { module = "io.github.andreypfau:kotlinx-crypto-crc32", version.ref = "crypto" }
 pbkdf2 = { module = "io.github.andreypfau:kotlinx-crypto-pbkdf2", version.ref = "crypto" }
 hmac = { module = "io.github.andreypfau:kotlinx-crypto-hmac", version.ref = "crypto" }
+salsa20 = { module = "io.github.andreypfau:kotlinx-crypto-salsa20", version.ref = "crypto" }
+poly1305 = { module = "io.github.andreypfau:kotlinx-crypto-poly1305", version.ref = "crypto" }
 
 [plugins]
 bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }
