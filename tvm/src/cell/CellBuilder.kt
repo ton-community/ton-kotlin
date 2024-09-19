@@ -151,7 +151,7 @@ public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
 public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
 private class CellBuilderImpl(
-    override var bits: MutableBitString = ByteBackedMutableBitString.of(),
+    override var bits: MutableBitString = ByteBackedMutableBitString(ByteArray(128), 0),
     override var refs: MutableList<Cell> = ArrayList(),
     override var levelMask: LevelMask? = null,
     override var isExotic: Boolean = false
@@ -351,8 +351,9 @@ private class CellBuilderImpl(
         val hashes = ArrayList<Pair<ByteArray, Int>>(levels)
 
         var (d1, d2) = descriptor
+        val hasher = SHA256()
         repeat(levels) { level ->
-            val hasher = SHA256()
+            hasher.reset()
             val levelMask = if (descriptor.cellType == CellType.PRUNED_BRANCH) {
                 descriptor.levelMask
             } else {

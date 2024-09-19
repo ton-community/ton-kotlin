@@ -11,11 +11,18 @@ public open class ByteBackedBitString protected constructor(
     override val size: Int,
     public open val bytes: ByteArray
 ) : BitString {
+    private val hashCode by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        var result = size
+        result = 31 * result + bytes.contentHashCode()
+        result
+    }
+
     override operator fun get(index: Int): Boolean = getOrNull(index) ?: throw BitStringUnderflowException()
 
     override fun getOrNull(index: Int): Boolean? =
         if (index in 0..size) get(bytes, index) else null
 
+    override fun plus(bits: BitString): BitString = toMutableBitString().plus(bits)
     override fun plus(bytes: ByteArray): BitString = toMutableBitString().plus(bytes)
     override fun plus(bytes: ByteArray, bits: Int): BitString = toMutableBitString().plus(bytes, bits)
 
@@ -77,9 +84,9 @@ public open class ByteBackedBitString protected constructor(
         }
     }
 
-    override fun toString(): String = "x{${toHex()}}"
+    override fun toString(): String = "x{${toHexString()}}"
 
-    override fun toHex(): String {
+    override fun toHexString(): String {
         if (size == 0) return ""
         val data = appendTag(bytes, size)
         val result = StringBuilder(data.toHexString())
@@ -111,11 +118,7 @@ public open class ByteBackedBitString protected constructor(
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = size
-        result = 31 * result + bytes.contentHashCode()
-        return result
-    }
+    override fun hashCode(): Int = hashCode
 
     internal open class BitStringIterator(
         val bitString: BitString,
@@ -168,10 +171,9 @@ public open class ByteBackedBitString protected constructor(
         @JvmStatic
         protected fun expandByteArray(bytes: ByteArray, size: Int): ByteArray {
             val requiredBytesSize = bytesSize(size)
-            return if (bytes.size == requiredBytesSize) {
-                bytes
-            } else {
-                constructByteArray(bytes, size)
+            return when {
+                bytes.size < requiredBytesSize -> constructByteArray(bytes, size)
+                else -> bytes
             }
         }
 

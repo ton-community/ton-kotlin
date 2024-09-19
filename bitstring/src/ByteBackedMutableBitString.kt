@@ -22,20 +22,28 @@ public open class ByteBackedMutableBitString(
 
     override fun plus(bits: BooleanArray): ByteBackedMutableBitString = plus(bits.asIterable())
     override fun plus(bytes: ByteArray): ByteBackedMutableBitString = plus(bytes, bytes.size * Byte.SIZE_BITS)
-    override fun plus(bits: Iterable<Boolean>): ByteBackedMutableBitString = plus(bits.toList())
-    override fun plus(bits: Collection<Boolean>): ByteBackedMutableBitString = apply {
-        if (bits is ByteBackedBitString) {
-            plus(bits.bytes, bits.size)
-        } else {
-            val bitsCount = bits.size
+    override fun plus(bits: Iterable<Boolean>): ByteBackedMutableBitString =
+        plus(if (bits is Collection<Boolean>) bits else bits.toList())
 
-            val newBytes = expandByteArray(bytes, size + bitsCount)
-            bits.forEachIndexed { index, bit ->
-                set(newBytes, size + index, bit)
-            }
-            bytes = newBytes
-            size += bitsCount
+    override fun plus(bits: BitString): BitString {
+        return if (bits is ByteBackedBitString) {
+            plus(bits)
+        } else {
+            plus(bits.toList())
         }
+    }
+
+    public fun plus(bits: ByteBackedBitString): BitString = plus(bits.bytes, bits.size)
+
+    override fun plus(bits: Collection<Boolean>): ByteBackedMutableBitString = apply {
+        val bitsCount = bits.size
+
+        val newBytes = expandByteArray(bytes, size + bitsCount)
+        bits.forEachIndexed { index, bit ->
+            set(newBytes, size + index, bit)
+        }
+        bytes = newBytes
+        size += bitsCount
     }
 
     override fun plus(bit: Boolean): MutableBitString = plus(listOf(bit))
@@ -116,6 +124,22 @@ public open class ByteBackedMutableBitString(
             bytes = newBytes
             size = newSize
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ByteBackedBitString) return false
+
+        if (size != other.size) return false
+        if (!bytes.contentEquals(other.bytes)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = size
+        result = 31 * result + bytes.contentHashCode()
+        return result
     }
 
     public companion object {

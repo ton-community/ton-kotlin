@@ -33,12 +33,14 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public operator fun plus(bits: BooleanArray): BitString =
         plus(bits.asIterable())
 
+
     public operator fun plus(bits: Collection<Boolean>): BitString =
         plus(bits.asIterable())
 
     public operator fun plus(bits: Iterable<Boolean>): BitString =
         binary(toBinary() + bits.joinToString("") { if (it) "1" else "0" })
 
+    public operator fun plus(bits: BitString): BitString
     public operator fun plus(bytes: ByteArray): BitString
     public fun plus(bytes: ByteArray, bits: Int): BitString
 
@@ -73,7 +75,11 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     override fun toString(): String
 
     public fun toBinary(): String = joinToString("") { if (it) "1" else "0" }
-    public fun toHex(): String
+
+    @Deprecated(message = "Use toHexString()", replaceWith = ReplaceWith("toHexString()"))
+    public fun toHex(): String = toHexString()
+
+    public fun toHexString(): String
 
     public companion object {
         @JvmStatic

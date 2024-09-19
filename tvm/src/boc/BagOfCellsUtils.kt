@@ -80,14 +80,23 @@ internal fun Input.readBagOfCell(): BagOfCells {
     val cellDescriptors = Array(cellCount) { CellDescriptor(0, 0) }
 
 //    measureTime {
+    val cellHashes = Array<List<Pair<ByteArray, Int>>?>(cellCount) { null }
+
     repeat(cellCount) { cellIndex ->
         val d1 = readByte()
         val d2 = readByte()
         val descriptor = CellDescriptor(d1, d2)
 
         if (descriptor.hasHashes) {
-            discardExact(descriptor.hashCount * Cell.HASH_BYTES)
-            discardExact(descriptor.hashCount * Cell.DEPTH_BYTES)
+            val hashes = ArrayList<ByteArray>(descriptor.hashCount)
+            val depths = ArrayList<Int>(descriptor.hashCount)
+            repeat(descriptor.hashCount) {
+                hashes.add(readBytes(Cell.HASH_BYTES))
+            }
+            repeat(descriptor.hashCount) {
+                depths.add(readInt(2))
+            }
+            cellHashes[cellIndex] = hashes.zip(depths)
         }
 
         val cellData = readBytes(descriptor.dataLength)
@@ -106,11 +115,11 @@ internal fun Input.readBagOfCell(): BagOfCells {
 //    }
 
     // Resolving references & constructing cells from leaves to roots
-    val cells = Array<CompletableDeferred<Cell>>(cellCount) { CompletableDeferred() }
+    val asyncCells = Array<CompletableDeferred<Cell>>(cellCount) { CompletableDeferred() }
     GlobalScope.launch {
         repeat(cellCount) { cellIndex ->
             launch {
-                createCell(cellIndex, cells, cellBits, cellRefs, cellDescriptors)
+                createCell(cellIndex, asyncCells, cellBits, cellRefs, cellDescriptors, cellHashes)
             }
         }
     }
@@ -120,13 +129,25 @@ internal fun Input.readBagOfCell(): BagOfCells {
         readIntLittleEndian()
     }
 
-    val roots = rootIndexes.map { rootIndex ->
-        runBlocking {
-            cells[rootIndex].await()
-        }
+    val cells = runBlocking {
+        asyncCells.toList().awaitAll()
     }
 
-    return BagOfCells(roots)
+    val roots = rootIndexes.map { rootIndex ->
+        cells[rootIndex]
+    }
+
+    return object : BagOfCells {
+        override val roots: List<Cell> = roots
+
+        override fun toString(): String = buildString {
+            roots.forEachIndexed { _, cell ->
+                Cell.toString(cell, this)
+            }
+        }
+
+        override fun iterator(): Iterator<Cell> = cells.iterator()
+    }
 }
 
 private suspend fun createCell(
@@ -134,16 +155,45 @@ private suspend fun createCell(
     cells: Array<CompletableDeferred<Cell>>,
     bits: Array<BitString>,
     refs: Array<IntArray>,
-    descriptors: Array<CellDescriptor>
+    descriptors: Array<CellDescriptor>,
+    cellHashes: Array<List<Pair<ByteArray, Int>>?>
 ) = coroutineScope {
     val cellBits = bits[index]
     val cellRefIndexes = refs[index]
     val cellRefs = cellRefIndexes.map { refIndex ->
         cells[refIndex].await()
     }
+    val descriptor = descriptors[index]
+    val hashes = cellHashes[index]
+//    val cell = if (!descriptors[index].isExotic && hashes != null) {
+//        val new = buildCell {
+//            isExotic = descriptor.isExotic
+//            levelMask = descriptor.levelMask
+//            storeBits(cellBits)
+//            storeRefs(cellRefs)
+//        }
+//        fun List<Pair<ByteArray, Int>>.print() = map {
+//            it.first.toHexString()+"="+it.second
+//        }
+//        DataCell(descriptor, cellBits, cellRefs, hashes).also {
+//            if (new is DataCell && new.hashes != it.hashes) {
+////                println("\nnew:${new.hashes.print()}\nit:${it.hashes.print()}")
+//            } else {
+//                println("\nWOW: ${it.hashes.print()}")
+//            }
+//        }
+//        new
+//    } else {
+//        buildCell {
+//            isExotic = descriptor.isExotic
+//            levelMask = descriptor.levelMask
+//            storeBits(cellBits)
+//            storeRefs(cellRefs)
+//        }
+//    }
     val cell = buildCell {
-        isExotic = descriptors[index].isExotic
-        levelMask = descriptors[index].levelMask
+        isExotic = descriptor.isExotic
+        levelMask = descriptor.levelMask
         storeBits(cellBits)
         storeRefs(cellRefs)
     }

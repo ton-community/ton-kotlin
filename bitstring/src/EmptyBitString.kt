@@ -11,6 +11,8 @@ internal object EmptyBitString : BitString {
 
     override fun plus(bits: Iterable<Boolean>): BitString = BitString(bits)
 
+    override fun plus(bits: BitString): BitString = bits
+
     override fun plus(bits: Collection<Boolean>): BitString = BitString(bits)
 
     override fun plus(bytes: ByteArray): BitString = BitString(bytes)
@@ -40,7 +42,7 @@ internal object EmptyBitString : BitString {
 
     override fun toString(): String = "x{}"
 
-    override fun toHex(): String = ""
+    override fun toHexString(): String = ""
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

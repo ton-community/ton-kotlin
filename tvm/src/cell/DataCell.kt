@@ -6,8 +6,14 @@ public class DataCell(
     override val descriptor: CellDescriptor,
     override val bits: BitString,
     override val refs: List<Cell>,
-    private val hashes: List<Pair<ByteArray, Int>>
+    internal val hashes: List<Pair<ByteArray, Int>>
 ) : Cell {
+    private val hashCode: Int by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        var result = descriptor.hashCode()
+        result = 31 * result + hashes.hashCode()
+        result
+    }
+
     override fun hash(level: Int): BitString {
         val hashIndex = levelMask.apply(level).hashIndex
         return BitString(hashes[hashIndex].first)
@@ -37,10 +43,5 @@ public class DataCell(
         return refs == other.refs
     }
 
-    override fun hashCode(): Int {
-        var result = descriptor.hashCode()
-        result = 31 * result + bits.hashCode()
-        result = 31 * result + refs.hashCode()
-        return result
-    }
+    override fun hashCode(): Int = hashCode
 }
