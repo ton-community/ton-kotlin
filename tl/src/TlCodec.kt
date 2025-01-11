@@ -1,6 +1,6 @@
 package org.ton.tl
 
-public interface TlCodec<T> : TlDecoder<T>, TlEncoder<T>
+public interface TlCodec<T> : TlDeserializer<T>, TlSerializer<T>
 
 public interface TlObject<T> where T : TlObject<T> {
     public fun tlCodec(): TlCodec<out T>

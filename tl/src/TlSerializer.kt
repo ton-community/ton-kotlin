@@ -6,7 +6,8 @@ import kotlinx.io.Sink
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.readByteArray
 
-public interface TlEncoder<in T> {
+@Deprecated("Use TL serialization instead")
+public interface TlSerializer<in T> {
     public fun encode(sink: Sink, value: T): Unit = encode(TlWriter(sink), value)
     public fun encode(writer: TlWriter, value: T)
 
@@ -24,6 +25,3 @@ public interface TlEncoder<in T> {
     public fun hash(value: T): ByteArray =
         sha256(encodeToByteArray(value))
 }
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-internal inline fun <T> TlEncoder<*>.cast(): TlEncoder<T> = this as TlEncoder<T>

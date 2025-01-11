@@ -24,7 +24,7 @@ public abstract class TlCombinator<T : Any> private constructor(
             .mapValues { it.value.value }
     }
 
-    override fun findConstructorOrNull(id: Int): TlDecoder<out T>? = id2Constructor[id]
+    override fun findConstructorOrNull(id: Int): TlDeserializer<out T>? = id2Constructor[id]
 
-    override fun findConstructorOrNull(value: T): TlEncoder<T>? = class2Constructor[value::class]?.cast()
+    override fun findConstructorOrNull(value: T): TlSerializer<T>? = class2Constructor[value::class] as? TlSerializer<T>
 }

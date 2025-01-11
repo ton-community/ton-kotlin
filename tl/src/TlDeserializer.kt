@@ -5,7 +5,8 @@ import kotlinx.io.Source
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.write
 
-public interface TlDecoder<T> {
+@Deprecated("Use TL instead")
+public interface TlDeserializer<T> {
     public fun decode(byteArray: ByteArray): T = decode(Buffer().also {
         it.write(byteArray)
     })

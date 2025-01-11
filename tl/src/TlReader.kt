@@ -12,42 +12,38 @@ public class TlReader(
     public fun readLong(): Long = input.readLongLe()
     public fun readRaw(size: Int): ByteArray = input.readByteArray(size)
 
-    public fun readByteString(size: Int): ByteString {
-        return input.readByteString(size)
-    }
+    public fun readByteString(size: Int): ByteString = input.readByteString(size)
 
-    public fun readByteString(): ByteString {
-        return ByteString(*readBytes())
-    }
+    public fun readByteString(): ByteString = ByteString(*readBytes())
 
     public fun readBytes(): ByteArray {
         var resultLength = input.readUByte().toInt()
-        var resultAlignedLength: Int
-        if (resultLength < 254) {
-            resultAlignedLength = resultLength + 1
-        } else if (resultLength == 254) {
-            resultLength = input.readUByte().toInt() or
-                    (input.readUByte().toInt() shl 8) or
-                    (input.readUByte().toInt() shl 16)
-            resultAlignedLength = resultLength + 4
-        } else {
-            val resultLengthLong = input.readUByte().toLong() or
-                    (input.readUByte().toLong() shl 8) or
-                    (input.readUByte().toLong() shl 16) or
-                    (input.readUByte().toLong() shl 24) or
-                    (input.readUByte().toLong() shl 32) or
-                    (input.readUByte().toLong() shl 40) or
-                    (input.readUByte().toLong() shl 48)
-            if (resultLengthLong > Int.MAX_VALUE) {
-                throw IllegalStateException("Too big byte array: $resultLengthLong")
+        var resultAlignedLength: Int = when {
+            resultLength < 254 -> resultLength + 1
+            resultLength == 254 -> {
+                resultLength = input.readUByte().toInt() or
+                        (input.readUByte().toInt() shl 8) or
+                        (input.readUByte().toInt() shl 16)
+                resultLength + 4
             }
-            resultLength = resultLengthLong.toInt()
-            resultAlignedLength = resultLength + 8
+
+            else -> {
+                val resultLengthLong = input.readUByte().toLong() or
+                        (input.readUByte().toLong() shl 8) or
+                        (input.readUByte().toLong() shl 16) or
+                        (input.readUByte().toLong() shl 24) or
+                        (input.readUByte().toLong() shl 32) or
+                        (input.readUByte().toLong() shl 40) or
+                        (input.readUByte().toLong() shl 48)
+                check(resultLengthLong <= Int.MAX_VALUE) {
+                    "Too big byte array: $resultLengthLong"
+                }
+                resultLength = resultLengthLong.toInt()
+                resultLength + 8
+            }
         }
         val result = input.readByteArray(resultLength)
-        while (resultAlignedLength++ % 4 > 0) {
-            check(input.readByte() == 0.toByte())
-        }
+        input.skip(((4 - resultAlignedLength % 4) % 4).toLong())
         return result
     }
 
