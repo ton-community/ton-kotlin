@@ -8,6 +8,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashmapAug
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @Serializable

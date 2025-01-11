@@ -83,7 +83,7 @@ public open class ByteBackedMutableBitString(
             val newValue = (BigInt.ONE shl bits) + value
             for (i in 0 until bits) {
                 val bit = newValue.bitAt(bits - i - 1)
-                set(index + i,  bit)
+                set(index + i, bit)
             }
         } else {
             set(index, false)

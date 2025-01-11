@@ -185,6 +185,7 @@ public class WalletV3R2Contract(
                         createdAt = 0u
                     )
                 }
+
                 is MsgAddressExt -> {
                     CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed(
                         src = AddrNone,

@@ -1,10 +1,6 @@
 package org.ton.crypto
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.*
 import platform.windows.BCRYPT_USE_SYSTEM_PREFERRED_RNG
 import platform.windows.BCryptGenRandom
 

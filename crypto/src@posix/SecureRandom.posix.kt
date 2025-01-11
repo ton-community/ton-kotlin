@@ -1,10 +1,6 @@
 package org.ton.crypto
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.UnsafeNumber
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.*
 import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fread

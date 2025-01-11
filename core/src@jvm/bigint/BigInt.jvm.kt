@@ -33,15 +33,18 @@ internal constructor(
     actual override fun toByte(): Byte = javaBigInt.toByte()
 
     public actual inline operator fun plus(other: BigInt): BigInt = BigInt(javaBigInt.add(other.javaBigInt))
-    public actual inline operator fun plus(other: Long): BigInt = BigInt(javaBigInt.add(java.math.BigInteger.valueOf(other)))
+    public actual inline operator fun plus(other: Long): BigInt =
+        BigInt(javaBigInt.add(java.math.BigInteger.valueOf(other)))
 
     public actual inline operator fun minus(other: BigInt): BigInt =
         BigInt(javaBigInt.subtract(other.javaBigInt))
+
     public actual inline operator fun minus(other: Long): BigInt =
         BigInt(javaBigInt.subtract(java.math.BigInteger.valueOf(other)))
 
     public actual inline operator fun times(other: BigInt): BigInt =
         BigInt(javaBigInt.multiply(other.javaBigInt))
+
     public actual inline operator fun times(other: Long): BigInt =
         BigInt(javaBigInt.multiply(java.math.BigInteger.valueOf(other)))
 

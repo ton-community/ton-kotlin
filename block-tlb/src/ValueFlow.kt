@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 
 @Serializable
 @SerialName("value_flow")

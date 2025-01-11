@@ -1,6 +1,5 @@
 package org.ton.adnl.connection
 
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.datetime.Clock

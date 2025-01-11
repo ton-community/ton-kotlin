@@ -1,14 +1,8 @@
 package org.ton.boc
 
 import io.github.andreypfau.kotlinx.crypto.crc32c
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.io.*
-import kotlinx.io.Buffer
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellDescriptor
@@ -58,8 +52,8 @@ internal fun Source.readBagOfCell(): BagOfCells {
     val offsetSize = readByte().toInt()
     val cellCount = readInt(refSize)
     val rootsCount = readInt(refSize)
-    val absentCount = readInt(refSize)
-    val totalCellsSize = readInt(offsetSize)
+    readInt(refSize)
+    readInt(offsetSize)
 
     // Roots
     val rootIndexes = IntArray(rootsCount) {
@@ -172,7 +166,7 @@ private suspend fun createCell(
         cells[refIndex].await()
     }
     val descriptor = descriptors[index]
-    val hashes = cellHashes[index]
+    cellHashes[index]
 //    val cell = if (!descriptors[index].isExotic && hashes != null) {
 //        val new = buildCell {
 //            isExotic = descriptor.isExotic

@@ -15,7 +15,12 @@ public actual class BigInt internal constructor(
 
     public actual constructor(value: String, radix: Int) : this(BigInteger.parseString(value, radix))
 
-    public actual constructor(value: ByteArray, sign: Int) : this(BigInteger.fromByteArray(value, if (sign >= 0) Sign.POSITIVE else Sign.NEGATIVE))
+    public actual constructor(value: ByteArray, sign: Int) : this(
+        BigInteger.fromByteArray(
+            value,
+            if (sign >= 0) Sign.POSITIVE else Sign.NEGATIVE
+        )
+    )
 
     public actual val sign: Int = value.signum()
     public actual val bitLength: Int = value.bitLength()

@@ -4,14 +4,9 @@ import io.github.andreypfau.kotlinx.crypto.AES
 import io.github.andreypfau.kotlinx.crypto.CTRBlockCipher
 import io.github.andreypfau.kotlinx.crypto.Sha256
 import io.github.andreypfau.kotlinx.crypto.sha256
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.close
+import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.errors.*
-import io.ktor.utils.io.readPacket
-import io.ktor.utils.io.writeFully
-import io.ktor.utils.io.writePacket
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

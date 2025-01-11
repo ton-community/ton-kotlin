@@ -1,6 +1,5 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.remaining
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlin.random.Random

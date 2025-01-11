@@ -2,9 +2,9 @@
 
 package org.ton.block
 
-import org.ton.bigint.BigInt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bigint.BigInt
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice

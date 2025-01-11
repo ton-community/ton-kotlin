@@ -1,5 +1,6 @@
 package org.ton.cell
 
+import org.ton.cell.CellType.values
 import kotlin.jvm.JvmStatic
 
 public enum class CellType(

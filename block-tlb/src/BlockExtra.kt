@@ -8,6 +8,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 
 @SerialName("block_extra")
 @Serializable

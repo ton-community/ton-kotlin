@@ -8,6 +8,7 @@ import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 

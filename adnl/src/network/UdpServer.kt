@@ -1,6 +1,5 @@
 package org.ton.adnl.network
 
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Source
 import kotlin.coroutines.CoroutineContext

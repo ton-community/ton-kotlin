@@ -65,6 +65,7 @@ public interface CellSlice {
         val i = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
         return i
     }
+
     public fun preloadUIntLeq(max: Int): UInt = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
 
     public fun loadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
@@ -184,14 +185,14 @@ private open class CellSliceImpl(
         return BigInt(intBits, 2)
     }
 
-    protected fun checkBitsOverflow(length: Int) {
+    fun checkBitsOverflow(length: Int) {
         val remaining = bits.size - bitsPosition
         require(length <= remaining) {
             "Bits overflow. Can't load $length bits. $remaining bits left."
         }
     }
 
-    protected fun checkRefsOverflow() {
+    fun checkRefsOverflow() {
         val remaining = 4 - refsPosition
         require(1 <= remaining) {
             "Refs overflow. Can't load ref. $remaining refs left."
@@ -281,6 +282,7 @@ private class CellSliceByteBackedBitString(
                 val byte = getByte(0).toInt() and 0xFF
                 byte.toBigInt()
             }
+
             else -> {
                 val value = getULong(length)
                 if (value > Long.MAX_VALUE.toULong()) {

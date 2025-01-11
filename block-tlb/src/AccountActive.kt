@@ -10,7 +10,6 @@ import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
-import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 @Serializable

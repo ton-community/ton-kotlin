@@ -1,7 +1,7 @@
 package org.ton.cell
 
-import org.ton.bigint.BigInt
 import io.github.andreypfau.kotlinx.crypto.Sha256
+import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.bitstring.*
 import org.ton.cell.exception.CellOverflowException
@@ -290,7 +290,11 @@ private class CellBuilderImpl(
         }
     }
 
-    private fun computeHashes(descriptor: CellDescriptor, data: ByteArray, childrenMask: LevelMask): List<Pair<ByteArray, Int>> {
+    private fun computeHashes(
+        descriptor: CellDescriptor,
+        data: ByteArray,
+        childrenMask: LevelMask
+    ): List<Pair<ByteArray, Int>> {
         var levels = descriptor.levelMask.level + 1
 
         val computedLevelMask = when (descriptor.cellType) {

@@ -1,8 +1,8 @@
 package org.ton.block
 
-import org.ton.bigint.BigInt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.block.VmStackNan.VmStackNanException
 import org.ton.cell.CellBuilder

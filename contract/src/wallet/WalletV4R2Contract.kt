@@ -15,6 +15,7 @@ import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.hashmap.HashMapE
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.AnyTlbConstructor
 import kotlin.io.encoding.Base64
 

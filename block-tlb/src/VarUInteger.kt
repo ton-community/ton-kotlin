@@ -1,7 +1,7 @@
 package org.ton.block
 
-import org.ton.bigint.BigInt
 import kotlinx.serialization.Serializable
+import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice

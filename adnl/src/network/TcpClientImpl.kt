@@ -1,7 +1,6 @@
 package org.ton.adnl.network
 
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.ByteWriteChannel
+import io.ktor.utils.io.*
 
 public expect class TcpClientImpl() : TcpClient {
     override val input: ByteReadChannel

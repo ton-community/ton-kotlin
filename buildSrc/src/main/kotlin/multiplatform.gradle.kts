@@ -74,6 +74,7 @@ fun KotlinMultiplatformExtension.configureSourceSetsLayout() {
                 kotlin.setSrcDirs(listOf("test$suffix"))
                 resources.setSrcDirs(listOf("testResources$suffix"))
             }
+
             name.endsWith("Main") -> {
                 val suffix = if (name.startsWith("common")) "" else "@${name.removeSuffix("Main")}"
                 kotlin.setSrcDirs(listOf("src$suffix"))
