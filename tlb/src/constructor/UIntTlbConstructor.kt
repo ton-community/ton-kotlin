@@ -1,6 +1,6 @@
 package org.ton.tlb.constructor
 
-import org.ton.bigint.BigInt
+import org.ton.bigint.*
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -23,21 +23,21 @@ public open class UIntTlbConstructor(
     override fun loadTlb(
         cellSlice: CellSlice
     ): BigInt = cellSlice {
-        loadUInt(length)
+        loadUBigInt(length)
     }
 
     public companion object {
         public fun byte(length: Int = Byte.SIZE_BITS): TlbConstructor<UByte> =
-            number(encode = { storeUInt(it.toByte(), length) }, decode = { loadUInt(length).toByte().toUByte() })
+            number(encode = { storeUInt(it.toByte(), length) }, decode = { loadUBigInt(length).toUByte() })
 
         public fun short(length: Int = Short.SIZE_BITS): TlbConstructor<UShort> =
-            number(encode = { storeUInt(it.toShort(), length) }, decode = { loadUInt(length).toShort().toUShort() })
+            number(encode = { storeUInt(it.toShort(), length) }, decode = { loadUBigInt(length).toUShort() })
 
         public fun int(length: Int = Int.SIZE_BITS): TlbConstructor<UInt> =
-            number(encode = { storeUInt(it.toInt(), length) }, decode = { loadUInt(length).toInt().toUInt() })
+            number(encode = { storeUInt(it.toInt(), length) }, decode = { loadUBigInt(length).toUInt() })
 
         public fun long(length: Int = Long.SIZE_BITS): TlbConstructor<ULong> =
-            number(encode = { storeUInt(it.toLong(), length) }, decode = { loadUInt(length).toLong().toULong() })
+            number(encode = { storeUInt(it.toLong(), length) }, decode = { loadUBigInt(length).toULong() })
 
         private fun <T : Any> number(encode: CellBuilder.(T) -> Unit, decode: CellSlice.() -> T) =
             object : TlbConstructor<T>("") {

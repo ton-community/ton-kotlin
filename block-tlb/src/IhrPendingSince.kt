@@ -29,7 +29,7 @@ private object IhrPendingSinceTlbConstructor : TlbConstructor<IhrPendingSince>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): IhrPendingSince = cellSlice {
-        val importLt = loadUInt64()
+        val importLt = loadULong()
         IhrPendingSince(importLt)
     }
 }

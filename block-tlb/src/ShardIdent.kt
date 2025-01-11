@@ -46,8 +46,8 @@ private object ShardIdentTlbConstructor : TlbConstructor<ShardIdent>(
         cellSlice: CellSlice
     ): ShardIdent = cellSlice {
         val shardPfxBits = loadUIntLeq(60).toInt()
-        val workchainId = loadInt(32).toInt()
-        val shardPrefix = loadUInt64()
+        val workchainId = loadInt(32)
+        val shardPrefix = loadULong()
         ShardIdent(shardPfxBits, workchainId, shardPrefix)
     }
 }

@@ -116,13 +116,13 @@ private object ShardStateUnsplitTlbConstructor : TlbConstructor<ShardStateUnspli
     override fun loadTlb(
         cellSlice: CellSlice
     ): ShardStateUnsplit = cellSlice {
-        val globalId = loadInt(32).toInt()
+        val globalId = loadInt(32)
         val shardId = loadTlb(ShardIdent)
-        val seqNo = loadUInt(32).toInt().toUInt()
-        val vertSeqNo = loadInt(32).toInt()
-        val genUtime = loadUInt(32).toInt().toUInt()
-        val genLt = loadUInt(64).toLong().toULong()
-        val minRefMcSeqno = loadUInt(32).toInt().toUInt()
+        val seqNo = loadUInt(32)
+        val vertSeqNo = loadUInt(32).toInt()
+        val genUtime = loadUInt(32)
+        val genLt = loadULong(64)
+        val minRefMcSeqno = loadUInt(32)
         val outMsgQueueInfo = loadRef(OutMsgQueueInfo)
         val beforeSplit = loadBit()
         val accounts = loadRef(ShardAccounts)
@@ -166,8 +166,8 @@ private object ShardStateUnsplitAuxTlbConstructor : TlbConstructor<ShardStateUns
     }
 
     override fun loadTlb(cellSlice: CellSlice): ShardStateUnsplitAux {
-        val overloadHistory = cellSlice.loadUInt(64).toLong().toULong()
-        val underloadHistory = cellSlice.loadUInt(64).toLong().toULong()
+        val overloadHistory = cellSlice.loadULong(64)
+        val underloadHistory = cellSlice.loadULong(64)
         val totalBalance = cellSlice.loadTlb(CurrencyCollection)
         val totalValidatorFees = cellSlice.loadTlb(CurrencyCollection)
         val libraries = cellSlice.loadTlb(hashMapELibDesc)

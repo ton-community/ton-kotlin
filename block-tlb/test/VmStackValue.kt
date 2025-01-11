@@ -31,7 +31,7 @@ class VmStackValueTest {
 
         repeat(10) {
             testSerialization(codec, VmStackInt(Random.nextLong()))
-            testSerialization(codec, VmStackInt(BigInt(Random.nextBytes(256 / 8))))
+            testSerialization(codec, VmStackInt(BigInt(Random.nextBytes(256 / 8), 1)))
         }
 
         testSerialization(

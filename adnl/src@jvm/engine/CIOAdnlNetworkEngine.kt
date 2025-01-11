@@ -5,6 +5,7 @@ import io.ktor.network.sockets.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.runBlocking
 import org.ton.adnl.ipv4
 import org.ton.adnl.utils.toAdnlUdpAddress
 import org.ton.adnl.utils.toSocketAddress
@@ -16,7 +17,9 @@ public class CIOAdnlNetworkEngine(
     public constructor(port: Int) : this(AdnlAddressUdp(ipv4("0.0.0.0"), port))
 
     public val socket: BoundDatagramSocket =
-        aSocket(ActorSelectorManager(DISPATCHER)).udp().bind(localAddress.toSocketAddress())
+        runBlocking {
+            aSocket(ActorSelectorManager(DISPATCHER)).udp().bind(localAddress.toSocketAddress())
+        }
 
     override suspend fun sendDatagram(adnlAddress: AdnlAddressUdp, payload: ByteReadPacket) {
         val datagram = Datagram(payload, adnlAddress.toSocketAddress())

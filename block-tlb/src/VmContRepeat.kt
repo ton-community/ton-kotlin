@@ -38,7 +38,7 @@ private object VmContRepeatTlbConstructor : TlbConstructor<VmContRepeat>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): VmContRepeat = cellSlice {
-        val count = loadUInt(63).toLong()
+        val count = loadULong(63).toLong()
         val body = loadTlb(vmCont)
         val after = loadTlb(vmCont)
         VmContRepeat(count, body, after)

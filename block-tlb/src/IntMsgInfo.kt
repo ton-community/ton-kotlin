@@ -74,8 +74,8 @@ private object IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
         val value = loadTlb(CurrencyCollection)
         val ihrFee = loadTlb(Coins)
         val fwdFee = loadTlb(Coins)
-        val createdLt = loadUInt(64).toLong()
-        val createdAt = loadUInt(32).toInt()
+        val createdLt = loadULong(64).toLong()
+        val createdAt = loadUInt().toInt()
         IntMsgInfo(
             ihrDisabled, bounce, bounced, src, dest, value, ihrFee, fwdFee, createdLt, createdAt
         )

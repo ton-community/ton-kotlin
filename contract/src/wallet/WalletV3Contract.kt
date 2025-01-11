@@ -71,7 +71,7 @@ public class WalletV3R2Contract(
         ) {
             override fun loadTlb(cellSlice: CellSlice): WalletV3R2Data {
                 val seqno = cellSlice.loadUInt(32).toInt()
-                val subWalletId = cellSlice.loadUInt(32).toInt()
+                val subWalletId = cellSlice.loadInt(32).toInt()
                 val publicKey = PublicKeyEd25519(ByteString(*cellSlice.loadBits(256).toByteArray()))
                 return WalletV3R2Data(seqno, subWalletId, publicKey)
             }

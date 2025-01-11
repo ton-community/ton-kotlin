@@ -4,14 +4,14 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface CommonMsgInfoRelaxed : TlbObject {
     @SerialName("int_msg_info")
@@ -119,8 +119,8 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
             val value = loadTlb(CurrencyCollection)
             val ihrFee = loadTlb(Coins)
             val fwdFee = loadTlb(Coins)
-            val createdLt = loadUInt64()
-            val createdAt = loadUInt32()
+            val createdLt = loadULong()
+            val createdAt = loadUInt()
             CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
                 ihrDisabled, bounce, bounced, src, dest, value, ihrFee, fwdFee, createdLt, createdAt
             )
@@ -146,8 +146,8 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
         ): CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed = cellSlice {
             val src = loadTlb(MsgAddress)
             val dest = loadTlb(MsgAddressExt)
-            val createdLt = loadUInt64()
-            val createdAt = loadUInt32()
+            val createdLt = loadULong()
+            val createdAt = loadUInt()
             CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed(src, dest, createdLt, createdAt)
         }
     }

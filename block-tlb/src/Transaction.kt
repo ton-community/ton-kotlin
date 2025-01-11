@@ -134,10 +134,10 @@ private object TransactionTlConstructor : TlbConstructor<Transaction>(
 ) {
     override fun loadTlb(cellSlice: CellSlice): Transaction = cellSlice {
         val accountAddr = loadBits(256)
-        val lt = loadUInt64()
+        val lt = loadULong()
         val prevTransHash = loadBits(256)
-        val prevTransLt = loadUInt64()
-        val now = loadUInt32()
+        val prevTransLt = loadULong()
+        val now = loadUInt()
         val outmsgCnt = loadUInt(15).toInt()
         val origStatus = loadTlb(AccountStatus)
         val endStatus = loadTlb(AccountStatus)

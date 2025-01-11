@@ -31,7 +31,7 @@ private class TextChunkTlbConstructor(
     }
 
     override fun loadTlb(cellSlice: CellSlice): TextChunk {
-        val len = cellSlice.loadUInt8()
+        val len = cellSlice.loadUInt(8).toUByte()
         val data = cellSlice.loadBits(len.toInt() * 8)
         val next = cellSlice.loadTlb(next)
         return TextChunk(len, data, next)

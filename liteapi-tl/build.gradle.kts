@@ -1,15 +1,10 @@
 plugins {
-    id("multiplatform")
-    id("publish")
+    id("buildsrc.convention.multiplatform")
 }
 
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(projects.tonKotlinTonapiTl)
-                api(projects.tonKotlinBlockTlb) //TODO: remove dependency
-            }
-        }
-    }
+dependencies {
+    commonMainApi(projects.tonKotlinTl)
+    commonMainApi(projects.tonKotlinTonapiTl)
+    commonMainApi(projects.tonKotlinBlockTlb) // TODO: remove, used in LiteServerRunSmcMethod
 }
+

@@ -37,8 +37,8 @@ private object IntermediateAddressSimpleTlbConstructor : TlbConstructor<Intermed
     override fun loadTlb(
         cellSlice: CellSlice
     ): IntermediateAddressSimple = cellSlice {
-        val workchainId = loadInt(8).toInt()
-        val addrPfx = loadUInt64()
+        val workchainId = loadInt(8)
+        val addrPfx = loadULong()
         IntermediateAddressSimple(workchainId, addrPfx)
     }
 }

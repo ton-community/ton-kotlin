@@ -1,6 +1,6 @@
 package org.ton.lite.client
 
-import io.github.andreypfau.kotlinx.crypto.sha2.sha256
+import io.github.andreypfau.kotlinx.crypto.sha256
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.*

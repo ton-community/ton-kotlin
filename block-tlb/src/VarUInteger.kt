@@ -1,8 +1,8 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
+import org.ton.bigint.BigInt
 import kotlinx.serialization.Serializable
-import org.ton.bigint.*
+import org.ton.bigint.toBigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -13,13 +13,11 @@ import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-@SerialName("var_uint")
 @Serializable
 public data class VarUInteger(
     @get:JvmName("len")
     val len: Int,
 
-    @Serializable(BigIntSerializer::class)
     @get:JvmName("value")
     val value: BigInt
 ) : TlbObject {
@@ -39,7 +37,7 @@ public data class VarUInteger(
     public fun toByte(): Byte = value.toByte()
 
     @Deprecated("Use VarUInteger.value instead")
-    public fun toChar(): Char = value.toChar()
+    public fun toChar(): Char = value.toInt().toChar()
 
     @Deprecated("Use VarUInteger.value instead")
     public fun toDouble(): Double = throw UnsupportedOperationException()
@@ -68,7 +66,7 @@ public data class VarUInteger(
     @Deprecated("Use VarUInteger.value instead")
     public operator fun minus(other: VarUInteger): VarUInteger {
         val result = value - other.value
-        if (result < 0L) throw NumberFormatException("Integer underflow")
+        if (result < BigInt.ZERO) throw NumberFormatException("Integer underflow")
         val len = maxOf(len, other.len)
         return VarUInteger(len, result)
     }
@@ -145,7 +143,7 @@ public data class VarUInteger(
             cellSlice: CellSlice
         ): VarUInteger = cellSlice {
             val len = loadUIntLes(n).toInt()
-            val value = loadUInt(len * 8)
+            val value = loadUBigInt(len * 8)
             VarUInteger(len, value)
         }
     }

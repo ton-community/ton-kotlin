@@ -57,7 +57,7 @@ private object TlbConstructor : org.ton.tlb.TlbConstructor<Block>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): Block = cellSlice {
-        val globalId = loadInt(32).toInt()
+        val globalId = loadInt(32)
         val info = loadRef().asRef(BlockInfo)
         val valueFlow = loadRef().asRef(ValueFlow)
         val stateUpdate = loadRef().asRef(merkleUpdate)

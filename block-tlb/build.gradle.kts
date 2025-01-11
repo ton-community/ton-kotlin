@@ -1,17 +1,9 @@
 plugins {
-    id("multiplatform")
-    id("publish")
+    id("buildsrc.convention.multiplatform")
 }
 
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(projects.tonKotlinHashmapTlb)
-                api(projects.tonKotlinTlb)
-                api(projects.tonKotlinTl)
-                implementation(libs.serialization.core)
-            }
-        }
-    }
+dependencies {
+    commonMainApi(projects.tonKotlinTlb)
+    commonMainApi(projects.tonKotlinHashmapTlb)
+    commonMainImplementation(libs.serialization.core)
 }

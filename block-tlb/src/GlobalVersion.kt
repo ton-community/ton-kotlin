@@ -38,8 +38,8 @@ private object GlobalVersionTlbConstructor : TlbConstructor<GlobalVersion>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): GlobalVersion = cellSlice {
-        val version = loadUInt(32).toInt().toUInt()
-        val capabilities = loadUInt(64).toLong().toULong()
+        val version = loadUInt()
+        val capabilities = loadULong(64)
         GlobalVersion(version, capabilities)
     }
 }

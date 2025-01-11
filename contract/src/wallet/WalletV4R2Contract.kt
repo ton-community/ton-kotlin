@@ -86,7 +86,7 @@ public class WalletV4R2Contract(
         ) {
             override fun loadTlb(cellSlice: CellSlice): Data {
                 val seqno = cellSlice.loadUInt(32).toInt()
-                val subWalletId = cellSlice.loadUInt(32).toInt()
+                val subWalletId = cellSlice.loadInt(32)
                 val publicKey = PublicKeyEd25519(ByteString(*cellSlice.loadBits(256).toByteArray()))
                 val plugins = cellSlice.loadTlb(HashMapE.tlbCodec(8 + 256, AnyTlbConstructor))
                 return Data(seqno, subWalletId, publicKey, plugins)

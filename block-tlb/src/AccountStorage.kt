@@ -49,7 +49,7 @@ private object AccountStorageTlbConstructor : TlbConstructor<AccountStorage>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): AccountStorage = cellSlice {
-        val lastTransLt = loadUInt64()
+        val lastTransLt = loadULong()
         val balance = loadTlb(CurrencyCollection)
         val state = loadTlb(AccountState)
         AccountStorage(lastTransLt, balance, state)

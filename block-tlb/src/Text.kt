@@ -25,7 +25,7 @@ private object TextTlbConstructor : TlbConstructor<Text>(
     }
 
     override fun loadTlb(cellSlice: CellSlice): Text {
-        val chunks = cellSlice.loadUInt8()
+        val chunks = cellSlice.loadUInt(8).toUByte()
         val rest = cellSlice.loadTlb(TextChunks.tlbCodec(chunks.toInt()))
         return Text(chunks, rest)
     }

@@ -1,18 +1,8 @@
 plugins {
-    id("multiplatform")
-    id("publish")
+    id("buildsrc.convention.multiplatform")
 }
 
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(projects.tonKotlinBigint)
-                api(projects.tonKotlinTl)
-                api(projects.tonKotlinBitstring)
-                api(projects.tonKotlinTlb)
-                api(libs.datetime)
-            }
-        }
-    }
+dependencies {
+    commonMainApi(projects.tonKotlinTl)
+    commonMainApi(projects.tonKotlinCore)
 }

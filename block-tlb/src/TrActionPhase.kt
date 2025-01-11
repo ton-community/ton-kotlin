@@ -1,4 +1,3 @@
-@file:UseSerializers(HexByteArraySerializer::class)
 
 package org.ton.block
 
@@ -9,7 +8,6 @@ import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.crypto.HexByteArraySerializer
 import org.ton.tlb.*
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -101,7 +99,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val statusChange = loadTlb(AccStatusChange)
         val totalFwdFees = loadTlb(maybeCoins)
         val totalActionFees = loadTlb(maybeCoins)
-        val resultCode = loadInt(32).toInt()
+        val resultCode = loadInt(32)
         val resultArg = loadTlb(maybeInt32)
         val totActions = loadUInt(16).toInt()
         val specActions = loadUInt(16).toInt()

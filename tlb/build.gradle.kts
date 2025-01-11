@@ -1,16 +1,7 @@
 plugins {
-    id("multiplatform")
-    id("publish")
+    id("buildsrc.convention.multiplatform")
 }
 
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(projects.tonKotlinTvm)
-                implementation(libs.atomicfu)
-                implementation(kotlin("reflect"))
-            }
-        }
-    }
+dependencies {
+    commonMainApi(projects.tonKotlinCore)
 }

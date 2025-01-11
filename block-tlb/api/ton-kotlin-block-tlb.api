@@ -1166,7 +1166,7 @@ public final class org/ton/block/Coins : org/ton/tlb/TlbObject {
 	public static final field Companion Lorg/ton/block/Coins$Companion;
 	public fun <init> ()V
 	public fun <init> (J)V
-	public fun <init> (Ljava/math/BigInteger;)V
+	public fun <init> (Ljava/math/BigInt;)V
 	public fun <init> (Lorg/ton/block/VarUInteger;)V
 	public synthetic fun <init> (Lorg/ton/block/VarUInteger;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun amount ()Lorg/ton/block/VarUInteger;
@@ -1182,7 +1182,7 @@ public final class org/ton/block/Coins : org/ton/tlb/TlbObject {
 	public static final fun of (DI)Lorg/ton/block/Coins;
 	public static final fun of (JI)Lorg/ton/block/Coins;
 	public static final fun ofNano (J)Lorg/ton/block/Coins;
-	public static final fun ofNano (Ljava/math/BigInteger;)Lorg/ton/block/Coins;
+	public static final fun ofNano (Ljava/math/BigInt;)Lorg/ton/block/Coins;
 	public final fun plus (Lorg/ton/block/Coins;)Lorg/ton/block/Coins;
 	public fun print (Lorg/ton/tlb/TlbPrettyPrinter;)Lorg/ton/tlb/TlbPrettyPrinter;
 	public final fun rem (Lorg/ton/block/Coins;)Lorg/ton/block/Coins;
@@ -1215,7 +1215,7 @@ public final class org/ton/block/Coins$Companion : org/ton/tlb/providers/TlbCons
 	public static synthetic fun of$default (Lorg/ton/block/Coins$Companion;DIILjava/lang/Object;)Lorg/ton/block/Coins;
 	public static synthetic fun of$default (Lorg/ton/block/Coins$Companion;JIILjava/lang/Object;)Lorg/ton/block/Coins;
 	public final fun ofNano (J)Lorg/ton/block/Coins;
-	public final fun ofNano (Ljava/math/BigInteger;)Lorg/ton/block/Coins;
+	public final fun ofNano (Ljava/math/BigInt;)Lorg/ton/block/Coins;
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 	public synthetic fun storeTlb (Lorg/ton/cell/CellBuilder;Ljava/lang/Object;)V
 	public fun storeTlb (Lorg/ton/cell/CellBuilder;Lorg/ton/block/Coins;)V
@@ -3811,7 +3811,7 @@ public abstract interface class org/ton/block/MutableVmStack : org/ton/block/VmS
 	public fun popBuilder ()Lorg/ton/cell/CellBuilder;
 	public fun popCell ()Lorg/ton/cell/Cell;
 	public fun popCont ()Lorg/ton/block/VmCont;
-	public fun popInt ()Ljava/math/BigInteger;
+	public fun popInt ()Ljava/math/BigInt;
 	public fun popNull ()Lorg/ton/block/VmStackNull;
 	public fun popNumber ()Lorg/ton/block/VmStackNumber;
 	public fun popSlice ()Lorg/ton/cell/CellSlice;
@@ -3822,7 +3822,7 @@ public abstract interface class org/ton/block/MutableVmStack : org/ton/block/VmS
 	public fun pushBuilder (Lorg/ton/cell/CellBuilder;)V
 	public fun pushCell (Lorg/ton/cell/Cell;)V
 	public fun pushCont (Lorg/ton/block/VmCont;)V
-	public fun pushInt (Ljava/math/BigInteger;)V
+	public fun pushInt (Ljava/math/BigInt;)V
 	public fun pushNan ()V
 	public fun pushNull ()V
 	public fun pushSlice (Lorg/ton/cell/CellSlice;)V
@@ -6425,19 +6425,19 @@ public final class org/ton/block/ValueFlow$Companion : org/ton/tlb/TlbCodec {
 public final class org/ton/block/VarInteger : java/lang/Number {
 	public static final field Companion Lorg/ton/block/VarInteger$Companion;
 	public fun <init> (I)V
-	public fun <init> (ILjava/math/BigInteger;)V
+	public fun <init> (ILjava/math/BigInt;)V
 	public fun <init> (J)V
-	public fun <init> (Ljava/math/BigInteger;)V
+	public fun <init> (Ljava/math/BigInt;)V
 	public final fun byteValue ()B
 	public final fun component1 ()I
-	public final fun component2 ()Ljava/math/BigInteger;
-	public final fun copy (ILjava/math/BigInteger;)Lorg/ton/block/VarInteger;
-	public static synthetic fun copy$default (Lorg/ton/block/VarInteger;ILjava/math/BigInteger;ILjava/lang/Object;)Lorg/ton/block/VarInteger;
+	public final fun component2 ()Ljava/math/BigInt;
+	public final fun copy (ILjava/math/BigInt;)Lorg/ton/block/VarInteger;
+	public static synthetic fun copy$default (Lorg/ton/block/VarInteger;ILjava/math/BigInt;ILjava/lang/Object;)Lorg/ton/block/VarInteger;
 	public final fun doubleValue ()D
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun floatValue ()F
 	public final fun getLen ()I
-	public final fun getValue ()Ljava/math/BigInteger;
+	public final fun getValue ()Ljava/math/BigInt;
 	public fun hashCode ()I
 	public final fun intValue ()I
 	public final fun longValue ()J
@@ -6472,13 +6472,13 @@ public final class org/ton/block/VarInteger$Companion {
 public final class org/ton/block/VarUInteger : org/ton/tlb/TlbObject {
 	public static final field Companion Lorg/ton/block/VarUInteger$Companion;
 	public fun <init> (I)V
-	public fun <init> (ILjava/math/BigInteger;)V
+	public fun <init> (ILjava/math/BigInt;)V
 	public fun <init> (J)V
-	public fun <init> (Ljava/math/BigInteger;)V
+	public fun <init> (Ljava/math/BigInt;)V
 	public final fun component1 ()I
-	public final fun component2 ()Ljava/math/BigInteger;
-	public final fun copy (ILjava/math/BigInteger;)Lorg/ton/block/VarUInteger;
-	public static synthetic fun copy$default (Lorg/ton/block/VarUInteger;ILjava/math/BigInteger;ILjava/lang/Object;)Lorg/ton/block/VarUInteger;
+	public final fun component2 ()Ljava/math/BigInt;
+	public final fun copy (ILjava/math/BigInt;)Lorg/ton/block/VarUInteger;
+	public static synthetic fun copy$default (Lorg/ton/block/VarUInteger;ILjava/math/BigInt;ILjava/lang/Object;)Lorg/ton/block/VarUInteger;
 	public final fun dec ()Lorg/ton/block/VarUInteger;
 	public final fun div (Lorg/ton/block/VarUInteger;)Lorg/ton/block/VarUInteger;
 	public fun equals (Ljava/lang/Object;)Z
@@ -6499,7 +6499,7 @@ public final class org/ton/block/VarUInteger : org/ton/tlb/TlbObject {
 	public final fun toLong ()J
 	public final fun toShort ()S
 	public fun toString ()Ljava/lang/String;
-	public final fun value ()Ljava/math/BigInteger;
+	public final fun value ()Ljava/math/BigInt;
 }
 
 public final class org/ton/block/VarUInteger$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
@@ -7173,18 +7173,18 @@ public final class org/ton/block/VmStackInt : org/ton/block/VmStackNumber, org/t
 	public static final field Companion Lorg/ton/block/VmStackInt$Companion;
 	public fun <init> (I)V
 	public fun <init> (J)V
-	public fun <init> (Ljava/math/BigInteger;)V
-	public final fun component1 ()Ljava/math/BigInteger;
-	public final fun copy (Ljava/math/BigInteger;)Lorg/ton/block/VmStackInt;
-	public static synthetic fun copy$default (Lorg/ton/block/VmStackInt;Ljava/math/BigInteger;ILjava/lang/Object;)Lorg/ton/block/VmStackInt;
+	public fun <init> (Ljava/math/BigInt;)V
+	public final fun component1 ()Ljava/math/BigInt;
+	public final fun copy (Ljava/math/BigInt;)Lorg/ton/block/VmStackInt;
+	public static synthetic fun copy$default (Lorg/ton/block/VmStackInt;Ljava/math/BigInt;ILjava/lang/Object;)Lorg/ton/block/VmStackInt;
 	public fun div (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getValue ()Ljava/math/BigInteger;
+	public final fun getValue ()Ljava/math/BigInt;
 	public fun hashCode ()I
 	public fun minus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun plus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun times (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
-	public fun toBigInt ()Ljava/math/BigInteger;
+	public fun toBigInt ()Ljava/math/BigInt;
 	public fun toBoolean ()Z
 	public fun toInt ()I
 	public fun toLong ()J
@@ -7292,7 +7292,7 @@ public final class org/ton/block/VmStackNan : org/ton/block/VmStackNumber, org/t
 	public fun storeTlb (Lorg/ton/cell/CellBuilder;Lorg/ton/block/VmStackNan;)V
 	public fun times (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun tlbConstructor ()Lorg/ton/tlb/TlbConstructor;
-	public fun toBigInt ()Ljava/math/BigInteger;
+	public fun toBigInt ()Ljava/math/BigInt;
 	public fun toBoolean ()Z
 	public fun toInt ()I
 	public fun toLong ()J
@@ -7323,7 +7323,7 @@ public abstract interface class org/ton/block/VmStackNumber : org/ton/block/VmSt
 	public abstract fun minus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public abstract fun plus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public abstract fun times (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
-	public abstract fun toBigInt ()Ljava/math/BigInteger;
+	public abstract fun toBigInt ()Ljava/math/BigInt;
 	public abstract fun toBoolean ()Z
 	public abstract fun toInt ()I
 	public abstract fun toLong ()J
@@ -7353,7 +7353,7 @@ public final class org/ton/block/VmStackTinyInt : org/ton/block/VmStackNumber, o
 	public fun minus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun plus (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
 	public fun times (Lorg/ton/block/VmStackNumber;)Lorg/ton/block/VmStackNumber;
-	public fun toBigInt ()Ljava/math/BigInteger;
+	public fun toBigInt ()Ljava/math/BigInt;
 	public fun toBoolean ()Z
 	public fun toInt ()I
 	public fun toLong ()J
@@ -7422,7 +7422,7 @@ public abstract interface class org/ton/block/VmStackValue {
 	public static fun of ()Lorg/ton/block/VmStackNull;
 	public static fun of (I)Lorg/ton/block/VmStackTinyInt;
 	public static fun of (J)Lorg/ton/block/VmStackTinyInt;
-	public static fun of (Ljava/math/BigInteger;)Lorg/ton/block/VmStackInt;
+	public static fun of (Ljava/math/BigInt;)Lorg/ton/block/VmStackInt;
 	public static fun of (Lorg/ton/block/VmCont;)Lorg/ton/block/VmStackCont;
 	public static fun of (Lorg/ton/block/VmTuple;)Lorg/ton/block/VmStackTuple;
 	public static fun of (Lorg/ton/cell/Cell;)Lorg/ton/block/VmStackCell;
@@ -7441,7 +7441,7 @@ public final class org/ton/block/VmStackValue$Companion : org/ton/tlb/providers/
 	public final fun of ()Lorg/ton/block/VmStackNull;
 	public final fun of (I)Lorg/ton/block/VmStackTinyInt;
 	public final fun of (J)Lorg/ton/block/VmStackTinyInt;
-	public final fun of (Ljava/math/BigInteger;)Lorg/ton/block/VmStackInt;
+	public final fun of (Ljava/math/BigInt;)Lorg/ton/block/VmStackInt;
 	public final fun of (Lorg/ton/block/VmCont;)Lorg/ton/block/VmStackCont;
 	public final fun of (Lorg/ton/block/VmTuple;)Lorg/ton/block/VmStackTuple;
 	public final fun of (Lorg/ton/cell/Cell;)Lorg/ton/block/VmStackCell;
@@ -7458,7 +7458,7 @@ public final class org/ton/block/VmStackValueKt {
 	public static final fun VmStackValue ()Lorg/ton/block/VmStackValue;
 	public static final fun VmStackValue (I)Lorg/ton/block/VmStackTinyInt;
 	public static final fun VmStackValue (J)Lorg/ton/block/VmStackTinyInt;
-	public static final fun VmStackValue (Ljava/math/BigInteger;)Lorg/ton/block/VmStackInt;
+	public static final fun VmStackValue (Ljava/math/BigInt;)Lorg/ton/block/VmStackInt;
 	public static final fun VmStackValue (Lorg/ton/block/VmCont;)Lorg/ton/block/VmStackCont;
 	public static final fun VmStackValue (Lorg/ton/block/VmTuple;)Lorg/ton/block/VmStackTuple;
 	public static final fun VmStackValue (Lorg/ton/cell/Cell;)Lorg/ton/block/VmStackCell;

@@ -114,10 +114,10 @@ private object TrComputePhaseAuxTlbConstructor : TlbConstructor<TrComputePhaseAu
             gasUsed = cellSlice.loadTlb(VarUInteger7),
             gasLimit = cellSlice.loadTlb(VarUInteger7),
             gasCredit = cellSlice.loadTlb(MaybeVarUInteger3),
-            mode = cellSlice.loadInt(8).toInt(),
-            exitCode = cellSlice.loadInt(32).toInt(),
+            mode = cellSlice.loadUInt(8).toInt(),
+            exitCode = cellSlice.loadUInt(32).toInt(),
             exitArg = cellSlice.loadTlb(MaybeInt32),
-            vmSteps = cellSlice.loadUInt32(),
+            vmSteps = cellSlice.loadUInt(),
             vmInitStateHash = cellSlice.loadBits(256),
             vmFinalStateHash = cellSlice.loadBits(256)
         )

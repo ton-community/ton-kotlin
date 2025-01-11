@@ -3,14 +3,13 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbObject
 import kotlin.jvm.JvmStatic
 
 @Serializable
-@JsonClassDiscriminator("@type")
+
 public sealed interface BinTree<X> : Iterable<X>, TlbObject {
 
     override fun iterator(): Iterator<X> = nodes().iterator()

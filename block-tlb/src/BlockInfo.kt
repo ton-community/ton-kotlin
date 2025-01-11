@@ -133,7 +133,7 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): BlockInfo = cellSlice {
-        val version = loadUInt32()
+        val version = loadUInt()
         val notMaster = loadBit()
         val afterMerge = loadBit()
         val beforeSplit = loadBit()
@@ -142,17 +142,17 @@ private object BlockInfoTlbConstructor : TlbConstructor<BlockInfo>(
         val wantMerge = loadBit()
         val keyBlock = loadBit()
         val verSeqnoIncr = loadBit()
-        val flags = loadInt(8).toInt()
-        val seqNo = loadUInt32().toInt()
-        val vertSeqNo = loadUInt32().toInt()
+        val flags = loadUInt(8).toInt()
+        val seqNo = loadUInt().toInt()
+        val vertSeqNo = loadUInt().toInt()
         val shard = loadTlb(ShardIdent)
-        val genUtime = loadUInt32()
-        val startLt = loadUInt64()
-        val endLt = loadUInt64()
-        val genValidatorListHashShort = loadUInt32()
-        val genCatchainSeqno = loadUInt32()
-        val minRefMcSeqno = loadUInt32()
-        val prevKeyBlockSeqno = loadUInt32()
+        val genUtime = loadUInt()
+        val startLt = loadULong()
+        val endLt = loadULong()
+        val genValidatorListHashShort = loadUInt()
+        val genCatchainSeqno = loadUInt()
+        val minRefMcSeqno = loadUInt()
+        val prevKeyBlockSeqno = loadUInt()
         val genSoftware = if (flags and 1 != 0) loadTlb(GlobalVersion) else null
         val masterRef = if (notMaster) loadTlb(blkMasterInfo) else null
         val prevRef = loadTlb(CellRef.tlbCodec(BlkPrevInfo.tlbCodec(afterMerge)))

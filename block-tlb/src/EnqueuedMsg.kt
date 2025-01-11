@@ -37,7 +37,7 @@ private object EnqueuedMsgTlbConstructor : TlbConstructor<EnqueuedMsg>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): EnqueuedMsg = cellSlice {
-        val enqueuedLt = loadUInt64()
+        val enqueuedLt = loadULong()
         val outMsg = loadRef(MsgEnvelope)
         EnqueuedMsg(enqueuedLt, outMsg)
     }

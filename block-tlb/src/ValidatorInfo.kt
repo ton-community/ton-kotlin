@@ -47,8 +47,8 @@ private object ValidatorInfoTlbConstructor : TlbConstructor<ValidatorInfo>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ValidatorInfo = cellSlice {
-        val validatorListHashShort = loadUInt32()
-        val catchainSeqno = loadUInt32()
+        val validatorListHashShort = loadUInt()
+        val catchainSeqno = loadUInt()
         val nxCcUpdated = loadBit()
         ValidatorInfo(validatorListHashShort, catchainSeqno, nxCcUpdated)
     }

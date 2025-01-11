@@ -25,7 +25,7 @@ public sealed interface PublicKey : Encryptor, TlObject<PublicKey> {
 
     public companion object : TlCombinator<PublicKey>(
         PublicKey::class,
-        PublicKeyEd25519::class to PublicKeyEd25519,
+        PublicKeyEd25519::class to PublicKeyEd25519.tlConstructor(),
         PublicKeyUnencrypted::class to PublicKeyUnencrypted,
         PublicKeyAes::class to PublicKeyAes,
         PublicKeyOverlay::class to PublicKeyOverlay,

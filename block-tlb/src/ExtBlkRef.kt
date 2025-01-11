@@ -54,8 +54,8 @@ private object ExtBlkRefTlbConstructor : TlbConstructor<ExtBlkRef>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ExtBlkRef = cellSlice {
-        val endLt = loadUInt64()
-        val seqNo = loadUInt32()
+        val endLt = loadULong()
+        val seqNo = loadUInt()
         val rootHash = loadBits(256)
         val fileHash = loadBits(256)
         ExtBlkRef(endLt, seqNo, rootHash, fileHash)

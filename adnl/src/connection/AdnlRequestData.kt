@@ -5,6 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.io.Source
 import org.ton.api.http.functions.HttpRequest
 import kotlin.coroutines.CoroutineContext
 
@@ -15,7 +16,7 @@ public class AdnlRequestData(
 
 public class AdnlResponseData(
     public val requestTime: Instant,
-    public val body: ByteReadPacket,
+    public val body: Source,
     public val callContext: CoroutineContext
 ) {
     public val responseTime: Instant = Clock.System.now()

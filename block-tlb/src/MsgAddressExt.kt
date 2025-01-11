@@ -3,7 +3,7 @@
 package org.ton.block
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+
 import org.ton.bitstring.BitString
 import org.ton.bitstring.isNullOrEmpty
 import org.ton.tlb.TlbCodec
@@ -14,7 +14,7 @@ public inline fun MsgAddressExt(externalAddress: BitString? = null): MsgAddressE
 
 public inline fun MsgAddressExt(externalAddress: ByteArray): MsgAddressExt = MsgAddressExt.of(externalAddress)
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface MsgAddressExt : MsgAddress {
     public companion object : TlbCodec<MsgAddressExt> by MsgAddressExtTlbCombinator {

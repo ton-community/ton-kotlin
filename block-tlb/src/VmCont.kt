@@ -4,14 +4,13 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface VmCont {
 
@@ -169,7 +168,7 @@ private object VmContPushIntTlbConstructor : TlbConstructor<VmCont.PushInt>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): VmCont.PushInt = cellSlice {
-        val value = loadInt(32).toInt()
+        val value = loadInt(32)
         val next = loadTlb(vmContCodec)
         VmCont.PushInt(value, next)
     }

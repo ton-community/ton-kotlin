@@ -13,10 +13,9 @@ import org.ton.tlb.storeTlb
 import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
-@JvmInline
 @Serializable
 @SerialName("account_active")
-public value class AccountActive(
+public class AccountActive(
     @get:JvmName("value")
     public val value: StateInit
 ) : AccountState {

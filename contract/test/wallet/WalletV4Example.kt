@@ -1,6 +1,6 @@
 package org.ton.contract.wallet
 
-import io.github.andreypfau.kotlinx.crypto.sha2.sha256
+import io.github.andreypfau.kotlinx.crypto.sha256
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519

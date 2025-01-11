@@ -41,7 +41,7 @@ private object ProcessedUptoTlbConstructor : TlbConstructor<ProcessedUpto>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ProcessedUpto = cellSlice {
-        val lastMsgLt = loadUInt64()
+        val lastMsgLt = loadULong()
         val lastMsgHash = loadBits(256)
         ProcessedUpto(lastMsgLt, lastMsgHash)
     }

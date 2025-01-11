@@ -4,7 +4,6 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -16,7 +15,7 @@ public inline fun VmTupleRef(): VmTupleRef = VmTupleRef.of()
 public inline fun VmTupleRef(entry: VmStackValue): VmTupleRef = VmTupleRef.of(entry)
 public inline fun VmTupleRef(ref: VmTuple): VmTupleRef = VmTupleRef.of(ref)
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface VmTupleRef {
     public fun depth(): Int

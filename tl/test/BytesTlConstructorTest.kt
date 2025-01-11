@@ -1,6 +1,8 @@
 package org.ton.tl
 
-import io.ktor.utils.io.core.*
+import io.ktor.utils.io.core.remaining
+import kotlinx.io.Buffer
+import kotlinx.io.readByteArray
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -31,24 +33,33 @@ class BytesTlConstructorTest {
     fun assertBytes(data: String, expected: String) {
         val serializedBytes = data.replace(" ", "").hexToByteArray()
         val expectedBytes = expected.replace(" ", "").hexToByteArray()
-        val reader = ByteReadPacket(serializedBytes)
+        val reader = Buffer().apply {
+            write(serializedBytes)
+        }
         val actualReadBytes = TlReader(reader).readBytes()
         assertContentEquals(expectedBytes, actualReadBytes)
-        assertTrue(reader.isEmpty)
-        val actualWriteBytes = buildPacket {
-            TlWriter(this).writeBytes(expectedBytes)
-        }.readBytes()
+        assertTrue(reader.size == 0L)
+
+        val actualWriteBytes = Buffer().let {
+            TlWriter(it).writeBytes(expectedBytes)
+            it.readByteArray()
+        }
         assertTrue(actualWriteBytes.size % 4 == 0)
         assertContentEquals(serializedBytes, actualWriteBytes)
     }
 
     fun assertEncoding(data: ByteArray) {
-        val serializedBytes = buildPacket {
+        val serializedBytes = Buffer().run {
             TlWriter(this).writeBytes(data)
+            readByteArray()
         }
-        assertTrue(serializedBytes.remaining % 4 == 0L)
-        val deserializedBytes = TlReader(serializedBytes).readBytes()
-        assertTrue(serializedBytes.isEmpty)
+        assertTrue(serializedBytes.size % 4 == 0)
+        val buffer = Buffer().apply {
+            write(serializedBytes)
+        }
+        val deserializedBytes = TlReader(buffer).readBytes()
+        assertTrue(buffer.size == 0L)
         assertContentEquals(data, deserializedBytes)
     }
+
 }

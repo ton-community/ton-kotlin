@@ -3,7 +3,6 @@
 package org.ton.hashmap
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -12,7 +11,6 @@ import kotlin.jvm.JvmStatic
 public inline fun Unary(depth: Int): Unary = Unary.of(depth)
 
 @Serializable
-@JsonClassDiscriminator("@type")
 public sealed class Unary : TlbObject {
     public companion object : TlbNegatedCodec<Unary> by UnaryTlbCombinator {
         @JvmStatic

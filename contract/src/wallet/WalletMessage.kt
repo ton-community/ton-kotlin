@@ -46,7 +46,7 @@ private class WalletMessageTlbConstructor<X : Any>(
     val messageRelaxedX = MessageRelaxed.tlbCodec(x)
 
     override fun loadTlb(cellSlice: CellSlice): WalletMessage<X> {
-        val mode = cellSlice.loadInt(8).toInt()
+        val mode = cellSlice.loadUInt(8).toInt()
         val msg = cellSlice.loadRef(messageRelaxedX)
         return WalletMessageImpl(mode, msg)
     }

@@ -63,6 +63,7 @@ public class TlReader(
 
 public inline operator fun <R> TlReader.invoke(block: TlReader.() -> R): R = block()
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <T> TlReader.read(codec: TlCodec<T>): T = codec.decode(this)
 
 public inline fun <E> TlReader.readNullable(flag: Int, index: Int, block: TlReader.() -> E): E? =

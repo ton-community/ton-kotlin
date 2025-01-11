@@ -48,10 +48,10 @@ private object CounterTlbConstructor : TlbConstructor<Counters>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): Counters = cellSlice {
-        val lastUpdated = loadUInt32()
-        val total = loadUInt64()
-        val cnt2048 = loadUInt64()
-        val cnt65535 = loadUInt64()
+        val lastUpdated = loadUInt()
+        val total = loadULong()
+        val cnt2048 = loadULong()
+        val cnt65535 = loadULong()
         Counters(lastUpdated, total, cnt2048, cnt65535)
     }
 }

@@ -4,7 +4,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
@@ -15,7 +15,7 @@ import kotlin.jvm.JvmStatic
 public inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = VmStackList.of(*stackValues)
 public inline fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface VmStackList : Iterable<VmStackValue> {
     @SerialName("vm_stk_cons")

@@ -40,7 +40,7 @@ private object KeyMaxLtTlbConstructor : TlbConstructor<KeyMaxLt>(
         cellSlice: CellSlice
     ): KeyMaxLt = cellSlice {
         val key = loadBit()
-        val maxEndLt = loadUInt64()
+        val maxEndLt = loadULong()
         KeyMaxLt(key, maxEndLt)
     }
 }

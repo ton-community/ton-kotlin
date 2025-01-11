@@ -1,8 +1,7 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import org.ton.bigint.*
+import org.ton.bigint.BigInt
+import org.ton.bigint.toBigInt
 import org.ton.block.VmStackNan.VmStackNanException
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -10,10 +9,7 @@ import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@SerialName("vm_stk_int")
-@Serializable
 public data class VmStackInt(
-    @Serializable(BigIntSerializer::class)
     val value: BigInt
 ) : VmStackValue, VmStackNumber {
     public constructor(int: Int) : this(int.toBigInt())
@@ -22,7 +18,7 @@ public data class VmStackInt(
     override fun toInt(): Int = value.toInt()
     override fun toLong(): Long = value.toLong()
     override fun toBigInt(): BigInt = value
-    override fun toBoolean(): Boolean = value != 0.toBigInt()
+    override fun toBoolean(): Boolean = value != BigInt.ZERO
 
     override fun plus(other: VmStackNumber): VmStackNumber = when (other) {
         is VmStackInt -> VmStackInt(value + other.value)
@@ -66,7 +62,7 @@ private object VmStackIntTlbConstructor : TlbConstructor<VmStackInt>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): VmStackInt = cellSlice {
-        val value = loadInt(257)
+        val value = loadBigInt(257)
         VmStackInt(value)
     }
 }

@@ -41,7 +41,7 @@ private object MsgExportDeqTlbConstructor : TlbConstructor<MsgExportDeq>(
         cellSlice: CellSlice
     ): MsgExportDeq = cellSlice {
         val outMsg = loadRef(MsgEnvelope)
-        val importBlockLt = loadUInt(63).toLong().toULong()
+        val importBlockLt = loadULong(63)
         MsgExportDeq(outMsg, importBlockLt)
     }
 }

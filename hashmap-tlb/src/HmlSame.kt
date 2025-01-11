@@ -18,6 +18,10 @@ public data class HmlSame(
 ) : HmLabel {
     public constructor(v: Int, n: Int) : this(v != 0, n)
 
+    init {
+        require(n >= 0) { "n must be non-negative" }
+    }
+
     override fun toBitString(): BitString = BitString(*BooleanArray(n) { v })
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("hml_same") {
@@ -68,8 +72,9 @@ private class HashMapLabelSameTlbConstructor(
         cellSlice: CellSlice
     ): TlbNegatedResult<HmlSame> {
         val v = cellSlice.loadBit()
-        val n = cellSlice.loadUIntLeq(m).toInt()
-        return TlbNegatedResult(n, HmlSame(v, n))
+        val n = cellSlice.loadUIntLeq(m)
+        val nn = n.toInt()
+        return TlbNegatedResult(nn, HmlSame(v, nn))
     }
 
     companion object {

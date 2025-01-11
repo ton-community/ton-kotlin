@@ -1,21 +1,12 @@
 plugins {
-    id("multiplatform")
-    id("publish")
+    id("buildsrc.convention.multiplatform")
 }
 
-kotlin {
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(libs.ktor.utils)
-                api(libs.sha2)
-                api(libs.aes)
-                api(libs.crc32)
-                api(libs.pbkdf2)
-                api(libs.hmac)
-                implementation(libs.curve25519)
-                implementation(libs.serialization.core)
-            }
-        }
-    }
+dependencies {
+    commonMainApi(libs.sha2)
+    commonMainApi(libs.aes)
+    commonMainApi(libs.crc32)
+    commonMainApi(libs.pbkdf2)
+    commonMainApi(libs.hmac)
+    commonMainImplementation(libs.curve25519)
 }

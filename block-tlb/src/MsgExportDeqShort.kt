@@ -51,9 +51,9 @@ private object MsgExportDeqShortTlbConstructor : TlbConstructor<MsgExportDeqShor
         cellSlice: CellSlice
     ): MsgExportDeqShort = cellSlice {
         val msgEnvHash = loadBits(256)
-        val nextWorkchain = loadTinyInt(32).toInt()
-        val nextAddrPfx = loadUInt64()
-        val importBlockLt = loadUInt64()
+        val nextWorkchain = loadInt(32)
+        val nextAddrPfx = loadULong()
+        val importBlockLt = loadULong()
         MsgExportDeqShort(msgEnvHash, nextWorkchain, nextAddrPfx, importBlockLt)
     }
 }

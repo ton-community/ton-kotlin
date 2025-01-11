@@ -1,10 +1,8 @@
 package org.ton.block
 
+import org.ton.bigint.BigInt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.BigInt
-import org.ton.bigint.pow
-import org.ton.bigint.times
 import org.ton.bigint.toBigInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -40,8 +38,8 @@ public data class Coins(
     public operator fun times(other: Coins): Coins = Coins(amount * other.amount)
     public operator fun div(other: Coins): Coins = Coins(amount / other.amount)
     public operator fun rem(other: Coins): Coins = Coins(amount % other.amount)
-    public operator fun inc(): Coins = Coins(amount + VarUInteger(1, 1.toBigInt()))
-    public operator fun dec(): Coins = Coins(amount - VarUInteger(1, 1.toBigInt()))
+    public operator fun inc(): Coins = Coins(amount + VarUInteger(1, BigInt.ONE))
+    public operator fun dec(): Coins = Coins(amount - VarUInteger(1, BigInt.ONE))
 
     public companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
         private const val DECIMALS = 9

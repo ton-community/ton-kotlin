@@ -68,8 +68,8 @@ private class MerkleUpdateTlbConstructor<X>(
     ): MerkleUpdate<X> = cellSlice {
         val oldHash = loadBits(256)
         val newHash = loadBits(256)
-        val oldDepth = loadUInt16()
-        val newDepth = loadUInt16()
+        val oldDepth = loadUInt(16).toUShort()
+        val newDepth = loadUInt(16).toUShort()
         val old = loadTlb(xCellRef)
         val new = loadTlb(xCellRef)
         MerkleUpdate(oldHash, newHash, oldDepth, newDepth, old, new)

@@ -44,7 +44,7 @@ private object MsgDiscardFinTlbConstructor : TlbConstructor<MsgDiscardFin>(
         cellSlice: CellSlice
     ): MsgDiscardFin = cellSlice {
         val inMsg = loadRef(MsgEnvelope)
-        val transactionId = loadUInt64()
+        val transactionId = loadULong()
         val fwdFee = loadTlb(Coins)
         MsgDiscardFin(inMsg, transactionId, fwdFee)
     }

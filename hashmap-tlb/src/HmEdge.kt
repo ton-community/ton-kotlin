@@ -3,6 +3,7 @@ package org.ton.hashmap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
@@ -117,20 +118,20 @@ private class HmEdgeIterator<T>(
                         null
                     } else {
                         rightVisited = true
-                        val newPrefix = CellBuilder().apply {
-                            storeBits(prefix)
-                            storeBit(true)
-                            storeBits(node.right.value.label.toBitString())
-                        }.bits.toBitString()
+                        val rightLabel = node.right.value.label.toBitString()
+                        val newPrefix = ByteBackedMutableBitString.of(prefix.size + 1 + rightLabel.size)
+                        newPrefix.setBitsAt(0, prefix)
+                        newPrefix[prefix.size] = true
+                        newPrefix.setBitsAt(prefix.size + 1, rightLabel)
                         newPrefix to node.right.value.node
                     }
                 } else {
                     leftVisited = true
-                    val newPrefix = CellBuilder().apply {
-                        storeBits(prefix)
-                        storeBit(false)
-                        storeBits(node.left.value.label.toBitString())
-                    }.bits.toBitString()
+                    val leftLabel = node.left.value.label.toBitString()
+                    val newPrefix = ByteBackedMutableBitString.of(prefix.size + 1 + leftLabel.size)
+                    newPrefix.setBitsAt(0, prefix)
+                    newPrefix[prefix.size] = false
+                    newPrefix.setBitsAt(prefix.size + 1, leftLabel)
                     newPrefix to node.left.value.node
                 }
             }

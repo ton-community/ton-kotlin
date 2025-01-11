@@ -4,7 +4,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -15,7 +15,7 @@ import kotlin.jvm.JvmStatic
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <X, Y> Pair<X?, Y?>.toEither(): Either<X, Y> = Either.of(first, second)
 
-@JsonClassDiscriminator("@type")
+
 @Serializable
 public sealed interface Either<X, Y> : TlbObject {
     public val x: X?

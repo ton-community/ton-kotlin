@@ -37,10 +37,10 @@ class StateInitTest {
         assertEquals(SIMPLE_WALLET_R3_CODE.bits, stateInitCell.refs[0].bits)
 
         stateInitCell.refs[1].parse {
-            assertEquals(0.toBigInt(), loadUInt(32))
+            assertEquals(0.toBigInt(), loadUBigInt(32))
             assertEquals(BitString(publicKey), loadBits(256))
         }
 
-        assertEquals(hash, stateInitCell.hash().toHex().lowercase())
+        assertEquals(hash, stateInitCell.hash().toHexString().lowercase())
     }
 }

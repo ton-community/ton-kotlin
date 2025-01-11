@@ -57,7 +57,7 @@ private object StorageInfoTlbConstructor : TlbConstructor<StorageInfo>(
         cellSlice: CellSlice
     ): StorageInfo = cellSlice {
         val used = loadTlb(StorageUsed)
-        val lastPaid = loadUInt32()
+        val lastPaid = loadUInt()
         val duePayment = loadTlb(maybeCoins)
         StorageInfo(used, lastPaid, duePayment)
     }

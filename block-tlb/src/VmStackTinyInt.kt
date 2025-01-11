@@ -1,8 +1,9 @@
 package org.ton.block
 
+import org.ton.bigint.BigInt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bigint.*
+import org.ton.bigint.toBigInt
 import org.ton.block.VmStackNan.VmStackNanException
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -105,7 +106,7 @@ private object VmStackTinyIntTlbConstructor : TlbConstructor<VmStackTinyInt>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): VmStackTinyInt = cellSlice {
-        val value = loadInt(64).toLong()
+        val value = loadLong()
         VmStackTinyInt(value)
     }
 }

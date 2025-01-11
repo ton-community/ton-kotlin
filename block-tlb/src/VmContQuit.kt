@@ -29,7 +29,7 @@ private object VmContQuitTlbConstructor : TlbConstructor<VmContQuit>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): VmContQuit = cellSlice {
-        val exitCode = loadInt(32).toInt()
+        val exitCode = loadInt()
         VmContQuit(exitCode)
     }
 }

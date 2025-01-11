@@ -37,8 +37,8 @@ private object CertificateTlbConstructor : TlbConstructor<Certificate>(
         cellSlice: CellSlice
     ): Certificate = cellSlice {
         val tempKey = loadTlb(SigPubKey)
-        val validSince = loadUInt32()
-        val validUntil = loadUInt32()
+        val validSince = loadUInt()
+        val validUntil = loadUInt()
         Certificate(tempKey, validSince, validUntil)
     }
 }

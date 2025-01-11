@@ -96,7 +96,7 @@ public data class AddrStd(
                     Base64.encode(data)
                 }
             } else {
-                "${address.workchainId}:${address.address.toHex()}"
+                "${address.workchainId}:${address.address.toHexString()}"
             }
         }
 
@@ -185,7 +185,7 @@ private object AddrStdTlbConstructor : TlbConstructor<AddrStd>(
         cellSlice: CellSlice
     ): AddrStd = cellSlice {
         val anycast = loadTlb(MaybeAnycast)
-        val workchainId = loadInt(8).toInt()
+        val workchainId = loadInt(8)
         val address = loadBits(256)
         AddrStd(anycast, workchainId, address)
     }

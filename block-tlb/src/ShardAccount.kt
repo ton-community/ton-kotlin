@@ -44,7 +44,7 @@ private object ShardAccountTlbConstructor : TlbConstructor<ShardAccount>(
     ): ShardAccount = cellSlice {
         val account = loadRef(Account)
         val lastTransHash = loadBits(256)
-        val lastTransLt = loadUInt64()
+        val lastTransLt = loadULong()
         ShardAccount(account, lastTransHash, lastTransLt)
     }
 }

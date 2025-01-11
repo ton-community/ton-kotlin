@@ -50,8 +50,8 @@ private object ExtOutMsgInfoTlbConstructor : TlbConstructor<ExtOutMsgInfo>(
     ): ExtOutMsgInfo = cellSlice {
         val src = loadTlb(MsgAddressInt)
         val dest = loadTlb(MsgAddressExt)
-        val createdLt = loadUInt64()
-        val createdAt = loadUInt32()
+        val createdLt = loadULong()
+        val createdAt = loadUInt()
         ExtOutMsgInfo(src, dest, createdLt, createdAt)
     }
 }
