@@ -5,8 +5,8 @@ import platform.windows.BCRYPT_USE_SYSTEM_PREFERRED_RNG
 import platform.windows.BCryptGenRandom
 
 @OptIn(ExperimentalForeignApi::class)
-public actual fun secureRandom(bytes: ByteArray, fromIndex: Int, toIndex: Int) {
-    bytes.usePinned {
+public actual fun secureRandom(array: ByteArray, fromIndex: Int, toIndex: Int) {
+    array.usePinned {
         val result = BCryptGenRandom(
             null,
             it.addressOf(fromIndex).reinterpret(),

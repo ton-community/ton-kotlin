@@ -1,6 +1,7 @@
 package org.ton.block
 
 import org.ton.bitstring.BitString
+import org.ton.block.message.address.AddrStd
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

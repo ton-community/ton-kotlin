@@ -37,9 +37,9 @@ public object CellStringTlbConstructor : TlbConstructor<ByteString>(
             "String is too long"
         }
         if (head / 8 == value.size) {
-            cellBuilder.storeBytes(value.toByteArray())
+            cellBuilder.storeByteArray(value.toByteArray())
         } else {
-            cellBuilder.storeBytes(value.substring(0, head / 8).toByteArray())
+            cellBuilder.storeByteArray(value.substring(0, head / 8).toByteArray())
             cellBuilder.storeRef {
                 storeTlb(this, value.substring(head / 8, value.size))
             }

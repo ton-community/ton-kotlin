@@ -1,5 +1,6 @@
 package org.ton.bitstring
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
 import kotlin.experimental.and
 import kotlin.experimental.inv
@@ -36,6 +37,10 @@ public open class ByteBackedMutableBitString(
     }
 
     override fun setBitsAt(index: Int, value: ByteArray, bits: Int) {
+        return setBitsAt(index, ByteString(*value), bits)
+    }
+
+    override fun setBitsAt(index: Int, value: ByteString, bits: Int) {
         if (bits == 0) return
         val q = index / 8
         val r = index % 8

@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
-import org.ton.block.Account
-import org.ton.block.MsgAddressInt
-import org.ton.block.Transaction
+import org.ton.block.message.address.AddrInt
+import org.ton.block.org.ton.account.Account
+import org.ton.block.transaction.Transaction
 import org.ton.tlb.CellRef
 import kotlin.jvm.JvmName
 
@@ -17,21 +17,14 @@ internal data class BlockHeaderResult(
     val stateHash: BitString?
 )
 
-@Serializable
 public data class FullAccountState(
-    @SerialName("block_id")
-    @get:JvmName("blockId")
     public val blockId: TonNodeBlockIdExt,
 
-    @get:JvmName("address")
-    public val address: MsgAddressInt,
+    public val address: AddrInt,
 
-    @SerialName("last_transaction_id")
-    @get:JvmName("lastTransactionId")
     public val lastTransactionId: TransactionId?,
 
-    @get:JvmName("account")
-    public val account: CellRef<Account>
+    public val account: CellRef<Account?>
 )
 
 @Serializable

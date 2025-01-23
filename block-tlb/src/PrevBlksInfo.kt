@@ -1,19 +1,15 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import org.ton.block.block.BlockRef
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
-@SerialName("prev_blks_info")
 public data class PrevBlksInfo(
-    val prev1: CellRef<ExtBlkRef>, // prev1 : ^ExtBlkRef
-    val prev2: CellRef<ExtBlkRef> // prev2 : ^ExtBlkRef
+    val prev1: CellRef<BlockRef>, // prev1 : ^ExtBlkRef
+    val prev2: CellRef<BlockRef> // prev2 : ^ExtBlkRef
 ) : BlkPrevInfo {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("prev_blks_info") {
         field("prev1", prev1)
@@ -28,7 +24,7 @@ public data class PrevBlksInfo(
 private object PrevBlksInfoTlbConstructor : TlbConstructor<PrevBlksInfo>(
     schema = "prev_blks_info\$_ prev1:^ExtBlkRef prev2:^ExtBlkRef = BlkPrevInfo 1;"
 ) {
-    private val cellRef = CellRef.tlbCodec(ExtBlkRef)
+    private val cellRef = CellRef.tlbCodec(BlockRef.Tlb)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,

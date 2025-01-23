@@ -2,6 +2,12 @@ package org.ton.contract.wallet
 
 import org.ton.api.pub.PublicKey
 import org.ton.block.*
+import org.ton.block.account.StateInit
+import org.ton.block.currency.Coins
+import org.ton.block.currency.CurrencyCollection
+import org.ton.block.currency.ExtraCurrencyCollection
+import org.ton.block.message.address.AddrInt
+import org.ton.block.message.address.MsgAddress
 import org.ton.cell.Cell
 import org.ton.tlb.CellRef
 import kotlin.contracts.InvocationKind
@@ -17,7 +23,7 @@ public data class WalletTransfer internal constructor(
 )
 
 public class WalletTransferBuilder {
-    public lateinit var destination: MsgAddressInt
+    public lateinit var destination: AddrInt
     public var bounceable: Boolean = true
     public var currencyCollection: CurrencyCollection = CurrencyCollection(Coins(), ExtraCurrencyCollection())
     public var coins: Coins

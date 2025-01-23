@@ -2,6 +2,7 @@ package org.ton.block
 
 import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
+import org.ton.block.account.StateInit
 import org.ton.boc.BagOfCells
 import org.ton.cell.CellBuilder
 import org.ton.hashmap.HmeEmpty
@@ -12,7 +13,7 @@ import kotlin.test.assertEquals
 class StateInitTest {
     private val SIMPLE_WALLET_R3_CODE =
         BagOfCells("b5ee9c7241010101005f0000baff0020dd2082014c97ba218201339cbab19c71b0ed44d0d31fd70bffe304e0a4f260810200d71820d70b1fed44d0d31fd3ffd15112baf2a122f901541044f910f2a2f80001d31f3120d74a96d307d402fb00ded1a4c8cb1fcbffc9ed54b5b86e42".hexToByteArray()).roots.first()
-    private val stateInitCodec by lazy { StateInit.tlbCodec() }
+    private val stateInitCodec by lazy { StateInit.Tlb }
 
     @Test
     fun `serialization of an example wallet StateInit`() {

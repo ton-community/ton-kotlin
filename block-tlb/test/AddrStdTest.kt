@@ -1,5 +1,6 @@
 package org.ton.block
 
+import org.ton.block.message.address.AddrStd
 import kotlin.test.Test
 
 class AddrStdTest {

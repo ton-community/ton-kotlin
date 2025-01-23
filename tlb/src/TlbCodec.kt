@@ -52,12 +52,29 @@ public inline fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
 }
 
+public fun <T> CellSlice.loadNullableTlb(codec: TlbLoader<T>): T? {
+    return if (loadBit()) {
+        codec.loadTlb(this)
+    } else {
+        null
+    }
+}
+
 public inline fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): TlbNegatedResult<T> {
     return codec.loadNegatedTlb(this)
 }
 
 public inline fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T): CellBuilder = apply {
     codec.storeTlb(this, value)
+}
+
+public fun <T> CellBuilder.storeNullableTlb(codec: TlbCodec<T>, value: T?) = apply {
+    if (value == null) {
+        storeBit(false)
+    } else {
+        storeBit(true)
+        storeTlb(codec, value as T)
+    }
 }
 
 public inline fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T): Int =

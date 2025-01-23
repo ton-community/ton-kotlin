@@ -3,10 +3,10 @@ package org.ton.block
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
+import org.ton.block.currency.CurrencyCollection
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -21,8 +21,6 @@ private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>(
     ShardDescrNew::class to ShardDescrNew,
 )
 
-@Serializable
-@SerialName("shard_descr_old")
 public data class ShardDescrOld(
     @SerialName("seq_no") val seqNo: UInt,
     @SerialName("reg_mc_seqno") val regMcSeqno: UInt,
@@ -78,7 +76,6 @@ public data class ShardDescrOld(
     public companion object : TlbConstructorProvider<ShardDescrOld> by ShardDescrOldTlbConstructor
 }
 
-@Serializable
 public data class ShardDescrAux(
     @SerialName("fees_collected") val feesCollected: CurrencyCollection,
     @SerialName("funds_created") val fundsCreated: CurrencyCollection
@@ -95,7 +92,6 @@ public data class ShardDescrAux(
     public companion object : TlbConstructorProvider<ShardDescrAux> by ShardDescrAuxTlbConstructor
 }
 
-@Serializable
 public data class ShardDescrNew(
     @SerialName("seq_no") val seqNo: UInt,
     @SerialName("reg_mc_seqno") val regMcSeqno: UInt,
@@ -180,8 +176,8 @@ private object ShardDescrOldTlbConstructor : TlbConstructor<ShardDescrOld>(
         val minRefMcSeqno = cellSlice.loadUInt()
         val genUtime = cellSlice.loadUInt()
         val splitMergeAt = cellSlice.loadTlb(FutureSplitMerge)
-        val feesCollected = cellSlice.loadTlb(CurrencyCollection)
-        val fundsCreated = cellSlice.loadTlb(CurrencyCollection)
+        val feesCollected = cellSlice.loadTlb(CurrencyCollection.Tlb)
+        val fundsCreated = cellSlice.loadTlb(CurrencyCollection.Tlb)
         return ShardDescrOld(
             seqNo = seqNo,
             regMcSeqno = regMcSeqno,
@@ -223,8 +219,8 @@ private object ShardDescrOldTlbConstructor : TlbConstructor<ShardDescrOld>(
         cellBuilder.storeUInt32(value.minRefMcSeqno)
         cellBuilder.storeUInt32(value.genUtime)
         cellBuilder.storeTlb(FutureSplitMerge, value.splitMergeAt)
-        cellBuilder.storeTlb(CurrencyCollection, value.feesCollected)
-        cellBuilder.storeTlb(CurrencyCollection, value.fundsCreated)
+        cellBuilder.storeTlb(CurrencyCollection.Tlb, value.feesCollected)
+        cellBuilder.storeTlb(CurrencyCollection.Tlb, value.fundsCreated)
     }
 }
 
@@ -233,14 +229,14 @@ private object ShardDescrAuxTlbConstructor : TlbConstructor<ShardDescrAux>(
     schema = ""
 ) {
     override fun loadTlb(cellSlice: CellSlice): ShardDescrAux {
-        val feesCollected = cellSlice.loadTlb(CurrencyCollection)
-        val fundsCreated = cellSlice.loadTlb(CurrencyCollection)
+        val feesCollected = cellSlice.loadTlb(CurrencyCollection.Tlb)
+        val fundsCreated = cellSlice.loadTlb(CurrencyCollection.Tlb)
         return ShardDescrAux(feesCollected, fundsCreated)
     }
 
     override fun storeTlb(cellBuilder: CellBuilder, value: ShardDescrAux) {
-        cellBuilder.storeTlb(CurrencyCollection, value.feesCollected)
-        cellBuilder.storeTlb(CurrencyCollection, value.fundsCreated)
+        cellBuilder.storeTlb(CurrencyCollection.Tlb, value.feesCollected)
+        cellBuilder.storeTlb(CurrencyCollection.Tlb, value.fundsCreated)
     }
 }
 

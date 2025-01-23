@@ -2,6 +2,7 @@
 
 package org.ton.cell
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.bigint.toULong
@@ -38,28 +39,37 @@ public interface CellSlice {
     public fun loadBit(): Boolean
     public fun preloadBit(): Boolean
 
-    public fun skipBits(length: Int): CellSlice
+    public fun skipBits(bitLength: Int): CellSlice
 
-    public fun loadBits(length: Int): BitString
-    public fun preloadBits(length: Int): BitString
+    public fun loadBits(bitLength: Int): BitString
+    public fun preloadBits(bitLength: Int): BitString
 
-    public fun loadBigInt(length: Int): BigInt
-    public fun preloadBigInt(length: Int): BigInt
+    public fun loadByteArray(bitLength: Int): ByteArray
+    public fun preloadByteArray(bitLength: Int): ByteArray
 
-    public fun loadInt(bits: Int = Int.SIZE_BITS): Int = loadLong(bits).toInt()
-    public fun preloadInt(bits: Int = Int.SIZE_BITS): Int = preloadLong(bits).toInt()
+    public fun loadByteString(bitLength: Int): ByteString = ByteString(* loadByteArray(bitLength))
+    public fun preloadByteString(bitLength: Int): ByteString = ByteString(*preloadByteArray(bitLength))
 
-    public fun loadLong(bits: Int = Long.SIZE_BITS): Long = loadBigInt(bits).toLong()
-    public fun preloadLong(bits: Int = Long.SIZE_BITS): Long = preloadBigInt(bits).toLong()
+    public fun loadBigInt(bitLength: Int): BigInt
+    public fun preloadBigInt(bitLength: Int): BigInt
 
-    public fun loadUBigInt(length: Int): BigInt
-    public fun preloadUBigInt(length: Int): BigInt
+    public fun loadInt(bitLength: Int = Int.SIZE_BITS): Int = loadLong(bitLength).toInt()
+    public fun preloadInt(bitLength: Int = Int.SIZE_BITS): Int = preloadLong(bitLength).toInt()
 
-    public fun loadUInt(bits: Int = UInt.SIZE_BITS): UInt = loadULong(bits).toUInt()
-    public fun preloadUInt(bits: Int = UInt.SIZE_BITS): UInt = preloadULong(bits).toUInt()
+    public fun loadLong(bitLength: Int = Long.SIZE_BITS): Long = loadBigInt(bitLength).toLong()
+    public fun preloadLong(bitLength: Int = Long.SIZE_BITS): Long = preloadBigInt(bitLength).toLong()
 
-    public fun loadULong(bits: Int = ULong.SIZE_BITS): ULong = loadUBigInt(bits).toULong()
-    public fun preloadULong(bits: Int = ULong.SIZE_BITS): ULong = preloadUBigInt(bits).toULong()
+    public fun loadUBigInt(bitLength: Int): BigInt
+    public fun preloadUBigInt(bitLength: Int): BigInt
+
+    public fun loadVarUInt(maxByteLength: Int): BigInt
+    public fun preloadVarUInt(maxByteLength: Int): BigInt
+
+    public fun loadUInt(bitLength: Int = UInt.SIZE_BITS): UInt = loadULong(bitLength).toUInt()
+    public fun preloadUInt(bitLength: Int = UInt.SIZE_BITS): UInt = preloadULong(bitLength).toUInt()
+
+    public fun loadULong(bitLength: Int = ULong.SIZE_BITS): ULong = loadUBigInt(bitLength).toULong()
+    public fun preloadULong(bitLength: Int = ULong.SIZE_BITS): ULong = preloadUBigInt(bitLength).toULong()
 
     public fun loadUIntLeq(max: Int): UInt {
         val i = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
@@ -137,43 +147,54 @@ private open class CellSliceImpl(
         throw CellUnderflowException(e)
     }
 
-    override fun skipBits(length: Int): CellSlice = apply {
-        bitsPosition += length
+    override fun skipBits(bitLength: Int): CellSlice = apply {
+        bitsPosition += bitLength
     }
 
-    override fun loadBits(length: Int): BitString {
-        val bitString = preloadBits(length)
-        bitsPosition += length
+    override fun loadBits(bitLength: Int): BitString {
+        val bitString = preloadBits(bitLength)
+        bitsPosition += bitLength
         return bitString
     }
 
-    override fun preloadBits(length: Int): BitString {
-        checkBitsOverflow(length)
-        return bits.slice(bitsPosition..length)
+    override fun preloadBits(bitLength: Int): BitString {
+        checkBitsOverflow(bitLength)
+        return bits.slice(bitsPosition..bitLength)
     }
 
-    override fun loadBigInt(length: Int): BigInt {
-        val int = preloadBigInt(length)
-        bitsPosition += length
+    override fun loadByteArray(bitLength: Int): ByteArray {
+        val array = preloadByteArray(bitLength)
+        bitsPosition += bitLength
+        return array
+    }
+
+    override fun preloadByteArray(bitLength: Int): ByteArray {
+        val bitString = preloadBits(bitLength)
+        return bitString.toByteArray()
+    }
+
+    override fun loadBigInt(bitLength: Int): BigInt {
+        val int = preloadBigInt(bitLength)
+        bitsPosition += bitLength
         return int
     }
 
-    override fun preloadBigInt(length: Int): BigInt {
-        val uint = preloadUBigInt(length)
-        val int = BigInt.ONE shl (length - 1)
+    override fun preloadBigInt(bitLength: Int): BigInt {
+        val uint = preloadUBigInt(bitLength)
+        val int = BigInt.ONE shl (bitLength - 1)
         return if (uint >= int) uint - (int * BigInt.TWO) else uint
     }
 
-    override fun loadUBigInt(length: Int): BigInt {
-        val uint = preloadUBigInt(length)
-        bitsPosition += length
+    override fun loadUBigInt(bitLength: Int): BigInt {
+        val uint = preloadUBigInt(bitLength)
+        bitsPosition += bitLength
         return uint
     }
 
-    override fun preloadUBigInt(length: Int): BigInt {
-        if (length == 0) return BigInt.ZERO
-        val bits = preloadBits(length)
-        val intBits = buildString(length) {
+    override fun preloadUBigInt(bitLength: Int): BigInt {
+        if (bitLength == 0) return BigInt.ZERO
+        val bits = preloadBits(bitLength)
+        val intBits = buildString(bitLength) {
             bits.forEach { bit ->
                 if (bit) {
                     append('1')
@@ -183,6 +204,18 @@ private open class CellSliceImpl(
             }
         }
         return BigInt(intBits, 2)
+    }
+
+    override fun loadVarUInt(maxByteLength: Int): BigInt {
+        val bits = loadUIntLes(maxByteLength).toInt() * Byte.SIZE_BITS
+        return loadUBigInt(bits)
+    }
+
+    override fun preloadVarUInt(maxByteLength: Int): BigInt {
+        val tmp = bitsPosition
+        val value = loadVarUInt(maxByteLength)
+        bitsPosition = tmp
+        return value
     }
 
     fun checkBitsOverflow(length: Int) {
@@ -254,9 +287,14 @@ private class CellSliceByteBackedBitString(
         return value shr (64 - length)
     }
 
-    override fun preloadBits(length: Int): BitString {
-        val bytes = length / 8
-        val remainder = length % 8
+    override fun preloadBits(bitLength: Int): BitString {
+        val array = preloadByteArray(bitLength)
+        return BitString(array, bitLength)
+    }
+
+    override fun preloadByteArray(bitLength: Int): ByteArray {
+        val bytes = bitLength / 8
+        val remainder = bitLength % 8
         val arraySize = bytes + if (remainder != 0) 1 else 0
         val array = ByteArray(arraySize)
         if (bitsPosition % 8 == 0) {
@@ -271,20 +309,20 @@ private class CellSliceByteBackedBitString(
             val v = getBits(bytes * 8, remainder).toInt() shl (8 - remainder)
             array[array.lastIndex] = v.toByte()
         }
-        return BitString(array, length)
+        return array
     }
 
-    override fun preloadUBigInt(length: Int): BigInt {
+    override fun preloadUBigInt(bitLength: Int): BigInt {
         return when {
-            length == 0 -> BigInt.ZERO
-            length > 64 -> super.preloadUBigInt(length)
-            length == 8 -> {
+            bitLength == 0 -> BigInt.ZERO
+            bitLength > 64 -> super.preloadUBigInt(bitLength)
+            bitLength == 8 -> {
                 val byte = getByte(0).toInt() and 0xFF
                 byte.toBigInt()
             }
 
             else -> {
-                val value = getULong(length)
+                val value = getULong(bitLength)
                 if (value > Long.MAX_VALUE.toULong()) {
                     BigInt(value.toString(), 10)
                 } else {
@@ -294,13 +332,13 @@ private class CellSliceByteBackedBitString(
         }
     }
 
-    override fun preloadBigInt(length: Int): BigInt {
+    override fun preloadBigInt(bitLength: Int): BigInt {
         return when {
-            length == 0 -> BigInt.ZERO
-            length > 64 -> super.preloadBigInt(length)
+            bitLength == 0 -> BigInt.ZERO
+            bitLength > 64 -> super.preloadBigInt(bitLength)
             else -> {
-                val uint = getULong(length).toLong()
-                val int = 1L shl (length - 1)
+                val uint = getULong(bitLength).toLong()
+                val int = 1L shl (bitLength - 1)
                 if (uint >= int) {
                     (uint - (int * 2)).toBigInt()
                 } else {
@@ -310,25 +348,25 @@ private class CellSliceByteBackedBitString(
         }
     }
 
-    override fun loadLong(bits: Int): Long {
-        val value = preloadLong(bits)
-        bitsPosition += bits
+    override fun loadLong(bitLength: Int): Long {
+        val value = preloadLong(bitLength)
+        bitsPosition += bitLength
         return value
     }
 
-    override fun loadULong(bits: Int): ULong {
-        val value = preloadULong(bits)
-        bitsPosition += bits
+    override fun loadULong(bitLength: Int): ULong {
+        val value = preloadULong(bitLength)
+        bitsPosition += bitLength
         return value
     }
 
-    override fun preloadLong(bits: Int): Long = preloadULong(bits).toLong()
+    override fun preloadLong(bitLength: Int): Long = preloadULong(bitLength).toLong()
 
-    override fun preloadULong(bits: Int): ULong {
+    override fun preloadULong(bitLength: Int): ULong {
         return when {
-            bits == 0 -> 0uL
-            bits <= 64 -> getULong(bits)
-            else -> throw IllegalArgumentException("expected length in 0..64, actual: $bits")
+            bitLength == 0 -> 0uL
+            bitLength <= 64 -> getULong(bitLength)
+            else -> throw IllegalArgumentException("expected length in 0..64, actual: $bitLength")
         }
     }
 }

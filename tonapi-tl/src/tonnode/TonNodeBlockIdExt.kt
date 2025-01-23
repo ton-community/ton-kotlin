@@ -3,13 +3,10 @@
 package org.ton.api.tonnode
 
 import kotlinx.io.bytestring.ByteString
-import kotlinx.io.bytestring.hexToByteString
-import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.tl.*
 import kotlin.jvm.JvmName
-import kotlin.jvm.JvmStatic
 
 @Serializable
 public data class TonNodeBlockIdExt(
@@ -35,53 +32,8 @@ public data class TonNodeBlockIdExt(
     @Serializable(ByteStringBase64Serializer::class)
     val fileHash: ByteString
 ) : TonNodeBlockId {
-    public constructor(
-        tonNodeBlockId: TonNodeBlockId = TonNodeBlockId(),
-        rootHash: ByteString = ByteString(*ByteArray(32)),
-        fileHash: ByteString = ByteString(*ByteArray(32)),
-    ) : this(
-        tonNodeBlockId.workchain,
-        tonNodeBlockId.shard,
-        tonNodeBlockId.seqno,
-        rootHash,
-        fileHash
-    )
-
-    override fun toString(): String = buildString {
-        append("(")
-        append(workchain)
-        append(":")
-        append(shard.toULong().toHexString(HexFormat.UpperCase))
-        append(":")
-        append(seqno)
-        append(")")
-        append(":")
-        append(rootHash.toHexString(HexFormat.UpperCase))
-        append(":")
-        append(fileHash.toHexString(HexFormat.UpperCase))
-    }
-
-    public companion object : TlCodec<TonNodeBlockIdExt> by TonNodeBlockIdExtTlConstructor {
-        @JvmStatic
-        public fun parse(string: String): TonNodeBlockIdExt {
-            require(string.getOrNull(0) == '(') { "Can't parse string: '$string'" }
-            val closeParenIndex = string.indexOfFirst { it == ')' }
-            require(closeParenIndex != -1) { "Can't parse string: '$string'" }
-            val tonNodeBlockId = TonNodeBlockId.parse(string.substring(0, closeParenIndex + 1))
-            val hashes = string.substring(closeParenIndex + 2, string.lastIndex + 1)
-            val (rawRootHash, rawFileHash) = hashes.split(':')
-            return TonNodeBlockIdExt(tonNodeBlockId, rawRootHash.hexToByteString(), rawFileHash.hexToByteString())
-        }
-
-        @JvmStatic
-        public fun parseOrNull(string: String): TonNodeBlockIdExt? = try {
-            parse(string)
-        } catch (e: Exception) {
-            null
-        }
-    }
+    public companion object : TlCodec<TonNodeBlockIdExt> by TonNodeBlockIdExtTlConstructor
 }
-
 
 private object TonNodeBlockIdExtTlConstructor : TlConstructor<TonNodeBlockIdExt>(
     schema = "tonNode.blockIdExt workchain:int shard:long seqno:int root_hash:int256 file_hash:int256 = tonNode.BlockIdExt"

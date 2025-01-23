@@ -2,6 +2,7 @@ package org.ton.block
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.ton.block.message.inmsg.InMsg
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -9,13 +10,10 @@ import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
-@SerialName("masterchain_block_extra")
 public data class McBlockExtra(
     @SerialName("key_block") val keyBlock: Boolean,
     @SerialName("shard_hases") val shardHashes: HashMapE<BinTree<ShardDescr>>,
@@ -80,7 +78,7 @@ private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(
         storeTlb(shardFees, value.shardFees)
         storeRef(McBlockExtraAux, value.r1)
         if (value.keyBlock && value.config != null) {
-            storeTlb(ConfigParams, value.config)
+            storeTlb(ConfigParams.Tlb, value.config)
         }
     }
 
@@ -90,7 +88,7 @@ private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(
         val keyBlock = loadBit()
         val shardHashes = loadTlb(shardHashes)
         val shardFees = loadTlb(shardFees)
-        val config = if (keyBlock) loadTlb(ConfigParams) else null
+        val config = if (keyBlock) loadTlb(ConfigParams.Tlb) else null
         val r1 = loadRef(McBlockExtraAux)
         McBlockExtra(keyBlock, shardHashes, shardFees, r1, config)
     }

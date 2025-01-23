@@ -1,6 +1,6 @@
 package org.ton.contract.wallet
 
-import org.ton.block.MessageRelaxed
+import org.ton.block.message.MessageRelaxed
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*

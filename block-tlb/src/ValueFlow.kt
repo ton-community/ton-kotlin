@@ -1,13 +1,10 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import org.ton.block.currency.CurrencyCollection
 import org.ton.cell.*
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 
-@Serializable
-@SerialName("value_flow")
 public data class ValueFlow(
     @SerialName("from_prev_blk") val fromPrevBlk: CurrencyCollection,
     @SerialName("to_next_blk") val toNextBlk: CurrencyCollection,
@@ -55,17 +52,17 @@ private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
         cellBuilder: CellBuilder, value: ValueFlow
     ) = cellBuilder {
         storeRef {
-            storeTlb(CurrencyCollection, value.fromPrevBlk)
-            storeTlb(CurrencyCollection, value.toNextBlk)
-            storeTlb(CurrencyCollection, value.imported)
-            storeTlb(CurrencyCollection, value.exported)
+            storeTlb(CurrencyCollection.Tlb, value.fromPrevBlk)
+            storeTlb(CurrencyCollection.Tlb, value.toNextBlk)
+            storeTlb(CurrencyCollection.Tlb, value.imported)
+            storeTlb(CurrencyCollection.Tlb, value.exported)
         }
-        storeTlb(CurrencyCollection, value.feesCollected)
+        storeTlb(CurrencyCollection.Tlb, value.feesCollected)
         storeRef {
-            storeTlb(CurrencyCollection, value.feesImported)
-            storeTlb(CurrencyCollection, value.recovered)
-            storeTlb(CurrencyCollection, value.created)
-            storeTlb(CurrencyCollection, value.minted)
+            storeTlb(CurrencyCollection.Tlb, value.feesImported)
+            storeTlb(CurrencyCollection.Tlb, value.recovered)
+            storeTlb(CurrencyCollection.Tlb, value.created)
+            storeTlb(CurrencyCollection.Tlb, value.minted)
         }
     }
 
@@ -74,19 +71,19 @@ private object ValueFlowTlbConstructor : TlbConstructor<ValueFlow>(
     ): ValueFlow = cellSlice {
         val (fromPrevBlk, toNextBlk, imported, exported) = loadRef {
             arrayOf(
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
             )
         }
-        val feesCollected = loadTlb(CurrencyCollection)
+        val feesCollected = loadTlb(CurrencyCollection.Tlb)
         val (feesImported, recovered, created, minted) = loadRef {
             arrayOf(
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
-                loadTlb(CurrencyCollection),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
+                loadTlb(CurrencyCollection.Tlb),
             )
         }
         ValueFlow(fromPrevBlk, toNextBlk, imported, exported, feesCollected, feesImported, recovered, created, minted)

@@ -7,7 +7,7 @@ class PrunedBranchTest {
     @Test
     fun test() {
         val cell = buildCell {
-            storeBytes("000000000000000000deafbeaf123123".hexToByteArray())
+            storeByteArray("000000000000000000deafbeaf123123".hexToByteArray())
             storeRef(Cell.empty())
         }
 

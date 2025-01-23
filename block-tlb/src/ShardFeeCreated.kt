@@ -1,14 +1,12 @@
 package org.ton.block
 
-import kotlinx.serialization.Serializable
+import org.ton.block.currency.CurrencyCollection
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
 public data class ShardFeeCreated(
     val fees: CurrencyCollection,
     val create: CurrencyCollection
@@ -33,15 +31,15 @@ private object ShardFeeCreatedTlbConstructor : TlbConstructor<ShardFeeCreated>(
         cellBuilder: CellBuilder,
         value: ShardFeeCreated
     ) = cellBuilder {
-        storeTlb(CurrencyCollection, value.fees)
-        storeTlb(CurrencyCollection, value.create)
+        storeTlb(CurrencyCollection.Tlb, value.fees)
+        storeTlb(CurrencyCollection.Tlb, value.create)
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): ShardFeeCreated = cellSlice {
-        val fees = loadTlb(CurrencyCollection)
-        val create = loadTlb(CurrencyCollection)
+        val fees = loadTlb(CurrencyCollection.Tlb)
+        val create = loadTlb(CurrencyCollection.Tlb)
         ShardFeeCreated(fees, create)
     }
 }

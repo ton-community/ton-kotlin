@@ -1,6 +1,7 @@
 package org.ton.cell
 
 import io.github.andreypfau.kotlinx.crypto.Sha256
+import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.bitstring.*
@@ -32,7 +33,8 @@ public interface CellBuilder {
     public fun storeBits(value: BitString): CellBuilder
     public fun storeBits(value: ByteArray, bits: Int): CellBuilder
 
-    public fun storeBytes(byteArray: ByteArray): CellBuilder
+    public fun storeByteArray(byteArray: ByteArray): CellBuilder
+    public fun storeByteString(byteString: ByteString): CellBuilder
     public fun storeByte(byte: Byte): CellBuilder
 
     /**
@@ -45,13 +47,13 @@ public interface CellBuilder {
     public fun storeRefs(refs: Collection<Cell>): CellBuilder
 
     /**
-     * Stores an unsigned [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 256.
+     * Stores an unsigned [bitLength]-bit integer [value] into builder for 0 ≤ [bitLength] ≤ 256.
      */
-    public fun storeUInt(value: BigInt, length: Int): CellBuilder
-    public fun storeUInt(value: Byte, length: Int): CellBuilder = storeUInt(value.toInt(), length)
-    public fun storeUInt(value: Short, length: Int): CellBuilder = storeUInt(value.toInt(), length)
-    public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
-    public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
+    public fun storeUInt(value: BigInt, bitLength: Int): CellBuilder
+    public fun storeUInt(value: Byte, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
+    public fun storeUInt(value: Short, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
+    public fun storeUInt(value: Int, bitLength: Int): CellBuilder = storeUInt(value.toBigInt(), bitLength)
+    public fun storeUInt(value: Long, bitLength: Int): CellBuilder = storeUInt(value.toBigInt(), bitLength)
 
     public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
     public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
@@ -73,6 +75,9 @@ public interface CellBuilder {
     public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
     public fun storeUIntLes(value: Long, max: Long): CellBuilder =
         storeUIntLes(value.toBigInt(), max.toBigInt())
+
+    public fun storeVarUInt(value: Long, maxByteLength: Int): CellBuilder
+    public fun storeVarUInt(value: BigInt, maxByteLength: Int): CellBuilder
 
     /**
      * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
@@ -129,7 +134,7 @@ public interface CellBuilder {
         }
     }
 
-    public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
+    public fun storeByteArray(byteArray: ByteArray, length: Int): CellBuilder
 }
 
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
@@ -193,10 +198,17 @@ private class CellBuilderImpl(
         bitsPosition += bits
     }
 
-    override fun storeBytes(byteArray: ByteArray): CellBuilder = apply {
+    override fun storeByteArray(byteArray: ByteArray): CellBuilder = apply {
         val bitLen = byteArray.size * Byte.SIZE_BITS
         checkBitsOverflow(bitLen)
         this.bits.setBitsAt(bitsPosition, byteArray, bitLen)
+        bitsPosition += bitLen
+    }
+
+    override fun storeByteString(byteString: ByteString): CellBuilder = apply {
+        val bitLen = byteString.size * Byte.SIZE_BITS
+        checkBitsOverflow(bitLen)
+        this.bits.setBitsAt(bitsPosition, byteString, bitLen)
         bitsPosition += bitLen
     }
 
@@ -206,7 +218,7 @@ private class CellBuilderImpl(
         bitsPosition += Byte.SIZE_BITS
     }
 
-    override fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder = apply {
+    override fun storeByteArray(byteArray: ByteArray, length: Int): CellBuilder = apply {
         checkBitsOverflow(length)
         this.bits.setBitsAt(bitsPosition, byteArray, length)
         bitsPosition += length
@@ -229,9 +241,20 @@ private class CellBuilderImpl(
         this.refs.addAll(refs)
     }
 
-    override fun storeUInt(value: BigInt, length: Int): CellBuilder = apply {
-        bits.setUBigIntAt(bitsPosition, value, length)
-        bitsPosition += length
+    override fun storeUInt(value: BigInt, bitLength: Int): CellBuilder = apply {
+        bits.setUBigIntAt(bitsPosition, value, bitLength)
+        bitsPosition += bitLength
+    }
+
+    override fun storeVarUInt(value: Long, maxByteLength: Int): CellBuilder = apply {
+        storeVarUInt(value.toBigInt(), maxByteLength)
+    }
+
+    override fun storeVarUInt(value: BigInt, maxByteLength: Int): CellBuilder = apply {
+        val bytes = (value.bitLength + Byte.SIZE_BITS - 1) / Byte.SIZE_BITS
+        storeUIntLes(bytes, 16)
+        val bits = bytes * Byte.SIZE_BITS
+        storeUInt(value, bits)
     }
 
     override fun storeInt(value: BigInt, length: Int): CellBuilder = apply {

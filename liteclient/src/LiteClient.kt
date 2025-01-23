@@ -16,10 +16,17 @@ import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.tonnode.*
 import org.ton.bitstring.toBitString
 import org.ton.block.*
+import org.ton.block.block.Block
+import org.ton.block.block.BlockId
+import org.ton.block.message.Message
+import org.ton.block.message.address.AddrInt
+import org.ton.block.org.ton.account.Account
+import org.ton.block.transaction.Transaction
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
+import org.ton.contract.Provider
 import org.ton.crypto.crc16
 import org.ton.lite.api.LiteApiClient
 import org.ton.lite.api.exception.LiteServerException
@@ -42,17 +49,7 @@ private const val BLOCK_ID_CACHE_SIZE = 100
 public class LiteClient(
     coroutineContext: CoroutineContext,
     liteClientConfigGlobal: LiteClientConfigGlobal
-) : Closeable, CoroutineScope, LiteClientApi {
-    public constructor(
-        coroutineContext: CoroutineContext,
-        liteServers: Collection<LiteServerDesc>
-    ) : this(coroutineContext, LiteClientConfigGlobal(liteServers = liteServers))
-
-    public constructor(
-        coroutineContext: CoroutineContext,
-        vararg liteServer: LiteServerDesc
-    ) : this(coroutineContext, liteServer.toList())
-
+) : Closeable, CoroutineScope, LiteClientApi, Provider {
     init {
         require(liteClientConfigGlobal.liteServers.isNotEmpty()) { "No lite servers provided" }
     }
@@ -60,8 +57,7 @@ public class LiteClient(
     override val coroutineContext: CoroutineContext = coroutineContext + CoroutineName("LiteClient")
     private val knownBlockIds: ArrayDeque<TonNodeBlockIdExt> = ArrayDeque(100)
     private var lastMasterchainBlockId: TonNodeBlockIdExt by atomic(
-        TonNodeBlockIdExt(
-        )
+        liteClientConfigGlobal.validator.initBlock
     )
     private var lastMasterchainBlockIdTime: Instant by atomic(Instant.DISTANT_PAST)
     private var zeroStateId: TonNodeZeroStateIdExt by atomic(
@@ -135,6 +131,7 @@ public class LiteClient(
         setServerVersion(version.version, version.capabilities)
         return version
     }
+
 
     public suspend fun getLastBlockId(mode: Int = if (serverCapabilities and 2 != 0L) 0 else -1): TonNodeBlockIdExt {
         val last: TonNodeBlockIdExt
@@ -318,7 +315,7 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
-        val actualRootHash = root.hash().toBitString()
+        root.hash().toBitString()
         // FIXME: https://github.com/andreypfau/ton-kotlin/issues/82
 //        check(blockId.rootHash.toBitString() == actualRootHash) {
 //            "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
@@ -331,11 +328,11 @@ public class LiteClient(
         return block
     }
 
-    override suspend fun getAccountState(accountAddress: MsgAddressInt): FullAccountState =
+    override suspend fun getAccountState(accountAddress: AddrInt): FullAccountState =
         getAccountState(accountAddress, getLastBlockId())
 
     public override suspend fun getAccountState(
-        accountAddress: MsgAddressInt, blockId: TonNodeBlockIdExt
+        accountAddress: AddrInt, blockId: TonNodeBlockIdExt
     ): FullAccountState {
         val rawAccountState = liteApi(LiteServerGetAccountState(blockId, accountAddress.toLiteServer()), blockId.seqno)
         val root = try {
@@ -366,7 +363,7 @@ public class LiteClient(
     }
 
     public override suspend fun getTransactions(
-        accountAddress: MsgAddressInt,
+        accountAddress: AddrInt,
         fromTransactionId: TransactionId,
         count: Int,
     ): List<TransactionInfo> {
@@ -503,5 +500,15 @@ public class LiteClient(
         knownBlockIds.addLast(blockIdExt)
     }
 
-    private fun MsgAddressInt.toLiteServer() = LiteServerAccountId(workchainId, ByteString(*address.toByteArray()))
+    private fun AddrInt.toLiteServer() = LiteServerAccountId(workchainId, ByteString(*address.toByteArray()))
+
+    override suspend fun getLastBlock(): BlockId = getLastBlockId().toBlockId()
+
 }
+
+internal fun TonNodeBlockIdExt.toBlockId(): BlockId = BlockId(
+    shard = ShardIdent(workchain, shard.toULong()),
+    seqno = seqno,
+    rootHash = rootHash,
+    fileHash = fileHash
+)

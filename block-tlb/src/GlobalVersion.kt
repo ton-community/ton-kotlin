@@ -1,46 +1,42 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.*
 import org.ton.tlb.TlbConstructor
 
-@SerialName("capabilities")
-@Serializable
+/**
+ * Software info.
+ */
 public data class GlobalVersion(
-    val version: UInt, // version : uint32
-    val capabilities: ULong // capabilities : uint64
-) : TlbObject {
+    /**
+     * Software version.
+     */
+    val version: Int,
 
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("capabilities") {
-        field("version", version)
-        field("capabilities", capabilities)
-    }
-
-    override fun toString(): String = print().toString()
-
-    public companion object : TlbCodec<GlobalVersion> by GlobalVersionTlbConstructor.asTlbCombinator()
-}
-
-private object GlobalVersionTlbConstructor : TlbConstructor<GlobalVersion>(
-    schema = "capabilities#c4 version:uint32 capabilities:uint64 = GlobalVersion;"
+    /**
+     * Software capability flags.
+     */
+    val capabilities: GlobalCapabilities
 ) {
-    override fun storeTlb(
-        cellBuilder: CellBuilder,
-        value: GlobalVersion
-    ) = cellBuilder {
-        storeUInt(value.version.toInt(), 32)
-        storeUInt(value.capabilities.toLong(), 64)
-    }
+    public object Tlb : TlbConstructor<GlobalVersion>(
+        schema = "capabilities#c4 version:uint32 capabilities:uint64 = GlobalVersion;"
+    ) {
+        override fun storeTlb(
+            cellBuilder: CellBuilder,
+            value: GlobalVersion
+        ): Unit = cellBuilder {
+            storeUInt(value.version.toInt(), 32)
+            GlobalCapabilities.Tlb.storeTlb(this, value.capabilities)
+        }
 
-    override fun loadTlb(
-        cellSlice: CellSlice
-    ): GlobalVersion = cellSlice {
-        val version = loadUInt()
-        val capabilities = loadULong(64)
-        GlobalVersion(version, capabilities)
+        override fun loadTlb(
+            cellSlice: CellSlice
+        ): GlobalVersion = cellSlice {
+            val version = loadUInt().toInt()
+            val capabilities = GlobalCapabilities.Tlb.loadTlb(this)
+            GlobalVersion(version, capabilities)
+        }
     }
 }
+

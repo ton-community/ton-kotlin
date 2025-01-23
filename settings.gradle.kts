@@ -5,6 +5,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 }
 
@@ -19,6 +20,8 @@ submodule("liteapi-tl")
 submodule("adnl")
 submodule("liteclient")
 submodule("contract")
+//submodule("dht")
+include("example")
 
 fun submodule(name: String) {
     include(":ton-kotlin-$name")
