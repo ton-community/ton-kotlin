@@ -18,7 +18,7 @@ public interface CellBuilder {
     public var levelMask: LevelMask?
     public var isExotic: Boolean
 
-    public val bitsPosition: Int
+    public var bitsPosition: Int
     public val remainingBits: Int
 
     /**
@@ -30,8 +30,10 @@ public interface CellBuilder {
     public fun storeBit(value: Boolean): CellBuilder
     public fun storeBits(vararg value: Boolean): CellBuilder
     public fun storeBits(value: Collection<Boolean>): CellBuilder
-    public fun storeBits(value: BitString): CellBuilder
+    public fun storeBits(value: BitString, bits: Int = value.size): CellBuilder
     public fun storeBits(value: ByteArray, bits: Int): CellBuilder
+
+    public fun storeBitString(value: BitString, startIndex: Int = 0, endIndex: Int = value.size): CellBuilder
 
     public fun storeByteArray(byteArray: ByteArray): CellBuilder
     public fun storeByteString(byteString: ByteString): CellBuilder
@@ -87,6 +89,8 @@ public interface CellBuilder {
     public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toInt(), length)
     public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
     public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+
+    public fun storeLong(value: Long, length: Int): CellBuilder = storeInt(value, length)
 
     /**
      * Stores [slice] into builder.
@@ -186,10 +190,8 @@ private class CellBuilderImpl(
         bitsPosition += value.size
     }
 
-    override fun storeBits(bits: BitString): CellBuilder = apply {
-        checkBitsOverflow(bits.size)
-        this.bits.setBitsAt(bitsPosition, bits)
-        bitsPosition += bits.size
+    override fun storeBits(value: BitString, bits: Int): CellBuilder = apply {
+        storeBitString(value, 0, bits)
     }
 
     override fun storeBits(value: ByteArray, bits: Int): CellBuilder = apply {
@@ -198,11 +200,22 @@ private class CellBuilderImpl(
         bitsPosition += bits
     }
 
+    override fun storeBitString(
+        value: BitString,
+        startIndex: Int,
+        endIndex: Int
+    ): CellBuilder = apply {
+        val length = endIndex - startIndex
+        checkBitsOverflow(length)
+        value.copyInto(bits, bitsPosition, startIndex, endIndex)
+        bitsPosition += length
+    }
+
     override fun storeByteArray(byteArray: ByteArray): CellBuilder = apply {
-        val bitLen = byteArray.size * Byte.SIZE_BITS
-        checkBitsOverflow(bitLen)
-        this.bits.setBitsAt(bitsPosition, byteArray, bitLen)
-        bitsPosition += bitLen
+        val bitCount = byteArray.size * Byte.SIZE_BITS
+        checkBitsOverflow(bitCount)
+        this.bits.setBitsAt(bitsPosition, byteArray, bitCount)
+        bitsPosition += bitCount
     }
 
     override fun storeByteString(byteString: ByteString): CellBuilder = apply {
@@ -270,9 +283,9 @@ private class CellBuilderImpl(
         checkBitsOverflow(bits.size)
         checkRefsOverflow(refs.size)
 
-        storeBits(bits)
-        refs.forEach { ref ->
-            storeRef(ref)
+        storeBitString(bits, slice.bitsPosition, bits.size)
+        for (i in slice.refsPosition until slice.refs.size) {
+            storeRef(slice.refs[i])
         }
     }
 

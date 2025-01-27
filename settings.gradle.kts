@@ -20,6 +20,7 @@ submodule("liteapi-tl")
 submodule("adnl")
 submodule("liteclient")
 submodule("contract")
+submodule("dict")
 //submodule("dht")
 include("example")
 

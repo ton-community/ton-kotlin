@@ -28,6 +28,8 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public operator fun get(index: Int): Boolean
     public fun getOrNull(index: Int): Boolean?
 
+    public fun countLeadingBits(fromIndex: Int = 0, toIndex: Int = size, bit: Boolean): Int
+
     public operator fun plus(bit: Boolean): BitString =
         plus(booleanArrayOf(bit))
 
@@ -65,6 +67,18 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public fun slice(startIndex: Int, endIndex: Int = size): BitString =
         binary(toBinary().substring(startIndex, endIndex))
 
+    public fun copyInto(
+        destination: MutableBitString,
+        destinationOffset: Int = 0,
+        startIndex: Int = 0,
+        endIndex: Int = size
+    ) {
+        val length = endIndex - startIndex
+        for (i in 0 until length) {
+            destination[destinationOffset + i] = this[startIndex + i]
+        }
+    }
+
     public infix fun xor(other: BitString): BitString
     public infix fun or(other: BitString): BitString
 
@@ -79,6 +93,11 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public fun toHexString(): String
 
     public companion object {
+        public val ALL_ZERO: BitString = ByteBackedBitString.of(ByteArray(128), 1023)
+        public val ALL_ONE: BitString = ByteBackedBitString.of(ByteArray(128) {
+            0xFF.toByte()
+        }, 1023)
+
         @JvmStatic
         public fun empty(): BitString = EmptyBitString
 

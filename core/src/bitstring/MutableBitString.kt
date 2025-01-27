@@ -13,8 +13,8 @@ public interface MutableBitString : BitString {
 
     public fun setBitsAt(index: Int, value: BitString)
     public fun setBitsAt(index: Int, value: Iterable<Boolean>)
-    public fun setBitsAt(index: Int, value: ByteArray, bits: Int)
-    public fun setBitsAt(index: Int, value: ByteString, bits: Int)
+    public fun setBitsAt(index: Int, value: ByteArray, bitCount: Int)
+    public fun setBitsAt(index: Int, value: ByteString, bitCount: Int)
 
     public companion object {
         @JvmStatic
