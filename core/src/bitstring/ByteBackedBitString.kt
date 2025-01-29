@@ -62,6 +62,13 @@ public open class ByteBackedBitString protected constructor(
         bitsCopy(destination.bytes, destinationOffset, bytes, startIndex, endIndex - startIndex)
     }
 
+    override fun slice(startIndex: Int, endIndex: Int): BitString {
+        val size = endIndex - startIndex
+        val result = of(size)
+        bitsCopy(result.bytes, 0, bytes, startIndex, size)
+        return result
+    }
+
     override fun toBooleanArray(): BooleanArray = toList().toBooleanArray()
 
     override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes.copyOf(), size)
@@ -295,7 +302,7 @@ internal fun bitsCopy(dest: ByteArray, toIndex: Int, src: ByteArray, fromIndex: 
 
             if (remainingBits > 0) {
                 accumulator =
-                    (accumulator shl remainingBits) or ((src[srcOffset].toInt() and (0xff ushr (8 - remainingBits))))
+                    (accumulator shl remainingBits) or ((src[srcOffset].toInt() and 0xff) ushr (8 - remainingBits))
                 bitsInAcc += remainingBits
             }
         }
@@ -326,11 +333,11 @@ internal fun countLeadingBits(
     var reminder = bitCount
 
     if (bitOffset != 0) {
-        val v = ((array[index++].toInt() xor xorVal) and 0xFF) shl (24 + bitOffset)
+        val v = ((array[index++].toInt() and 0xFF) xor xorVal) shl (24 + bitOffset)
         val c = v.countLeadingZeroBits()
         val remainingBits = 8 - bitOffset
-        if (c < remainingBits && reminder <= remainingBits) {
-            return min(c, reminder)
+        if (c < remainingBits || bitCount <= remainingBits) {
+            return min(c, bitCount)
         }
         reminder -= remainingBits
     }

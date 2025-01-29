@@ -10,31 +10,24 @@ import org.ton.cell.exception.CellUnderflowException
 /**
  * Typed dictionary with fixed length keys.
  */
-public class Dictionary<K : Comparable<K>, V>(
+public class RawDictionary(
     root: Cell?,
     public val keySize: Int,
-    public val keySerializer: (CellBuilder, CellContext, K) -> Unit,
-    public val valueSerializer: (CellBuilder, CellContext, V) -> Unit,
 ) {
     public var root: Cell? = root
         private set
 
     public constructor(
         keySize: Int,
-        keySerializer: (CellBuilder, CellContext, K) -> Unit,
-        valueSerializer: (CellBuilder, CellContext, V) -> Unit,
-    ) : this(null, keySize, keySerializer, valueSerializer)
+    ) : this(null, keySize)
 
     public val isEmpty: Boolean get() = root == null
 
-    public fun set(key: K, value: V) {
-        val builder = CellBuilder()
-        keySerializer(builder, CellContext.EMPTY, key)
-        val keyBits = builder.toBitString()
+    public fun set(key: BitString, value: CellSlice) {
         dictSet(
-            keyBits,
+            key,
             0,
-            keyBits.size,
+            key.size,
             value,
             SetMode.Set,
             CellContext.EMPTY,
@@ -45,11 +38,10 @@ public class Dictionary<K : Comparable<K>, V>(
         key: BitString,
         startIndex: Int,
         endIndex: Int,
-        value: V,
+        value: CellSlice,
         mode: SetMode,
         context: CellContext
     ) {
-//        println("set: $key")
         val root = root
         if (root == null) {
             if (mode == SetMode.Replace) {
@@ -57,7 +49,7 @@ public class Dictionary<K : Comparable<K>, V>(
             }
             val builder = CellBuilder()
             builder.storeLabel(keySize, key, startIndex, endIndex)
-            valueSerializer(builder, context, value)
+            builder.storeSlice(value)
             this.root = context.finalizeCell(builder)
             return
         }
@@ -70,12 +62,7 @@ public class Dictionary<K : Comparable<K>, V>(
             var keyLength = endIndex - keyOffset
             val remainingData = data.beginParse()
 
-//            println("before label: ${remainingData.data.toBinary()}")
-            val label = run {
-                val builder = CellBuilder() // todo: remove cell builder, use calculating offsets
-                readLabel(remainingData, keyLength, builder)
-                builder.toBitString()
-            }
+            val label = readLabel(remainingData, keyLength)
 //            println("label: ${label.toBinary()}")
 //            println("after label: ${remainingData.data.toBinary()}")
             // todo: WARNING VERY BAD PERFORMANCE, FIX IN FEATURE
@@ -87,7 +74,7 @@ public class Dictionary<K : Comparable<K>, V>(
                 }
                 val builder = CellBuilder()
                 builder.storeLabel(keySize, key, startIndex, endIndex)
-                valueSerializer(builder, context, value)
+                builder.storeSlice(value)
                 leaf = context.finalizeCell(builder)
                 break
             } else if (prefix.size < keyLength) {
@@ -112,10 +99,10 @@ public class Dictionary<K : Comparable<K>, V>(
                     val right = run {
                         val builder = CellBuilder()
                         builder.storeLabel(keyLength, key, keyOffset, endIndex)
-                        valueSerializer(builder, context, value)
+                        builder.storeSlice(value)
                         context.finalizeCell(builder)
                     }
-//                    println("hash left: ${left.hash()}")
+//                    println("tree left: ${left}")
 //                    println("data left: ${left.bits.toBinary()}")
 //                    println("leaf right: ${right.hash()}")
                     val builder = CellBuilder()
@@ -178,13 +165,13 @@ public class Dictionary<K : Comparable<K>, V>(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Dictionary<*, *>) return false
+        if (other !is RawDictionary) return false
         return root == other.root
     }
 
     override fun hashCode(): Int = root.hashCode()
 
-    override fun toString(): String = "Dictionary($root)"
+    override fun toString(): String = "RawDictionary(${root?.hash()})"
 
     private class Segment(
         val data: Cell,
@@ -226,58 +213,36 @@ public class Dictionary<K : Comparable<K>, V>(
 //    }
 }
 
-
-internal fun readLabel(label: CellSlice, keyBitLength: Int, builder: CellBuilder): Int {
-    val labelType = label.loadLong(2).toInt()
+internal fun readLabel(label: CellSlice, keyBitLength: Int): BitString {
+    val labelType = label.preloadUInt(2).toInt()
     when (labelType) {
         // hml_short$0 unary_zero$0
         0b00 -> {
-            return 0
+            label.skipBits(2)
+            return BitString.empty()
         }
         // hml_short$0 unary_succ$1
         0b01 -> {
-            val len = label.bits.countLeadingBits(fromIndex = label.bitsPosition - 1, bit = true)
-            val startIndex = label.bitsPosition + len
-//            println("current pos: ${label.bitsPosition}")
-            val endIndex = label.bitsPosition + len + len
-//            println("len: ${len} read label from $startIndex to $endIndex")
-            builder.storeBitString(label.bits, startIndex, endIndex)
-            label.skipBits(len * 2)
-//            println("after: ${label.bitsPosition} - ${label.data.toBinary()}")
-
-
-//            val before = label.bitsPosition
-//            val leadingResult = label.bits.countLeadingBits(label.bitsPosition - 1, bit = true)
-//
-//            var len = 1
-//            while (label.loadBit()) {
-//                len++
-//            }
-//            check(len == leadingResult)
-//            builder.storeBitString(label.loadBits(len))
-//
-//            val a = before + leadingResult * 2
-//            val b = label.bitsPosition
-//            check(a == b) { "$a $b | $leadingResult == $len | before=$before" }
-
-            return len
+            label.skipBits(1)
+            val len = label.bits.countLeadingBits(fromIndex = label.bitsPosition, bit = true)
+            label.skipBits(len + 1)
+            return label.loadBits(len)
         }
         // hml_long$10
         0b10 -> {
+            label.skipBits(2)
             val len = label.loadUIntLeq(keyBitLength).toInt()
-            builder.storeBitString(label.bits, label.bitsPosition, label.bitsPosition + len)
-            label.skipBits(len)
-            return len
+            return label.loadBits(len)
         }
         // hml_same$11
         0b11 -> {
+            label.skipBits(2)
             val bits = when (label.loadBit()) {
                 true -> BitString.ALL_ONE
                 false -> BitString.ALL_ZERO
             }
             val len = label.loadUIntLeq(keyBitLength).toInt()
-            builder.storeBitString(bits, 0, len)
-            return len
+            return bits.slice(0, len)
         }
 
         else -> throw IllegalArgumentException("Invalid label type: $labelType")
@@ -317,74 +282,74 @@ internal fun readLabel(label: CellSlice, keyBitLength: Int, builder: CellBuilder
 //        val key: CellBuilder
 //    )
 //}
-
-internal class DictIterator(
-    val root: Cell?,
-    val keyBits: Int,
-) : Iterator<Pair<CellBuilder, CellSlice>> {
-    constructor(dictionary: Dictionary<*, *>) : this(dictionary.root, dictionary.keySize)
-
-    val path = ArrayDeque<Fork>()
-    var isValid: Boolean = true
-
-    override fun hasNext(): Boolean = isValid
-
-
-    override fun next(): Pair<CellBuilder, CellSlice> {
-
-        TODO()
-    }
-
-    /**
-     * forkRoute is a bit string of length keyBits that represents the path to the next key.
-     */
-    private fun nextKey(forkRoute: Int): CellBuilder {
-//        var n = keyBits
-//        var m = 0
-//        var route = forkRoute
-//        val node = path.lastOrNull()?.let {
-//            m = it.position + 1
-//            n -= m
-//            route = route ushr 1
-//            it.next
-//        } ?: root ?: throw NoSuchElementException()
 //
-//        val builder = CellBuilder()
-//        while (true) {
-//            val nodeSlice = cellContext.loadCell(node).asSlice()
-//            val label = readLabel(nodeSlice, n)
-//            builder.storeBitString(label)
-//            val labelSize = label.size
-//            m += labelSize
-//            n -= labelSize
-//            if (n == 0) {
-//                return builder
-//            }
-//            if (labelSize != 0) {
-//                route = route ushr 1
-//            }
-//            val bit = route and 1
-//            val next = nodeSlice.getReference(bit)
-//            val alt = nodeSlice.getReference(1 - bit)
-//            path.add(Fork(next, alt, bit))
-//            builder.storeBoolean(bit != 0)
-//            n--
-//            route = route ushr 1
-//        }
-        TODO()
-    }
-
-    data class Fork(
-        val next: Cell,
-        val alt: Cell,
-        val position: Int
-    )
-
-    enum class Status {
-        Valid,
-        Pruned,
-        NoElements
-    }
-}
+//internal class DictIterator(
+//    val root: Cell?,
+//    val keyBits: Int,
+//) : Iterator<Pair<CellBuilder, CellSlice>> {
+//    constructor(dictionary: Dictionary<*, *>) : this(dictionary.root, dictionary.keySize)
+//
+//    val path = ArrayDeque<Fork>()
+//    var isValid: Boolean = true
+//
+//    override fun hasNext(): Boolean = isValid
+//
+//
+//    override fun next(): Pair<CellBuilder, CellSlice> {
+//
+//        TODO()
+//    }
+//
+//    /**
+//     * forkRoute is a bit string of length keyBits that represents the path to the next key.
+//     */
+//    private fun nextKey(forkRoute: Int): CellBuilder {
+////        var n = keyBits
+////        var m = 0
+////        var route = forkRoute
+////        val node = path.lastOrNull()?.let {
+////            m = it.position + 1
+////            n -= m
+////            route = route ushr 1
+////            it.next
+////        } ?: root ?: throw NoSuchElementException()
+////
+////        val builder = CellBuilder()
+////        while (true) {
+////            val nodeSlice = cellContext.loadCell(node).asSlice()
+////            val label = readLabel(nodeSlice, n)
+////            builder.storeBitString(label)
+////            val labelSize = label.size
+////            m += labelSize
+////            n -= labelSize
+////            if (n == 0) {
+////                return builder
+////            }
+////            if (labelSize != 0) {
+////                route = route ushr 1
+////            }
+////            val bit = route and 1
+////            val next = nodeSlice.getReference(bit)
+////            val alt = nodeSlice.getReference(1 - bit)
+////            path.add(Fork(next, alt, bit))
+////            builder.storeBoolean(bit != 0)
+////            n--
+////            route = route ushr 1
+////        }
+//        TODO()
+//    }
+//
+//    data class Fork(
+//        val next: Cell,
+//        val alt: Cell,
+//        val position: Int
+//    )
+//
+//    enum class Status {
+//        Valid,
+//        Pruned,
+//        NoElements
+//    }
+//}
 
 private val CellSlice.data get() = bits.slice(bitsPosition, bits.size)
