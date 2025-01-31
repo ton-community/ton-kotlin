@@ -2,6 +2,7 @@
 
 package org.ton.bitstring
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Serializable
 import org.ton.bitstring.serialization.HexBitStringSerializer
 import kotlin.contracts.ExperimentalContracts
@@ -28,23 +29,9 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public operator fun get(index: Int): Boolean
     public fun getOrNull(index: Int): Boolean?
 
+    public fun getBit(index: Int): Int
+
     public fun countLeadingBits(fromIndex: Int = 0, toIndex: Int = size, bit: Boolean): Int
-
-    public operator fun plus(bit: Boolean): BitString =
-        plus(booleanArrayOf(bit))
-
-    public operator fun plus(bits: BooleanArray): BitString =
-        plus(bits.asIterable())
-
-    public operator fun plus(bits: Collection<Boolean>): BitString =
-        plus(bits.asIterable())
-
-    public operator fun plus(bits: Iterable<Boolean>): BitString =
-        binary(toBinary() + bits.joinToString("") { if (it) "1" else "0" })
-
-    public operator fun plus(bits: BitString): BitString
-    public operator fun plus(bytes: ByteArray): BitString = plus(bytes, bytes.size * Byte.SIZE_BITS)
-    public fun plus(bytes: ByteArray, bits: Int): BitString
 
     public fun toByteArray(augment: Boolean = false): ByteArray
     public fun toBooleanArray(): BooleanArray
@@ -57,15 +44,32 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public fun endsWith(suffix: BitString): Boolean =
         toBinary().endsWith(suffix.toBinary())
 
-    public fun commonPrefixWith(other: BitString): BitString =
-        binary(toBinary().commonPrefixWith(other.toBinary()))
+    public fun commonPrefixWith(other: BitString): BitString {
+        val shortestLength = minOf(this.size, other.size)
+        var i = 0
+        while (i < shortestLength && this[i] == other[i]) {
+            i++
+        }
+        return substring(0, i)
+    }
 
-    public fun commonSuffixWith(other: BitString): BitString =
-        binary(toBinary().commonSuffixWith(other.toBinary()))
+    public fun commonSuffixWith(other: BitString): BitString {
+        val thisSize = this.size
+        val otherSize = other.size
+        val shortestLength = minOf(thisSize, otherSize)
 
-    public fun slice(indices: IntRange): BitString = slice(indices.first, indices.last)
-    public fun slice(startIndex: Int, endIndex: Int = size): BitString =
+        var i = 0
+        while (i < shortestLength && this[thisSize - i - 1] == other[otherSize - i - 1]) {
+            i++
+        }
+        return substring(thisSize - i, thisSize)
+    }
+
+    public fun substring(startIndex: Int, endIndex: Int = size): BitString = if (startIndex == endIndex) {
+        EmptyBitString
+    } else {
         binary(toBinary().substring(startIndex, endIndex))
+    }
 
     public fun copyInto(
         destination: MutableBitString,
@@ -84,7 +88,14 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
 
     public fun isEmpty(): Boolean = size == 0
 
-    override fun compareTo(other: BitString): Int = toBinary().compareTo(other.toBinary())
+    override fun compareTo(other: BitString): Int {
+        if (other === this) return 0
+        for (i in 0 until minOf(size, other.size)) {
+            val cmp = this[i].compareTo(other[i])
+            if (cmp != 0) return cmp
+        }
+        return size.compareTo(other.size)
+    }
 
     override fun toString(): String
 
@@ -93,6 +104,7 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     public fun toHexString(): String
 
     public companion object {
+        public val EMPTY: BitString = EmptyBitString
         public val ALL_ZERO: BitString = ByteBackedBitString.of(ByteArray(128), 1023)
         public val ALL_ONE: BitString = ByteBackedBitString.of(ByteArray(128) {
             0xFF.toByte()
@@ -171,6 +183,9 @@ public interface BitString : Iterable<Boolean>, Comparable<BitString> {
     }
 }
 
+public val ByteString.indices: IntRange
+    get() = IntRange(0, size)
+
 @OptIn(ExperimentalContracts::class)
 public inline fun BitString?.isNullOrEmpty(): Boolean {
     contract {
@@ -178,3 +193,5 @@ public inline fun BitString?.isNullOrEmpty(): Boolean {
     }
     return this == null || this.size == 0
 }
+
+public fun BitString.isNotEmpty(): Boolean = !isEmpty()

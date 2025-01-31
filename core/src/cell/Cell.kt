@@ -2,36 +2,17 @@
 
 package org.ton.cell
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.bitstring.BitString
 import kotlin.jvm.JvmStatic
 
 public interface Cell {
-    public val bits: BitString
-    public val refs: List<Cell>
-    public val descriptor: CellDescriptor
-    public val type: CellType get() = descriptor.cellType
-    public val levelMask: LevelMask get() = descriptor.levelMask
+    public val levelMask: LevelMask
 
-    public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
-
-    public fun hash(level: Int = MAX_LEVEL): BitString
+    public fun hash(level: Int = MAX_LEVEL): ByteString
     public fun depth(level: Int = MAX_LEVEL): Int
 
-    public fun treeWalk(): Sequence<Cell> = sequence {
-        yieldAll(refs)
-        refs.forEach { reference ->
-            yieldAll(reference.treeWalk())
-        }
-    }
-
-    public fun beginParse(): CellSlice = CellSlice.beginParse(this)
-
-    public fun <T> parse(block: CellSlice.() -> T): T {
-        val slice = beginParse()
-        val result = block(slice)
-//        slice.endParse()
-        return result
-    }
+    public fun treeWalk(): Sequence<Cell>
 
     /**
      * Creates a virtualized cell
@@ -48,46 +29,47 @@ public interface Cell {
         public const val MAX_LEVEL: Int = 3
         public const val MAX_DEPTH: Int = 1024
         public const val MAX_BITS_SIZE: Int = 1023
+        public val EMPTY: DataCell = DataCell.EMPTY
 
         @JvmStatic
-        public fun empty(): Cell = EmptyCell
+        public fun empty(): Cell = EMPTY
 
         @JvmStatic
-        public fun of(hex: String, vararg refs: Cell): Cell = buildCell {
+        public fun of(hex: String, vararg refs: Cell): DataCell = buildCell {
             storeBits(BitString(hex))
             storeRefs(*refs)
-        }
+        } as DataCell
 
         @JvmStatic
-        public fun of(bits: BitString, vararg refs: Cell): Cell = buildCell {
+        public fun of(bits: BitString, vararg refs: Cell): DataCell = buildCell {
             storeBits(bits)
             storeRefs(*refs)
-        }
+        } as DataCell
 
-        @JvmStatic
-        public fun toString(cell: Cell): String = buildString {
-            toString(cell, this)
-        }
+//        @JvmStatic
+//        public fun toString(cell: Cell): String = buildString {
+//            toString(cell, this)
+//        }
 
-        @JvmStatic
-        public fun toString(
-            cell: Cell,
-            appendable: Appendable,
-            indent: String = ""
-        ) {
-            appendable.append(indent)
-            if (cell.type.isExotic) {
-                appendable.append(cell.type.toString())
-                appendable.append(' ')
-            }
-            appendable.append(cell.bits.toString())
-            appendable.append(", hash: ")
-            appendable.append(cell.hash().toHexString())
-            cell.refs.forEach { reference ->
-                appendable.append('\n')
-                toString(reference, appendable, "$indent    ")
-            }
-        }
+//        @JvmStatic
+//        public fun toString(
+//            cell: Cell,
+//            appendable: Appendable,
+//            indent: String = ""
+//        ) {
+//            appendable.append(indent)
+//            if (cell.type.isExotic) {
+//                appendable.append(cell.type.toString())
+//                appendable.append(' ')
+//            }
+//            appendable.append(cell.bits.toString())
+//            appendable.append(", hash: ")
+//            appendable.append(cell.hash().toHexString())
+//            cell.refs.forEach { reference ->
+//                appendable.append('\n')
+//                toString(reference, appendable, "$indent    ")
+//            }
+//        }
 
         @JvmStatic
         public fun getRefsDescriptor(refs: Int, isExotic: Boolean, levelMask: LevelMask): Byte {
@@ -105,8 +87,6 @@ public interface Cell {
     }
 }
 
-public inline fun Cell(): Cell = Cell.empty()
+public inline fun Cell(hex: String, vararg refs: Cell): DataCell = Cell.of(hex, *refs)
 
-public inline fun Cell(hex: String, vararg refs: Cell): Cell = Cell.of(hex, *refs)
-
-public inline fun Cell(bits: BitString, vararg refs: Cell): Cell = Cell.of(bits, *refs)
+public inline fun Cell(bits: BitString, vararg refs: Cell): DataCell = Cell.of(bits, *refs)

@@ -1,9 +1,11 @@
 package org.ton.dict
 
+import kotlinx.io.bytestring.toHexString
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.measureTime
 
 class DictTest {
     @Test
@@ -16,7 +18,7 @@ class DictTest {
         println(dict.root)
         assertEquals(
             "9E2B71045A456389525FBC1F34B7ED234BF84B9D21B154461614EFEC92FB99C5",
-            dict.root?.hash()?.toHexString()
+            dict.root?.hash()?.toHexString(HexFormat.UpperCase)
         )
         dict.set(
             CellBuilder().storeUInt(0xcafebabe.toInt(), 32).toBitString(),
@@ -24,7 +26,7 @@ class DictTest {
         )
         assertEquals(
             "89A396110350B0FB4DDEB4F501BEE0CDF914691CEC838ECC0B7D9839BF2C990A",
-            dict.root?.hash()?.toHexString()
+            dict.root?.hash()?.toHexString(HexFormat.UpperCase)
         )
     }
 
@@ -37,7 +39,7 @@ class DictTest {
             dict.set(key, value)
         }
         assertEquals(
-            "9592C8784B8350CC55E75D85D8FF48B122F5A08A01E8ACE32D94732C90BFC032",
+            "9592c8784b8350cc55e75d85d8ff48b122f5a08a01e8ace32d94732c90bfc032",
             dict.root?.hash()?.toHexString()
         )
         repeat(5) {
@@ -69,8 +71,53 @@ class DictTest {
         println(label.toBitString().toBinary())
     }
 
+    // 19.118s
+    // 19.404s
+    // 19.250s
+    // 19.076s
+
+    // 15.128 make calc of common prefix
+    // 15.687
+    // 15.206
+    // 15.460
+
+    // 15.660 - storeRef without grow
+    // 15.445
+    // 15.445
+
+    // 13.723 - list to array in computeHashes
+    // 13.770
+    // 12.882
+    // 13.709
+    // 13.675
+
+    // 13.241
+    // 13.418
+    // 13.295
+    // 13.268
+
+    // 12.139
+    // 12.348
+    // 12.369
+
+    // 12.032
+    // 12.240
+    // 12.183
+
+    // 12.331
+    // 12.236
+
+    // 11.244
+    // 11.425
+    // 11.470
+
+    // 10.671
+
+    // 10.432
+    // 10.658
+    // 10.592
     @Test
-    fun fuzzTest() {
+    fun fuzzTest() = measureTime {
         val value = CellBuilder().storeBit(true).build().beginParse()
         var minFailedIndex = Int.MAX_VALUE
         repeat(10000) {
@@ -86,7 +133,7 @@ class DictTest {
                     dict.set(key, value)
                 }
                 assertEquals(
-                    "9592C8784B8350CC55E75D85D8FF48B122F5A08A01E8ACE32D94732C90BFC032",
+                    "9592c8784b8350cc55e75d85d8ff48b122f5a08a01e8ace32d94732c90bfc032",
                     dict.root?.hash()?.toHexString()
                 )
             } catch (e: Throwable) {
@@ -96,6 +143,8 @@ class DictTest {
                 }
             }
         }
+    }.let {
+        println("done for $it")
     }
 
 //    @Test

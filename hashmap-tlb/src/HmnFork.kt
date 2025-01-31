@@ -31,11 +31,11 @@ public data class HmnFork<T>(
         return if (key[0]) {
             copy(
                 left = left,
-                right = CellRef(right.value.set(key.slice(1), value))
+                right = CellRef(right.value.set(key.substring(1), value))
             )
         } else {
             copy(
-                left = CellRef(left.value.set(key.slice(1), value)),
+                left = CellRef(left.value.set(key.substring(1), value)),
                 right = right,
             )
         }

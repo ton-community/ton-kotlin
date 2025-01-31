@@ -5,14 +5,15 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import org.ton.cell.Cell
+import org.ton.cell.DataCell
 import kotlin.jvm.JvmStatic
 
 public fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
-public fun BagOfCells(roots: Collection<Cell>): BagOfCells = BagOfCells.of(roots)
-public fun BagOfCells(vararg roots: Cell): BagOfCells = BagOfCells.of(*roots)
+public fun BagOfCells(roots: Collection<DataCell>): BagOfCells = BagOfCells.of(roots)
+public fun BagOfCells(vararg roots: DataCell): BagOfCells = BagOfCells.of(*roots)
 
 public interface BagOfCells : Iterable<Cell> {
-    public val roots: List<Cell>
+    public val roots: List<DataCell>
 
     public fun toByteArray(): ByteArray {
         val buffer = Buffer()
@@ -32,13 +33,13 @@ public interface BagOfCells : Iterable<Cell> {
         public const val BOC_INDEXED_CRC32C_MAGIC: Int = 0xACC3A728.toInt()
 
         @JvmStatic
-        public fun of(roots: Iterable<Cell>): BagOfCells {
+        public fun of(roots: Iterable<DataCell>): BagOfCells {
             val rootsList = roots.toList()
             return CachedBagOfCells(rootsList)
         }
 
         @JvmStatic
-        public fun of(vararg roots: Cell): BagOfCells {
+        public fun of(vararg roots: DataCell): BagOfCells {
             val rootsList = roots.toList()
             return CachedBagOfCells(rootsList)
         }
@@ -46,7 +47,7 @@ public interface BagOfCells : Iterable<Cell> {
         @JvmStatic
         public fun of(byteArray: ByteArray): BagOfCells {
             if (byteArray.isEmpty()) {
-                return BagOfCells(Cell())
+                return BagOfCells(Cell.EMPTY)
             }
             try {
                 val buffer = Buffer()

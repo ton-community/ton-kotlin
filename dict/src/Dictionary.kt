@@ -1,10 +1,7 @@
 package org.ton.dict
 
 import org.ton.bitstring.BitString
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellContext
-import org.ton.cell.CellSlice
+import org.ton.cell.*
 import org.ton.cell.exception.CellUnderflowException
 
 /**
@@ -63,12 +60,14 @@ public class RawDictionary(
             val remainingData = data.beginParse()
 
             val label = readLabel(remainingData, keyLength)
-//            println("label: ${label.toBinary()}")
-//            println("after label: ${remainingData.data.toBinary()}")
-            // todo: WARNING VERY BAD PERFORMANCE, FIX IN FEATURE
-            val prefix = key.slice(keyOffset, endIndex).commonPrefixWith(label)
 
-            if (prefix.size == keyLength) {
+            val shortestLength = minOf(keyLength, label.size)
+            var prefixLen = 0
+            while (prefixLen < shortestLength && key[keyOffset + prefixLen] == label[prefixLen]) {
+                prefixLen++
+            }
+
+            if (prefixLen == keyLength) {
                 if (mode == SetMode.Add) {
                     return
                 }
@@ -77,36 +76,33 @@ public class RawDictionary(
                 builder.storeSlice(value)
                 leaf = context.finalizeCell(builder)
                 break
-            } else if (prefix.size < keyLength) {
-                if (prefix.size < label.size) {
+            } else if (prefixLen < keyLength) {
+                if (prefixLen < label.size) {
                     // have to insert a new node (fork) inside the current edge
                     if (mode == SetMode.Replace) {
                         return
                     }
                     val prevKeyLength = keyLength
-                    keyOffset += prefix.size + 1
+                    keyOffset += prefixLen + 1
                     keyLength = endIndex - keyOffset
-                    val oldToRight = label[prefix.size]
-//                    println("label: ${label.toBinary().substring(prefix.size + 1, label.size)}")
+                    val oldToRight = label[prefixLen]
+//                    println("label: ${label.toBinary().substring(prefixLen + 1, label.size)}")
 //                    println("key length: $keyLength")
 //                    println("rem data: ${remainingData.data.toBinary()}")
-                    val left = run {
-                        val builder = CellBuilder()
-                        builder.storeLabel(keyLength, label, prefix.size + 1, label.size)
-                        builder.storeSlice(remainingData)
-                        context.finalizeCell(builder)
-                    }
-                    val right = run {
-                        val builder = CellBuilder()
-                        builder.storeLabel(keyLength, key, keyOffset, endIndex)
-                        builder.storeSlice(value)
-                        context.finalizeCell(builder)
-                    }
+                    val leftBuilder = CellBuilder()
+                    leftBuilder.storeLabel(keyLength, label, prefixLen + 1, label.size)
+                    leftBuilder.storeSlice(remainingData)
+                    val left = context.finalizeCell(leftBuilder)
+
+                    val rightBuilder = CellBuilder()
+                    rightBuilder.storeLabel(keyLength, key, keyOffset, endIndex)
+                    rightBuilder.storeSlice(value)
+                    val right = context.finalizeCell(rightBuilder)
 //                    println("tree left: ${left}")
 //                    println("data left: ${left.bits.toBinary()}")
 //                    println("leaf right: ${right.hash()}")
                     val builder = CellBuilder()
-                    builder.storeLabel(prevKeyLength, prefix, 0, prefix.size)
+                    builder.storeLabel(prevKeyLength, label, 0, prefixLen)
                     if (oldToRight) {
                         builder.storeRef(right)
                         builder.storeRef(left)
@@ -122,9 +118,9 @@ public class RawDictionary(
                 if (data.refs.size != 2) {
                     throw CellUnderflowException("Not enough references in fork")
                 }
-                keyOffset += prefix.size
+                keyOffset += prefixLen
                 val nextBranch = key[keyOffset++]
-                val child: Cell = context.loadCell(data.refs[if (nextBranch) 1 else 0])
+                val child = context.loadCell(data.refs[if (nextBranch) 1 else 0])
 //                println("child: ${child.hash()}")
                 stack.addLast(
                     Segment(
@@ -174,7 +170,7 @@ public class RawDictionary(
     override fun toString(): String = "RawDictionary(${root?.hash()})"
 
     private class Segment(
-        val data: Cell,
+        val data: DataCell,
         /**
          * Which branch to take when traversing the tree,
          * `false` - left, `true` - right
@@ -224,25 +220,25 @@ internal fun readLabel(label: CellSlice, keyBitLength: Int): BitString {
         // hml_short$0 unary_succ$1
         0b01 -> {
             label.skipBits(1)
-            val len = label.bits.countLeadingBits(fromIndex = label.bitsPosition, bit = true)
+            val len = label.countLeadingBits(bit = true)
             label.skipBits(len + 1)
-            return label.loadBits(len)
+            return label.loadBitString(len)
         }
         // hml_long$10
         0b10 -> {
             label.skipBits(2)
             val len = label.loadUIntLeq(keyBitLength).toInt()
-            return label.loadBits(len)
+            return label.loadBitString(len)
         }
         // hml_same$11
         0b11 -> {
             label.skipBits(2)
-            val bits = when (label.loadBit()) {
+            val bits = when (label.loadBoolean()) {
                 true -> BitString.ALL_ONE
                 false -> BitString.ALL_ZERO
             }
             val len = label.loadUIntLeq(keyBitLength).toInt()
-            return bits.slice(0, len)
+            return bits.substring(0, len)
         }
 
         else -> throw IllegalArgumentException("Invalid label type: $labelType")
@@ -351,5 +347,3 @@ internal fun readLabel(label: CellSlice, keyBitLength: Int): BitString {
 //        NoElements
 //    }
 //}
-
-private val CellSlice.data get() = bits.slice(bitsPosition, bits.size)

@@ -1,23 +1,25 @@
 package org.ton.cell
 
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 
 public class PrunedBranchCell(
-    private val hash: BitString,
+    private val hash: ByteString,
     private val depth: Int,
-    override val descriptor: CellDescriptor,
-    override val bits: BitString
+    public val descriptor: CellDescriptor,
+    public val bits: BitString
 ) : Cell {
-    override val refs: List<Cell> get() = emptyList()
+    override val levelMask: LevelMask = descriptor.levelMask
+    private var hashCode: Int = 0
 
-    override fun hash(level: Int): BitString {
+    override fun hash(level: Int): ByteString {
         val hashIndex = descriptor.levelMask.apply(level).hashIndex
         return if (hashIndex == descriptor.levelMask.level) {
             hash
         } else {
             val offset = 2 + hashIndex * 32
-            bits.toByteArray().copyOfRange(offset, offset + 32).toBitString()
+            ByteString(*bits.toByteArray().copyOfRange(offset, offset + 32))
         }
     }
 
@@ -32,16 +34,26 @@ public class PrunedBranchCell(
         }
     }
 
+    override fun treeWalk(): Sequence<Cell> = emptySequence()
+
     override fun virtualize(offset: Int): Cell =
         VirtualCell(this, offset)
 
-    override fun toString(): String = "$type x{$bits}"
+    override fun toString(): String = "Cell(${CellType.PRUNED_BRANCH}, ${hash().toHexString()})"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PrunedBranchCell) return false
-        return hash == other.hash
+        if (hashCode != 0 && other.hashCode != 0 && hashCode != other.hashCode) return false
+        return hash() == other.hash()
     }
 
-    override fun hashCode(): Int = hash.hashCode()
+    override fun hashCode(): Int {
+        var hc = hashCode
+        if (hc == 0) {
+            hc = hash().hashCode()
+            hashCode = hc
+        }
+        return hc
+    }
 }

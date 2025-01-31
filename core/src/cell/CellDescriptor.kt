@@ -70,6 +70,7 @@ public interface CellDescriptor {
         public const val HAS_HASHES_MASK: Int = 0b0001_0000
         public const val IS_EXOTIC_MASK: Int = 0b0000_1000
         public const val REFERENCE_COUNT_MASK: Int = 0b0000_0111
+        public val EMPTY: CellDescriptor = CellDescriptorImpl(0, 0)
 
         @JvmStatic
         public fun computeD1(levelMask: LevelMask, isExotic: Boolean, referenceCount: Int): Byte {
@@ -87,20 +88,20 @@ public interface CellDescriptor {
         }
 
         @JvmStatic
+        public fun from(levelMask: LevelMask, isExotic: Boolean, referenceCount: Int, bitLength: Int): CellDescriptor =
+            fromBytes(computeD1(levelMask, isExotic, referenceCount), computeD2(bitLength))
+
+        @JvmStatic
         public fun fromBytes(source: ByteArray): CellDescriptor =
-            CellDescriptorImpl(source[0], source[1])
+            fromBytes(source[0], source[1])
 
         @JvmStatic
         public fun fromBytes(source: ByteArray, startIndex: Int): CellDescriptor =
-            CellDescriptorImpl(source[startIndex], source[startIndex + 1])
+            fromBytes(source[startIndex], source[startIndex + 1])
 
         @JvmStatic
         public fun fromBytes(d1: Byte, d2: Byte): CellDescriptor =
-            CellDescriptorImpl(d1, d2)
-
-        @JvmStatic
-        public fun from(levelMask: LevelMask, isExotic: Boolean, referenceCount: Int, bitLength: Int): CellDescriptor =
-            CellDescriptorImpl(computeD1(levelMask, isExotic, referenceCount), computeD2(bitLength))
+            if (d1 == 0.toByte() && d2 == 0.toByte()) EMPTY else CellDescriptorImpl(d1, d2)
     }
 }
 

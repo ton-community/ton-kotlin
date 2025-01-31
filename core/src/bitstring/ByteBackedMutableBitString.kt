@@ -2,26 +2,31 @@ package org.ton.bitstring
 
 import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
 import kotlin.jvm.JvmStatic
 
 public open class ByteBackedMutableBitString(
-    override var bytes: ByteArray,
+    override var data: ByteArray,
     override var size: Int
-) : ByteBackedBitString(size, bytes), MutableBitString {
+) : ByteBackedBitString(size, data), MutableBitString {
     override operator fun set(index: Int, bit: Int) {
         set(index, bit != 0)
     }
 
     override operator fun set(index: Int, element: Boolean): Boolean {
-        return set(bytes, index, element)
+        val wordIndex = index.byteIndex
+        val bitMask = index.bitMask
+        val before = data[wordIndex].toInt()
+        if (element) {
+            data[wordIndex] = (before or bitMask).toByte()
+        } else {
+            data[wordIndex] = (before and bitMask.inv()).toByte()
+        }
+        return before and bitMask != 0
     }
 
     override fun setBitsAt(index: Int, value: BitString) {
         if (value is ByteBackedBitString) {
-            bitsCopy(bytes, index, value.bytes, 0, value.size)
+            bitsCopy(data, index, value.data, 0, value.size)
         } else {
             if (value.size == 0) return
             value.forEachIndexed { i, bit ->
@@ -37,11 +42,11 @@ public open class ByteBackedMutableBitString(
     }
 
     override fun setBitsAt(index: Int, value: ByteArray, bitCount: Int) {
-        bitsCopy(bytes, index, value, 0, bitCount)
+        bitsCopy(data, index, value, 0, bitCount)
     }
 
     override fun setBitsAt(index: Int, value: ByteString, bitCount: Int) {
-        bitsCopy(bytes, index, value.toByteArray(), 0, bitCount)
+        bitsCopy(data, index, value.toByteArray(), 0, bitCount)
     }
 
     override fun setBigIntAt(index: Int, value: BigInt, bits: Int) {
@@ -68,8 +73,8 @@ public open class ByteBackedMutableBitString(
     }
 
     override fun setUBigIntAt(index: Int, value: BigInt, bits: Int) {
-        check(value.bitLength <= bits) { "Integer `$value` does not fit into $bits bits" }
-//        require(value.sign >= 0) { "Integer `$value` must be unsigned" }
+        require(value.bitLength <= bits) { "Integer `$value` does not fit into $bits bits" }
+        require(value.sign >= 0) { "Integer `$value` must be unsigned" }
         for (i in 0 until bits) {
             set(index + i, value.bitAt(bits - i - 1))
         }
@@ -80,14 +85,14 @@ public open class ByteBackedMutableBitString(
         if (other !is ByteBackedBitString) return false
 
         if (size != other.size) return false
-        if (!bytes.contentEquals(other.bytes)) return false
+        if (!data.contentEquals(other.data)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = size
-        result = 31 * result + bytes.contentHashCode()
+        result = 31 * result + data.contentHashCode()
         return result
     }
 
@@ -107,7 +112,7 @@ public open class ByteBackedMutableBitString(
         @JvmStatic
         public fun of(bitString: BitString, size: Int = bitString.size): ByteBackedMutableBitString {
             return if (bitString is ByteBackedBitString) {
-                of(bitString.bytes, size)
+                of(bitString.data, size)
             } else {
                 val result = of(size)
                 bitString.forEachIndexed { index, bit ->
@@ -115,19 +120,6 @@ public open class ByteBackedMutableBitString(
                 }
                 result
             }
-        }
-
-        @JvmStatic
-        protected fun set(bytes: ByteArray, index: Int, element: Boolean): Boolean {
-            val wordIndex = index.byteIndex
-            val bitMask = index.bitMask
-            val previous = get(bytes, index)
-            if (element) {
-                bytes[wordIndex] = bytes[wordIndex] or bitMask
-            } else {
-                bytes[wordIndex] = bytes[wordIndex] and bitMask.inv()
-            }
-            return previous
         }
     }
 }

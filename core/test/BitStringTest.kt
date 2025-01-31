@@ -39,44 +39,44 @@ class BitStringTest {
         assertBitString("100010", "8A_")
         assertBitString("00101101100", "2D9_")
     }
-
-    @Test
-    fun `BitString concatenation without shifting`() {
-        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + BitString("BABE"))
-        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + byteArrayOf(0xBA.toByte(), 0xBE.toByte()))
-        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + BitString("BEEF"))
-        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + byteArrayOf(0xBE.toByte(), 0xEF.toByte()))
-
-        val bytes1 = Random.nextBytes(8)
-        val bytes2 = Random.nextBytes(8)
-        val expectedBytes = bytes1 + bytes2
-        assertEquals(BitString(expectedBytes), BitString(bytes1) + bytes2)
-    }
-
-    @Test
-    fun `BitString concatenation with shifting`() {
-        assertEquals(BitString.binary("100000001"), BitString.binary("10000000") + BitString.binary("1"))
-        assertEquals(BitString.binary("1000000011"), BitString.binary("10000000") + BitString.binary("11"))
-        assertEquals(BitString.binary("10000000111"), BitString.binary("10000000") + BitString.binary("111"))
-        assertEquals(BitString.binary("100000001111"), BitString.binary("10000000") + BitString.binary("1111"))
-        assertEquals(BitString.binary("1000000011111"), BitString.binary("10000000") + BitString.binary("11111"))
-        assertEquals(BitString.binary("10000000111111"), BitString.binary("10000000") + BitString.binary("111111"))
-        assertEquals(BitString.binary("100000001111111"), BitString.binary("10000000") + BitString.binary("1111111"))
-    }
-
-    @Test
-    fun `BitString concatenation with double-shifting`() {
-        assertEquals(BitString("AB"), BitString("A") + BitString("B"))
-        assertEquals(BitString("BC"), BitString("B") + BitString("C"))
-        assertEquals(BitString("CD"), BitString("C") + BitString("D"))
-        assertEquals(BitString.binary("100000010000001"), BitString.binary("1000000") + BitString.binary("10000001"))
-        assertEquals(BitString.binary("100000110000001"), BitString.binary("100000") + BitString.binary("110000001"))
-        assertEquals(BitString.binary("100001110000001"), BitString.binary("10000") + BitString.binary("1110000001"))
-        assertEquals(BitString.binary("100011110000001"), BitString.binary("1000") + BitString.binary("11110000001"))
-        assertEquals(BitString.binary("100111110000001"), BitString.binary("100") + BitString.binary("111110000001"))
-        assertEquals(BitString.binary("101111110000001"), BitString.binary("10") + BitString.binary("1111110000001"))
-        assertEquals(BitString.binary("101111110000001"), BitString.binary("1") + BitString.binary("01111110000001"))
-    }
+//
+//    @Test
+//    fun `BitString concatenation without shifting`() {
+//        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + BitString("BABE"))
+//        assertEquals(BitString("CAFEBABE"), BitString("CAFE") + byteArrayOf(0xBA.toByte(), 0xBE.toByte()))
+//        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + BitString("BEEF"))
+//        assertEquals(BitString("FEEDBEEF"), BitString("FEED") + byteArrayOf(0xBE.toByte(), 0xEF.toByte()))
+//
+//        val bytes1 = Random.nextBytes(8)
+//        val bytes2 = Random.nextBytes(8)
+//        val expectedBytes = bytes1 + bytes2
+//        assertEquals(BitString(expectedBytes), BitString(bytes1) + bytes2)
+//    }
+//
+//    @Test
+//    fun `BitString concatenation with shifting`() {
+//        assertEquals(BitString.binary("100000001"), BitString.binary("10000000") + BitString.binary("1"))
+//        assertEquals(BitString.binary("1000000011"), BitString.binary("10000000") + BitString.binary("11"))
+//        assertEquals(BitString.binary("10000000111"), BitString.binary("10000000") + BitString.binary("111"))
+//        assertEquals(BitString.binary("100000001111"), BitString.binary("10000000") + BitString.binary("1111"))
+//        assertEquals(BitString.binary("1000000011111"), BitString.binary("10000000") + BitString.binary("11111"))
+//        assertEquals(BitString.binary("10000000111111"), BitString.binary("10000000") + BitString.binary("111111"))
+//        assertEquals(BitString.binary("100000001111111"), BitString.binary("10000000") + BitString.binary("1111111"))
+//    }
+//
+//    @Test
+//    fun `BitString concatenation with double-shifting`() {
+//        assertEquals(BitString("AB"), BitString("A") + BitString("B"))
+//        assertEquals(BitString("BC"), BitString("B") + BitString("C"))
+//        assertEquals(BitString("CD"), BitString("C") + BitString("D"))
+//        assertEquals(BitString.binary("100000010000001"), BitString.binary("1000000") + BitString.binary("10000001"))
+//        assertEquals(BitString.binary("100000110000001"), BitString.binary("100000") + BitString.binary("110000001"))
+//        assertEquals(BitString.binary("100001110000001"), BitString.binary("10000") + BitString.binary("1110000001"))
+//        assertEquals(BitString.binary("100011110000001"), BitString.binary("1000") + BitString.binary("11110000001"))
+//        assertEquals(BitString.binary("100111110000001"), BitString.binary("100") + BitString.binary("111110000001"))
+//        assertEquals(BitString.binary("101111110000001"), BitString.binary("10") + BitString.binary("1111110000001"))
+//        assertEquals(BitString.binary("101111110000001"), BitString.binary("1") + BitString.binary("01111110000001"))
+//    }
 
     @Test
     fun `random BitString`() {

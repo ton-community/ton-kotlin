@@ -3,10 +3,11 @@ package org.ton.boc
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import org.ton.cell.Cell
+import org.ton.cell.DataCell
 import kotlin.math.min
 
 public class CachedBagOfCells(
-    override val roots: List<Cell>
+    override val roots: List<DataCell>
 ) : BagOfCells, Iterable<Cell> {
     private var cellCount = 0
     private var cellHashmap = HashMap<Cell, Int>()
@@ -27,11 +28,7 @@ public class CachedBagOfCells(
         return buffer.readByteArray()
     }
 
-    override fun toString(): String = buildString {
-        roots.forEachIndexed { _, cell ->
-            Cell.toString(cell, this)
-        }
-    }
+    override fun toString(): String = "CachedBagOfCells(roots=$roots)"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -61,6 +58,7 @@ public class CachedBagOfCells(
 
     private fun importCell(cell: Cell, depth: Int): Int {
         check(depth <= Cell.MAX_DEPTH) { "error while importing a cell into a bag of cells: cell depth too large" }
+        check(cell is DataCell) { "Can't import cell: $cell" }
 
         val currentIndex = cellHashmap[cell]
         if (currentIndex != null) {

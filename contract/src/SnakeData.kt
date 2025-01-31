@@ -3,7 +3,6 @@ package org.ton.contract
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.loadRef
 import org.ton.cell.storeRef
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
@@ -40,7 +39,7 @@ public data class SnakeDataTail(
         }
 
         override fun loadTlb(cellSlice: CellSlice): SnakeDataTail =
-            SnakeDataTail(cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitsPosition))
+            SnakeDataTail(cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitPosition))
     }
 }
 
@@ -62,7 +61,7 @@ public data class SnakeDataCons(
 
         override fun loadTlb(cellSlice: CellSlice) =
             SnakeDataCons(
-                cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitsPosition),
+                cellSlice.loadBits(cellSlice.bits.size - cellSlice.bitPosition),
                 cellSlice.loadRef {
                     loadTlb(SnakeData)
                 }

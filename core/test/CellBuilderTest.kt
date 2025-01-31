@@ -12,7 +12,7 @@ class CellBuilderTest {
         val cell = CellBuilder.beginCell()
             .endCell()
         assertEquals(0, cell.bits.size)
-        val empty = Cell()
+        val empty = Cell.EMPTY
         assertEquals(empty, cell)
     }
 

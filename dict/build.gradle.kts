@@ -6,5 +6,4 @@ plugins {
 
 dependencies {
     commonMainApi(projects.tonKotlinCore)
-    commonMainApi(projects.tonKotlinTlb)
 }

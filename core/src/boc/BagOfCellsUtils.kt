@@ -6,6 +6,7 @@ import kotlinx.io.*
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellDescriptor
+import org.ton.cell.DataCell
 import org.ton.cell.buildCell
 import kotlin.experimental.and
 
@@ -117,7 +118,7 @@ internal fun Source.readBagOfCell(): BagOfCells {
 //    }
 
     // Resolving references & constructing cells from leaves to roots
-    val asyncCells = Array<CompletableDeferred<Cell>>(cellCount) { CompletableDeferred() }
+    val asyncCells = Array<CompletableDeferred<DataCell>>(cellCount) { CompletableDeferred() }
     GlobalScope.launch {
         repeat(cellCount) { cellIndex ->
             launch {
@@ -139,22 +140,12 @@ internal fun Source.readBagOfCell(): BagOfCells {
         cells[rootIndex]
     }
 
-    return object : BagOfCells {
-        override val roots: List<Cell> = roots
-
-        override fun toString(): String = buildString {
-            roots.forEachIndexed { _, cell ->
-                Cell.toString(cell, this)
-            }
-        }
-
-        override fun iterator(): Iterator<Cell> = cells.iterator()
-    }
+    return BagOfCellsImpl(roots)
 }
 
 private suspend fun createCell(
     index: Int,
-    cells: Array<CompletableDeferred<Cell>>,
+    cells: Array<CompletableDeferred<DataCell>>,
     bits: Array<BitString>,
     refs: Array<IntArray>,
     descriptors: Array<CellDescriptor>,
@@ -260,6 +251,7 @@ private fun Sink.serializeBagOfCells(
 
     val serializedCells = cells.mapIndexed { index: Int, cell: Cell ->
         val cellBuffer = Buffer()
+        val cell = cell as? DataCell ?: throw IllegalStateException("Can't serialize cell $cell")
         val (d1, d2) = cell.descriptor
         cellBuffer.writeByte(d1)
         cellBuffer.writeByte(d2)

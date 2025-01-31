@@ -4,7 +4,10 @@ import io.github.andreypfau.kotlinx.crypto.Sha256
 import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
-import org.ton.bitstring.*
+import org.ton.bitstring.BitString
+import org.ton.bitstring.ByteBackedBitString
+import org.ton.bitstring.ByteBackedMutableBitString
+import org.ton.bitstring.MutableBitString
 import org.ton.cell.exception.CellOverflowException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -24,8 +27,8 @@ public interface CellBuilder {
     /**
      * Converts a builder into an ordinary cell.
      */
-    public fun endCell(): Cell = build()
-    public fun build(): Cell
+    public fun endCell(): DataCell = build()
+    public fun build(): DataCell
 
     public fun storeBit(value: Boolean): CellBuilder
     public fun storeBits(vararg value: Boolean): CellBuilder
@@ -54,8 +57,8 @@ public interface CellBuilder {
     public fun storeUInt(value: BigInt, bitLength: Int): CellBuilder
     public fun storeUInt(value: Byte, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
     public fun storeUInt(value: Short, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
-    public fun storeUInt(value: Int, bitLength: Int): CellBuilder = storeUInt(value.toBigInt(), bitLength)
-    public fun storeUInt(value: Long, bitLength: Int): CellBuilder = storeUInt(value.toBigInt(), bitLength)
+    public fun storeUInt(value: Int, bitLength: Int): CellBuilder = storeUInt(value.toUInt().toBigInt(), bitLength)
+    public fun storeUInt(value: Long, bitLength: Int): CellBuilder = storeUInt(value.toULong().toBigInt(), bitLength)
 
     public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
     public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
@@ -101,10 +104,6 @@ public interface CellBuilder {
 
     public companion object {
         @JvmStatic
-        public fun of(cell: Cell): CellBuilder =
-            CellBuilderImpl(cell.bits.toMutableBitString(), cell.refs.toMutableList())
-
-        @JvmStatic
         public fun beginCell(): CellBuilder = CellBuilderImpl()
 
         @OptIn(ExperimentalContracts::class)
@@ -120,17 +119,16 @@ public interface CellBuilder {
 
         @JvmStatic
         public fun createPrunedBranch(cell: Cell, merkleDepth: Int): Cell = buildCell {
-            val descriptor = cell.descriptor
-            val levelMask = LevelMask.level(descriptor.levelMask.mask or (1 shl merkleDepth)).also {
+            val levelMask = LevelMask.level(cell.levelMask.mask or (1 shl merkleDepth)).also {
                 levelMask = it
             }
             isExotic = true
             storeByte(CellType.PRUNED_BRANCH.value.toByte())
             storeByte(levelMask.mask.toByte())
 
-            val hashCount = descriptor.hashCount
+            val hashCount = cell.levelMask.hashCount
             repeat(hashCount) { level ->
-                storeBits(cell.hash(level))
+                storeByteString(cell.hash(level))
             }
             repeat(hashCount) { level ->
                 storeUInt16(cell.depth(level).toUShort())
@@ -146,7 +144,7 @@ public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
 }
 
 @OptIn(ExperimentalContracts::class)
-public inline fun buildCell(builderAction: CellBuilder.() -> Unit): Cell {
+public inline fun buildCell(builderAction: CellBuilder.() -> Unit): DataCell {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
     return CellBuilder.beginCell().apply(builderAction).endCell()
 }
@@ -159,14 +157,11 @@ public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): Cell
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
-
-@Suppress("NOTHING_TO_INLINE")
 public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
 private class CellBuilderImpl(
     var bits: MutableBitString = ByteBackedMutableBitString(ByteArray(128), 1023),
-    var refs: MutableList<Cell> = ArrayList(),
+    var refs: MutableList<Cell> = ArrayList(4),
     override var levelMask: LevelMask? = null,
     override var isExotic: Boolean = false
 ) : CellBuilder {
@@ -278,14 +273,16 @@ private class CellBuilderImpl(
     }
 
     override fun storeSlice(slice: CellSlice): CellBuilder = apply {
-        val (bits, refs) = slice
+        val cell = slice.cell
+        val bits = cell.bits
+        val refs = cell.refs
 
         checkBitsOverflow(bits.size)
         checkRefsOverflow(refs.size)
 
-        storeBitString(bits, slice.bitsPosition, bits.size)
-        for (i in slice.refsPosition until slice.refs.size) {
-            storeRef(slice.refs[i])
+        storeBitString(bits, slice.bitsStart, slice.bitsEnd)
+        for (i in slice.refsStart until slice.refsEnd) {
+            storeRef(refs[i])
         }
     }
 
@@ -294,7 +291,7 @@ private class CellBuilderImpl(
         return ByteBackedBitString.of(bytes, bitsPosition)
     }
 
-    override fun build(): Cell {
+    override fun build(): DataCell {
         var childrenMask = LevelMask()
         refs.forEach { child ->
             childrenMask = childrenMask or child.levelMask
@@ -304,33 +301,27 @@ private class CellBuilderImpl(
         val d1 = CellDescriptor.computeD1(levelMask, isExotic, refs.size)
         val d2 = CellDescriptor.computeD2(bitsPosition)
         val descriptor = CellDescriptor(d1, d2)
+        if (descriptor == CellDescriptor.EMPTY) {
+            return DataCell.EMPTY
+        }
 
         val bits = toBitString()
         val data = bits.toByteArray(augment = true)
-        val hashes = computeHashes(descriptor, data, childrenMask)
+        val levels = descriptor.levelMask.level + 1
+        val hashes = Array(levels) { ByteArray(32) }
+        val depths = IntArray(levels)
+        computeHashes(descriptor, data, childrenMask, hashes, depths)
 
-        return when (descriptor.cellType) {
-            CellType.PRUNED_BRANCH -> {
-                check(hashes.size == 1)
-                val (hash, depth) = hashes[0]
-                PrunedBranchCell(
-                    hash.toBitString(), depth, descriptor, bits
-                )
-            }
-
-            else -> if (descriptor == EmptyCell.descriptor) {
-                EmptyCell
-            } else {
-                DataCell(descriptor, bits, refs, hashes)
-            }
-        }
+        return DataCell(descriptor, bits, refs, Array(levels) { ByteString(*hashes[it]) }, depths)
     }
 
     private fun computeHashes(
         descriptor: CellDescriptor,
         data: ByteArray,
-        childrenMask: LevelMask
-    ): List<Pair<ByteArray, Int>> {
+        childrenMask: LevelMask,
+        hashes: Array<ByteArray>,
+        depths: IntArray
+    ) {
         var levels = descriptor.levelMask.level + 1
 
         val computedLevelMask = when (descriptor.cellType) {
@@ -404,10 +395,11 @@ private class CellBuilderImpl(
         }
 
         val levelOffset = if (descriptor.cellType.isMerkle) 1 else 0
-        val hashes = ArrayList<Pair<ByteArray, Int>>(levels)
 
         var (d1, d2) = descriptor
         val hasher = Sha256()
+        val refCount = refs.size
+        val buf = ByteArray(max(2, (32 + 2) * refCount))
         repeat(levels) { level ->
             hasher.reset()
             val levelMask = if (descriptor.cellType == CellType.PRUNED_BRANCH) {
@@ -417,35 +409,36 @@ private class CellBuilderImpl(
             }
             d1 = d1 and (CellDescriptor.LEVEL_MASK or CellDescriptor.HAS_HASHES_MASK).inv().toByte()
             d1 = d1 or (levelMask.mask shl 5).toByte()
-            hasher.update(d1)
-            hasher.update(d2)
+            buf[0] = d1
+            buf[1] = d2
+            hasher.update(buf, 0, 2)
 
             if (level == 0) {
                 hasher.update(data)
             } else {
-                val prevHash = hashes[level - 1].first
+                val prevHash = hashes[level - 1]
                 hasher.update(prevHash)
             }
 
             var depth = 0
-            refs.forEach { child ->
+            val hashOffset = 2 * refCount
+            repeat(refCount) { refIndex ->
+                val child = refs[refIndex]
                 val childDepth = child.depth(level + levelOffset)
                 depth = max(depth, childDepth + 1)
 
-                hasher.update((childDepth ushr Byte.SIZE_BITS).toByte())
-                hasher.update(childDepth.toByte())
+                val depthOffset = 2 * refIndex
+                buf[depthOffset] = (childDepth ushr Byte.SIZE_BITS).toByte()
+                buf[depthOffset + 1] = childDepth.toByte()
+                child.hash(level + levelOffset).copyInto(buf, hashOffset + 32 * refIndex)
+            }
+            if (refCount > 0) {
+                hasher.update(buf)
             }
 
-            refs.forEach { child ->
-                val childHash = child.hash(level + levelOffset).toByteArray()
-                hasher.update(childHash)
-            }
-
-            val hash = hasher.digest()
-            hashes.add(hash to depth)
+            depths[level] = depth
+            hasher.digest(hashes[level])
         }
-
-        return hashes
     }
 
     override fun toString(): String = endCell().toString()

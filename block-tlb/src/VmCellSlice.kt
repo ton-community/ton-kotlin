@@ -20,7 +20,7 @@ public data class VmCellSlice(
             storeBits(cellSlice.bits)
             storeRefs(cellSlice.refs)
         },
-        stBits = cellSlice.bitsPosition,
+        stBits = cellSlice.bitPosition,
         endBits = cellSlice.bits.size,
         stRef = cellSlice.refsPosition,
         endRef = cellSlice.refs.size

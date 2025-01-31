@@ -29,19 +29,19 @@ public data class HmEdge<T>(
             return HmEdge(this.label, node.set(key, value))
         } else {
             val labelPrefix = label.commonPrefixWith(key)
-            val labelReminder = label.slice(labelPrefix.size)
-            val keyReminder = key.slice(labelPrefix.size)
+            val labelReminder = label.substring(labelPrefix.size)
+            val keyReminder = key.substring(labelPrefix.size)
 
             if (keyReminder.isEmpty()) {
                 throw IllegalArgumentException("variable length key: $key")
             } else if (!labelReminder.isEmpty() && !keyReminder.isEmpty()) {
                 // forking
                 val (left, right) = if (keyReminder[0]) {
-                    HmEdge(HmLabel(labelReminder.slice(1)), node) to
-                            HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value))
+                    HmEdge(HmLabel(labelReminder.substring(1)), node) to
+                            HmEdge(HmLabel(keyReminder.substring(1)), HmnLeaf(value))
                 } else {
-                    HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value)) to
-                            HmEdge(HmLabel(labelReminder.slice(1)), node)
+                    HmEdge(HmLabel(keyReminder.substring(1)), HmnLeaf(value)) to
+                            HmEdge(HmLabel(labelReminder.substring(1)), node)
                 }
                 return HmEdge(HmLabel(labelPrefix), HmnFork(left, right))
             } else if (!labelPrefix.isEmpty() && labelReminder.isEmpty() && !keyReminder.isEmpty()) {

@@ -80,7 +80,7 @@ private data class AhmeEdgeImpl<X, Y>(
                     } else {
                         node.loadLeft()
                     } as HashmapAug.AhmEdge<X, Y>
-                    k = k.slice(commonPrefix.size + 1)
+                    k = k.substring(commonPrefix.size + 1)
                 }
             }
         }

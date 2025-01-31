@@ -1,14 +1,11 @@
 package org.ton.cell
 
-import org.ton.bitstring.BitString
+import kotlinx.io.bytestring.ByteString
 
 internal class VirtualCell(
     val cell: Cell,
     val offset: Int
 ) : Cell by cell {
-    override val refs: List<Cell>
-        get() = cell.refs.map { it.virtualize(offset) }
-
     override val levelMask: LevelMask
         get() = cell.levelMask.virtualize(offset)
 
@@ -17,15 +14,7 @@ internal class VirtualCell(
         else VirtualCell(cell, offset)
     }
 
-    override fun hash(level: Int): BitString {
-        return cell.hash(levelMask.apply(level).level)
-    }
+    override fun hash(level: Int): ByteString = cell.hash(levelMask.apply(level).level)
 
-    override fun depth(level: Int): Int {
-        return cell.depth(levelMask.apply(level).level)
-    }
-
-    override fun beginParse(): CellSlice {
-        return CellSlice.beginParse(this)
-    }
+    override fun depth(level: Int): Int = cell.depth(levelMask.apply(level).level)
 }

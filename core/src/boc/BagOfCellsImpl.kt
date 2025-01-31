@@ -3,11 +3,12 @@ package org.ton.boc
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import org.ton.cell.Cell
+import org.ton.cell.DataCell
 
 internal data class BagOfCellsImpl(
-    override val roots: List<Cell>
+    override val roots: List<DataCell>
 ) : BagOfCells, List<Cell> by roots {
-    constructor(root: Cell) : this(roots = listOf(root))
+    constructor(root: DataCell) : this(roots = listOf(root))
 
     override fun iterator(): Iterator<Cell> = iterator {
         yieldAll(roots)
@@ -22,9 +23,5 @@ internal data class BagOfCellsImpl(
         return buffer.readByteArray()
     }
 
-    override fun toString(): String = buildString {
-        roots.forEach { cell ->
-            Cell.toString(cell, this)
-        }
-    }
+    override fun toString(): String = "BagOfCellsImpl(roots=$roots)"
 }

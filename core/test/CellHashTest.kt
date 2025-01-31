@@ -1,6 +1,7 @@
 package org.ton.cell
 
-import org.ton.bitstring.BitString
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,7 +30,7 @@ class CellHashTest {
         assertHex("6c2f0317132aad2b120968921bac0e3788b7588cc6ff470946e3ada3430d3338", c3.hash())
     }
 
-    private fun assertHex(expected: String, actual: BitString) {
-        assertEquals(expected, actual.toHexString().lowercase())
+    private fun assertHex(expected: String, actual: ByteString) {
+        assertEquals(expected, actual.toHexString())
     }
 }

@@ -32,7 +32,7 @@ public class WalletTransferBuilder {
             currencyCollection = currencyCollection.copy(coins = value)
         }
     public var sendMode: Int = 3
-    public var messageData: MessageData = MessageData.Raw(Cell.empty(), null)
+    public var messageData: MessageData = MessageData.Raw(Cell.EMPTY, null)
 
     public fun build(): WalletTransfer =
         WalletTransfer(destination, bounceable, currencyCollection, sendMode, messageData)

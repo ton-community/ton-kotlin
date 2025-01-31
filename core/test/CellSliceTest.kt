@@ -7,11 +7,11 @@ class CellSliceTest {
     @Test
     fun `extract ints from slice`() {
         Cell("0000010100000000000000457C_").parse {
-            assertEquals(0, loadUBigInt(16).toInt())
-            assertEquals(1, loadUBigInt(8).toInt())
-            assertEquals(1, loadUBigInt(8).toInt())
-            assertEquals(69, loadUBigInt(64).toInt())
-            assertEquals(15, loadUBigInt(5).toInt())
+            assertEquals(0, loadBigInt(16, false).toInt())
+            assertEquals(1, loadBigInt(8, false).toInt())
+            assertEquals(1, loadBigInt(8, false).toInt())
+            assertEquals(69, loadBigInt(64, false).toInt())
+            assertEquals(15, loadBigInt(5, false).toInt())
         }
         Cell("0000FF880FFFFFFFFFFFFFFDDC_").parse {
             assertEquals(0, loadBigInt(16).toInt())

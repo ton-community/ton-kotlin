@@ -4,369 +4,208 @@ package org.ton.cell
 
 import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
-import org.ton.bigint.toBigInt
+import org.ton.bigint.toUInt
 import org.ton.bigint.toULong
 import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
-import org.ton.bitstring.exception.BitStringUnderflowException
-import org.ton.cell.exception.CellUnderflowException
-import kotlin.jvm.JvmStatic
+import org.ton.bitstring.ByteBackedMutableBitString
+import org.ton.bitstring.MutableBitString
+import kotlin.experimental.inv
 
-public inline fun CellSlice(bits: BitString, refs: List<Cell> = emptyList()): CellSlice = CellSlice.of(bits, refs)
+public class CellSlice {
+    public val cell: DataCell
 
-public interface CellSlice {
-    public val bits: BitString
-    public val refs: List<Cell>
-    public var bitsPosition: Int
+    internal var bitsStart: Int = 0
+    internal val bitsEnd: Int
+
+    internal var refsStart: Int = 0
+    internal val refsEnd: Int
+
+    public constructor(cell: DataCell) {
+        this.cell = cell
+        this.bitsEnd = cell.bits.size
+        this.refsEnd = cell.refs.size
+    }
+
+    public constructor(slice: CellSlice, bitsCount: Int, refsCount: Int) {
+        this.cell = slice.cell
+        this.bitsEnd = slice.bitsStart + bitsCount
+        this.refsEnd = slice.refsEnd + refsCount
+    }
+
+    public var bitPosition: Int
+        get() = bitsStart
+        set(value) {
+            require(value <= bitsEnd) { "bitsStart must be <= bitsEnd" }
+            bitsStart = value
+        }
+
     public var refsPosition: Int
-    public val remainingBits: Int get() = bits.size - bitsPosition
+        get() = refsStart
+        set(value) {
+            require(value <= refsEnd) { "refsStart must be <= refsEnd" }
+            refsStart = value
+        }
+
+    public val size: Int get() = bitsEnd - bitsStart
+
+    public val refSize: Int get() = bitsStart - bitsEnd
 
     /**
      * Checks if slice is empty. If not, throws an exception.
      */
-    public fun endParse()
+    public fun endParse() {
+
+    }
 
     /**
      * Loads the first reference from the slice.
      */
-    public fun loadRef(): Cell
-    public fun loadRefs(count: Int): List<Cell>
+    public fun loadRef(): Cell {
+        check(refsPosition < refSize)
+        return cell.refs[refsPosition++]
+    }
 
-    public fun preloadRef(): Cell
-    public fun preloadRefs(count: Int): List<Cell>
-    public fun <T> preloadRef(cellSlice: CellSlice.() -> T): T
+    public fun preloadRef(offset: Int = 0): Cell {
+        return cell.refs[refsPosition + offset]
+    }
 
-    public fun loadBit(): Boolean
-    public fun preloadBit(): Boolean
+    public fun getBit(offset: Int): Int {
+        return cell.bits.getBit(bitsStart + offset)
+    }
 
-    public fun skipBits(bitLength: Int): CellSlice
+    public fun loadBoolean(): Boolean {
+        return cell.bits[bitsStart++]
+    }
 
-    public fun loadBits(bitLength: Int): BitString
-    public fun preloadBits(bitLength: Int): BitString
+    public fun preloadBoolean(): Boolean {
+        return cell.bits[bitsStart]
+    }
 
-    public fun loadByteArray(bitLength: Int): ByteArray
-    public fun preloadByteArray(bitLength: Int): ByteArray
+    public fun skipBits(bitCount: Int): Boolean {
+        if (bitCount > size) return false
+        bitsStart += bitCount
+        return true
+    }
 
-    public fun loadByteString(bitLength: Int): ByteString = ByteString(* loadByteArray(bitLength))
-    public fun preloadByteString(bitLength: Int): ByteString = ByteString(*preloadByteArray(bitLength))
+    public fun skipRefs(refCount: Int): Boolean {
+        if (refCount > refSize) return false
+        refsStart += refCount
+        return true
+    }
 
-    public fun loadBigInt(bitLength: Int): BigInt
-    public fun preloadBigInt(bitLength: Int): BigInt
+    public fun preloadBitString(bitCount: Int): BitString {
+        require(bitCount <= size)
+        val result = cell.bits.substring(bitsStart, bitsStart + bitCount)
+        return result
+    }
 
-    public fun loadInt(bitLength: Int = Int.SIZE_BITS): Int = loadLong(bitLength).toInt()
-    public fun preloadInt(bitLength: Int = Int.SIZE_BITS): Int = preloadLong(bitLength).toInt()
+    public fun loadBitString(bitCount: Int): BitString {
+        val result = preloadBitString(bitCount)
+        bitsStart += bitCount
+        return result
+    }
 
-    public fun loadLong(bitLength: Int = Long.SIZE_BITS): Long = loadBigInt(bitLength).toLong()
-    public fun preloadLong(bitLength: Int = Long.SIZE_BITS): Long = preloadBigInt(bitLength).toLong()
+    public fun preloadBitsTo(destination: MutableBitString, startIndex: Int = 0, endIndex: Int = size) {
+        val bitCount = endIndex - startIndex
+        val untilIndex = bitsStart + bitCount
+        require(untilIndex <= size)
+        cell.bits.copyInto(destination, startIndex, bitsStart, bitsStart + bitCount)
+    }
 
-    public fun loadUBigInt(bitLength: Int): BigInt
-    public fun preloadUBigInt(bitLength: Int): BigInt
+    public fun loadBitsTo(destination: MutableBitString, startIndex: Int = 0, endIndex: Int = size) {
+        preloadBitsTo(destination, startIndex, endIndex)
+        bitsStart += (endIndex - startIndex)
+    }
 
-    public fun loadVarUInt(maxByteLength: Int): BigInt
-    public fun preloadVarUInt(maxByteLength: Int): BigInt
+    public fun preloadBytesTo(destination: ByteArray, startIndex: Int = 0, endIndex: Int = size) {
+        val byteCount = endIndex - startIndex
+        val bits = ByteBackedMutableBitString(ByteArray(byteCount), byteCount * Byte.SIZE_BITS)
+        loadBitsTo(bits)
+        bits.data.copyInto(destination, startIndex)
+    }
 
-    public fun loadUInt(bitLength: Int = UInt.SIZE_BITS): UInt = loadULong(bitLength).toUInt()
-    public fun preloadUInt(bitLength: Int = UInt.SIZE_BITS): UInt = preloadULong(bitLength).toUInt()
+    public fun loadBytesTo(destination: ByteArray, startIndex: Int = 0, endIndex: Int = size) {
+        preloadBytesTo(destination, startIndex, endIndex)
+        bitsStart += (endIndex - startIndex)
+    }
 
-    public fun loadULong(bitLength: Int = ULong.SIZE_BITS): ULong = loadUBigInt(bitLength).toULong()
-    public fun preloadULong(bitLength: Int = ULong.SIZE_BITS): ULong = preloadUBigInt(bitLength).toULong()
+    public fun preloadByteArray(byteCount: Int): ByteArray {
+        require(byteCount <= size)
+        val result = ByteArray(byteCount)
+        preloadBytesTo(result)
+        return result
+    }
 
-    public fun loadUIntLeq(max: Int): UInt {
-        val i = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
-        return i
+    public fun loadByteArray(byteCount: Int): ByteArray {
+        val result = preloadByteArray(byteCount)
+        bitsStart += byteCount
+        return result
+    }
+
+    public fun preloadByteString(byteCount: Int): ByteString = ByteString(*preloadByteArray(byteCount))
+    public fun loadByteString(byteCount: Int): ByteString = ByteString(*loadByteArray(byteCount))
+
+    public fun loadBigInt(bitCount: Int, signed: Boolean = true): BigInt {
+        val result = preloadBigInt(bitCount, signed)
+        bitsStart += bitCount
+        return result
+    }
+
+    public fun preloadBigInt(bitCount: Int, signed: Boolean = true): BigInt {
+        require(bitCount <= size)
+        if (bitCount == 0) return BigInt.ZERO
+        val bytes = ByteArray((bitCount + 7) ushr 3)
+        val bits = ByteBackedMutableBitString(bytes, bitCount)
+        val shift = (bytes.size * Byte.SIZE_BITS) - bitCount
+        return if (signed) {
+            cell.bits.copyInto(bits, 0, bitsStart + 1, bitsStart + bitCount)
+            val sign = if (getBit(0) != 0) {
+                // is it faster than `val int = 1 shl (bitCount - 1); if (uint >= int) (uint - (int * 2)) uint`?
+                bytes.forEachIndexed { index, byte ->
+                    bytes[index] = byte.inv()
+                }
+                -1
+            } else 1
+            BigInt(bytes, sign).shr(shift + 1)
+        } else {
+            cell.bits.copyInto(bits, 0, bitsStart, bitsStart + bitCount)
+            BigInt(bytes, 1).shr(shift)
+        }
+    }
+
+    public fun preloadLong(bitCount: Int = Long.SIZE_BITS): Long = preloadBigInt(bitCount, signed = true).toLong()
+    public fun loadLong(bitCount: Int = Long.SIZE_BITS): Long {
+        val result = preloadLong(bitCount)
+        bitsStart += bitCount
+        return result
+    }
+
+    public fun preloadInt(bitCount: Int = Int.SIZE_BITS): Int = preloadBigInt(bitCount, signed = true).toInt()
+    public fun loadInt(bitCount: Int = Int.SIZE_BITS): Int {
+        val result = preloadInt(bitCount)
+        bitsStart += bitCount
+        return result
+    }
+
+    public fun preloadULong(bitCount: Int = ULong.SIZE_BITS): ULong = preloadBigInt(bitCount, signed = false).toULong()
+    public fun loadULong(bitCount: Int = ULong.SIZE_BITS): ULong {
+        val result = preloadULong(bitCount)
+        bitsStart += bitCount
+        return result
+    }
+
+    public fun preloadUInt(bitCount: Int = UInt.SIZE_BITS): UInt = preloadBigInt(bitCount, signed = false).toUInt()
+    public fun loadUInt(bitCount: Int = UInt.SIZE_BITS): UInt {
+        val result = preloadUInt(bitCount)
+        bitsStart += bitCount
+        return result
     }
 
     public fun preloadUIntLeq(max: Int): UInt = preloadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
+    public fun loadUIntLeq(max: Int): UInt = loadUInt(Int.SIZE_BITS - max.countLeadingZeroBits())
 
-    public fun loadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
     public fun preloadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
+    public fun loadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
 
-    public fun isEmpty(): Boolean = bits.isEmpty() && refs.isEmpty()
-
-    public operator fun component1(): BitString = bits
-    public operator fun component2(): List<Cell> = refs
-
-    public companion object {
-        @JvmStatic
-        public fun beginParse(cell: Cell): CellSlice {
-            return of(cell.bits, cell.refs)
-        }
-
-        @JvmStatic
-        public fun of(bits: BitString, refs: List<Cell> = emptyList()): CellSlice {
-            return if (bits is ByteBackedBitString) {
-                CellSliceByteBackedBitString(bits, refs)
-            } else {
-                CellSliceImpl(bits, refs)
-            }
-        }
-    }
-}
-
-public inline operator fun <T> CellSlice.invoke(cellSlice: CellSlice.() -> T): T = let(cellSlice)
-
-public inline fun <T> CellSlice.loadRef(cellSlice: CellSlice.() -> T): T =
-    cellSlice(loadRef().beginParse())
-
-private open class CellSliceImpl(
-    override val bits: BitString,
-    override val refs: List<Cell>,
-    override var bitsPosition: Int = 0,
-    override var refsPosition: Int = 0
-) : CellSlice {
-    override fun endParse() =
-        check(bitsPosition >= bits.size) { "bitsPosition: $bitsPosition != bits.length: ${bits.size}" }
-
-    override fun loadRef(): Cell {
-        checkRefsOverflow()
-        val cell = preloadRef()
-        refsPosition++
-        return cell
-    }
-
-    override fun loadRefs(count: Int): List<Cell> = List(count) { loadRef() }
-
-    override fun preloadRef(): Cell = refs[refsPosition]
-
-    override fun <T> preloadRef(cellSlice: CellSlice.() -> T): T {
-        val slice = preloadRef().beginParse()
-        return cellSlice(slice)
-    }
-
-    override fun preloadRefs(count: Int): List<Cell> = List(refsPosition + count) { refs[it] }
-
-    override fun loadBit(): Boolean {
-        val bit = preloadBit()
-        bitsPosition++
-        return bit
-    }
-
-    override fun preloadBit(): Boolean = try {
-        bits[bitsPosition]
-    } catch (e: BitStringUnderflowException) {
-        throw CellUnderflowException(e)
-    }
-
-    override fun skipBits(bitLength: Int): CellSlice = apply {
-        bitsPosition += bitLength
-    }
-
-    override fun loadBits(bitLength: Int): BitString {
-        val bitString = preloadBits(bitLength)
-        bitsPosition += bitLength
-        return bitString
-    }
-
-    override fun preloadBits(bitLength: Int): BitString {
-        checkBitsOverflow(bitLength)
-        return bits.slice(bitsPosition..bitLength)
-    }
-
-    override fun loadByteArray(bitLength: Int): ByteArray {
-        val array = preloadByteArray(bitLength)
-        bitsPosition += bitLength
-        return array
-    }
-
-    override fun preloadByteArray(bitLength: Int): ByteArray {
-        val bitString = preloadBits(bitLength)
-        return bitString.toByteArray()
-    }
-
-    override fun loadBigInt(bitLength: Int): BigInt {
-        val int = preloadBigInt(bitLength)
-        bitsPosition += bitLength
-        return int
-    }
-
-    override fun preloadBigInt(bitLength: Int): BigInt {
-        val uint = preloadUBigInt(bitLength)
-        val int = BigInt.ONE shl (bitLength - 1)
-        return if (uint >= int) uint - (int * BigInt.TWO) else uint
-    }
-
-    override fun loadUBigInt(bitLength: Int): BigInt {
-        val uint = preloadUBigInt(bitLength)
-        bitsPosition += bitLength
-        return uint
-    }
-
-    override fun preloadUBigInt(bitLength: Int): BigInt {
-        if (bitLength == 0) return BigInt.ZERO
-        val bits = preloadBits(bitLength)
-        val intBits = buildString(bitLength) {
-            bits.forEach { bit ->
-                if (bit) {
-                    append('1')
-                } else {
-                    append('0')
-                }
-            }
-        }
-        return BigInt(intBits, 2)
-    }
-
-    override fun loadVarUInt(maxByteLength: Int): BigInt {
-        val bits = loadUIntLes(maxByteLength).toInt() * Byte.SIZE_BITS
-        return loadUBigInt(bits)
-    }
-
-    override fun preloadVarUInt(maxByteLength: Int): BigInt {
-        val tmp = bitsPosition
-        val value = loadVarUInt(maxByteLength)
-        bitsPosition = tmp
-        return value
-    }
-
-    fun checkBitsOverflow(length: Int) {
-        val remaining = bits.size - bitsPosition
-        require(length <= remaining) {
-            "Bits overflow. Can't load $length bits. $remaining bits left."
-        }
-    }
-
-    fun checkRefsOverflow() {
-        val remaining = 4 - refsPosition
-        require(1 <= remaining) {
-            "Refs overflow. Can't load ref. $remaining refs left."
-        }
-    }
-
-    override fun toString(): String = buildString {
-        append("x")
-        append(bits.toString())
-        if (refs.isNotEmpty()) {
-            append(",")
-            append(refs.size)
-        }
-    }
-}
-
-private class CellSliceByteBackedBitString(
-    override val bits: ByteBackedBitString,
-    refs: List<Cell>
-) : CellSliceImpl(bits, refs) {
-    val data get() = bits.bytes
-
-    fun getBits(offset: Int, length: Int): Byte {
-        val index = bitsPosition + offset
-        val q = index / 8
-        val r = index % 8
-        val result = if (r == 0) {
-            (data[q].toInt() and 0xFF) shr (8 - length)
-        } else if (length <= (8 - r)) {
-            ((data[q].toInt() and 0xFF) shr (8 - r - length)) and ((1 shl length) - 1)
-        } else {
-            var ret = 0
-            if (q < data.size) {
-                ret = ret or ((data[q].toInt() and 0xFF) shl 8)
-            }
-            if (q < data.size - 1) {
-                ret = ret or (data[q + 1].toInt() and 0xFF)
-            }
-            (ret shr (8 - r)).toByte().toInt() shr (8 - length)
-        }
-        return result.toByte()
-    }
-
-    fun getByte(offset: Int) = getBits(offset, 8)
-
-    fun getULong(length: Int): ULong {
-        if (length == 0) return 0uL
-        var value = 0uL
-        val bytes = length / 8
-        val remainder = length % 8
-        repeat(bytes) { i ->
-            val byte = getByte(8 * i).toInt() and 0xFF
-            value = value or (byte.toULong() shl (8 * (7 - i)))
-        }
-        if (remainder != 0) {
-            val r = getBits(bytes * 8, remainder).toInt() and 0xFF
-            value = value or (r.toULong() shl (8 * (7 - bytes) + (8 - remainder)))
-        }
-        return value shr (64 - length)
-    }
-
-    override fun preloadBits(bitLength: Int): BitString {
-        val array = preloadByteArray(bitLength)
-        return BitString(array, bitLength)
-    }
-
-    override fun preloadByteArray(bitLength: Int): ByteArray {
-        val bytes = bitLength / 8
-        val remainder = bitLength % 8
-        val arraySize = bytes + if (remainder != 0) 1 else 0
-        val array = ByteArray(arraySize)
-        if (bitsPosition % 8 == 0) {
-            val startIndex = bitsPosition / 8
-            data.copyInto(array, startIndex = startIndex, endIndex = startIndex + bytes)
-        } else {
-            repeat(bytes) { i ->
-                array[i] = getByte(i * 8)
-            }
-        }
-        if (remainder != 0) {
-            val v = getBits(bytes * 8, remainder).toInt() shl (8 - remainder)
-            array[array.lastIndex] = v.toByte()
-        }
-        return array
-    }
-
-    override fun preloadUBigInt(bitLength: Int): BigInt {
-        return when {
-            bitLength == 0 -> BigInt.ZERO
-            bitLength > 64 -> super.preloadUBigInt(bitLength)
-            bitLength == 8 -> {
-                val byte = getByte(0).toInt() and 0xFF
-                byte.toBigInt()
-            }
-
-            else -> {
-                val value = getULong(bitLength)
-                if (value > Long.MAX_VALUE.toULong()) {
-                    BigInt(value.toString(), 10)
-                } else {
-                    value.toBigInt()
-                }
-            }
-        }
-    }
-
-    override fun preloadBigInt(bitLength: Int): BigInt {
-        return when {
-            bitLength == 0 -> BigInt.ZERO
-            bitLength > 64 -> super.preloadBigInt(bitLength)
-            else -> {
-                val uint = getULong(bitLength).toLong()
-                val int = 1L shl (bitLength - 1)
-                if (uint >= int) {
-                    (uint - (int * 2)).toBigInt()
-                } else {
-                    uint.toBigInt()
-                }
-            }
-        }
-    }
-
-    override fun loadLong(bitLength: Int): Long {
-        val value = preloadLong(bitLength)
-        bitsPosition += bitLength
-        return value
-    }
-
-    override fun loadULong(bitLength: Int): ULong {
-        val value = preloadULong(bitLength)
-        bitsPosition += bitLength
-        return value
-    }
-
-    override fun preloadLong(bitLength: Int): Long = preloadULong(bitLength).toLong()
-
-    override fun preloadULong(bitLength: Int): ULong {
-        return when {
-            bitLength == 0 -> 0uL
-            bitLength <= 64 -> getULong(bitLength)
-            else -> throw IllegalArgumentException("expected length in 0..64, actual: $bitLength")
-        }
-    }
+    public fun countLeadingBits(bit: Boolean): Int = cell.bits.countLeadingBits(bitsStart, bitsEnd, bit)
 }
