@@ -39,6 +39,18 @@ class BitStringTest {
         assertBitString("100010", "8A_")
         assertBitString("00101101100", "2D9_")
     }
+
+    @Test
+    fun write() {
+        val a = BitString.binary("0000110111100000101101110010001011110010011010100000101100100001")
+//        val a = BitString.binary("100011011110000010110111001001110")
+//        val a = BitString.binary("100000000000000000000000000000000")
+        val b = ByteBackedMutableBitString(a.size + 1)
+
+        a.copyInto(b, 1)
+        println(a.toBinary())
+        println(b.toBinary())
+    }
 //
 //    @Test
 //    fun `BitString concatenation without shifting`() {

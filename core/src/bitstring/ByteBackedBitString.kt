@@ -10,6 +10,8 @@ public open class ByteBackedBitString protected constructor(
     override val size: Int,
     public open val data: ByteArray
 ) : BitString {
+    public constructor(size: Int) : this(size, ByteArray((size + 7) ushr 3))
+
     private var hashCode = 0
 
     override operator fun get(index: Int): Boolean = getOrNull(index) ?: throw BitStringUnderflowException()
@@ -50,7 +52,7 @@ public open class ByteBackedBitString protected constructor(
             return EmptyBitString
         }
         val size = endIndex - startIndex
-        val result = of(size)
+        val result = ByteBackedBitString(size)
         bitsCopy(result.data, 0, data, startIndex, size)
         return result
     }
@@ -176,7 +178,7 @@ public open class ByteBackedBitString protected constructor(
 
     public companion object {
         @JvmStatic
-        public fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, constructByteArray(size))
+        public fun of(size: Int = 0): ByteBackedBitString = ByteBackedBitString(size, ByteArray((size + 7) ushr 3))
 
         @JvmStatic
         public fun of(
@@ -186,31 +188,22 @@ public open class ByteBackedBitString protected constructor(
 
         @JvmStatic
         protected fun constructByteArray(bytes: ByteArray, size: Int): ByteArray {
-            return bytes.copyOf(bytesSize(size))
+            return bytes.copyOf((size + 7) ushr 3)
         }
 
         @JvmStatic
         protected fun expandByteArray(bytes: ByteArray, size: Int): ByteArray {
-            val requiredBytesSize = bytesSize(size)
+            val requiredBytesSize = (size + 7) ushr 3
             return when {
                 bytes.size < requiredBytesSize -> constructByteArray(bytes, size)
                 else -> bytes.copyOf(requiredBytesSize)
             }
         }
-
-        @JvmStatic
-        protected fun constructByteArray(size: Int): ByteArray {
-            return ByteArray(bytesSize(size))
-        }
-
-        private fun bytesSize(bits: Int): Int {
-            return bits / Byte.SIZE_BITS + if (bits % Byte.SIZE_BITS == 0) 0 else 1
-        }
     }
 }
 
 internal inline val Int.byteIndex get() = this / Byte.SIZE_BITS
-internal inline val Int.bitMask get() = (1 shl (7 - (this % Byte.SIZE_BITS)))
+internal inline val Int.bitMask get() = 0x80 ushr (this and 7)
 
 private fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
     val shift = bits % Byte.SIZE_BITS
@@ -232,6 +225,45 @@ private fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
         return newData
     }
 }
+
+internal fun bitsStoreLong(dest: ByteArray, toIndex: Int, value: Long, bitCount: Int) {
+    if (bitCount <= 0) return
+    val value = value shl (64 - bitCount)
+
+    var byteIndex = toIndex ushr 3
+    val bitOffset = toIndex and 7
+
+    var z = ((dest[byteIndex].toInt() and (0xFF ushr bitOffset).inv()).toLong() shl 56) or (value ushr bitOffset)
+    val adjustedBits = bitCount + bitOffset
+    if (adjustedBits > 64) {
+        dest.setLong(byteIndex, z)
+        z = value shl (8 - bitOffset)
+        val mask = 0xFF ushr (adjustedBits - 64)
+        dest[byteIndex + 8] = ((dest[byteIndex + 8].toInt() and mask) or (z.toInt() and mask.inv())).toByte()
+    } else {
+        var p = 56
+        val q = 64 - adjustedBits
+        if (q <= 32) {
+            dest.setInt(byteIndex, (z ushr 32).toInt())
+            byteIndex += 4
+            p -= 32
+        }
+        while (p >= q) {
+            dest[byteIndex++] = (z ushr p).toByte()
+            p -= 8
+        }
+        val remainingBits = p + 8 - q
+        if (remainingBits > 0) {
+            val mask = 0xFF ushr remainingBits
+            dest[byteIndex] = ((dest[byteIndex].toInt() and mask) or ((z ushr p).toInt() and mask.inv())).toByte()
+        }
+    }
+}
+
+internal expect fun ByteArray.setInt(index: Int, value: Int)
+internal expect fun ByteArray.getInt(index: Int): Int
+internal expect fun ByteArray.setLong(index: Int, value: Long)
+
 
 internal fun bitsCopy(dest: ByteArray, toIndex: Int, src: ByteArray, fromIndex: Int, bitCount: Int) {
     if (bitCount <= 0) return
@@ -267,29 +299,30 @@ internal fun bitsCopy(dest: ByteArray, toIndex: Int, src: ByteArray, fromIndex: 
         }
     } else {
         var bitsInAcc = toOffset
-        var accumulator = if (bitsInAcc > 0) dest[destOffset].toInt() ushr (8 - bitsInAcc) else 0
+        var accumulator = if (bitsInAcc != 0) dest[destOffset].toLong() ushr (8 - bitsInAcc) else 0L
 
         if (bitCountTotal < 8) {
             accumulator = accumulator shl remainingBits
-            accumulator = accumulator or ((src[srcOffset].toInt() and (0xff ushr fromOffset)) ushr (8 - bitCountTotal))
+            accumulator =
+                accumulator or ((src[srcOffset].toLong() and (0xffL ushr fromOffset)) ushr (8 - bitCountTotal))
             bitsInAcc += remainingBits
         } else {
             val leadingBits = 8 - fromOffset
             accumulator = (accumulator shl leadingBits)
-            accumulator = accumulator or (src[srcOffset++].toInt() and (0xff ushr fromOffset))
+            accumulator = accumulator or (src[srcOffset++].toLong() and (0xffL ushr fromOffset))
             bitsInAcc += leadingBits
             remainingBits -= leadingBits
 
             while (remainingBits >= 8) {
                 accumulator = accumulator shl 8
-                accumulator = accumulator or (src[srcOffset++].toInt() and 0xff)
-                bitsInAcc += 8
+                accumulator = accumulator or (src[srcOffset++].toLong() and 0xffL)
+                dest[destOffset++] = (accumulator ushr bitsInAcc).toByte()
                 remainingBits -= 8
             }
 
             if (remainingBits > 0) {
                 accumulator =
-                    (accumulator shl remainingBits) or ((src[srcOffset].toInt() and 0xff) ushr (8 - remainingBits))
+                    (accumulator shl remainingBits) or ((src[srcOffset].toLong() and 0xff) ushr (8 - remainingBits))
                 bitsInAcc += remainingBits
             }
         }
@@ -301,7 +334,7 @@ internal fun bitsCopy(dest: ByteArray, toIndex: Int, src: ByteArray, fromIndex: 
 
         if (bitsInAcc > 0) {
             dest[destOffset] =
-                ((dest[destOffset].toInt() and (0xff ushr bitsInAcc)) or (accumulator shl (8 - bitsInAcc))).toByte()
+                ((dest[destOffset].toInt() and (0xff ushr bitsInAcc)) or (accumulator.toInt() shl (8 - bitsInAcc))).toByte()
         }
     }
 }

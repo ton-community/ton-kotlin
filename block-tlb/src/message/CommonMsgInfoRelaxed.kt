@@ -12,7 +12,6 @@ import org.ton.block.message.address.AddrInt
 import org.ton.block.message.address.AddrStd
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbCombinatorProvider
 
@@ -101,9 +100,9 @@ private object CommonMsgInfoRelaxedTlbCombinator : TlbCombinator<CommonMsgInfoRe
         override fun storeTlb(
             cellBuilder: CellBuilder, value: CommonMsgInfoRelaxed.IntMsgInfoRelaxed
         ) = cellBuilder {
-            storeBit(value.ihrDisabled)
-            storeBit(value.bounce)
-            storeBit(value.bounced)
+            storeBoolean(value.ihrDisabled)
+            storeBoolean(value.bounce)
+            storeBoolean(value.bounced)
             if (value.src != null) {
                 storeTlb(AddrInt, value.src)
             } else {

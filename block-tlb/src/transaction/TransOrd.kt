@@ -5,7 +5,6 @@ import org.ton.block.Maybe
 import org.ton.block.transaction.phases.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -59,14 +58,14 @@ private object TransOrdTlbConstructor : TlbConstructor<TransOrd>(
         cellBuilder: CellBuilder,
         value: TransOrd
     ) = cellBuilder {
-        storeBit(value.creditFirst)
+        storeBoolean(value.creditFirst)
         storeTlb(maybeTrStoragePhase, value.storagePh)
         storeTlb(maybeTrCreditPhase, value.creditPh)
         storeTlb(ComputePhase.Companion, value.computePh)
         storeTlb(maybeTrActionPhase, value.action)
-        storeBit(value.aborted)
+        storeBoolean(value.aborted)
         storeTlb(maybeTrBouncePhase, value.bounce)
-        storeBit(value.destroyed)
+        storeBoolean(value.destroyed)
     }
 
     override fun loadTlb(

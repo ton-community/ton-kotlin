@@ -2,6 +2,7 @@ package org.ton.dict
 
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
+import org.ton.cell.CellSlice
 
 internal fun CellBuilder.storeLabel(
     maxKeyLength: Int,
@@ -21,20 +22,20 @@ internal fun CellBuilder.storeLabel(
     when {
         length > 1 && k < 2 * length - 1 && length == key.countLeadingBits(startIndex, endIndex, firstBit) -> {
             // mode 'hml_same$11', requires 3+k bits (for n>=2, k<2n-1)
-            storeUInt(if (firstBit) 0b111 else 0b110, 3)
-            storeUInt(length, k)
+            storeUInt(if (firstBit) 0b111u else 0b110u, 3)
+            storeUInt(length.toUInt(), k)
             return
         }
 
         k < length -> {
             // mode 'hml_long$10', requires 2+k+n bits
-            storeUInt(0b10, 2) // tag hml_long$10
-            storeUInt(length, k) // 'n:(#<= m)' from hml_long
+            storeUInt(0b10u, 2) // tag hml_long$10
+            storeUInt(length.toUInt(), k) // 'n:(#<= m)' from hml_long
         }
 
         else -> {
             // mode 'hml_short$0', requires 1+2n+1 bits
-            storeBit(false) // tag hml_short$0
+            storeBoolean(false) // tag hml_short$0
             // 'len:(Unary ~n)' from hml_short,
             // where -0b10 = 0b1111_1111_1111_1110,
             // unary_succ$1 - counter for n
@@ -44,4 +45,40 @@ internal fun CellBuilder.storeLabel(
         }
     }
     storeBitString(key, startIndex, endIndex)
+}
+
+internal fun CellSlice.readLabel(keyBitLength: Int): BitString {
+    val labelType = preloadUInt(2).toInt()
+    when (labelType) {
+        // hml_short$0 unary_zero$0
+        0b00 -> {
+            skipBits(bitCount = 2)
+            return BitString.empty()
+        }
+        // hml_short$0 unary_succ$1
+        0b01 -> {
+            skipBits(1)
+            val len = countLeadingBits(bit = true)
+            skipBits(len + 1)
+            return loadBitString(len)
+        }
+        // hml_long$10
+        0b10 -> {
+            skipBits(2)
+            val len = loadUIntLeq(keyBitLength).toInt()
+            return loadBitString(len)
+        }
+        // hml_same$11
+        0b11 -> {
+            skipBits(2)
+            val bits = when (loadBoolean()) {
+                true -> BitString.ALL_ONE
+                false -> BitString.ALL_ZERO
+            }
+            val len = loadUIntLeq(keyBitLength).toInt()
+            return bits.substring(0, len)
+        }
+
+        else -> throw IllegalArgumentException("Invalid label type: $labelType")
+    }
 }

@@ -1,13 +1,14 @@
 package org.ton.bitstring
 
 import kotlinx.io.bytestring.ByteString
-import org.ton.bigint.BigInt
 import kotlin.jvm.JvmStatic
 
 public open class ByteBackedMutableBitString(
     override var data: ByteArray,
     override var size: Int
 ) : ByteBackedBitString(size, data), MutableBitString {
+    public constructor(size: Int) : this(ByteArray((size + 7) ushr 3), size)
+
     override operator fun set(index: Int, bit: Int) {
         set(index, bit != 0)
     }
@@ -25,10 +26,10 @@ public open class ByteBackedMutableBitString(
     }
 
     override fun setBitsAt(index: Int, value: BitString) {
+        if (value.size == 0) return
         if (value is ByteBackedBitString) {
             bitsCopy(data, index, value.data, 0, value.size)
         } else {
-            if (value.size == 0) return
             value.forEachIndexed { i, bit ->
                 set(index + i, bit)
             }
@@ -49,36 +50,36 @@ public open class ByteBackedMutableBitString(
         bitsCopy(data, index, value.toByteArray(), 0, bitCount)
     }
 
-    override fun setBigIntAt(index: Int, value: BigInt, bits: Int) {
-        if (bits == 0) {
-            return
-        }
-        val bits = bits - 1
-        if (value.sign == -1) {
-            set(index, true)
-            val index = index + 1
-            val newValue = (BigInt.ONE shl bits) + value
-            for (i in 0 until bits) {
-                val bit = newValue.bitAt(bits - i - 1)
-                set(index + i, bit)
-            }
-        } else {
-            set(index, false)
-            val index = index + 1
-            for (i in 0 until bits) {
-                val bit = value.bitAt(bits - i - 1)
-                set(index + i, bit)
-            }
-        }
-    }
-
-    override fun setUBigIntAt(index: Int, value: BigInt, bits: Int) {
-        require(value.bitLength <= bits) { "Integer `$value` does not fit into $bits bits" }
-        require(value.sign >= 0) { "Integer `$value` must be unsigned" }
-        for (i in 0 until bits) {
-            set(index + i, value.bitAt(bits - i - 1))
-        }
-    }
+//    override fun setBigIntAt(index: Int, value: BigInt, bits: Int) {
+//        if (bits == 0) {
+//            return
+//        }
+//        val bits = bits - 1
+//        if (value.sign == -1) {
+//            set(index, true)
+//            val index = index + 1
+//            val newValue = (BigInt.ONE shl bits) + value
+//            for (i in 0 until bits) {
+//                val bit = newValue.bitAt(bits - i - 1)
+//                set(index + i, bit)
+//            }
+//        } else {
+//            set(index, false)
+//            val index = index + 1
+//            for (i in 0 until bits) {
+//                val bit = value.bitAt(bits - i - 1)
+//                set(index + i, bit)
+//            }
+//        }
+//    }
+//
+//    override fun setUBigIntAt(index: Int, value: BigInt, bits: Int) {
+//        require(value.bitLength <= bits) { "Integer `$value` does not fit into $bits bits" }
+//        require(value.sign >= 0) { "Integer `$value` must be unsigned" }
+//        for (i in 0 until bits) {
+//            set(index + i, value.bitAt(bits - i - 1))
+//        }
+//    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -99,8 +100,7 @@ public open class ByteBackedMutableBitString(
     public companion object {
         @JvmStatic
         public fun of(size: Int = 0): ByteBackedMutableBitString {
-            val bytes = constructByteArray(size)
-            return ByteBackedMutableBitString(bytes, size)
+            return ByteBackedMutableBitString(size)
         }
 
         @JvmStatic

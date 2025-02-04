@@ -5,9 +5,9 @@ import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
 import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.ByteBackedMutableBitString
-import org.ton.bitstring.MutableBitString
+import org.ton.bitstring.bitsCopy
+import org.ton.bitstring.bitsStoreLong
 import org.ton.cell.exception.CellOverflowException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -16,128 +16,6 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.jvm.JvmStatic
 import kotlin.math.max
-
-public interface CellBuilder {
-    public var levelMask: LevelMask?
-    public var isExotic: Boolean
-
-    public var bitsPosition: Int
-    public val remainingBits: Int
-
-    /**
-     * Converts a builder into an ordinary cell.
-     */
-    public fun endCell(): DataCell = build()
-    public fun build(): DataCell
-
-    public fun storeBit(value: Boolean): CellBuilder
-    public fun storeBits(vararg value: Boolean): CellBuilder
-    public fun storeBits(value: Collection<Boolean>): CellBuilder
-    public fun storeBits(value: BitString, bits: Int = value.size): CellBuilder
-    public fun storeBits(value: ByteArray, bits: Int): CellBuilder
-
-    public fun storeBitString(value: BitString, startIndex: Int = 0, endIndex: Int = value.size): CellBuilder
-
-    public fun storeByteArray(byteArray: ByteArray): CellBuilder
-    public fun storeByteString(byteString: ByteString): CellBuilder
-    public fun storeByte(byte: Byte): CellBuilder
-
-    /**
-     * Stores a reference to cell into builder.
-     */
-    public fun storeRef(ref: Cell): CellBuilder
-
-    public fun storeRefs(vararg refs: Cell): CellBuilder
-    public fun storeRefs(refs: Iterable<Cell>): CellBuilder
-    public fun storeRefs(refs: Collection<Cell>): CellBuilder
-
-    /**
-     * Stores an unsigned [bitLength]-bit integer [value] into builder for 0 ≤ [bitLength] ≤ 256.
-     */
-    public fun storeUInt(value: BigInt, bitLength: Int): CellBuilder
-    public fun storeUInt(value: Byte, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
-    public fun storeUInt(value: Short, bitLength: Int): CellBuilder = storeUInt(value.toInt(), bitLength)
-    public fun storeUInt(value: Int, bitLength: Int): CellBuilder = storeUInt(value.toUInt().toBigInt(), bitLength)
-    public fun storeUInt(value: Long, bitLength: Int): CellBuilder = storeUInt(value.toULong().toBigInt(), bitLength)
-
-    public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
-    public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
-    public fun storeUInt32(value: UInt): CellBuilder = storeInt(value.toInt(), 32)
-    public fun storeUInt64(value: ULong): CellBuilder = storeInt(value.toLong(), 64)
-
-    public fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
-    public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(value.toInt(), max.toInt())
-    public fun storeUIntLeq(value: Short, max: Short): CellBuilder = storeUIntLeq(value.toInt(), max.toInt())
-    public fun storeUIntLeq(value: Int, max: Int): CellBuilder = storeUIntLeq(value.toBigInt(), max.toBigInt())
-    public fun storeUIntLeq(value: Long, max: Long): CellBuilder =
-        storeUIntLeq(value.toBigInt(), max.toBigInt())
-
-    public fun storeUIntLes(value: BigInt, max: BigInt): CellBuilder =
-        storeUInt(value, (max - BigInt.ONE).bitLength)
-
-    public fun storeUIntLes(value: Byte, max: Byte): CellBuilder = storeUIntLes(value.toInt(), max.toInt())
-    public fun storeUIntLes(value: Short, max: Short): CellBuilder = storeUIntLes(value.toInt(), max.toInt())
-    public fun storeUIntLes(value: Int, max: Int): CellBuilder = storeUIntLes(value.toBigInt(), max.toBigInt())
-    public fun storeUIntLes(value: Long, max: Long): CellBuilder =
-        storeUIntLes(value.toBigInt(), max.toBigInt())
-
-    public fun storeVarUInt(value: Long, maxByteLength: Int): CellBuilder
-    public fun storeVarUInt(value: BigInt, maxByteLength: Int): CellBuilder
-
-    /**
-     * Stores a signed [length]-bit integer [value] into builder for 0 ≤ [length] ≤ 257.
-     */
-    public fun storeInt(value: BigInt, length: Int): CellBuilder
-    public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(value.toInt(), length)
-    public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toInt(), length)
-    public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
-    public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
-
-    public fun storeLong(value: Long, length: Int): CellBuilder = storeInt(value, length)
-
-    /**
-     * Stores [slice] into builder.
-     */
-    public fun storeSlice(slice: CellSlice): CellBuilder
-
-    public fun toBitString(): BitString
-
-    public companion object {
-        @JvmStatic
-        public fun beginCell(): CellBuilder = CellBuilderImpl()
-
-        @OptIn(ExperimentalContracts::class)
-        @JvmStatic
-        public fun createCell(builder: CellBuilder.() -> Unit): Cell {
-            contract {
-                callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-            }
-            val cellBuilder = CellBuilderImpl()
-            builder(cellBuilder)
-            return cellBuilder.build()
-        }
-
-        @JvmStatic
-        public fun createPrunedBranch(cell: Cell, merkleDepth: Int): Cell = buildCell {
-            val levelMask = LevelMask.level(cell.levelMask.mask or (1 shl merkleDepth)).also {
-                levelMask = it
-            }
-            isExotic = true
-            storeByte(CellType.PRUNED_BRANCH.value.toByte())
-            storeByte(levelMask.mask.toByte())
-
-            val hashCount = cell.levelMask.hashCount
-            repeat(hashCount) { level ->
-                storeByteString(cell.hash(level))
-            }
-            repeat(hashCount) { level ->
-                storeUInt16(cell.depth(level).toUShort())
-            }
-        }
-    }
-
-    public fun storeByteArray(byteArray: ByteArray, length: Int): CellBuilder
-}
 
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
     builder(this)
@@ -156,145 +34,232 @@ public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): Cell
     storeRef(cell)
 }
 
-@Suppress("NOTHING_TO_INLINE")
-public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
-private class CellBuilderImpl(
-    var bits: MutableBitString = ByteBackedMutableBitString(ByteArray(128), 1023),
-    var refs: MutableList<Cell> = ArrayList(4),
-    override var levelMask: LevelMask? = null,
-    override var isExotic: Boolean = false
-) : CellBuilder {
-    override var bitsPosition: Int = 0
-    override val remainingBits: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
+public class CellBuilder private constructor(
+    private var bits: ByteBackedMutableBitString = ByteBackedMutableBitString(1023),
+    private val refs: Array<Cell?> = Array(4) { null },
+    public var levelMask: LevelMask? = null,
+    public var isExotic: Boolean = false,
+    private val hasher: Sha256
+) {
+    public constructor() : this(hasher = CELL_BUILDER_HASHER)
 
-    override fun storeBit(bit: Boolean): CellBuilder = apply {
+    public var bitsPosition: Int = 0
+    private var refPosition: Int = 0
+    public val remainingBits: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
+
+    public fun storeBoolean(bit: Boolean): CellBuilder {
         checkBitsOverflow(1)
         bits[bitsPosition] = bit
         bitsPosition++
+        return this
     }
 
-    override fun storeBits(vararg value: Boolean): CellBuilder = apply {
+    public fun storeBits(vararg value: Boolean): CellBuilder {
         checkBitsOverflow(value.size)
         this.bits.setBitsAt(bitsPosition, value.asIterable())
         bitsPosition += value.size
+        return this
     }
 
-    override fun storeBits(value: Collection<Boolean>): CellBuilder = apply {
+    public fun storeBits(value: Collection<Boolean>): CellBuilder {
+        checkBitsOverflow(value.size)
         this.bits.setBitsAt(bitsPosition, value)
         bitsPosition += value.size
+        return this
     }
 
-    override fun storeBits(value: BitString, bits: Int): CellBuilder = apply {
-        storeBitString(value, 0, bits)
+    public fun storeBits(value: BitString, bits: Int = value.size): CellBuilder {
+        return storeBitString(value, 0, bits)
     }
 
-    override fun storeBits(value: ByteArray, bits: Int): CellBuilder = apply {
+    public fun storeBits(value: ByteArray, bits: Int): CellBuilder {
         checkBitsOverflow(bits)
         this.bits.setBitsAt(bitsPosition, value, bits)
         bitsPosition += bits
+        return this
     }
 
-    override fun storeBitString(
+    public fun storeBitString(
         value: BitString,
-        startIndex: Int,
-        endIndex: Int
-    ): CellBuilder = apply {
+        startIndex: Int = 0,
+        endIndex: Int = value.size
+    ): CellBuilder {
         val length = endIndex - startIndex
         checkBitsOverflow(length)
         value.copyInto(bits, bitsPosition, startIndex, endIndex)
         bitsPosition += length
+        return this
     }
 
-    override fun storeByteArray(byteArray: ByteArray): CellBuilder = apply {
+    public fun storeByteArray(byteArray: ByteArray): CellBuilder {
         val bitCount = byteArray.size * Byte.SIZE_BITS
         checkBitsOverflow(bitCount)
         this.bits.setBitsAt(bitsPosition, byteArray, bitCount)
         bitsPosition += bitCount
+        return this
     }
 
-    override fun storeByteString(byteString: ByteString): CellBuilder = apply {
+    public fun storeByteString(byteString: ByteString): CellBuilder {
         val bitLen = byteString.size * Byte.SIZE_BITS
         checkBitsOverflow(bitLen)
         this.bits.setBitsAt(bitsPosition, byteString, bitLen)
         bitsPosition += bitLen
+        return this
     }
 
-    override fun storeByte(byte: Byte): CellBuilder = apply {
-        checkBitsOverflow(Byte.SIZE_BITS)
-        this.bits.setBitsAt(bitsPosition, byteArrayOf(byte), Byte.SIZE_BITS)
-        bitsPosition += Byte.SIZE_BITS
-    }
-
-    override fun storeByteArray(byteArray: ByteArray, length: Int): CellBuilder = apply {
+    public fun storeByteArray(byteArray: ByteArray, length: Int): CellBuilder {
         checkBitsOverflow(length)
         this.bits.setBitsAt(bitsPosition, byteArray, length)
         bitsPosition += length
+        return this
     }
 
-    override fun storeRef(ref: Cell): CellBuilder = apply {
-        checkRefsOverflow(1)
-        refs.add(ref)
+    public fun storeRef(ref: Cell): CellBuilder {
+        if (refPosition >= 4) {
+            throw CellOverflowException("Refs overflow. Can't add refs. ${4 - refPosition} refs left.")
+        }
+        refs[refPosition++] = ref
+        return this
     }
 
-    override fun storeRefs(vararg refs: Cell): CellBuilder = apply {
-        checkRefsOverflow(refs.size)
-        this.refs.addAll(refs)
+    public fun storeBigInt(
+        value: BigInt,
+        bitCount: Int,
+        signed: Boolean
+    ): CellBuilder {
+        if (value == BigInt.ZERO) {
+            checkBitsOverflow(bitCount)
+            bitsPosition += bitCount
+            return this
+        }
+        if (bitCount < 64) {
+            checkBitsOverflow(bitCount)
+            bitsStoreLong(bits.data, bitsPosition, value.toLong(), bitCount)
+            bitsPosition += bitCount
+            return this
+        }
+        val bytes = value.toByteArray()
+        val actualBitLen = bytes.size * Byte.SIZE_BITS
+        if (signed) {
+            this.bits[bitsPosition] = value.sign < 0
+        }
+        bitsCopy(
+            this.bits.data,
+            bitsPosition + bitCount - value.bitLength,
+            bytes,
+            actualBitLen - value.bitLength,
+            value.bitLength
+        )
+        bitsPosition += bitCount
+        return this
     }
 
-    override fun storeRefs(refs: Iterable<Cell>): CellBuilder = storeRefs(refs.toList())
-
-    override fun storeRefs(refs: Collection<Cell>): CellBuilder = apply {
-        checkRefsOverflow(refs.size)
-        this.refs.addAll(refs)
+    public fun storeInt(value: Int, bitCount: Int): CellBuilder {
+        if (bitCount > Long.SIZE_BITS) {
+            return storeBigInt(value.toBigInt(), bitCount, true)
+        }
+        checkBitsOverflow(bitCount)
+        bitsStoreLong(bits.data, bitsPosition, value.toLong(), bitCount)
+        bitsPosition += bitCount
+        return this
     }
 
-    override fun storeUInt(value: BigInt, bitLength: Int): CellBuilder = apply {
-        bits.setUBigIntAt(bitsPosition, value, bitLength)
-        bitsPosition += bitLength
+    public fun storeLong(value: Long, bitCount: Int): CellBuilder {
+        if (bitCount > Long.SIZE_BITS) {
+            return storeBigInt(value.toBigInt(), bitCount, true)
+        }
+        checkBitsOverflow(bitCount)
+        bitsStoreLong(bits.data, bitsPosition, value, bitCount)
+        bitsPosition += bitCount
+        return this
     }
 
-    override fun storeVarUInt(value: Long, maxByteLength: Int): CellBuilder = apply {
-        storeVarUInt(value.toBigInt(), maxByteLength)
+    public fun storeUInt(value: UInt, bitCount: Int): CellBuilder {
+        if (bitCount > Long.SIZE_BITS) {
+            return storeBigInt(value.toBigInt(), bitCount, false)
+        }
+        checkBitsOverflow(bitCount)
+        bitsStoreLong(bits.data, bitsPosition, value.toLong(), bitCount)
+        bitsPosition += bitCount
+        return this
     }
 
-    override fun storeVarUInt(value: BigInt, maxByteLength: Int): CellBuilder = apply {
-        val bytes = (value.bitLength + Byte.SIZE_BITS - 1) / Byte.SIZE_BITS
-        storeUIntLes(bytes, 16)
-        val bits = bytes * Byte.SIZE_BITS
-        storeUInt(value, bits)
+    public fun storeULong(value: ULong, bitCount: Int): CellBuilder {
+        if (bitCount > Long.SIZE_BITS) {
+            return storeBigInt(value.toBigInt(), bitCount, false)
+        }
+        checkBitsOverflow(bitCount)
+        bitsStoreLong(bits.data, bitsPosition, value.toLong(), bitCount)
+        bitsPosition += bitCount
+        return this
     }
 
-    override fun storeInt(value: BigInt, length: Int): CellBuilder = apply {
-        val intBits = 1.toBigInt() shl (length - 1)
-        require(value >= -intBits && value < intBits) { "Can't store an Int, because its value allocates more space than provided." }
-        bits.setBigIntAt(bitsPosition, value, length)
-        bitsPosition += length
+    public fun storeVarUInt(value: Long, maxByteCount: Int): CellBuilder {
+        return storeVarUInt(value.toBigInt(), maxByteCount)
     }
 
-    override fun storeSlice(slice: CellSlice): CellBuilder = apply {
+    public fun storeVarUInt(value: BigInt, maxByteCount: Int): CellBuilder {
+        val byteCount = (value.bitLength + 7) ushr 3
+        storeIntLess(byteCount, maxByteCount)
+        val bitCount = byteCount * Byte.SIZE_BITS
+        return storeBigInt(value, bitCount, false)
+    }
+
+    public fun storeIntLess(value: Int, upperBound: Int): CellBuilder {
+        require(value < upperBound)
+        return storeInt(value, Int.SIZE_BITS - (upperBound - 1).countLeadingZeroBits())
+    }
+
+    public fun storeUIntLess(value: UInt, upperBound: UInt): CellBuilder {
+        require(value < upperBound)
+        return storeUInt(value, UInt.SIZE_BITS - (upperBound - 1u).countLeadingZeroBits())
+    }
+
+    public fun storeIntLeq(value: Int, upperBound: Int): CellBuilder {
+        require(value <= upperBound)
+        return storeInt(value, Int.SIZE_BITS - upperBound.countLeadingZeroBits())
+    }
+
+    public fun storeUIntLeq(value: UInt, upperBound: UInt): CellBuilder {
+        require(value <= upperBound)
+        return storeUInt(value, UInt.SIZE_BITS - upperBound.countLeadingZeroBits())
+    }
+
+    public fun storeSlice(slice: CellSlice): CellBuilder {
         val cell = slice.cell
         val bits = cell.bits
         val refs = cell.refs
 
-        checkBitsOverflow(bits.size)
         checkRefsOverflow(refs.size)
-
         storeBitString(bits, slice.bitsStart, slice.bitsEnd)
         for (i in slice.refsStart until slice.refsEnd) {
-            storeRef(refs[i])
+            this.refs[refPosition++] = refs[i]
         }
+        return this
     }
 
-    override fun toBitString(): BitString {
-        val bytes = bits.toByteArray()
-        return ByteBackedBitString.of(bytes, bitsPosition)
+    public fun toBitString(): BitString = bits.substring(0, bitsPosition)
+
+    public fun toCellSlice(): CellSlice = build().asCellSlice()
+
+    public fun reset(): CellBuilder {
+        bits.data.fill(0)
+        bitsPosition = 0
+        refs.fill(null)
+        refPosition = 0
+        return this
     }
 
-    override fun build(): DataCell {
+    public fun endCell(): DataCell = build()
+
+    public fun build(): DataCell {
         var childrenMask = LevelMask()
-        refs.forEach { child ->
+        val refs = ArrayList<Cell>(refPosition)
+        for (i in 0 until refPosition) {
+            val child = this.refs[i] ?: continue
             childrenMask = childrenMask or child.levelMask
+            refs.add(child)
         }
 
         val levelMask = levelMask ?: childrenMask
@@ -310,7 +275,7 @@ private class CellBuilderImpl(
         val levels = descriptor.levelMask.level + 1
         val hashes = Array(levels) { ByteArray(32) }
         val depths = IntArray(levels)
-        computeHashes(descriptor, data, childrenMask, hashes, depths)
+        computeHashes(descriptor, data, childrenMask, refs, hashes, depths)
 
         return DataCell(descriptor, bits, refs, Array(levels) { ByteString(*hashes[it]) }, depths)
     }
@@ -319,6 +284,7 @@ private class CellBuilderImpl(
         descriptor: CellDescriptor,
         data: ByteArray,
         childrenMask: LevelMask,
+        refs: List<Cell>,
         hashes: Array<ByteArray>,
         depths: IntArray
     ) {
@@ -366,7 +332,6 @@ private class CellBuilderImpl(
                 }
                 val expectedBitLength = 8 + 2 * (HASH_BITS + DEPTH_BITS)
                 check(bitsPosition == expectedBitLength) {
-                    println(bits)
                     "Invalid bit length, expected: $expectedBitLength, actual: $bitsPosition"
                 }
                 check(refs.size == 2) {
@@ -397,7 +362,7 @@ private class CellBuilderImpl(
         val levelOffset = if (descriptor.cellType.isMerkle) 1 else 0
 
         var (d1, d2) = descriptor
-        val hasher = Sha256()
+        val hasher = hasher
         val refCount = refs.size
         val buf = ByteArray(max(2, (32 + 2) * refCount))
         repeat(levels) { level ->
@@ -447,12 +412,44 @@ private class CellBuilderImpl(
         throw CellOverflowException("Bits overflow. Can't add $length bits. $remainingBits bits left. - ${bits.size}")
     }
 
-    private fun checkRefsOverflow(count: Int) = require(count <= (4 - refs.size)) {
-        throw CellOverflowException("Refs overflow. Can't add $count refs. ${4 - refs.size} refs left.")
+    private fun checkRefsOverflow(count: Int) = require(count < (4 - refPosition)) {
+        throw CellOverflowException("Refs overflow. Can't add $count refs. ${4 - refPosition} refs left.")
     }
 
-    companion object {
-        const val HASH_BITS = 256
-        const val DEPTH_BITS = 16
+    public companion object {
+        public const val HASH_BITS: Int = 256
+        public const val DEPTH_BITS: Int = 16
+
+        @JvmStatic
+        public fun beginCell(): CellBuilder = CellBuilder()
+
+        @OptIn(ExperimentalContracts::class)
+        @JvmStatic
+        public fun createCell(builder: CellBuilder.() -> Unit): DataCell {
+            contract {
+                callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+            }
+            val cellBuilder = CellBuilder()
+            builder(cellBuilder)
+            return cellBuilder.build()
+        }
+
+        @JvmStatic
+        public fun createPrunedBranch(cell: Cell, merkleDepth: Int): Cell = buildCell {
+            val levelMask = LevelMask.level(cell.levelMask.mask or (1 shl merkleDepth)).also {
+                levelMask = it
+            }
+            isExotic = true
+            storeInt(CellType.PRUNED_BRANCH.value, 8)
+            storeInt(levelMask.mask, 8)
+
+            val hashCount = cell.levelMask.hashCount
+            repeat(hashCount) { level ->
+                storeByteString(cell.hash(level))
+            }
+            repeat(hashCount) { level ->
+                storeInt(cell.depth(level), 16)
+            }
+        }
     }
 }

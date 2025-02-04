@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
@@ -32,7 +31,7 @@ private object KeyMaxLtTlbConstructor : TlbConstructor<KeyMaxLt>(
         cellBuilder: CellBuilder,
         value: KeyMaxLt
     ) = cellBuilder {
-        storeBit(value.key)
+        storeBoolean(value.key)
         storeUInt64(value.maxEndLt)
     }
 

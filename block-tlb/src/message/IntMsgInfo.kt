@@ -6,12 +6,9 @@ import org.ton.block.currency.CurrencyCollection
 import org.ton.block.message.address.AddrInt
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
-import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
-import org.ton.tlb.storeTlb
 
 public data class IntMsgInfo(
     @SerialName("ihr_disabled") val ihrDisabled: Boolean,
@@ -51,9 +48,9 @@ private object IntMsgInfoTlbConstructor : TlbConstructor<IntMsgInfo>(
     override fun storeTlb(
         cellBuilder: CellBuilder, value: IntMsgInfo
     ) = cellBuilder {
-        storeBit(value.ihrDisabled)
-        storeBit(value.bounce)
-        storeBit(value.bounced)
+        storeBoolean(value.ihrDisabled)
+        storeBoolean(value.bounce)
+        storeBoolean(value.bounced)
         storeTlb(AddrInt, value.src)
         storeTlb(AddrInt, value.dest)
         storeTlb(CurrencyCollection.Tlb, value.value)

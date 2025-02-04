@@ -8,7 +8,6 @@ import org.ton.block.VarUInteger
 import org.ton.block.currency.Coins
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -42,9 +41,9 @@ public object TrPhaseComputeVmTlbConstructor : TlbConstructor<ExecutedComputePha
         cellBuilder: CellBuilder,
         value: ExecutedComputePhase
     ): Unit = cellBuilder {
-        storeBit(value.success)
-        storeBit(value.msgStateUsed)
-        storeBit(value.accountActivated)
+        storeBoolean(value.success)
+        storeBoolean(value.msgStateUsed)
+        storeBoolean(value.accountActivated)
         storeTlb(Coins.Tlb, value.gasFees)
         storeTlb(CellRef(TrComputePhaseAux), value.r1)
     }

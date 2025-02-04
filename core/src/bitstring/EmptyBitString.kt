@@ -31,7 +31,7 @@ internal object EmptyBitString : BitString {
 
     override fun toBooleanArray(): BooleanArray = booleanArrayOf()
 
-    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString(ByteArray(1), 0)
+    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString(0)
 
     override fun xor(other: BitString): BitString = other
 

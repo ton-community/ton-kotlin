@@ -2,7 +2,6 @@ package org.ton.block.account
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 
 /**
@@ -23,8 +22,8 @@ public data class TickTock(
         override fun storeTlb(
             cellBuilder: CellBuilder, value: TickTock
         ): Unit = cellBuilder {
-            storeBit(value.tick)
-            storeBit(value.tock)
+            storeBoolean(value.tick)
+            storeBoolean(value.tock)
         }
 
         override fun loadTlb(

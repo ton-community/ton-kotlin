@@ -6,7 +6,6 @@ import org.ton.block.message.inmsg.InMsg
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
@@ -73,7 +72,7 @@ private object McBlockExtraTlbConstructor : TlbConstructor<McBlockExtra>(
         cellBuilder: CellBuilder,
         value: McBlockExtra
     ) = cellBuilder {
-        storeBit(value.keyBlock)
+        storeBoolean(value.keyBlock)
         storeTlb(shardHashes, value.shardHashes)
         storeTlb(shardFees, value.shardFees)
         storeRef(McBlockExtraAux, value.r1)

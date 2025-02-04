@@ -7,7 +7,6 @@ import org.ton.block.block.BlockRef
 import org.ton.block.currency.CurrencyCollection
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.cell.storeRef
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
@@ -90,7 +89,7 @@ public data class McStateExtra(
                 storeUInt(flags, 16)
                 ValidatorInfo.Tlb.storeTlb(this, value.validatorInfo)
                 prevBlocksCodec.storeTlb(this, value.prevBlocks)
-                storeBit(value.afterKeyBlock)
+                storeBoolean(value.afterKeyBlock)
                 storeNullableTlb(BlockRef.Tlb, value.lastKeyBlock)
                 if (value.blockCreateStats != null) {
                     storeUInt(BLOCK_STATS_TAG, 8)

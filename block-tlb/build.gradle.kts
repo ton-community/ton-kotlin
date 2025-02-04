@@ -5,7 +5,6 @@ plugins {
 }
 
 dependencies {
-    commonMainApi(projects.tonKotlinTlb)
     commonMainApi(projects.tonKotlinHashmapTlb)
     commonMainImplementation(libs.serialization.core)
 }

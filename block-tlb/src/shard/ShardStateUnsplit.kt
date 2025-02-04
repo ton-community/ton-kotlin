@@ -8,7 +8,6 @@ import org.ton.block.currency.CurrencyCollection
 import org.ton.block.message.export.OutMsgQueueInfo
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.cell.storeRef
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
@@ -155,7 +154,7 @@ public data class ShardStateUnsplit(
             storeUInt(value.genLt.toLong(), 64)
             storeUInt(value.minRefMcSeqno.toInt(), 32)
             storeRef(OutMsgQueueInfo, value.outMsgQueueInfo)
-            storeBit(value.beforeSplit)
+            storeBoolean(value.beforeSplit)
             storeRef(shardAccounts, value.accounts)
             storeRef {
                 storeUInt(value.overloadHistory.toLong(), 64)

@@ -7,7 +7,6 @@ import org.ton.block.account.StorageUsedShort
 import org.ton.block.currency.Coins
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -72,9 +71,9 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<ActionPhase>(
         cellBuilder: CellBuilder,
         value: ActionPhase
     ) = cellBuilder {
-        storeBit(value.success)
-        storeBit(value.valid)
-        storeBit(value.noFunds)
+        storeBoolean(value.success)
+        storeBoolean(value.valid)
+        storeBoolean(value.noFunds)
         storeTlb(AccountStatusChange.Companion, value.statusChange)
         storeTlb(maybeCoins, value.totalFwdFees)
         storeTlb(maybeCoins, value.totalActionFees)

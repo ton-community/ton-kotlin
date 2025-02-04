@@ -3,7 +3,6 @@ package org.ton.block.account
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HmeRoot
 import org.ton.tlb.*
@@ -76,16 +75,16 @@ public data class StateInit(
             storeNullableTlb(SplitDepth.Tlb, value.splitDepth)
             storeNullableTlb(TickTock.Tlb, value.special)
             if (value.code != null) {
-                storeBit(true)
+                storeBoolean(true)
                 storeRef(value.code)
             } else {
-                storeBit(false)
+                storeBoolean(false)
             }
             if (value.data != null) {
-                storeBit(true)
+                storeBoolean(true)
                 storeRef(value.data)
             } else {
-                storeBit(false)
+                storeBoolean(false)
             }
             storeTlb(Library, value.libraries)
         }

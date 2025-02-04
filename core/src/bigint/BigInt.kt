@@ -20,6 +20,8 @@ public expect class BigInt : Number, Comparable<BigInt> {
     override fun toShort(): Short
     override fun toByte(): Byte
 
+    public fun toByteArray(): ByteArray
+
     public operator fun plus(other: BigInt): BigInt
     public operator fun plus(other: Long): BigInt
 

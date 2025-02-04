@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import org.ton.block.SplitMergeInfo
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -39,7 +38,7 @@ private object TransSplitInstallTlbConstructor : TlbConstructor<TransSplitInstal
     ) = cellBuilder {
         storeTlb(SplitMergeInfo.Companion, value.splitInfo)
         storeRef(Transaction, value.prepareTransaction)
-        storeBit(value.installed)
+        storeBoolean(value.installed)
     }
 
     override fun loadTlb(

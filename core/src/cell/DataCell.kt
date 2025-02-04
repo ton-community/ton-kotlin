@@ -52,7 +52,7 @@ public class DataCell internal constructor(
         return result
     }
 
-    override fun toString(): String = "Cell($type, ${hash().toHexString()})"
+    override fun toString(): String = "Cell($type, data=$bits, bits=${bits.size}, hash=${hash().toHexString()})"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -32,6 +32,8 @@ internal constructor(
 
     actual override fun toByte(): Byte = javaBigInt.toByte()
 
+    public actual fun toByteArray(): ByteArray = javaBigInt.toByteArray()
+
     public actual inline operator fun plus(other: BigInt): BigInt = BigInt(javaBigInt.add(other.javaBigInt))
     public actual inline operator fun plus(other: Long): BigInt =
         BigInt(javaBigInt.add(java.math.BigInteger.valueOf(other)))

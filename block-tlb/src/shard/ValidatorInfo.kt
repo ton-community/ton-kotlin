@@ -2,7 +2,6 @@ package org.ton.block.shard
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 
 /**
@@ -41,7 +40,7 @@ public data class ValidatorInfo(
         ): Unit = cellBuilder {
             storeUInt32(value.validatorListHashShort)
             storeUInt32(value.catchainSeqno)
-            storeBit(value.nxCcUpdated)
+            storeBoolean(value.nxCcUpdated)
         }
 
         override fun loadTlb(

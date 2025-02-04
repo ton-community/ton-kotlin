@@ -23,6 +23,7 @@ submodule("contract")
 submodule("dict")
 //submodule("dht")
 include("example")
+include("benchmarks")
 
 fun submodule(name: String) {
     include(":ton-kotlin-$name")

@@ -4,9 +4,9 @@ package org.ton.cell
 
 import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.BigInt
-import org.ton.bigint.toUInt
-import org.ton.bigint.toULong
+import org.ton.bigint.toBigInt
 import org.ton.bitstring.BitString
+import org.ton.bitstring.ByteBackedBitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
 import kotlin.experimental.inv
@@ -26,9 +26,11 @@ public class CellSlice {
         this.refsEnd = cell.refs.size
     }
 
-    public constructor(slice: CellSlice, bitsCount: Int, refsCount: Int) {
+    public constructor(slice: CellSlice, bitsCount: Int = 0, refsCount: Int = 0) {
         this.cell = slice.cell
-        this.bitsEnd = slice.bitsStart + bitsCount
+        this.bitsStart = slice.bitsStart
+        this.refsStart = slice.refsStart
+        this.bitsEnd = slice.bitsEnd + bitsCount
         this.refsEnd = slice.refsEnd + refsCount
     }
 
@@ -48,7 +50,7 @@ public class CellSlice {
 
     public val size: Int get() = bitsEnd - bitsStart
 
-    public val refSize: Int get() = bitsStart - bitsEnd
+    public val refSize: Int get() = refsEnd - refsStart
 
     /**
      * Checks if slice is empty. If not, throws an exception.
@@ -93,7 +95,7 @@ public class CellSlice {
         return true
     }
 
-    public fun preloadBitString(bitCount: Int): BitString {
+    public fun preloadBitString(bitCount: Int = size): BitString {
         require(bitCount <= size)
         val result = cell.bits.substring(bitsStart, bitsStart + bitCount)
         return result
@@ -119,7 +121,7 @@ public class CellSlice {
 
     public fun preloadBytesTo(destination: ByteArray, startIndex: Int = 0, endIndex: Int = size) {
         val byteCount = endIndex - startIndex
-        val bits = ByteBackedMutableBitString(ByteArray(byteCount), byteCount * Byte.SIZE_BITS)
+        val bits = ByteBackedMutableBitString(byteCount * Byte.SIZE_BITS)
         loadBitsTo(bits)
         bits.data.copyInto(destination, startIndex)
     }
@@ -153,9 +155,12 @@ public class CellSlice {
 
     public fun preloadBigInt(bitCount: Int, signed: Boolean = true): BigInt {
         require(bitCount <= size)
-        if (bitCount == 0) return BigInt.ZERO
-        val bytes = ByteArray((bitCount + 7) ushr 3)
-        val bits = ByteBackedMutableBitString(bytes, bitCount)
+        if (bitCount <= 0) return BigInt.ZERO
+        if (bitCount <= 64) {
+            return if (signed) preloadLong(bitCount).toBigInt() else preloadULong(bitCount).toBigInt()
+        }
+        val bits = ByteBackedMutableBitString(bitCount)
+        val bytes = bits.data
         val shift = (bytes.size * Byte.SIZE_BITS) - bitCount
         return if (signed) {
             cell.bits.copyInto(bits, 0, bitsStart + 1, bitsStart + bitCount)
@@ -173,28 +178,57 @@ public class CellSlice {
         }
     }
 
-    public fun preloadLong(bitCount: Int = Long.SIZE_BITS): Long = preloadBigInt(bitCount, signed = true).toLong()
+    public fun preloadLong(bitCount: Int = Long.SIZE_BITS): Long {
+        var offset = 0
+        var data: ByteArray
+        if (cell.bits is ByteBackedBitString) {
+            data = cell.bits.data
+            offset = bitPosition
+        } else {
+            data = ByteArray((bitCount + 7) ushr 3)
+        }
+
+        val r = offset and 7
+        val q = offset ushr 3
+
+        val firstByte = data[q].toInt() and (0xFF ushr r)
+        val rightShift = (8 - (bitCount + r) % 8) % 8
+        if (r + bitCount <= 8) {
+            return (firstByte ushr rightShift).toLong()
+        }
+        val b = bitCount - 8 + r
+        var result = 0L
+        val byteCount = (b + 7) shr 3
+        for (i in 1..byteCount) {
+            val currentByte = data[q + i].toLong()
+            result = (result shl 8) or (currentByte and 0xFF)
+        }
+        result = result ushr rightShift
+        result = result or (firstByte.toLong() shl b)
+        return result
+    }
+
     public fun loadLong(bitCount: Int = Long.SIZE_BITS): Long {
         val result = preloadLong(bitCount)
         bitsStart += bitCount
         return result
     }
 
-    public fun preloadInt(bitCount: Int = Int.SIZE_BITS): Int = preloadBigInt(bitCount, signed = true).toInt()
+    public fun preloadInt(bitCount: Int = Int.SIZE_BITS): Int = preloadLong(bitCount).toInt()
     public fun loadInt(bitCount: Int = Int.SIZE_BITS): Int {
         val result = preloadInt(bitCount)
         bitsStart += bitCount
         return result
     }
 
-    public fun preloadULong(bitCount: Int = ULong.SIZE_BITS): ULong = preloadBigInt(bitCount, signed = false).toULong()
+    public fun preloadULong(bitCount: Int = ULong.SIZE_BITS): ULong = preloadLong(bitCount).toULong()
     public fun loadULong(bitCount: Int = ULong.SIZE_BITS): ULong {
         val result = preloadULong(bitCount)
         bitsStart += bitCount
         return result
     }
 
-    public fun preloadUInt(bitCount: Int = UInt.SIZE_BITS): UInt = preloadBigInt(bitCount, signed = false).toUInt()
+    public fun preloadUInt(bitCount: Int = UInt.SIZE_BITS): UInt = preloadULong(bitCount).toUInt()
     public fun loadUInt(bitCount: Int = UInt.SIZE_BITS): UInt {
         val result = preloadUInt(bitCount)
         bitsStart += bitCount
@@ -208,4 +242,37 @@ public class CellSlice {
     public fun loadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
 
     public fun countLeadingBits(bit: Boolean): Int = cell.bits.countLeadingBits(bitsStart, bitsEnd, bit)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as CellSlice
+
+        if (bitsStart != other.bitsStart) return false
+        if (bitsEnd != other.bitsEnd) return false
+        if (refsStart != other.refsStart) return false
+        if (refsEnd != other.refsEnd) return false
+        if (cell != other.cell) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = bitsStart
+        result = 31 * result + bitsEnd
+        result = 31 * result + refsStart
+        result = 31 * result + refsEnd
+        result = 31 * result + cell.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "CellSlice(bits=$bitsStart..$bitsEnd, refs=$refsStart..$refsEnd, data=${
+            cell.bits.substring(
+                bitsStart,
+                bitsEnd
+            )
+        })"
+    }
 }

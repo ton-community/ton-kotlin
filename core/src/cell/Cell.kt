@@ -37,13 +37,13 @@ public interface Cell {
         @JvmStatic
         public fun of(hex: String, vararg refs: Cell): DataCell = buildCell {
             storeBits(BitString(hex))
-            storeRefs(*refs)
+            refs.forEach(::storeRef)
         } as DataCell
 
         @JvmStatic
         public fun of(bits: BitString, vararg refs: Cell): DataCell = buildCell {
             storeBits(bits)
-            storeRefs(*refs)
+            refs.forEach(::storeRef)
         } as DataCell
 
 //        @JvmStatic

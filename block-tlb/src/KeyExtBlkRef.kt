@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import org.ton.block.block.BlockRef
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -31,7 +30,7 @@ private object KeyExtBlkRefTlbConstructor : TlbConstructor<KeyExtBlkRef>(
         cellBuilder: CellBuilder,
         value: KeyExtBlkRef
     ) = cellBuilder {
-        storeBit(value.key)
+        storeBoolean(value.key)
         storeTlb(BlockRef.Tlb, value.blkRef)
     }
 

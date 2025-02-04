@@ -45,7 +45,7 @@ public sealed interface AccountState {
         override fun storeTlb(cellBuilder: CellBuilder, value: AccountState) {
             when (value) {
                 is Active -> {
-                    cellBuilder.storeBit(true)
+                    cellBuilder.storeBoolean(true)
                     cellBuilder.storeTlb(StateInit.Tlb, value.state)
                 }
 

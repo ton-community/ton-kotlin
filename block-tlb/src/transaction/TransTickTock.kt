@@ -7,7 +7,6 @@ import org.ton.block.transaction.phases.ComputePhase
 import org.ton.block.transaction.phases.StoragePhase
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -46,12 +45,12 @@ private object TransTickTockTlbConstructor : TlbConstructor<TransTickTock>(
         cellBuilder: CellBuilder,
         value: TransTickTock
     ) = cellBuilder {
-        storeBit(value.isTock)
+        storeBoolean(value.isTock)
         storeTlb(StoragePhase.Companion, value.storagePh)
         storeTlb(ComputePhase.Companion, value.computePh)
         storeTlb(maybeTrActionPhase, value.action)
-        storeBit(value.aborted)
-        storeBit(value.destroyed)
+        storeBoolean(value.aborted)
+        storeBoolean(value.destroyed)
     }
 
     override fun loadTlb(

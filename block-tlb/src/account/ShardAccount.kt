@@ -3,7 +3,6 @@ package org.ton.block.account
 import kotlinx.io.bytestring.ByteString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
 import org.ton.tlb.*
 
 /**
@@ -52,9 +51,9 @@ public data class ShardAccount(
         private object NullableAccountTlbCodec : TlbCodec<Account?> {
             override fun storeTlb(cellBuilder: CellBuilder, value: Account?) {
                 if (value == null) {
-                    cellBuilder.storeBit(false)
+                    cellBuilder.storeBoolean(false)
                 } else {
-                    cellBuilder.storeBit(true)
+                    cellBuilder.storeBoolean(true)
                     cellBuilder.storeTlb(Account.Tlb, value)
                 }
             }

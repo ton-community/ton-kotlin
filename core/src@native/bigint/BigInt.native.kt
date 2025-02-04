@@ -32,6 +32,8 @@ public actual class BigInt internal constructor(
     actual override fun toShort(): Short = value.shortValue()
     actual override fun toByte(): Byte = value.byteValue()
 
+    public actual fun toByteArray(): ByteArray = value.toByteArray()
+
     public actual operator fun plus(other: BigInt): BigInt = BigInt(value.add(other.value))
     public actual operator fun plus(other: Long): BigInt = BigInt(value.add(BigInteger.fromLong(other)))
 
