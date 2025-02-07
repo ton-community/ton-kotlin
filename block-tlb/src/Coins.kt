@@ -10,11 +10,19 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.math.pow
 
+/**
+ * Variable-length 120-bit integer. Used for native currencies.
+ *
+ * Stored as 4 bits of `len` (0..=15), followed by `len` bytes.
+ *
+ * @see [CurrencyCollection]
+ */
 @SerialName("nanocoins")
 @Serializable
 public data class Coins(
@@ -44,6 +52,8 @@ public data class Coins(
     public operator fun dec(): Coins = Coins(amount - VarUInteger(1, 1.toBigInt()))
 
     public companion object : TlbConstructorProvider<Coins> by CoinsTlbConstructor {
+        public val ZERO: Coins = Coins(0)
+
         private const val DECIMALS = 9
 
         @JvmStatic

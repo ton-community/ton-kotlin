@@ -30,11 +30,23 @@ public interface CellBuilder {
     public fun endCell(): Cell = build()
     public fun build(): Cell
 
-    public fun storeBit(bit: Boolean): CellBuilder
+    @Deprecated(
+        message = "Use storeBoolean()",
+        level = DeprecationLevel.WARNING,
+        replaceWith = ReplaceWith("storeBoolean(bit)")
+    )
+    public fun storeBit(bit: Boolean): CellBuilder = storeBoolean(bit)
+
+    public fun storeBoolean(value: Boolean): CellBuilder
+
     public fun storeBits(vararg bits: Boolean): CellBuilder
     public fun storeBits(bits: Iterable<Boolean>): CellBuilder
     public fun storeBits(bits: Collection<Boolean>): CellBuilder
-    public fun storeBits(bits: BitString): CellBuilder
+
+    @Deprecated("use storeBitString(bits) instead.", ReplaceWith("storeBitString(bits)"))
+    public fun storeBits(bits: BitString): CellBuilder = storeBitString(bits)
+
+    public fun storeBitString(value: BitString, startIndex: Int = 0, endIndex: Int = value.size): CellBuilder
 
     public fun storeBytes(byteArray: ByteArray): CellBuilder
     public fun storeByte(byte: Byte): CellBuilder
@@ -81,12 +93,26 @@ public interface CellBuilder {
     public fun storeInt(value: Byte, length: Int): CellBuilder = storeInt(value.toInt(), length)
     public fun storeInt(value: Short, length: Int): CellBuilder = storeInt(value.toInt(), length)
     public fun storeInt(value: Int, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
-    public fun storeInt(value: Long, length: Int): CellBuilder = storeInt(value.toBigInt(), length)
+
+    @Deprecated("Use storeLong(length) instead", ReplaceWith("storeLong(value, length)"))
+    public fun storeInt(value: Long, length: Int): CellBuilder = storeLong(value, length)
+
+    public fun storeLong(value: Long, bitCount: Int = Long.SIZE_BITS): CellBuilder {
+        if (bitCount <= 0) return this
+        if (value == 0L) {
+            storeBits(*BooleanArray(bitCount))
+            return this
+        }
+        storeInt(value.toBigInt(), bitCount)
+        return this
+    }
 
     /**
      * Stores [slice] into builder.
      */
     public fun storeSlice(slice: CellSlice): CellBuilder
+
+    public fun reset(): CellBuilder
 
     public companion object {
         @JvmStatic
@@ -159,7 +185,7 @@ private class CellBuilderImpl(
     override val bitsPosition: Int get() = bits.size
     override val remainingBits: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
 
-    override fun storeBit(bit: Boolean): CellBuilder = apply {
+    override fun storeBoolean(bit: Boolean): CellBuilder = apply {
         checkBitsOverflow(1)
         bits.plus(bit)
     }
@@ -174,9 +200,15 @@ private class CellBuilderImpl(
         this.bits.plus(bits)
     }
 
-    override fun storeBits(bits: BitString): CellBuilder = apply {
-        checkBitsOverflow(bits.size)
-        this.bits.plus(bits)
+    override fun storeBitString(value: BitString, startIndex: Int, endIndex: Int): CellBuilder {
+        if (startIndex == endIndex) return this
+        if (startIndex == 0 && endIndex == value.size) {
+            checkBitsOverflow(value.size)
+            this.bits.plus(value)
+        } else {
+            this.bits.plus(value.slice(startIndex, endIndex))
+        }
+        return this
     }
 
     override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(bits.toList())
@@ -233,15 +265,21 @@ private class CellBuilderImpl(
     }
 
     override fun storeSlice(slice: CellSlice): CellBuilder = apply {
-        val (bits, refs) = slice
+        checkBitsOverflow(slice.remainingBits)
+        checkRefsOverflow(slice.remainingRefs)
 
-        checkBitsOverflow(bits.size)
-        checkRefsOverflow(refs.size)
-
-        storeBits(bits)
-        refs.forEach { ref ->
-            storeRef(ref)
+        storeBitString(slice.preloadBitString(slice.remainingBits))
+        repeat(slice.remainingRefs) { index ->
+            storeRef(slice.preloadRef(index))
         }
+    }
+
+    override fun reset(): CellBuilder {
+        bits = ByteBackedMutableBitString(ByteArray(128), 0)
+        refs = ArrayList()
+        levelMask = null
+        isExotic = false
+        return this
     }
 
     override fun build(): Cell {
@@ -265,6 +303,7 @@ private class CellBuilderImpl(
                     hash.toBitString(), depth, descriptor, bits
                 )
             }
+
             else -> if (descriptor == EmptyCell.descriptor) {
                 EmptyCell
             } else {
@@ -406,4 +445,14 @@ private class CellBuilderImpl(
         const val HASH_BITS = 256
         const val DEPTH_BITS = 16
     }
+}
+
+public fun CellBuilder.storeUInt(value: UInt, bits: Int = UInt.SIZE_BITS): CellBuilder {
+    if (bits <= 0) return this
+    if (value == 0u) {
+        storeBits(*BooleanArray(bits))
+        return this
+    }
+    storeUInt(value.toLong().toBigInt(), bits)
+    return this
 }

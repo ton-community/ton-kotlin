@@ -22,6 +22,10 @@ public open class ByteBackedBitString protected constructor(
     override fun getOrNull(index: Int): Boolean? =
         if (index in 0..size) get(bytes, index) else null
 
+    override fun countLeadingBits(fromIndex: Int, toIndex: Int, bit: Boolean): Int {
+        return countLeadingBits(bytes, fromIndex, toIndex - fromIndex, bit)
+    }
+
     override fun plus(bits: BitString): BitString = toMutableBitString().plus(bits)
     override fun plus(bytes: ByteArray): BitString = toMutableBitString().plus(bytes)
     override fun plus(bytes: ByteArray, bits: Int): BitString = toMutableBitString().plus(bytes, bits)
@@ -82,6 +86,13 @@ public open class ByteBackedBitString protected constructor(
             }
             of(result, maxOf(size, other.size))
         }
+    }
+
+    override fun copyInto(destination: MutableBitString, destinationOffset: Int, startIndex: Int, endIndex: Int) {
+        if (destination !is ByteBackedBitString) {
+            return super.copyInto(destination, destinationOffset, startIndex, endIndex)
+        }
+        bitsCopy(destination.bytes, destinationOffset, bytes, startIndex, endIndex - startIndex)
     }
 
     override fun toString(): String = "x{${toHexString()}}"
@@ -217,4 +228,118 @@ private fun appendAugmentTag(data: ByteArray, bits: Int): ByteArray {
         newData[newData.lastIndex] = lastByte.toByte()
         return newData
     }
+}
+
+internal fun bitsCopy(dest: ByteArray, toIndex: Int, src: ByteArray, fromIndex: Int, bitCount: Int) {
+    if (bitCount <= 0) return
+
+    var srcOffset = fromIndex shr 3
+    var destOffset = toIndex shr 3
+    val fromOffset = fromIndex and 7
+    val toOffset = toIndex and 7
+
+    var remainingBits = bitCount
+    val bitCountTotal = bitCount + fromOffset
+
+    if (fromOffset == toOffset) {
+        if (bitCountTotal < 8) {
+            val mask = ((-0x100 ushr bitCountTotal) and (0xff ushr toOffset))
+            dest[destOffset] = ((dest[destOffset].toInt() and mask.inv()) or (src[srcOffset].toInt() and mask)).toByte()
+            return
+        }
+
+        val bytesToCopy = bitCountTotal shr 3
+        if (toOffset == 0) {
+            src.copyInto(dest, destOffset, srcOffset, srcOffset + bytesToCopy)
+        } else {
+            val mask = (0xff ushr toOffset)
+            dest[destOffset] = ((dest[destOffset].toInt() and mask.inv()) or (src[srcOffset].toInt() and mask)).toByte()
+            src.copyInto(dest, destOffset + 1, srcOffset + 1, srcOffset + bytesToCopy)
+        }
+
+        if (bitCountTotal and 7 != 0) {
+            val mask = (-0x100 ushr (bitCountTotal and 7))
+            dest[destOffset + bytesToCopy] =
+                ((dest[destOffset + bytesToCopy].toInt() and mask.inv()) or (src[srcOffset + bytesToCopy].toInt() and mask)).toByte()
+        }
+    } else {
+        var bitsInAcc = toOffset
+        var accumulator = if (bitsInAcc != 0) dest[destOffset].toLong() ushr (8 - bitsInAcc) else 0L
+
+        if (bitCountTotal < 8) {
+            accumulator = accumulator shl remainingBits
+            accumulator =
+                accumulator or ((src[srcOffset].toLong() and (0xffL ushr fromOffset)) ushr (8 - bitCountTotal))
+            bitsInAcc += remainingBits
+        } else {
+            val leadingBits = 8 - fromOffset
+            accumulator = (accumulator shl leadingBits)
+            accumulator = accumulator or (src[srcOffset++].toLong() and (0xffL ushr fromOffset))
+            bitsInAcc += leadingBits
+            remainingBits -= leadingBits
+
+            while (remainingBits >= 8) {
+                accumulator = accumulator shl 8
+                accumulator = accumulator or (src[srcOffset++].toLong() and 0xffL)
+                dest[destOffset++] = (accumulator ushr bitsInAcc).toByte()
+                remainingBits -= 8
+            }
+
+            if (remainingBits > 0) {
+                accumulator =
+                    (accumulator shl remainingBits) or ((src[srcOffset].toLong() and 0xff) ushr (8 - remainingBits))
+                bitsInAcc += remainingBits
+            }
+        }
+
+        while (bitsInAcc >= 8) {
+            bitsInAcc -= 8
+            dest[destOffset++] = (accumulator ushr bitsInAcc).toByte()
+        }
+
+        if (bitsInAcc > 0) {
+            dest[destOffset] =
+                ((dest[destOffset].toInt() and (0xff ushr bitsInAcc)) or (accumulator.toInt() shl (8 - bitsInAcc))).toByte()
+        }
+    }
+}
+
+internal fun countLeadingBits(
+    array: ByteArray,
+    offset: Int,
+    bitCount: Int,
+    bit: Boolean
+): Int {
+    if (bitCount == 0) return 0
+
+    val xorVal = if (bit) -1 else 0
+    var index = offset ushr 3
+    val bitOffset = offset and 7
+    var reminder = bitCount
+
+    if (bitOffset != 0) {
+        val v = ((array[index++].toInt() and 0xFF) xor xorVal) shl (24 + bitOffset)
+        val c = v.countLeadingZeroBits()
+        val remainingBits = 8 - bitOffset
+        if (c < remainingBits || bitCount <= remainingBits) {
+            return min(c, bitCount)
+        }
+        reminder -= remainingBits
+    }
+
+    while (reminder >= 8) {
+        val v = ((array[index++].toInt() xor xorVal) and 0xFF) shl 24
+        if (v != 0) {
+            return bitCount - reminder + v.countLeadingZeroBits()
+        }
+        reminder -= 8
+    }
+
+    if (reminder > 0) {
+        val v = (((array[index].toInt() xor xorVal) and 0xFF) shl 24).countLeadingZeroBits()
+        if (v < reminder) {
+            return bitCount - reminder + v
+        }
+    }
+    return bitCount
 }
