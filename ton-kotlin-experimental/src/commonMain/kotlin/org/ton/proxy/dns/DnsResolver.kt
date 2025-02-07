@@ -4,12 +4,12 @@ import io.github.reactivecircus.cache4k.Cache
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.block.*
-import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.boc.BagOfCells
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.crypto.hex
 import org.ton.hashmap.HashMapEdge
 import org.ton.lite.api.liteserver.LiteServerAccountId

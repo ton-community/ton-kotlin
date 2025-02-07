@@ -1,9 +1,10 @@
-package org.ton.block.account
+package org.ton.kotlin.account
 
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
 
 /**
  * Simple TVM library.
@@ -19,20 +20,39 @@ public data class SimpleLib(
      */
     val root: Cell
 ) {
-    public companion object Tlb : TlbCodec<SimpleLib> {
-        override fun storeTlb(
-            cellBuilder: CellBuilder, value: SimpleLib
-        ): Unit = cellBuilder {
-            storeBoolean(value.public)
-            storeRef(value.root)
-        }
+    //    public companion object Tlb : TlbCodec<SimpleLib> {
+//        override fun storeTlb(
+//            cellBuilder: CellBuilder, value: SimpleLib
+//        ): Unit = cellBuilder {
+//            storeBoolean(value.public)
+//            storeRef(value.root)
+//        }
+//
+//        override fun loadTlb(
+//            cellSlice: CellSlice
+//        ): SimpleLib = cellSlice {
+//            val public = loadBit()
+//            val root = loadRef()
+//            SimpleLib(public, root)
+//        }
+//    }
+    public companion object : CellSerializer<SimpleLib> by SimpleLibSerializer
+}
 
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): SimpleLib = cellSlice {
-            val public = loadBit()
-            val root = loadRef()
-            SimpleLib(public, root)
-        }
+private object SimpleLibSerializer : CellSerializer<SimpleLib> {
+    override fun load(
+        slice: CellSlice,
+        context: CellContext
+    ): SimpleLib {
+        TODO("Not yet implemented")
     }
+
+    override fun store(
+        builder: CellBuilder,
+        value: SimpleLib,
+        context: CellContext
+    ) {
+        TODO("Not yet implemented")
+    }
+
 }

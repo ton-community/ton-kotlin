@@ -1,10 +1,10 @@
 package org.ton.kotlin.benchmarks
 
 import kotlinx.benchmark.*
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
 import org.ton.dict.RawDictionary
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 
 @State(Scope.Benchmark)
 open class DictBenchmark {

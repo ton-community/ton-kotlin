@@ -1,9 +1,9 @@
-package org.ton.block.block
+package org.ton.kotlin.block
 
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.hexToByteString
 import kotlinx.io.bytestring.toHexString
-import org.ton.block.ShardIdent
+import org.ton.kotlin.shard.ShardIdent
 import kotlin.jvm.JvmStatic
 
 public data class BlockId(

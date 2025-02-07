@@ -1,16 +1,19 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package org.ton.bitstring
+package org.ton.kotlin.bitstring
 
 import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.serialization.HexBitStringSerializer
+import org.ton.kotlin.bitstring.serialization.HexBitStringSerializer
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.jvm.JvmStatic
 
 public inline fun BitString(byteArray: ByteArray, size: Int = byteArray.size * Byte.SIZE_BITS): BitString =
     BitString.of(byteArray, size)
+
+public inline fun BitString(byteString: ByteString, size: Int = byteString.size * Byte.SIZE_BITS): BitString =
+    BitString.of(byteString.toByteArray(), size)
 
 public inline fun BitString(size: Int): BitString = BitString.of(size)
 public inline fun BitString(vararg bits: Boolean): BitString = BitString.of(*bits)
@@ -195,3 +198,7 @@ public inline fun BitString?.isNullOrEmpty(): Boolean {
 }
 
 public fun BitString.isNotEmpty(): Boolean = !isEmpty()
+
+public fun ByteArray.toBitString(): BitString = BitString(this)
+
+public fun ByteString.toBitString(): BitString = BitString(this.toByteArray())

@@ -1,49 +1,23 @@
-package org.ton.block.currency
+package org.ton.kotlin.currency
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import org.ton.block.VarUInteger
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
-import org.ton.hashmap.HashMapE
-import org.ton.tlb.*
-import org.ton.tlb.providers.TlbConstructorProvider
-import kotlin.jvm.JvmName
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.dict.Dictionary
+import org.ton.kotlin.dict.RawDictionary
 
-@Serializable
-@SerialName("extra_currencies")
-public data class ExtraCurrencyCollection(
-    @get:JvmName("dict")
-    val dict: HashMapE<VarUInteger> = HashMapE.of()
-) : TlbObject {
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
-        return printer.type("extra_currencies") {
-            field("dict", dict)
-        }
-    }
-
-    override fun toString(): String = print().toString()
-
-    public companion object : TlbConstructorProvider<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor
-}
-
-private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurrencyCollection>(
-    schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
+/**
+ * Dictionary with amounts for multiple currencies.
+ *
+ * @see [CurrencyCollection]
+ */
+public class ExtraCurrencyCollection(
+    dict: RawDictionary = RawDictionary(32),
+) : Dictionary<Int, VarUInt248>(
+    dict = dict,
+    keySerializer = { CellBuilder().storeInt(it).toBitString() },
+    keyDeserializer = { CellBuilder().storeBitString(it).toCellSlice().loadInt() },
+    valueSerializer = VarUInt248
 ) {
-    private val hashMapE32Codec = HashMapE.tlbCodec(32, VarUInteger.Companion.tlbCodec(32))
-
-    override fun storeTlb(
-        cellBuilder: CellBuilder,
-        value: ExtraCurrencyCollection
-    ) = cellBuilder {
-        storeTlb(hashMapE32Codec, value.dict)
-    }
-
-    override fun loadTlb(
-        cellSlice: CellSlice
-    ): ExtraCurrencyCollection = cellSlice {
-        val dict = loadTlb(hashMapE32Codec)
-        ExtraCurrencyCollection(dict)
+    init {
+        require(dict.keySize == 32) { "Dictionary key size must be 32 bits length" }
     }
 }

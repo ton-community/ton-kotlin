@@ -14,7 +14,7 @@ import org.ton.api.adnl.AdnlPacketContents
 import org.ton.api.adnl.message.*
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKeyEd25519
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.logger.Logger
 import org.ton.logger.PrintLnLogger
 import org.ton.proxy.adnl.channel.AdnlChannel

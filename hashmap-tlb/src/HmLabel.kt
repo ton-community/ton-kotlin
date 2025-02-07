@@ -2,7 +2,7 @@
 
 package org.ton.hashmap
 
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.tlb.TlbNegatedCodec
 import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbNegatedConstructor

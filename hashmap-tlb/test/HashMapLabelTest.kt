@@ -1,6 +1,6 @@
 package org.ton.hashmap
 
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

@@ -1,6 +1,6 @@
-package org.ton.cell
+package org.ton.kotlin.cell
 
-import org.ton.boc.BagOfCells
+import org.ton.kotlin.cell.boc.BagOfCells
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

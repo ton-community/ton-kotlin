@@ -1,11 +1,14 @@
-package org.ton.block.account
+package org.ton.kotlin.account
 
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.hashmap.HashMapE
-import org.ton.hashmap.HmeRoot
-import org.ton.tlb.*
+import kotlinx.io.bytestring.ByteString
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
+import org.ton.kotlin.dict.Dictionary
+import org.ton.kotlin.dict.RawDictionary
 
 /**
  * Deployed account state.
@@ -34,12 +37,12 @@ public data class StateInit(
     /**
      * Libraries used in smart-contract.
      */
-    val libraries: HashMapE<SimpleLib> = HashMapE.of()
+    val libraries: Dictionary<ByteString, SimpleLib>? = null,
 ) {
     public constructor(
         code: Cell? = null,
         data: Cell? = null,
-        library: HashMapE<SimpleLib> = HashMapE.of(),
+        library: Dictionary<ByteString, SimpleLib>,
         splitDepth: SplitDepth? = null,
         special: TickTock? = null
     ) : this(
@@ -64,44 +67,26 @@ public data class StateInit(
      */
     val referenceCount: Int
         get() =
-            if (code != null) 1 else 0 + if (data != null) 1 else 0 + if (libraries is HmeRoot<*>) 1 else 0
+            if (code != null) 1 else 0 + if (data != null) 1 else 0 + if (libraries.isNullOrEmpty()) 0 else 1
 
-    public object Tlb : TlbCodec<StateInit> {
-        private val Library = HashMapE.tlbCodec(256, SimpleLib.Tlb)
+    public class Libraries(
+        dict: RawDictionary
+    ) : Dictionary<ByteString, SimpleLib>(dict, {
+        BitString(it)
+    }, {
+        ByteString(*it.toByteArray())
+    }, SimpleLib)
 
-        override fun storeTlb(
-            cellBuilder: CellBuilder, value: StateInit
-        ): Unit = cellBuilder {
-            storeNullableTlb(SplitDepth.Tlb, value.splitDepth)
-            storeNullableTlb(TickTock.Tlb, value.special)
-            if (value.code != null) {
-                storeBoolean(true)
-                storeRef(value.code)
-            } else {
-                storeBoolean(false)
-            }
-            if (value.data != null) {
-                storeBoolean(true)
-                storeRef(value.data)
-            } else {
-                storeBoolean(false)
-            }
-            storeTlb(Library, value.libraries)
-        }
+    public companion object : CellSerializer<StateInit> by StateInitSerializer
+}
 
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): StateInit = cellSlice {
-            val splitDepth = loadNullableTlb(SplitDepth.Tlb)
-            val special = loadNullableTlb(TickTock.Tlb)
-            val code = if (loadBit()) {
-                loadRef()
-            } else null
-            val data = if (loadBit()) {
-                loadRef()
-            } else null
-            val library = loadTlb(Library)
-            StateInit(splitDepth, special, code, data, library)
-        }
+private object StateInitSerializer : CellSerializer<StateInit> {
+
+    override fun store(builder: CellBuilder, value: StateInit, context: CellContext) {
+
+    }
+
+    override fun load(slice: CellSlice, context: CellContext): StateInit {
+        TODO()
     }
 }

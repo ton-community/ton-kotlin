@@ -1,9 +1,10 @@
-package org.ton.block.shard
+package org.ton.kotlin.shard
 
-import org.ton.block.account.ShardAccount
-import org.ton.hashmap.HashmapAugE
+import org.ton.kotlin.dict.RawDictionary
 
 /**
  * A dictionary of account states.
  */
-public typealias ShardAccounts = HashmapAugE<ShardAccount, DepthBalanceInfo>
+public class ShardAccounts(
+    public val dict: RawDictionary
+)

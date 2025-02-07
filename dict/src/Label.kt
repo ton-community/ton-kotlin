@@ -1,8 +1,8 @@
-package org.ton.dict
+package org.ton.kotlin.dict
 
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 
 internal fun CellBuilder.storeLabel(
     maxKeyLength: Int,

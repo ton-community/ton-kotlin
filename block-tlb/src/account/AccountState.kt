@@ -1,11 +1,6 @@
-package org.ton.block.account
+package org.ton.kotlin.account
 
 import kotlinx.io.bytestring.ByteString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
 
 /**
  * State of an existing account.
@@ -40,6 +35,9 @@ public sealed interface AccountState {
     ) : AccountState {
         override val status: AccountStatus get() = AccountStatus.Frozen
     }
+}
+
+/*
 
     public object Tlb : TlbCodec<AccountState> {
         override fun storeTlb(cellBuilder: CellBuilder, value: AccountState) {
@@ -83,7 +81,4 @@ public sealed interface AccountState {
                 else -> throw IllegalStateException("Invalid tag $tag")
             }
         }
-    }
-
-    public companion object
-}
+ */

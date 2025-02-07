@@ -11,7 +11,7 @@ import org.ton.api.dht.DhtNode
 import org.ton.api.dht.DhtValue
 import org.ton.api.dht.DhtValueFound
 import org.ton.api.pub.PublicKey
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.proxy.adnl.resolver.AdnlAddressResolver
 import org.ton.proxy.dht.state.DhtState
 import org.ton.proxy.dht.storage.DhtStorage

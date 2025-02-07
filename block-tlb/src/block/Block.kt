@@ -1,14 +1,12 @@
-package org.ton.block.block
+package org.ton.kotlin.block
 
-import org.ton.block.MerkleUpdate
-import org.ton.block.ValueFlow
-import org.ton.block.shard.ShardState
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
-import org.ton.tlb.CellRef
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.asRef
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellRef
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.merkle.MerkleUpdate
+import org.ton.kotlin.cell.serialization.CellSerializer
+import org.ton.kotlin.shard.ShardState
 
 /**
  * Shard block.
@@ -42,31 +40,58 @@ public data class Block(
     /**
      * Tries to load block info.
      */
-    public fun loadInfo(): Result<BlockInfo> = runCatching {
-        info.value
+    public fun loadInfo(context: CellContext = CellContext.EMPTY): Result<BlockInfo> = runCatching {
+        info.load(context)
     }
 
     /**
      * Tries to load tokens flow info.
      */
-    public fun loadValueFlow(): Result<ValueFlow> = runCatching {
-        valueFlow.value
+    public fun loadValueFlow(context: CellContext = CellContext.EMPTY): Result<ValueFlow> = runCatching {
+        valueFlow.load(context)
     }
 
     /**
      * Tries to load state update.
      */
-    public fun loadStateUpdate(): Result<MerkleUpdate<ShardState>> = runCatching {
-        stateUpdate.value
-    }
+    public fun loadStateUpdate(context: CellContext = CellContext.EMPTY): Result<MerkleUpdate<ShardState>> =
+        runCatching {
+            stateUpdate.load(context)
+        }
 
     /**
      * Tries to load block content.
      */
-    public fun loadExtra(): Result<BlockExtra> = runCatching {
-        extra.value
+    public fun loadExtra(context: CellContext = CellContext.EMPTY): Result<BlockExtra> = runCatching {
+        extra.load(context)
     }
 
+    public companion object : CellSerializer<Block> by BlockSerializer
+}
+
+private object BlockSerializer : CellSerializer<Block> {
+    private const val TAG = 0x11ef55aa
+
+    override fun load(slice: CellSlice, context: CellContext): Block {
+        val tag = slice.loadInt()
+        require(tag == TAG) { "Invalid block tag: ${tag.toHexString()}" }
+        slice.loadInt()
+        CellRef(slice.loadRef(), BlockInfo)
+        CellRef(slice.loadRef(), ValueFlow)
+        TODO("Not yet implemented")
+    }
+
+    override fun store(
+        builder: CellBuilder,
+        value: Block,
+        context: CellContext
+    ) {
+        TODO("Not yet implemented")
+    }
+
+}
+
+/*
     public object Tlb : TlbConstructor<Block>(
         schema = "block#11ef55aa global_id:int32 " +
                 "info:^BlockInfo value_flow:^ValueFlow " +
@@ -97,5 +122,4 @@ public data class Block(
             Block(globalId, info, valueFlow, stateUpdate, extra)
         }
     }
-}
-
+ */

@@ -1,4 +1,4 @@
-package org.ton.dict
+package org.ton.kotlin.dict
 
 
 internal enum class SetMode(

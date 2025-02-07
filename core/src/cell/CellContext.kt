@@ -1,4 +1,4 @@
-package org.ton.cell
+package org.ton.kotlin.cell
 
 public interface CellContext {
     public fun loadCell(cell: Cell): DataCell

@@ -1,17 +1,16 @@
-package org.ton.block.shard
+package org.ton.kotlin.shard
 
-import org.ton.block.LibDescr
-import org.ton.block.ShardIdent
-import org.ton.block.account.ShardAccount
-import org.ton.block.block.BlockRef
-import org.ton.block.currency.CurrencyCollection
-import org.ton.block.message.export.OutMsgQueueInfo
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.storeRef
-import org.ton.hashmap.HashMapE
-import org.ton.hashmap.HashmapAugE
-import org.ton.tlb.*
+import kotlinx.io.bytestring.ByteString
+import org.ton.kotlin.bitstring.toBitString
+import org.ton.kotlin.block.BlockRef
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellRef
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
+import org.ton.kotlin.currency.CurrencyCollection
+import org.ton.kotlin.dict.Dictionary
+import org.ton.kotlin.dict.RawDictionary
 
 /**
  * State of the single shard.
@@ -54,8 +53,10 @@ public data class ShardStateUnsplit(
 
     /**
      * Output messages queue info.
+     *
+     * TODO: implement outMsgQueueInfo
      */
-    val outMsgQueueInfo: CellRef<OutMsgQueueInfo>,
+    val outMsgQueueInfo: CellRef<CellSlice>,
 
     /**
      * Whether this state was produced before the shards split.
@@ -90,7 +91,7 @@ public data class ShardStateUnsplit(
     /**
      * Dictionary with all libraries and its providers.
      */
-    val libraries: HashMapE<LibDescr>,
+    val libraries: Libraries,
 
     /**
      * Optional reference to the masterchain block.
@@ -105,17 +106,35 @@ public data class ShardStateUnsplit(
     /**
      * Tries to load output messages queue info.
      */
-    public fun loadOutMsgQueueInfo(): Result<OutMsgQueueInfo> = runCatching { outMsgQueueInfo.value }
+    public fun loadOutMsgQueueInfo(context: CellContext = CellContext.EMPTY): Result<CellSlice> =
+        runCatching { outMsgQueueInfo.load(context) }
 
     /**
      * Tries to load shard accounts dictionary.
      */
-    public fun loadAccounts(): Result<ShardAccounts> = runCatching { accounts.value }
+    public fun loadAccounts(context: CellContext = CellContext.EMPTY): Result<ShardAccounts> =
+        runCatching { accounts.load(context) }
 
     /**
      * Tries to load additional masterchain data.
      */
-    public fun loadCustom(): Result<McStateExtra?> = runCatching { custom?.value }
+    public fun loadCustom(context: CellContext = CellContext.EMPTY): Result<McStateExtra?> =
+        runCatching { custom?.load(context) }
+
+    public class Libraries(
+        dict: RawDictionary
+    ) : Dictionary<ByteString, LibDescr>(
+        dict = dict,
+        keySerializer = { it.toBitString() },
+        keyDeserializer = { ByteString(*it.toByteArray()) },
+        valueSerializer = LibDescr.cellSerializer()
+    )
+
+    public companion object : CellSerializer<ShardStateUnsplit> by ShardStateUnsplitSerializer
+}
+
+/*
+
 
     public object Tlb : TlbConstructor<ShardStateUnsplit>(
         schema = "shard_state#9023afe2 " +
@@ -210,4 +229,21 @@ public data class ShardStateUnsplit(
             )
         }
     }
+ */
+internal object ShardStateUnsplitSerializer : CellSerializer<ShardStateUnsplit> {
+    override fun load(
+        slice: CellSlice,
+        context: CellContext
+    ): ShardStateUnsplit {
+        TODO("Not yet implemented")
+    }
+
+    override fun store(
+        builder: CellBuilder,
+        value: ShardStateUnsplit,
+        context: CellContext
+    ) {
+        TODO("Not yet implemented")
+    }
+
 }

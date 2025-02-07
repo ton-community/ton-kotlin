@@ -1,4 +1,4 @@
-package org.ton.bitstring.serialization
+package org.ton.kotlin.bitstring.serialization
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -6,7 +6,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 
 public object HexBitStringSerializer : KSerializer<BitString> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BitString", PrimitiveKind.STRING)

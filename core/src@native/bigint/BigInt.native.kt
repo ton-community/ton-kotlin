@@ -1,9 +1,9 @@
-package org.ton.bigint
+package org.ton.kotlin.bigint
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.Sign
 import kotlinx.serialization.Serializable
-import org.ton.bigint.serialization.BigIntSerializer
+import org.ton.kotlin.bigint.serialization.BigIntSerializer
 
 @Serializable(with = BigIntSerializer::class)
 public actual class BigInt internal constructor(

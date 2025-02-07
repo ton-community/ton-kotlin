@@ -1,7 +1,7 @@
-package org.ton.bigint
+package org.ton.kotlin.bigint
 
 import kotlinx.serialization.Serializable
-import org.ton.bigint.serialization.BigIntSerializer
+import org.ton.kotlin.bigint.serialization.BigIntSerializer
 
 @Suppress("NOTHING_TO_INLINE")
 @Serializable(with = BigIntSerializer::class)

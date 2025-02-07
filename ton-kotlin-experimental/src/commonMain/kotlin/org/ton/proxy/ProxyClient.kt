@@ -25,7 +25,7 @@ import org.ton.api.http.HttpResponse
 import org.ton.api.http.functions.HttpGetNextPayloadPart
 import org.ton.api.http.functions.HttpRequest
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.block.DnsAdnlAddress
 import org.ton.lite.client.LiteClient
 import org.ton.proxy.adnl.engine.CIOAdnlNetworkEngine

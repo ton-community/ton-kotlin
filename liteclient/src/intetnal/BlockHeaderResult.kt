@@ -3,11 +3,11 @@ package org.ton.lite.client.internal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
-import org.ton.block.message.address.AddrInt
+import org.ton.block.message.address.IntAddr
 import org.ton.block.org.ton.account.Account
 import org.ton.block.transaction.Transaction
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.toBitString
 import org.ton.tlb.CellRef
 import kotlin.jvm.JvmName
 
@@ -20,7 +20,7 @@ internal data class BlockHeaderResult(
 public data class FullAccountState(
     public val blockId: TonNodeBlockIdExt,
 
-    public val address: AddrInt,
+    public val address: IntAddr,
 
     public val lastTransactionId: TransactionId?,
 

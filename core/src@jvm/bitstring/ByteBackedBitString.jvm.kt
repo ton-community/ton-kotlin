@@ -1,4 +1,4 @@
-package org.ton.bitstring
+package org.ton.kotlin.bitstring
 
 internal actual fun ByteArray.setInt(index: Int, value: Int) {
     this[index] = (value ushr 24).toByte()

@@ -1,14 +1,16 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package org.ton.cell
+package org.ton.kotlin.cell
 
 import kotlinx.io.bytestring.ByteString
-import org.ton.bigint.BigInt
-import org.ton.bigint.toBigInt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedBitString
-import org.ton.bitstring.ByteBackedMutableBitString
-import org.ton.bitstring.MutableBitString
+import org.ton.kotlin.bigint.BigInt
+import org.ton.kotlin.bigint.toBigInt
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.ByteBackedBitString
+import org.ton.kotlin.bitstring.ByteBackedMutableBitString
+import org.ton.kotlin.bitstring.MutableBitString
+import org.ton.kotlin.cell.exception.CellUnderflowException
+import org.ton.kotlin.cell.serialization.CellLoader
 import kotlin.experimental.inv
 
 public class CellSlice {
@@ -52,6 +54,8 @@ public class CellSlice {
 
     public val refSize: Int get() = refsEnd - refsStart
 
+    public fun haveRefs(): Boolean = 1 <= refSize
+
     /**
      * Checks if slice is empty. If not, throws an exception.
      */
@@ -62,9 +66,11 @@ public class CellSlice {
     /**
      * Loads the first reference from the slice.
      */
-    public fun loadRef(): Cell {
-        check(refsPosition < refSize)
-        return cell.refs[refsPosition++]
+    public fun loadRef(): Cell =
+        loadRefOrNull() ?: throw CellUnderflowException("Out of range: $refsPosition in $refsStart..$refsEnd")
+
+    public fun loadRefOrNull(): Cell? {
+        return if (refsPosition < refSize) cell.refs[refsPosition++] else null
     }
 
     public fun preloadRef(offset: Int = 0): Cell {
@@ -140,7 +146,7 @@ public class CellSlice {
 
     public fun loadByteArray(byteCount: Int): ByteArray {
         val result = preloadByteArray(byteCount)
-        bitsStart += byteCount
+        bitsStart += byteCount * Byte.SIZE_BITS
         return result
     }
 
@@ -240,6 +246,14 @@ public class CellSlice {
 
     public fun preloadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
     public fun loadUIntLes(max: Int): UInt = loadUIntLeq(max - 1)
+
+    public fun <T> load(loader: CellLoader<T>, context: CellContext = CellContext.EMPTY): T {
+        return loader.load(this, context)
+    }
+
+    public fun <T> loadNullable(loader: CellLoader<T>, context: CellContext = CellContext.EMPTY): T? {
+        return if (loadBoolean()) loader.load(this, context) else null
+    }
 
     public fun countLeadingBits(bit: Boolean): Int = cell.bits.countLeadingBits(bitsStart, bitsEnd, bit)
 

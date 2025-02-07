@@ -1,57 +1,49 @@
-package org.ton.block.message.address
+package org.ton.kotlin.message.address
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbObject
-import org.ton.tlb.TlbPrettyPrinter
-import org.ton.tlb.providers.TlbConstructorProvider
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.ByteBackedMutableBitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
 
-@SerialName("anycast_info")
-@Serializable
+/**
+ * Anycast prefix info.
+ *
+ * ```tlb
+ * anycast_info$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;
+ * ```
+ */
 public data class Anycast(
     val depth: Int,
-    @SerialName("rewrite_pfx") val rewritePfx: BitString
-) : TlbObject {
-    public constructor(
-        rewritePfx: BitString
-    ) : this(rewritePfx.size, rewritePfx)
-
-    init {
-        require(depth in 1..30) { "required: depth in 1..30, actual: $depth" }
+    val rewritePrefix: BitString
+) {
+    public fun rewrite(address: BitString): BitString {
+        val result = ByteBackedMutableBitString(address.size)
+        rewritePrefix.copyInto(result)
+        address.copyInto(result, depth)
+        return result
     }
 
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
-        type("anycast_info") {
-            field("depth", depth)
-            field("rewrite_pfx", rewritePfx)
-        }
-    }
-
-    override fun toString(): String = print().toString()
-
-    public companion object : TlbConstructorProvider<Anycast> by AnycastTlbConstructor
+    public companion object : CellSerializer<Anycast> by AnycastSerializer
 }
 
-private object AnycastTlbConstructor : TlbConstructor<Anycast>(
-    schema = "anycast_info\$_ depth:(#<= 30) { depth >= 1 } rewrite_pfx:(bits depth) = Anycast;"
-) {
-    override fun storeTlb(
-        cellBuilder: CellBuilder, value: Anycast
-    ) = cellBuilder {
-        storeUIntLeq(value.depth, 30)
-        storeBits(value.rewritePfx)
+private object AnycastSerializer : CellSerializer<Anycast> {
+    override fun load(
+        slice: CellSlice,
+        context: CellContext
+    ): Anycast {
+        val depth = slice.loadUInt(5).toInt()
+        val rewritePrefix = slice.loadBitString(depth)
+        return Anycast(depth, rewritePrefix)
     }
 
-    override fun loadTlb(
-        cellSlice: CellSlice
-    ): Anycast = cellSlice {
-        val depth = loadUIntLeq(30).toInt()
-        val rewritePfx = loadBits(depth)
-        Anycast(depth, rewritePfx)
+    override fun store(
+        builder: CellBuilder,
+        value: Anycast,
+        context: CellContext
+    ) {
+        builder.storeUInt(value.depth.toUInt(), 5)
+        builder.storeBitString(value.rewritePrefix)
     }
 }

@@ -1,11 +1,9 @@
-package org.ton.block.currency
+package org.ton.kotlin.currency
 
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
 
 /**
  * Amounts collection.
@@ -23,25 +21,24 @@ public data class CurrencyCollection(
 ) {
     public constructor(coins: Coins) : this(coins, ExtraCurrencyCollection())
 
-    public object Tlb : TlbCodec<CurrencyCollection> {
-        override fun storeTlb(
-            cellBuilder: CellBuilder,
-            value: CurrencyCollection
-        ): Unit = cellBuilder {
-            storeTlb(Coins.Tlb, value.coins)
-            storeTlb(ExtraCurrencyCollection, value.other)
-        }
+    public companion object : CellSerializer<CurrencyCollection> by CurrencyCollectionSerializer {
+        public val ZERO: CurrencyCollection = CurrencyCollection(Coins.ZERO)
+    }
+}
 
-        override fun loadTlb(
-            cellSlice: CellSlice
-        ): CurrencyCollection = cellSlice {
-            val coins = loadTlb(Coins.Tlb)
-            val other = loadTlb(ExtraCurrencyCollection)
-            CurrencyCollection(coins, other)
-        }
+private object CurrencyCollectionSerializer : CellSerializer<CurrencyCollection> {
+    override fun load(
+        slice: CellSlice,
+        context: CellContext
+    ): CurrencyCollection {
+        TODO()
     }
 
-    public companion object {
-        public val ZERO: CurrencyCollection = CurrencyCollection(Coins.ZERO)
+    override fun store(
+        builder: CellBuilder,
+        value: CurrencyCollection,
+        context: CellContext
+    ) {
+        TODO()
     }
 }

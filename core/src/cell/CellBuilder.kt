@@ -1,14 +1,15 @@
-package org.ton.cell
+package org.ton.kotlin.cell
 
 import io.github.andreypfau.kotlinx.crypto.Sha256
 import kotlinx.io.bytestring.ByteString
-import org.ton.bigint.BigInt
-import org.ton.bigint.toBigInt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.ByteBackedMutableBitString
-import org.ton.bitstring.bitsCopy
-import org.ton.bitstring.bitsStoreLong
-import org.ton.cell.exception.CellOverflowException
+import org.ton.kotlin.bigint.BigInt
+import org.ton.kotlin.bigint.toBigInt
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.ByteBackedMutableBitString
+import org.ton.kotlin.bitstring.bitsCopy
+import org.ton.kotlin.bitstring.bitsStoreLong
+import org.ton.kotlin.cell.exception.CellOverflowException
+import org.ton.kotlin.cell.serialization.CellStorer
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -46,7 +47,7 @@ public class CellBuilder private constructor(
 
     public var bitsPosition: Int = 0
     private var refPosition: Int = 0
-    public val remainingBits: Int get() = Cell.MAX_BITS_SIZE - bitsPosition
+    public val remainingBits: Int get() = Cell.MAX_SIZE_BITS - bitsPosition
 
     public fun storeBoolean(bit: Boolean): CellBuilder {
         checkBitsOverflow(1)
@@ -155,7 +156,7 @@ public class CellBuilder private constructor(
         return this
     }
 
-    public fun storeInt(value: Int, bitCount: Int): CellBuilder {
+    public fun storeInt(value: Int, bitCount: Int = Int.SIZE_BITS): CellBuilder {
         if (bitCount > Long.SIZE_BITS) {
             return storeBigInt(value.toBigInt(), bitCount, true)
         }
@@ -165,7 +166,7 @@ public class CellBuilder private constructor(
         return this
     }
 
-    public fun storeLong(value: Long, bitCount: Int): CellBuilder {
+    public fun storeLong(value: Long, bitCount: Int = Long.SIZE_BITS): CellBuilder {
         if (bitCount > Long.SIZE_BITS) {
             return storeBigInt(value.toBigInt(), bitCount, true)
         }
@@ -175,7 +176,7 @@ public class CellBuilder private constructor(
         return this
     }
 
-    public fun storeUInt(value: UInt, bitCount: Int): CellBuilder {
+    public fun storeUInt(value: UInt, bitCount: Int = UInt.SIZE_BITS): CellBuilder {
         if (bitCount > Long.SIZE_BITS) {
             return storeBigInt(value.toBigInt(), bitCount, false)
         }
@@ -185,7 +186,7 @@ public class CellBuilder private constructor(
         return this
     }
 
-    public fun storeULong(value: ULong, bitCount: Int): CellBuilder {
+    public fun storeULong(value: ULong, bitCount: Int = ULong.SIZE_BITS): CellBuilder {
         if (bitCount > Long.SIZE_BITS) {
             return storeBigInt(value.toBigInt(), bitCount, false)
         }
@@ -235,6 +236,29 @@ public class CellBuilder private constructor(
         storeBitString(bits, slice.bitsStart, slice.bitsEnd)
         for (i in slice.refsStart until slice.refsEnd) {
             this.refs[refPosition++] = refs[i]
+        }
+        return this
+    }
+
+    public fun <T> store(
+        serializer: CellStorer<T>,
+        value: T,
+        context: CellContext = CellContext.EMPTY
+    ): CellBuilder {
+        serializer.store(this, value, context)
+        return this
+    }
+
+    public fun <T> storeNullable(
+        serializer: CellStorer<T>,
+        value: T?,
+        context: CellContext = CellContext.EMPTY
+    ): CellBuilder {
+        if (value == null) {
+            storeBoolean(false)
+        } else {
+            storeBoolean(true)
+            serializer.store(this, value, context)
         }
         return this
     }

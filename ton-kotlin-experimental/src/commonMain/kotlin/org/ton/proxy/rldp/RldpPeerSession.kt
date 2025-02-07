@@ -13,7 +13,7 @@ import org.ton.api.rldp.RldpAnswer
 import org.ton.api.rldp.RldpMessageData
 import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpQuery
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.logger.Logger
 import org.ton.proxy.adnl.AbstractAdnlPeerSession
 import org.ton.proxy.adnl.AdnlPeerSession

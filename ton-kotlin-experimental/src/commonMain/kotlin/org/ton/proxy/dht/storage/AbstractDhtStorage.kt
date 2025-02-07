@@ -7,7 +7,7 @@ import org.ton.api.dht.DhtValue
 import org.ton.api.overlay.OverlayNode
 import org.ton.api.overlay.OverlayNodes
 import org.ton.api.pub.PublicKeyOverlay
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.proxy.dht.storage.exception.DhtStorageException
 
 abstract class AbstractDhtStorage(

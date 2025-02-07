@@ -1,8 +1,9 @@
-package org.ton.block.account
+package org.ton.kotlin.account
 
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.tlb.TlbCodec
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.serialization.CellSerializer
 
 /**
  * Brief account status.
@@ -28,28 +29,35 @@ public enum class AccountStatus {
      */
     NotExist;
 
-    public object Tlb : TlbCodec<AccountStatus> {
-        override fun loadTlb(cellSlice: CellSlice): AccountStatus {
-            val tag = cellSlice.loadUInt(2).toInt()
-            return when (tag) {
-                0b00 -> Uninit
-                0b01 -> Frozen
-                0b10 -> Active
-                0b11 -> NotExist
-                else -> throw IllegalStateException("Unknown account status type: $tag")
-            }
-        }
+    public companion object : CellSerializer<AccountStatus> by AccountStatusSerializer
+}
 
-        override fun storeTlb(cellBuilder: CellBuilder, value: AccountStatus) {
-            val tag = when (value) {
-                Uninit -> 0b00
-                Frozen -> 0b01
-                Active -> 0b10
-                NotExist -> 0b11
-            }
-            cellBuilder.storeUInt(tag, 2)
+private object AccountStatusSerializer : CellSerializer<AccountStatus> {
+    override fun load(
+        slice: CellSlice,
+        context: CellContext
+    ): AccountStatus {
+        val tag = slice.loadUInt(2).toInt()
+        return when (tag) {
+            0b00 -> AccountStatus.Uninit
+            0b01 -> AccountStatus.Frozen
+            0b10 -> AccountStatus.Active
+            0b11 -> AccountStatus.NotExist
+            else -> throw IllegalStateException("Unknown account status type: $tag")
         }
     }
 
-    public companion object
+    override fun store(
+        builder: CellBuilder,
+        value: AccountStatus,
+        context: CellContext
+    ) {
+        val tag = when (value) {
+            AccountStatus.Uninit -> 0b00u
+            AccountStatus.Frozen -> 0b01u
+            AccountStatus.Active -> 0b10u
+            AccountStatus.NotExist -> 0b11u
+        }
+        builder.storeUInt(tag, 2)
+    }
 }

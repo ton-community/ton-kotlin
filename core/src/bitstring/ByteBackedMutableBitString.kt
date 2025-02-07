@@ -1,4 +1,4 @@
-package org.ton.bitstring
+package org.ton.kotlin.bitstring
 
 import kotlinx.io.bytestring.ByteString
 import kotlin.jvm.JvmStatic

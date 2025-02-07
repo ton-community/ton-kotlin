@@ -1,9 +1,9 @@
 package org.ton.hashmap
 
-import org.ton.bitstring.BitString
-import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.boc.BagOfCells
 import org.ton.tlb.constructor.UIntTlbConstructor
 import kotlin.io.encoding.Base64
 import kotlin.test.Test

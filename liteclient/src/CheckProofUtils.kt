@@ -1,16 +1,16 @@
 package org.ton.lite.client
 
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.bitstring.BitString
-import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.block.block.Block
-import org.ton.block.message.address.AddrInt
+import org.ton.block.message.address.IntAddr
 import org.ton.block.org.ton.account.Account
 import org.ton.block.shard.ShardState
 import org.ton.block.shard.ShardStateUnsplit
-import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.toBitString
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.boc.BagOfCells
 import org.ton.lite.client.internal.BlockHeaderResult
 import org.ton.lite.client.internal.FullAccountState
 import org.ton.lite.client.internal.TransactionId
@@ -42,7 +42,7 @@ internal object CheckProofUtils {
     fun checkAccountProof(
         proof: ByteArray,
         shardBlock: TonNodeBlockIdExt,
-        address: AddrInt,
+        address: IntAddr,
         root: Cell
     ): FullAccountState {
         val account = CellRef(root, Account)

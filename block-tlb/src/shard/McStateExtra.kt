@@ -1,21 +1,26 @@
-package org.ton.block.shard
+package org.ton.kotlin.shard
 
-import org.ton.block.ConfigParams
-import org.ton.block.KeyExtBlkRef
-import org.ton.block.KeyMaxLt
-import org.ton.block.block.BlockRef
-import org.ton.block.currency.CurrencyCollection
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.storeRef
-import org.ton.hashmap.HashMapE
-import org.ton.hashmap.HashmapAugE
-import org.ton.tlb.TlbCodec
-import org.ton.tlb.loadNullableTlb
-import org.ton.tlb.storeNullableTlb
+import org.ton.kotlin.block.BlockRef
+import org.ton.kotlin.config.BlockchainConfigParams
+import org.ton.kotlin.currency.CurrencyCollection
+import org.ton.kotlin.dict.RawDictionary
 
 /**
  * Additional content for masterchain state.
+ *
+ * ```tlb
+ * masterchain_state_extra#cc26
+ *   shard_hashes:ShardHashes
+ *   config:ConfigParams
+ *   ^[ flags:(## 16) { flags <= 1 }
+ *      validator_info:ValidatorInfo
+ *      prev_blocks:OldMcBlocksInfo
+ *      after_key_block:Bool
+ *      last_key_block:(Maybe ExtBlkRef)
+ *      block_create_stats:(flags . 0)?BlockCreateStats ]
+ *   global_balance:CurrencyCollection
+ * = McStateExtra;
+ * ```
  */
 public data class McStateExtra(
     /**
@@ -26,7 +31,7 @@ public data class McStateExtra(
     /**
      * The most recent blockchain config (if the block is a key block).
      */
-    val config: ConfigParams,
+    val config: BlockchainConfigParams,
 
     /**
      * Brief validator info.
@@ -36,7 +41,7 @@ public data class McStateExtra(
     /**
      * A dictionary with previous masterchain blocks.
      */
-    val prevBlocks: HashmapAugE<KeyExtBlkRef, KeyMaxLt>,
+    val prevBlocks: RawDictionary,
 
     /**
      * Whether this state was produced after the key block.
@@ -51,29 +56,15 @@ public data class McStateExtra(
     /**
      * Block creation stats for validators from the current set.
      */
-    val blockCreateStats: HashMapE<CreatorStats>?,
+    val blockCreateStats: BlockCreateStats?,
 
     /**
      * Total balance of all accounts.
      */
     val globalBalance: CurrencyCollection
-) {
-    /**
-     * TL-B Schema:
-     * ```tlb
-     * masterchain_state_extra#cc26
-     *   shard_hashes:ShardHashes
-     *   config:ConfigParams
-     *   ^[ flags:(## 16) { flags <= 1 }
-     *      validator_info:ValidatorInfo
-     *      prev_blocks:OldMcBlocksInfo
-     *      after_key_block:Bool
-     *      last_key_block:(Maybe ExtBlkRef)
-     *      block_create_stats:(flags . 0)?BlockCreateStats ]
-     *   global_balance:CurrencyCollection
-     * = McStateExtra;
-     * ```
-     */
+)
+
+/*
     public object Tlb : TlbCodec<McStateExtra> {
         private const val TAG = 0xcc26
         private const val BLOCK_STATS_TAG = 0x17
@@ -129,7 +120,7 @@ public data class McStateExtra(
             )
         }
     }
-}
+ */
 
 
 

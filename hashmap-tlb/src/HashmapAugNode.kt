@@ -1,7 +1,7 @@
 package org.ton.hashmap
 
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 

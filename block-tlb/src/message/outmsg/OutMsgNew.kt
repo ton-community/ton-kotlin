@@ -1,45 +1,25 @@
-package org.ton.block.message.export
+package org.ton.kotlin.message.outmsg
 
-import org.ton.block.message.envelope.MsgEnvelope
-import org.ton.block.transaction.Transaction
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
-import org.ton.tlb.*
-import org.ton.tlb.providers.TlbConstructorProvider
+import org.ton.kotlin.cell.CellRef
+import org.ton.kotlin.message.envelope.MsgEnvelope
+import org.ton.kotlin.transaction.Transaction
 
+/**
+ * Ordinary (internal) outbound message, generated in this block and included into the outbound queue.
+ *
+ * ```tlb
+ * msg_export_new$001 out_msg:^MsgEnvelope
+ *     transaction:^Transaction = OutMsg;
+ * ```
+ */
 public data class OutMsgNew(
+    /**
+     * Outbound message envelope.
+     */
     val outMsg: CellRef<MsgEnvelope>,
+
+    /**
+     * The source transaction of this message.
+     */
     val transaction: CellRef<Transaction>
-) : OutMsg, TlbObject {
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
-        type("msg_export_new") {
-            field("out_msg", outMsg)
-            field("transaction", transaction)
-        }
-    }
-
-    override fun toString(): String = print().toString()
-
-    public companion object : TlbConstructorProvider<OutMsgNew> by MsgExportNewTlbConstructor
-}
-
-private object MsgExportNewTlbConstructor : TlbConstructor<OutMsgNew>(
-    schema = "msg_export_new\$001 out_msg:^MsgEnvelope transaction:^Transaction = OutMsg;"
-) {
-    override fun storeTlb(
-        cellBuilder: CellBuilder,
-        value: OutMsgNew
-    ) = cellBuilder {
-        storeRef(MsgEnvelope, value.outMsg)
-        storeRef(Transaction, value.transaction)
-    }
-
-    override fun loadTlb(
-        cellSlice: CellSlice
-    ): OutMsgNew = cellSlice {
-        val outMsg = loadRef(MsgEnvelope)
-        val transaction = loadRef(Transaction)
-        OutMsgNew(outMsg, transaction)
-    }
-}
+) : OutMsg

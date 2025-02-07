@@ -1,6 +1,6 @@
 package org.ton.hashmap
 
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 
 public interface Dictionary<X> {
     public interface Leaf<out X> {

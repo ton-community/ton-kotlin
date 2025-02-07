@@ -1,6 +1,6 @@
 package org.ton.hashmap.tlb
 
-import org.ton.cell.CellBuilder
+import org.ton.kotlin.cell.CellBuilder
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.loadTlb
 import org.ton.tlb.storeTlb

@@ -1,9 +1,10 @@
 package org.ton.dict
 
 import kotlinx.io.bytestring.toHexString
-import org.ton.bitstring.BitString
-import org.ton.boc.BagOfCells
-import org.ton.cell.CellBuilder
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.boc.BagOfCells
+import org.ton.kotlin.dict.RawDictionary
 import kotlin.io.encoding.Base64
 import kotlin.test.*
 

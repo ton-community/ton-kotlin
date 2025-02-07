@@ -1,9 +1,9 @@
-package org.ton.cell
+package org.ton.kotlin.cell
 
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.hexToByteString
 import kotlinx.io.bytestring.toHexString
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 
 public class DataCell internal constructor(
     public val descriptor: CellDescriptor,
