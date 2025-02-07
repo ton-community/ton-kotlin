@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.BigInt
 import org.ton.bigint.pow
 import org.ton.bigint.times
@@ -10,7 +9,6 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
-import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
@@ -24,7 +22,7 @@ import kotlin.math.pow
  * @see [CurrencyCollection]
  */
 @SerialName("nanocoins")
-@Serializable
+
 public data class Coins(
     @get:JvmName("amount")
     val amount: VarUInteger = VarUInteger(0)

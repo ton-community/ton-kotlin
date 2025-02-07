@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -10,7 +9,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("msg_export_deq_short")
 public data class MsgExportDeqShort(
     val msgEnvHash: BitString,

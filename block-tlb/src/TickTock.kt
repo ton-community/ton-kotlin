@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -14,7 +13,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 public inline fun Pair<Boolean, Boolean>.toTickTock(): TickTock = TickTock(first, second)
 
 @SerialName("tick_tock")
-@Serializable
+
 public data class TickTock(
     val tick: Boolean,
     val tock: Boolean

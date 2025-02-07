@@ -1,25 +1,41 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
+import kotlin.Byte
+import kotlin.Char
+import kotlin.Deprecated
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.NumberFormatException
+import kotlin.Short
+import kotlin.String
+import kotlin.UnsupportedOperationException
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
+import kotlin.text.toByte
+import kotlin.text.toInt
+import kotlin.text.toLong
+import kotlin.text.toShort
+import kotlin.toString
 
 @SerialName("var_uint")
-@Serializable
+
 public data class VarUInteger(
     @get:JvmName("len")
     val len: Int,
 
-    @Serializable(BigIntSerializer::class)
+    (BigIntSerializer::
+
+class)
     @get:JvmName("value")
     val value: BigInt
 ) : TlbObject {

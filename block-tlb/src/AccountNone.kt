@@ -1,14 +1,13 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("account_none")
 public object AccountNone : Account, TlbConstructorProvider<AccountNone> by AccountNoneTlbConstructor {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_none")

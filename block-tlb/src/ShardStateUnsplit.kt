@@ -1,15 +1,15 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("shard_state")
 public data class ShardStateUnsplit(
     @SerialName("global_id") val globalId: Int, // global_id : int32
@@ -47,7 +47,7 @@ public data class ShardStateUnsplit(
     public companion object : TlbConstructorProvider<ShardStateUnsplit> by ShardStateUnsplitTlbConstructor
 }
 
-@Serializable
+
 public data class ShardStateUnsplitAux(
     @SerialName("overload_history") val overloadHistory: ULong, // overload_history : uint64
     @SerialName("underload_history") val underloadHistory: ULong, // underload_history : uint64

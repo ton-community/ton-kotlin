@@ -1,15 +1,15 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 
-@Serializable
+
 @SerialName("storage_info")
 public data class StorageInfo(
     @get:JvmName("used")

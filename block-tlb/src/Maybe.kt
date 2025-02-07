@@ -3,20 +3,20 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <X> X?.toMaybe(): Maybe<X> = Maybe.of(this)
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface Maybe<X> : TlbObject {
     public val value: X?
 
@@ -35,7 +35,7 @@ public sealed interface Maybe<X> : TlbObject {
 }
 
 @SerialName("nothing")
-@Serializable
+
 public class Nothing<X> : Maybe<X> {
     override val value: X? = null
     override fun hashCode(): Int = 0
@@ -48,7 +48,7 @@ public class Nothing<X> : Maybe<X> {
 }
 
 @SerialName("just")
-@Serializable
+
 public data class Just<X>(
     override val value: X
 ) : Maybe<X> {

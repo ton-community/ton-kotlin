@@ -3,33 +3,33 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface VmCont {
 
     @SerialName("vmc_until")
-    @Serializable
+
     public data class Until(
         val body: CellRef<VmCont>,
         val after: CellRef<VmCont>
     ) : VmCont
 
     @SerialName("vmc_again")
-    @Serializable
+
     public data class Again(
         val body: CellRef<VmCont>
     ) : VmCont
 
     @SerialName("vmc_while_cond")
-    @Serializable
+
     public data class WhileCond(
         val cond: CellRef<VmCont>,
         val body: CellRef<VmCont>,
@@ -37,7 +37,7 @@ public sealed interface VmCont {
     ) : VmCont
 
     @SerialName("vmc_while_body")
-    @Serializable
+
     public data class WhileBody(
         val cond: CellRef<VmCont>,
         val body: CellRef<VmCont>,
@@ -45,7 +45,7 @@ public sealed interface VmCont {
     ) : VmCont
 
     @SerialName("vmc_pushint")
-    @Serializable
+
     public data class PushInt(
         val value: Int,
         val next: CellRef<VmCont>

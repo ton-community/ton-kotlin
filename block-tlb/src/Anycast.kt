@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -12,7 +11,7 @@ import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("anycast_info")
-@Serializable
+
 public data class Anycast(
     val depth: Int,
     @SerialName("rewrite_pfx") val rewritePfx: BitString

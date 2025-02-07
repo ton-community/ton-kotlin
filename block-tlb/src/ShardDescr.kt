@@ -1,15 +1,15 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 public sealed interface ShardDescr : TlbObject {
     public companion object : TlbCombinatorProvider<ShardDescr> by ShardDescrTlbCombinator
 }
@@ -20,7 +20,7 @@ private object ShardDescrTlbCombinator : TlbCombinator<ShardDescr>(
     ShardDescrNew::class to ShardDescrNew,
 )
 
-@Serializable
+
 @SerialName("shard_descr_old")
 public data class ShardDescrOld(
     @SerialName("seq_no") val seqNo: UInt,
@@ -77,7 +77,7 @@ public data class ShardDescrOld(
     public companion object : TlbConstructorProvider<ShardDescrOld> by ShardDescrOldTlbConstructor
 }
 
-@Serializable
+
 public data class ShardDescrAux(
     @SerialName("fees_collected") val feesCollected: CurrencyCollection,
     @SerialName("funds_created") val fundsCreated: CurrencyCollection
@@ -94,7 +94,7 @@ public data class ShardDescrAux(
     public companion object : TlbConstructorProvider<ShardDescrAux> by ShardDescrAuxTlbConstructor
 }
 
-@Serializable
+
 public data class ShardDescrNew(
     @SerialName("seq_no") val seqNo: UInt,
     @SerialName("reg_mc_seqno") val regMcSeqno: UInt,

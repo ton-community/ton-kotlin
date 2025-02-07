@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -12,7 +11,7 @@ import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
 
 @SerialName("ext_blk_ref")
-@Serializable
+
 public data class ExtBlkRef(
     @SerialName("end_lt") val endLt: ULong, // end_lt : uint64
     @SerialName("seq_no") val seqNo: UInt, // seq_no : uint32

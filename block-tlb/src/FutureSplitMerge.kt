@@ -3,7 +3,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -15,10 +14,10 @@ import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @JsonClassDiscriminator("@type")
 public sealed interface FutureSplitMerge : TlbObject {
-    @Serializable
+
     @SerialName("fsm_none")
     public object FsmNone : FutureSplitMerge,
         TlbConstructorProvider<FsmNone> by FutureSplitMergeNoneTlbConstructor {
@@ -27,7 +26,7 @@ public sealed interface FutureSplitMerge : TlbObject {
         override fun toString(): String = print().toString()
     }
 
-    @Serializable
+
     @SerialName("fsm_merge")
     public data class FsmMerge(
         val mergeUtime: UInt,
@@ -45,7 +44,7 @@ public sealed interface FutureSplitMerge : TlbObject {
         public companion object : TlbConstructorProvider<FsmMerge> by FutureSplitMergeMergeTlbConstructor
     }
 
-    @Serializable
+
     @SerialName("fsm_split")
     public data class FsmSplit(
         val splitUtime: UInt,

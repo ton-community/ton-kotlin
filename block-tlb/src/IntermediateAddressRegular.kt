@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -9,7 +8,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("interm_addr_regular")
 public data class IntermediateAddressRegular(
     @SerialName("use_dest_bits") val useDestBits: Int

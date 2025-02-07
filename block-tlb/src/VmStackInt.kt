@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.*
 import org.ton.block.VmStackNan.VmStackNanException
 import org.ton.cell.CellBuilder
@@ -9,11 +8,15 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
+import kotlin.text.toInt
+import kotlin.text.toLong
 
 @SerialName("vm_stk_int")
-@Serializable
+
 public data class VmStackInt(
-    @Serializable(BigIntSerializer::class)
+    (BigIntSerializer::
+
+class)
     val value: BigInt
 ) : VmStackValue, VmStackNumber {
     public constructor(int: Int) : this(int.toBigInt())

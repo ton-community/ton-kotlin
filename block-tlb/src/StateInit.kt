@@ -1,19 +1,19 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-@Serializable
+
 public data class StateInit(
     @SerialName("split_depth")
     @get:JvmName("splitDepth")

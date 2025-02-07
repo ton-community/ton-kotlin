@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -14,7 +13,7 @@ import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
 @JvmInline
-@Serializable
+
 @SerialName("account_active")
 public value class AccountActive(
     @get:JvmName("value")

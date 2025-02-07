@@ -1,6 +1,5 @@
 package org.ton.block
 
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.HashmapAugE
@@ -9,7 +8,7 @@ import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
 import kotlin.jvm.JvmInline
 
-@Serializable
+
 @JvmInline
 public value class OldMcBlocksInfo(
     public val value: HashmapAugE<KeyExtBlkRef, KeyMaxLt>

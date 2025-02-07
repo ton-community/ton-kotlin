@@ -3,20 +3,20 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import kotlin.jvm.JvmStatic
 
 @Suppress("NOTHING_TO_INLINE")
 public inline fun <X, Y> Pair<X?, Y?>.toEither(): Either<X, Y> = Either.of(first, second)
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface Either<X, Y> : TlbObject {
     public val x: X?
     public val y: Y?
@@ -24,7 +24,7 @@ public sealed interface Either<X, Y> : TlbObject {
     public fun toPair(): Pair<X?, Y?> = x to y
 
     @SerialName("left")
-    @Serializable
+
     public class Left<X, Y>(
         public val value: X
     ) : Either<X, Y> {
@@ -53,7 +53,7 @@ public sealed interface Either<X, Y> : TlbObject {
     }
 
     @SerialName("right")
-    @Serializable
+
     public class Right<X, Y>(
         public val value: Y
     ) : Either<X, Y> {

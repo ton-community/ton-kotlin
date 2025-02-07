@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
@@ -9,6 +8,7 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.crypto.crc16
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.io.encoding.Base64
@@ -17,7 +17,7 @@ import kotlin.jvm.JvmStatic
 
 public inline fun AddrStd(address: String): AddrStd = AddrStd.parse(address)
 
-@Serializable
+
 @SerialName("addr_std")
 public data class AddrStd(
     @get:JvmName("anycast")

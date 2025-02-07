@@ -1,16 +1,16 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 
 @SerialName("account_storage")
-@Serializable
+
 public data class AccountStorage(
     @SerialName("last_trans_lt")
     @get:JvmName("lastTransLt")

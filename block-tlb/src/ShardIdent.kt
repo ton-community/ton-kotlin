@@ -1,14 +1,14 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 
 @SerialName("shard_ident")
-@Serializable
+
 public data class ShardIdent(
     @SerialName("shard_pfx_bits") val shardPfxBits: Int, // shard_pfx_bits : #<= 60
     @SerialName("workchain_id") val workchainId: Int, // workchain_id : int32

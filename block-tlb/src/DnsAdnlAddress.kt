@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.tlb.loadTlb
@@ -9,7 +8,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("dns_adnl_address")
-@Serializable
+
 public data class DnsAdnlAddress(
     val adnl_addr: BitString,
     val flags: BitString,

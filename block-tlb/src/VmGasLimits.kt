@@ -3,10 +3,9 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 @SerialName("gas_limits")
-@Serializable
+
 public data class VmGasLimits(
     val remaining: Long,
     val max_limit: Long,

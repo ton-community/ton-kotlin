@@ -1,13 +1,12 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
 @SerialName("proto_list_next")
-@Serializable
+
 public data class ProtoListNext(
     val head: Protocol,
     val tail: ProtoList

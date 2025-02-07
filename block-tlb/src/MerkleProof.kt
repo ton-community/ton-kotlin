@@ -1,13 +1,12 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellType
 import org.ton.tlb.CellRef
 
-@Serializable
+
 @SerialName("merkle_proof")
 public data class MerkleProof<X>(
     val virtualHash: BitString,

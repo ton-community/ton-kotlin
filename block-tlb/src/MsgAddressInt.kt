@@ -3,7 +3,6 @@
 package org.ton.block
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.tlb.TlbCodec
@@ -15,7 +14,7 @@ public inline fun MsgAddressInt(address: String): MsgAddressInt = MsgAddressInt.
 
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface MsgAddressInt : MsgAddress {
     public val workchainId: Int
     public val address: BitString
