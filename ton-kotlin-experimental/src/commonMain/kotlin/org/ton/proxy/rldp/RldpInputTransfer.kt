@@ -11,7 +11,7 @@ import org.ton.api.rldp.RldpComplete
 import org.ton.api.rldp.RldpConfirm
 import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpMessagePartData
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.proxy.rldp.fec.raptorq.RaptorQFecDecoder
 import kotlin.jvm.JvmStatic
 

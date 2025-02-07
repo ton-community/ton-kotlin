@@ -28,7 +28,7 @@ public open class EnumTlCombinator<T : Enum<T>>(
         override fun encode(writer: TlWriter, value: T) = Unit
     }
 
-    override fun findConstructorOrNull(id: Int): TlDecoder<out T>? = constructor2Enum[id]
+    override fun findConstructorOrNull(id: Int): TlDeserializer<out T>? = constructor2Enum[id]
 
-    override fun findConstructorOrNull(value: T): TlEncoder<T>? = enum2Constructor[value]?.cast()
+    override fun findConstructorOrNull(value: T): TlSerializer<T>? = enum2Constructor[value] as? TlSerializer<T>
 }

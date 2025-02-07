@@ -2,9 +2,9 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.tlb.TlbNegatedConstructor
 import org.ton.tlb.TlbNegatedResult
 import org.ton.tlb.TlbPrettyPrinter
@@ -17,6 +17,10 @@ public data class HmlSame(
     val n: Int
 ) : HmLabel {
     public constructor(v: Int, n: Int) : this(v != 0, n)
+
+    init {
+        require(n >= 0) { "n must be non-negative" }
+    }
 
     override fun toBitString(): BitString = BitString(*BooleanArray(n) { v })
 
@@ -59,7 +63,7 @@ private class HashMapLabelSameTlbConstructor(
         cellBuilder: CellBuilder,
         value: HmlSame
     ): Int {
-        cellBuilder.storeBit(value.v)
+        cellBuilder.storeBoolean(value.v)
         cellBuilder.storeUIntLeq(value.n, m)
         return value.n
     }
@@ -68,8 +72,9 @@ private class HashMapLabelSameTlbConstructor(
         cellSlice: CellSlice
     ): TlbNegatedResult<HmlSame> {
         val v = cellSlice.loadBit()
-        val n = cellSlice.loadUIntLeq(m).toInt()
-        return TlbNegatedResult(n, HmlSame(v, n))
+        val n = cellSlice.loadUIntLeq(m)
+        val nn = n.toInt()
+        return TlbNegatedResult(nn, HmlSame(v, nn))
     }
 
     companion object {

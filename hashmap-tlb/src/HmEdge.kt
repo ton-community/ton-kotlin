@@ -2,9 +2,10 @@ package org.ton.hashmap
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.ByteBackedMutableBitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
@@ -28,19 +29,19 @@ public data class HmEdge<T>(
             return HmEdge(this.label, node.set(key, value))
         } else {
             val labelPrefix = label.commonPrefixWith(key)
-            val labelReminder = label.slice(labelPrefix.size)
-            val keyReminder = key.slice(labelPrefix.size)
+            val labelReminder = label.substring(labelPrefix.size)
+            val keyReminder = key.substring(labelPrefix.size)
 
             if (keyReminder.isEmpty()) {
                 throw IllegalArgumentException("variable length key: $key")
             } else if (!labelReminder.isEmpty() && !keyReminder.isEmpty()) {
                 // forking
                 val (left, right) = if (keyReminder[0]) {
-                    HmEdge(HmLabel(labelReminder.slice(1)), node) to
-                            HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value))
+                    HmEdge(HmLabel(labelReminder.substring(1)), node) to
+                            HmEdge(HmLabel(keyReminder.substring(1)), HmnLeaf(value))
                 } else {
-                    HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value)) to
-                            HmEdge(HmLabel(labelReminder.slice(1)), node)
+                    HmEdge(HmLabel(keyReminder.substring(1)), HmnLeaf(value)) to
+                            HmEdge(HmLabel(labelReminder.substring(1)), node)
                 }
                 return HmEdge(HmLabel(labelPrefix), HmnFork(left, right))
             } else if (!labelPrefix.isEmpty() && labelReminder.isEmpty() && !keyReminder.isEmpty()) {
@@ -117,20 +118,20 @@ private class HmEdgeIterator<T>(
                         null
                     } else {
                         rightVisited = true
-                        val newPrefix = CellBuilder().apply {
-                            storeBits(prefix)
-                            storeBit(true)
-                            storeBits(node.right.value.label.toBitString())
-                        }.bits.toBitString()
+                        val rightLabel = node.right.value.label.toBitString()
+                        val newPrefix = ByteBackedMutableBitString.of(prefix.size + 1 + rightLabel.size)
+                        newPrefix.setBitsAt(0, prefix)
+                        newPrefix[prefix.size] = true
+                        newPrefix.setBitsAt(prefix.size + 1, rightLabel)
                         newPrefix to node.right.value.node
                     }
                 } else {
                     leftVisited = true
-                    val newPrefix = CellBuilder().apply {
-                        storeBits(prefix)
-                        storeBit(false)
-                        storeBits(node.left.value.label.toBitString())
-                    }.bits.toBitString()
+                    val leftLabel = node.left.value.label.toBitString()
+                    val newPrefix = ByteBackedMutableBitString.of(prefix.size + 1 + leftLabel.size)
+                    newPrefix.setBitsAt(0, prefix)
+                    newPrefix[prefix.size] = false
+                    newPrefix.setBitsAt(prefix.size + 1, leftLabel)
                     newPrefix to node.left.value.node
                 }
             }

@@ -1,8 +1,9 @@
 package org.ton.adnl.connection
 
-import io.github.andreypfau.kotlinx.crypto.aes.AES
-import io.github.andreypfau.kotlinx.crypto.cipher.CTRBlockCipher
-import io.github.andreypfau.kotlinx.crypto.sha2.SHA256
+import io.github.andreypfau.kotlinx.crypto.AES
+import io.github.andreypfau.kotlinx.crypto.CTRBlockCipher
+import io.github.andreypfau.kotlinx.crypto.Sha256
+import io.github.andreypfau.kotlinx.crypto.sha256
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.errors.*
@@ -11,6 +12,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.io.readByteArray
+import kotlinx.io.readIntLe
+import kotlinx.io.write
+import kotlinx.io.writeIntLe
 import org.ton.adnl.network.TcpClient
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.crypto.SecureRandom
@@ -65,10 +70,10 @@ public class AdnlConnection(
                 }
             }
 
-            connection.output.writePacket {
-                writeFully(liteServerDesc.id.toAdnlIdShort().id.toByteArray())
-                writeFully(liteServerDesc.id.encrypt(nonce))
-            }
+            val buffer = kotlinx.io.Buffer()
+            buffer.write(liteServerDesc.id.toAdnlIdShort().id)
+            buffer.write(liteServerDesc.id.encrypt(nonce))
+            connection.output.writePacket(buffer)
             connection.output.flush()
 
             val cipher = ChannelCipher(nonce)
@@ -126,7 +131,7 @@ public class AdnlConnection(
             } finally {
                 output.flush()
                 if (closeChannel) {
-                    output.close()
+                    output.flushAndClose()
                 }
             }
         }
@@ -154,7 +159,7 @@ public class AdnlConnection(
         val plainLength = ByteArray(4)
         cipher.processBytes(encryptedLength, plainLength)
 
-        val length = ByteReadPacket(plainLength).readIntLittleEndian()
+        val length = ByteReadPacket(plainLength).readIntLe()
         check(length in 32..(1 shl 24)) { "Invalid length" }
         val encryptedData = input.readPacket(length).readBytes()
         val plainData = ByteArray(length)
@@ -164,7 +169,7 @@ public class AdnlConnection(
         val payload = data.readBytes((data.remaining - 32).toInt())
         val hash = data.readBytes(32)
 
-        require(io.github.andreypfau.kotlinx.crypto.sha2.sha256(payload).contentEquals(hash)) {
+        require(sha256(payload).contentEquals(hash)) {
             "sha256 mismatch"
         }
 
@@ -183,20 +188,20 @@ public class AdnlConnection(
         val nonce = SecureRandom.nextBytes(32)
         val payload = packet.readBytes()
 
-        val hash = SHA256().apply {
+        val hash = Sha256().apply {
             update(nonce)
             update(payload)
         }.digest()
 
-        val data = buildPacket {
-            writeIntLittleEndian(dataSize)
+        val data = Buffer().apply {
+            writeIntLe(dataSize)
             writeFully(nonce)
             writeFully(payload)
             writeFully(hash)
         }
 
         val encryptedData = ByteArray(data.remaining.toInt())
-        cipher.processBytes(data.readBytes(), encryptedData)
+        cipher.processBytes(data.readByteArray(), encryptedData)
         output.writeFully(encryptedData)
     }
 

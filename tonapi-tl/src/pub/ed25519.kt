@@ -29,7 +29,7 @@ public data class PublicKeyEd25519(
     public constructor(byteArray: ByteArray) : this(ByteString(byteArray))
 
     private val _adnlIdShort: AdnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        AdnlIdShort(ByteString(*PublicKeyEd25519.hash(this)))
+        AdnlIdShort(ByteString(*tlConstructor().hash(this)))
     }
     private val _encryptor by lazy(LazyThreadSafetyMode.PUBLICATION) {
         EncryptorEd25519(key.toByteArray())
@@ -37,13 +37,9 @@ public data class PublicKeyEd25519(
 
     override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
 
-    public companion object : TlConstructor<PublicKeyEd25519>(
+    public object TL : TlConstructor<PublicKeyEd25519>(
         schema = "pub.ed25519 key:int256 = PublicKey",
     ) {
-        @JvmStatic
-        public fun of(privateKey: PrivateKeyEd25519): PublicKeyEd25519 =
-            PublicKeyEd25519(ByteString(*Ed25519.publicKey(privateKey.key.toByteArray())))
-
         override fun encode(writer: TlWriter, value: PublicKeyEd25519) {
             writer.writeRaw(value.key)
         }
@@ -52,6 +48,15 @@ public data class PublicKeyEd25519(
             val key = reader.readByteString(32)
             return PublicKeyEd25519(key)
         }
+    }
+
+    public companion object {
+        @JvmStatic
+        public fun tlConstructor(): TlConstructor<PublicKeyEd25519> = TL
+
+        @JvmStatic
+        public fun of(privateKey: PrivateKeyEd25519): PublicKeyEd25519 =
+            PublicKeyEd25519(ByteString(*Ed25519.publicKey(privateKey.key.toByteArray())))
     }
 
     override fun encrypt(data: ByteArray): ByteArray =

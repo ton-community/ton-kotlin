@@ -67,7 +67,10 @@ public interface LiteApiClient : LiteApi {
     override suspend fun invoke(function: LiteServerSendMessage): LiteServerSendMsgStatus =
         sendQuery(LiteServerSendMessage, LiteServerSendMsgStatus, function)
 
-    override suspend fun invoke(function: LiteServerGetAccountState, waitMasterchainSeqno: Int): LiteServerAccountState =
+    override suspend fun invoke(
+        function: LiteServerGetAccountState,
+        waitMasterchainSeqno: Int
+    ): LiteServerAccountState =
         sendQuery(LiteServerGetAccountState, LiteServerAccountState, function, waitMasterchainSeqno)
 
     override suspend fun invoke(function: LiteServerRunSmcMethod): LiteServerRunMethodResult =

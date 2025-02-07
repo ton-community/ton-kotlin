@@ -89,6 +89,7 @@ public class TlWriter(
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 public inline fun <T> TlWriter.write(codec: TlCodec<T>, value: T) {
     codec.encode(this, value)
 }

@@ -2,9 +2,9 @@
 
 package org.ton.api.tonnode
 
-import org.ton.bitstring.BitString
-import org.ton.cell.Cell
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellSlice
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -26,7 +26,7 @@ public value class Shard(
         public val ALL: Shard = ID_ALL.toShard()
 
         public fun extractShard(bits: BitString): Long {
-            return CellSlice(bits).loadUInt64().toLong()
+            return CellSlice(bits).loadULong().toLong()
         }
 
         public fun containsShard(parent: Long, child: Long): Boolean {

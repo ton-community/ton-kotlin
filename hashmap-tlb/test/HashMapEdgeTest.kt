@@ -1,11 +1,11 @@
 package org.ton.hashmap
 
-import io.ktor.util.*
-import org.ton.bitstring.BitString
-import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.Cell
+import org.ton.kotlin.cell.CellSlice
+import org.ton.kotlin.cell.boc.BagOfCells
 import org.ton.tlb.constructor.UIntTlbConstructor
+import kotlin.io.encoding.Base64
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,12 +14,12 @@ class HashMapEdgeTest {
     fun `1 - keys are correctly determined when iterating over nodes`() {
         val codec = HmEdge.tlbCodec(32, UIntTlbConstructor.int(1))
         val cellSlice =
-            BagOfCells(("te6cckEBEwEAVwACASABAgIC2QMEAgm3///wYBESAgEgBQYCAWIODwIBIAcIAgHODQ0CAdQNDQIBIAkKAgEgCxACASAQDAABWAIBIA0NAAEgAgEgEBAAAdQAAUgAAfwAAdwXk+eF").decodeBase64Bytes())
+            BagOfCells(Base64.decode("te6cckEBEwEAVwACASABAgIC2QMEAgm3///wYBESAgEgBQYCAWIODwIBIAcIAgHODQ0CAdQNDQIBIAkKAgEgCxACASAQDAABWAIBIA0NAAEgAgEgEBAAAdQAAUgAAfwAAdwXk+eF"))
                 .first()
                 .beginParse()
         val hashMapEdge = codec.loadTlb(cellSlice)
 
-        val keys = hashMapEdge.map { CellSlice(it.first).loadInt(32).toInt() }.toList()
+        val keys = hashMapEdge.map { CellSlice(it.first).loadInt(32) }.toList()
         assertEquals(
             listOf(0, 1, 9, 10, 12, 14, 15, 16, 17, 32, 34, 36, -1001, -1000),
             keys

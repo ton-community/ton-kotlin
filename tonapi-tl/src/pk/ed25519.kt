@@ -8,10 +8,7 @@ import org.ton.crypto.Decryptor
 import org.ton.crypto.DecryptorEd25519
 import org.ton.crypto.Ed25519
 import org.ton.crypto.SecureRandom
-import org.ton.tl.ByteStringBase64Serializer
-import org.ton.tl.TlConstructor
-import org.ton.tl.TlReader
-import org.ton.tl.TlWriter
+import org.ton.tl.*
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random
 
@@ -42,11 +39,22 @@ public data class PrivateKeyEd25519(
     public fun sharedKey(publicKey: PublicKeyEd25519): ByteArray =
         Ed25519.sharedKey(key.toByteArray(), publicKey.key.toByteArray())
 
-    public companion object : TlConstructor<PrivateKeyEd25519>(
+    public object TL : TlConstructor<PrivateKeyEd25519>(
         schema = "pk.ed25519 key:int256 = PrivateKey"
     ) {
+        public override fun encode(writer: TlWriter, value: PrivateKeyEd25519) {
+            writer.writeRaw(value.key)
+        }
+
+        public override fun decode(reader: TlReader): PrivateKeyEd25519 {
+            val key = reader.readByteString(32)
+            return PrivateKeyEd25519(key)
+        }
+    }
+
+    public companion object : TlCodec<PrivateKeyEd25519> {
         @JvmStatic
-        public fun tlConstructor(): TlConstructor<PrivateKeyEd25519> = this
+        public fun tlConstructor(): TlConstructor<PrivateKeyEd25519> = TL
 
         @JvmStatic
         public fun generate(random: Random = SecureRandom): PrivateKeyEd25519 =
@@ -56,18 +64,17 @@ public data class PrivateKeyEd25519(
         public fun of(byteArray: ByteArray): PrivateKeyEd25519 =
             when (byteArray.size) {
                 Ed25519.KEY_SIZE_BYTES -> PrivateKeyEd25519(byteArray)
-                Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> decodeBoxed(byteArray)
+                Ed25519.KEY_SIZE_BYTES + Int.SIZE_BYTES -> TL.decodeBoxed(byteArray)
                 else -> throw IllegalArgumentException("Invalid key size: ${byteArray.size}")
             }
 
-        public override fun encode(writer: TlWriter, value: PrivateKeyEd25519) {
-            writer.writeRaw(value.key)
-        }
+        override fun decode(reader: TlReader): PrivateKeyEd25519 = TL.decode(reader)
 
-        public override fun decode(reader: TlReader): PrivateKeyEd25519 {
-            val key = reader.readByteString(32)
-            return PrivateKeyEd25519(key)
-        }
+        override fun decodeBoxed(reader: TlReader): PrivateKeyEd25519 = TL.decodeBoxed(reader)
+
+        override fun encode(writer: TlWriter, value: PrivateKeyEd25519): Unit = TL.encode(writer, value)
+
+        override fun encodeBoxed(writer: TlWriter, value: PrivateKeyEd25519): Unit = TL.encodeBoxed(writer, value)
     }
 
     override fun decrypt(data: ByteArray): ByteArray =

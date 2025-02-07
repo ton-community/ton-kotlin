@@ -12,5 +12,5 @@ public data class LiteClientConfigGlobal(
     val dht: DhtConfigGlobal = DhtConfigGlobal(),
     @SerialName("liteservers")
     val liteServers: Collection<LiteServerDesc>,
-    val validator: ValidatorConfigGlobal = ValidatorConfigGlobal()
+    val validator: ValidatorConfigGlobal
 )

@@ -1,0 +1,20 @@
+package org.ton.crypto
+
+import kotlinx.cinterop.*
+import platform.windows.BCRYPT_USE_SYSTEM_PREFERRED_RNG
+import platform.windows.BCryptGenRandom
+
+@OptIn(ExperimentalForeignApi::class)
+public actual fun secureRandom(array: ByteArray, fromIndex: Int, toIndex: Int) {
+    array.usePinned {
+        val result = BCryptGenRandom(
+            null,
+            it.addressOf(fromIndex).reinterpret(),
+            (toIndex - fromIndex).convert(),
+            BCRYPT_USE_SYSTEM_PREFERRED_RNG.convert()
+        )
+        if (result != 0) {
+            error("Can't generate random values using BCryptGenRandom: $result")
+        }
+    }
+}

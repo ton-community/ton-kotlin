@@ -13,9 +13,9 @@ import org.ton.tl.*
 @JsonClassDiscriminator("@type")
 public data class ValidatorConfigGlobal(
     @SerialName("zero_state")
-    val zeroState: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val zeroState: TonNodeBlockIdExt,
     @SerialName("init_block")
-    val initBlock: TonNodeBlockIdExt = TonNodeBlockIdExt(),
+    val initBlock: TonNodeBlockIdExt,
     @SerialName("hardforks")
     val hardforks: Collection<TonNodeBlockIdExt> = listOf()
 ) {

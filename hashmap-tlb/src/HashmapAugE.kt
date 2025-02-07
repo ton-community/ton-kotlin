@@ -2,14 +2,12 @@
 
 package org.ton.hashmap
 
-import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
-@JsonClassDiscriminator("@type")
 public interface HashmapAugE<X, Y> : AugmentedDictionary<X, Y>, TlbObject {
 
     public val n: Int

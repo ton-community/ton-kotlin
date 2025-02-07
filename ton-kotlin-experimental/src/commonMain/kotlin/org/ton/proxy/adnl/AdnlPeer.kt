@@ -19,7 +19,7 @@ import org.ton.api.adnl.message.AdnlMessageAnswer
 import org.ton.api.adnl.message.AdnlMessageQuery
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.api.pub.PublicKey
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.tl.TLFunction
 import org.ton.tl.TlObject
 import java.util.concurrent.atomic.AtomicReference

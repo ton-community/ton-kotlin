@@ -9,7 +9,7 @@ import kotlinx.coroutines.isActive
 import org.ton.api.rldp.RldpComplete
 import org.ton.api.rldp.RldpMessagePart
 import org.ton.api.rldp.RldpMessagePartData
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.proxy.rldp.fec.raptorq.RaptorQFecEncoder
 import kotlin.jvm.JvmStatic
 import kotlin.random.Random

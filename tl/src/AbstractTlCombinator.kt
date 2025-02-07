@@ -24,7 +24,7 @@ public abstract class AbstractTlCombinator<T : Any> : TlCodec<T> {
         constructor.encodeBoxed(writer, value)
     }
 
-    public abstract fun findConstructorOrNull(id: Int): TlDecoder<out T>?
+    public abstract fun findConstructorOrNull(id: Int): TlDeserializer<out T>?
 
-    public abstract fun findConstructorOrNull(value: T): TlEncoder<T>?
+    public abstract fun findConstructorOrNull(value: T): TlSerializer<T>?
 }

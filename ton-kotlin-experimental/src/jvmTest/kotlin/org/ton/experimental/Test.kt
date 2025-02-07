@@ -21,7 +21,7 @@ import org.ton.api.http.functions.HttpGetNextPayloadPart
 import org.ton.api.http.functions.HttpRequest
 import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.block.DnsAdnlAddress
 import org.ton.crypto.encodeHex
 import org.ton.crypto.hex

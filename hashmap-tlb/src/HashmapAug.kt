@@ -1,8 +1,9 @@
 package org.ton.hashmap
 
-import org.ton.bitstring.BitString
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.bitstring.BitString
+import org.ton.kotlin.bitstring.ByteBackedMutableBitString
+import org.ton.kotlin.cell.CellBuilder
+import org.ton.kotlin.cell.CellSlice
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
@@ -79,7 +80,7 @@ private data class AhmeEdgeImpl<X, Y>(
                     } else {
                         node.loadLeft()
                     } as HashmapAug.AhmEdge<X, Y>
-                    k = k.slice(commonPrefix.size + 1)
+                    k = k.substring(commonPrefix.size + 1)
                 }
             }
         }
@@ -146,21 +147,21 @@ internal class AhmnNodeIterator<X, Y>(
                     else {
                         rightVisited = true
                         val edge = node.right.value as HashmapAug.AhmEdge
-                        val newPrefix = CellBuilder().apply {
-                            storeBits(prefix)
-                            storeBit(true)
-                            storeBits(edge.label.toBitString())
-                        }.bits.toBitString()
+                        val label = edge.label.toBitString()
+                        val newPrefix = ByteBackedMutableBitString.of(prefix.size + label.size + 1)
+                        newPrefix.setBitsAt(0, prefix)
+                        newPrefix[prefix.size] = true
+                        newPrefix.setBitsAt(prefix.size + 1, label)
                         newPrefix to edge.node
                     }
                 } else {
                     leftVisited = true
                     val edge = node.left.value as HashmapAug.AhmEdge
-                    val newPrefix = CellBuilder().apply {
-                        storeBits(prefix)
-                        storeBit(false)
-                        storeBits(edge.label.toBitString())
-                    }.bits.toBitString()
+                    val label = edge.label.toBitString()
+                    val newPrefix = ByteBackedMutableBitString.of(prefix.size + label.size + 1)
+                    newPrefix.setBitsAt(0, prefix)
+                    newPrefix[prefix.size] = false
+                    newPrefix.setBitsAt(prefix.size + 1, label)
                     newPrefix to edge.node
                 }
             }

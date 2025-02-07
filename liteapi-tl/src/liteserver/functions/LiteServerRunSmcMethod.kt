@@ -7,10 +7,11 @@ import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.VmStack
 import org.ton.block.VmStackList
 import org.ton.block.VmStackValue
-import org.ton.boc.BagOfCells
 import org.ton.crypto.crc16
+import org.ton.kotlin.cell.boc.BagOfCells
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerRunMethodResult
+import org.ton.lite.api.liteserver.functions.LiteServerRunSmcMethod.Companion.params
 import org.ton.tl.*
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic

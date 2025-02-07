@@ -2,9 +2,7 @@
 
 package org.ton.hashmap
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
-import org.ton.bitstring.BitString
+import org.ton.kotlin.bitstring.BitString
 import org.ton.tlb.TlbNegatedCodec
 import org.ton.tlb.TlbNegatedCombinator
 import org.ton.tlb.TlbNegatedConstructor
@@ -13,8 +11,6 @@ import kotlin.jvm.JvmStatic
 
 public inline fun HmLabel(key: BitString, max: Int = key.size): HmLabel = HmLabel.of(key, max)
 
-@Serializable
-@JsonClassDiscriminator("@type")
 public sealed interface HmLabel : TlbObject {
     public fun toBitString(): BitString
 
