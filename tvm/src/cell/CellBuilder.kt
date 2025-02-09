@@ -177,7 +177,7 @@ public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
 public inline fun CellBuilder(): CellBuilder = CellBuilder.beginCell()
 
 private class CellBuilderImpl(
-    override var bits: MutableBitString = ByteBackedMutableBitString(ByteArray(128), 0),
+    override var bits: MutableBitString = ByteBackedMutableBitString(0),
     override var refs: MutableList<Cell> = ArrayList(),
     override var levelMask: LevelMask? = null,
     override var isExotic: Boolean = false
@@ -276,7 +276,7 @@ private class CellBuilderImpl(
 
     override fun reset(): CellBuilder {
         bits = ByteBackedMutableBitString(ByteArray(128), 0)
-        refs = ArrayList()
+        refs.clear()
         levelMask = null
         isExotic = false
         return this

@@ -7,11 +7,10 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AccountInfo
 import org.ton.block.AddrStd
 import org.ton.block.Coins
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class WalletV4Example {
-    @Ignore
+    //    @Ignore
     @Test
     fun walletExample(): Unit = runBlocking {
         val liteClient = liteClientTestnet()

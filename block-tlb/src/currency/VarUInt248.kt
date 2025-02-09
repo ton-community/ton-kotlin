@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package org.ton.kotli.currency
+package org.ton.kotlin.currency
 
 import org.ton.bigint.BigInt
 import org.ton.bigint.bitLength
@@ -39,6 +39,8 @@ public data class VarUInt248(
     override fun compareTo(other: VarUInt248): Int {
         return amount.compareTo(other.amount)
     }
+
+    override fun toString(): String = amount.toString()
 
     public companion object : TlbCodec<VarUInt248> by VarUInt248Codec {
         public val ZERO: VarUInt248 = VarUInt248(0.toBigInt())

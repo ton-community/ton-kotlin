@@ -8,15 +8,10 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
-import kotlin.text.toInt
-import kotlin.text.toLong
 
 @SerialName("vm_stk_int")
 
 public data class VmStackInt(
-    (BigIntSerializer::
-
-class)
     val value: BigInt
 ) : VmStackValue, VmStackNumber {
     public constructor(int: Int) : this(int.toBigInt())

@@ -3,7 +3,7 @@ package org.ton.block
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.kotli.currency.VarUInt248
+import org.ton.kotlin.currency.VarUInt248
 import org.ton.kotlin.dict.Dictionary
 import org.ton.tlb.*
 import org.ton.tlb.TlbConstructor
@@ -23,6 +23,8 @@ public data class CurrencyCollection(
      */
     val other: ExtraCurrencyCollection
 ) : TlbObject {
+    public constructor() : this(Coins.ZERO, ExtraCurrencyCollection.EMPTY)
+
     public constructor(coins: Coins) : this(coins, ExtraCurrencyCollection.EMPTY)
 
     public constructor(coins: Coins, other: Map<Int, VarUInt248>) : this(coins, ExtraCurrencyCollection(other))
@@ -34,7 +36,20 @@ public data class CurrencyCollection(
         field("other", other)
     }
 
-    override fun toString(): String = print().toString()
+    override fun toString(): String =
+        if (other.isEmpty()) {
+            coins.toString()
+        } else buildString {
+            append("(")
+            append(coins)
+            other.forEach { (key, value) ->
+                append("+")
+                append(value)
+                append(".$")
+                append(key)
+            }
+            append(")")
+        }
 
     public companion object : TlbConstructorProvider<CurrencyCollection> by CurrencyCollectionTlbConstructor {
         public val ZERO: CurrencyCollection = CurrencyCollection(Coins.ZERO, ExtraCurrencyCollection.EMPTY)

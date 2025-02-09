@@ -21,7 +21,7 @@ public sealed interface CommonMsgInfoRelaxed : TlbObject {
         val bounced: Boolean = false,
         val src: MsgAddress = MsgAddressExt(),
         val dest: MsgAddressInt = AddrStd(),
-        val value: CurrencyCollection = CurrencyCollection(),
+        val value: CurrencyCollection = CurrencyCollection.ZERO,
         val ihrFee: Coins = Coins(),
         val fwdFee: Coins = Coins(),
         val createdLt: ULong = 0u,
@@ -30,7 +30,7 @@ public sealed interface CommonMsgInfoRelaxed : TlbObject {
         public constructor(dest: MsgAddressInt, bounce: Boolean, value: Coins) : this(
             dest = dest,
             bounce = bounce,
-            value = CurrencyCollection(value, ExtraCurrencyCollection())
+            value = CurrencyCollection(value, ExtraCurrencyCollection.EMPTY)
         )
 
         public constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(

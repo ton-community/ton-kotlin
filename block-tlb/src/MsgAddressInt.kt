@@ -19,6 +19,8 @@ public sealed interface MsgAddressInt : MsgAddress {
     public val workchainId: Int
     public val address: BitString
 
+    public fun toAddrStd(): AddrStd
+
     public companion object : TlbCodec<MsgAddressInt> by MsgAddressIntTlbCombinator {
         @JvmStatic
         public fun tlbCodec(): TlbCombinator<MsgAddressInt> = MsgAddressIntTlbCombinator

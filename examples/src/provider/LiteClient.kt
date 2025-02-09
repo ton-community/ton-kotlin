@@ -1,4 +1,4 @@
-package org.ton.contract.wallet
+package org.ton.kotlin.examples.provider
 
 import kotlinx.coroutines.Dispatchers
 import org.ton.lite.client.LiteClient

@@ -290,7 +290,9 @@ internal class RawDictIterator(
     private var leaf: CellSlice? = null
 
     init {
-        rewind(false)
+        if (root != null) {
+            rewind(false)
+        }
     }
 
     override fun next(): Map.Entry<BitString, CellSlice> {

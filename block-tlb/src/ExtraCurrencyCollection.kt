@@ -3,8 +3,8 @@ package org.ton.block
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.kotli.currency.VarUInt248
 import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.currency.VarUInt248
 import org.ton.kotlin.dict.Dictionary
 import org.ton.kotlin.dict.DictionaryKeyCodec
 import org.ton.kotlin.dict.RawDictionary
@@ -17,6 +17,8 @@ import org.ton.tlb.providers.TlbConstructorProvider
  * @see [CurrencyCollection]
  */
 public class ExtraCurrencyCollection : Dictionary<Int, VarUInt248> {
+    public constructor() : super(null, DictionaryKeyCodec.INT32, VarUInt248)
+
     public constructor(map: Map<Int, VarUInt248>, context: CellContext = CellContext.EMPTY) : super(
         map, DictionaryKeyCodec.INT32, VarUInt248, context
     )

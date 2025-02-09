@@ -2,6 +2,7 @@ package org.ton.boc
 
 import io.ktor.utils.io.core.*
 import org.ton.cell.Cell
+import kotlin.io.encoding.Base64
 import kotlin.jvm.JvmStatic
 
 public fun BagOfCells(byteArray: ByteArray): BagOfCells = BagOfCells.of(byteArray)
@@ -58,3 +59,5 @@ public interface BagOfCells : Iterable<Cell> {
         }
     }
 }
+
+public fun String.base64ToCell(): Cell = BagOfCells(Base64.decode(this)).first()
