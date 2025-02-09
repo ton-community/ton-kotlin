@@ -4,14 +4,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 plugins {
     kotlin("multiplatform") apply false
     kotlin("plugin.serialization") apply false
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0-rc-1"
 
     alias(libs.plugins.bcv)
 }
 
 allprojects {
-    group = "org.ton"
-    version = "0.4.0-SNAPSHOT"
+    group = "org.ton.kotlin"
+    version = "0.4.0"
 
     repositories {
         mavenCentral()
@@ -37,16 +36,16 @@ subprojects {
     }
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(System.getenv("OSSRH_USERNAME"))
-            password.set(System.getenv("OSSRH_PASSWORD"))
-        }
-    }
-}
+//nexusPublishing {
+//    repositories {
+//        sonatype {
+//            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+//            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+//            username.set(System.getenv("OSSRH_USERNAME"))
+//            password.set(System.getenv("OSSRH_PASSWORD"))
+//        }
+//    }
+//}
 //val isCI = System.getenv("CI") == "true"
 //val isSnapshot = System.getenv("TON_KOTLIN_SNAPSHOT") == "true"
 //val disableNativeTarget = System.getenv("TON_KOTLIN_DISABLE_NATIVE_TARGET") == "true"

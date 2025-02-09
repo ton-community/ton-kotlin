@@ -39,3 +39,4 @@ hmac = { module = "io.github.andreypfau:kotlinx-crypto-hmac", version.ref = "cry
 
 [plugins]
 bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }
+publish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
