@@ -1,16 +1,16 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 
 @SerialName("block_extra")
-@Serializable
+
 public data class BlockExtra(
     @SerialName("in_msg_descr") val inMsgDescr: CellRef<HashmapAugE<InMsg, ImportFees>>,
     @SerialName("out_msg_descr") val outMsgDescr: CellRef<HashmapAugE<OutMsg, CurrencyCollection>>,

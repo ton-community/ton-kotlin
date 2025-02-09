@@ -1,12 +1,12 @@
 package org.ton.block
 
-import kotlinx.serialization.Serializable
+import org.ton.kotlin.cell.CellSizeable
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbObject
 import org.ton.tlb.providers.TlbCombinatorProvider
 
-@Serializable
-public sealed interface MsgAddress : TlbObject {
+
+public sealed interface MsgAddress : TlbObject, CellSizeable {
     public companion object : TlbCombinatorProvider<MsgAddress> by MsgAddressTlbCombinator
 }
 

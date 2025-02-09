@@ -1,16 +1,17 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.kotlin.cell.CellSize
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import kotlin.jvm.JvmStatic
 
-@Serializable
+
 @SerialName("addr_var")
 public data class AddrVar(
     val anycast: Maybe<Anycast>,
@@ -37,6 +38,13 @@ public data class AddrVar(
         workchainId,
         address.toBitString()
     )
+
+    override val cellSize: CellSize
+        get() = CellSize(2 + 1 + 9 + 32 + addrLen, 0).let { cellSize ->
+            anycast.value?.let { anycast -> anycast.cellSize + cellSize } ?: cellSize
+        }
+
+    override fun toAddrStd(): AddrStd = AddrStd(workchainId, address)
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("addr_var") {

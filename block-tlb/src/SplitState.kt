@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbPrettyPrinter
@@ -9,7 +8,7 @@ import org.ton.tlb.loadTlb
 import org.ton.tlb.providers.TlbConstructorProvider
 import org.ton.tlb.storeTlb
 
-@Serializable
+
 @SerialName("split_state")
 public data class SplitState(
     val left: ShardStateUnsplit,

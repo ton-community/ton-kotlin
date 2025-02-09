@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.*
 import org.ton.block.VmStackNan.VmStackNanException
 import org.ton.cell.CellBuilder
@@ -12,7 +11,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.math.abs
 
 @SerialName("vm_stk_tinyint")
-@Serializable
+
 public data class VmStackTinyInt(
     val value: Long
 ) : VmStackValue, VmStackNumber {

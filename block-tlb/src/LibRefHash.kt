@@ -1,10 +1,9 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 
-@Serializable
+
 @SerialName("libref_hash")
 public data class LibRefHash(
     val lib_hash: BitString

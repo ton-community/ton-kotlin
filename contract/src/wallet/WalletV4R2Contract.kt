@@ -15,6 +15,7 @@ import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.hashmap.HashMapE
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.AnyTlbConstructor
 import kotlin.io.encoding.Base64
 
@@ -176,7 +177,7 @@ public class WalletV4R2Contract(
                     if (gift.sendMode > -1) {
                         sendMode = gift.sendMode
                     }
-                    val intMsg = CellRef(createIntMsg(gift))
+                    val intMsg = CellRef(gift.toMessageRelaxed())
 
                     storeUInt(sendMode, 8)
                     storeRef(MessageRelaxed.tlbCodec(AnyTlbConstructor), intMsg)
@@ -189,49 +190,6 @@ public class WalletV4R2Contract(
                 storeBits(unsignedBody.bits)
                 storeRefs(unsignedBody.refs)
             }
-        }
-
-        private fun createIntMsg(gift: WalletTransfer): MessageRelaxed<Cell> {
-            val info = when (val dest = gift.destination) {
-                is MsgAddressInt -> {
-                    CommonMsgInfoRelaxed.IntMsgInfoRelaxed(
-                        ihrDisabled = true,
-                        bounce = gift.bounceable,
-                        bounced = false,
-                        src = AddrNone,
-                        dest = dest,
-                        value = gift.coins,
-                        ihrFee = Coins(),
-                        fwdFee = Coins(),
-                        createdLt = 0u,
-                        createdAt = 0u
-                    )
-                }
-
-                is MsgAddressExt -> {
-                    CommonMsgInfoRelaxed.ExtOutMsgInfoRelaxed(
-                        src = AddrNone,
-                        dest = dest,
-                        createdLt = 0u,
-                        createdAt = 0u
-                    )
-                }
-            }
-
-            val init = Maybe.of(gift.messageData.stateInit?.let {
-                Either.of<StateInit, CellRef<StateInit>>(null, it)
-            })
-            val bodyCell = gift.messageData.body
-            val body = if (bodyCell.isEmpty()) {
-                Either.of<Cell, CellRef<Cell>>(Cell.empty(), null)
-            } else {
-                Either.of<Cell, CellRef<Cell>>(null, CellRef(bodyCell))
-            }
-            return MessageRelaxed(
-                info = info,
-                init = init,
-                body = body,
-            )
         }
     }
 }

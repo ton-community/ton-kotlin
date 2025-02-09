@@ -1,13 +1,12 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("vm_stk_slice")
-@Serializable
+
 public data class VmCellSlice(
     override val cell: Cell,
     override val stBits: Int,

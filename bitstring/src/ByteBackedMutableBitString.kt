@@ -9,6 +9,8 @@ public open class ByteBackedMutableBitString(
     override var bytes: ByteArray,
     override var size: Int
 ) : ByteBackedBitString(size, bytes), MutableBitString {
+    public constructor(size: Int) : this(ByteArray((size + 7) ushr 3), size)
+
     override operator fun set(index: Int, bit: Int) {
         set(index, bit != 0)
     }

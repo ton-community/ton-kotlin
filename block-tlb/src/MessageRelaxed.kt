@@ -1,20 +1,32 @@
 package org.ton.block
 
-import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
+import org.ton.kotlin.message.MessageLayout
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import kotlin.jvm.JvmStatic
 
-@Serializable
+
 public data class MessageRelaxed<X>(
     val info: CommonMsgInfoRelaxed,
     val init: Maybe<Either<StateInit, CellRef<StateInit>>>,
     val body: Either<X, CellRef<X>>
 ) : TlbObject {
+    public constructor(
+        info: CommonMsgInfoRelaxed,
+        init: StateInit?,
+        body: X,
+        layout: MessageLayout
+    ) : this(
+        info = info,
+        init = layout.eitherInit(init).toMaybe(),
+        body = layout.eitherBody(body),
+    )
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("message") {
             field("info", info)

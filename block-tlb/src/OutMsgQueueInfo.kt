@@ -1,17 +1,17 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 public data class OutMsgQueueInfo(
     @SerialName("out_queue") val outQueue: HashmapAugE<EnqueuedMsg, ULong>, // out_queue : OutMsgQueue
     @SerialName("proc_info") val procInfo: HashMapE<ProcessedUpto>, // proc_info : ProcessedInfo

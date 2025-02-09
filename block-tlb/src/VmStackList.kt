@@ -3,7 +3,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.*
 import org.ton.tlb.TlbCodec
@@ -16,10 +15,10 @@ public inline fun VmStackList(vararg stackValues: VmStackValue): VmStackList = V
 public inline fun VmStackList(stackValues: Iterable<VmStackValue>): VmStackList = VmStackList.of(stackValues)
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface VmStackList : Iterable<VmStackValue> {
     @SerialName("vm_stk_cons")
-    @Serializable
+
     public data class Cons(
         val rest: VmStackList,
         val tos: VmStackValue
@@ -29,7 +28,7 @@ public sealed interface VmStackList : Iterable<VmStackValue> {
     }
 
     @SerialName("vm_stk_nil")
-    @Serializable
+
     public object Nil : VmStackList {
         private val iterator = ListIterator(this)
         override fun iterator(): Iterator<VmStackValue> = iterator

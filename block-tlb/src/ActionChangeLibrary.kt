@@ -1,9 +1,8 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
+
 @SerialName("action_change_library")
 public data class ActionChangeLibrary(
     val mode: Int,

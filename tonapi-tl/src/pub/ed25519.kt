@@ -3,6 +3,7 @@
 package org.ton.api.pub
 
 import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -29,13 +30,15 @@ public data class PublicKeyEd25519(
     public constructor(byteArray: ByteArray) : this(ByteString(byteArray))
 
     private val _adnlIdShort: AdnlIdShort by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        AdnlIdShort(ByteString(*PublicKeyEd25519.hash(this)))
+        AdnlIdShort(ByteString(*hash(this)))
     }
     private val _encryptor by lazy(LazyThreadSafetyMode.PUBLICATION) {
         EncryptorEd25519(key.toByteArray())
     }
 
     override fun toAdnlIdShort(): AdnlIdShort = _adnlIdShort
+
+    override fun toString(): String = "PublicKeyEd25519(${key.toHexString()})"
 
     public companion object : TlConstructor<PublicKeyEd25519>(
         schema = "pub.ed25519 key:int256 = PublicKey",

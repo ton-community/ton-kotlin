@@ -2,7 +2,6 @@
 
 package org.ton.block
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bigint.BigInt
 import org.ton.cell.Cell
@@ -24,7 +23,7 @@ public inline fun VmStackValue(cont: VmCont): VmStackCont = VmStackValue.of(cont
 public inline fun VmStackValue(tuple: VmTuple): VmStackTuple = VmStackValue.of(tuple)
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface VmStackValue {
     public companion object : TlbCombinatorProvider<VmStackValue> by VmStackValueTlbCombinator {
         @JvmStatic

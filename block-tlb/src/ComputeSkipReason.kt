@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbCodec
@@ -10,7 +9,7 @@ import org.ton.tlb.TlbConstructor
 import org.ton.tlb.TlbStorer
 import kotlin.jvm.JvmStatic
 
-@Serializable
+
 public enum class ComputeSkipReason {
     @SerialName("cskip_no_state")
     NO_STATE {

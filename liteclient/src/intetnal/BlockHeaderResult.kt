@@ -49,7 +49,6 @@ public data class TransactionId(
     }
 }
 
-@Serializable
 public data class TransactionInfo(
     @SerialName("block_id")
     @get:JvmName("blockId")

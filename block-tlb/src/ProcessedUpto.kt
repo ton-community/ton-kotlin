@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -11,7 +10,7 @@ import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("processed_upto")
 public data class ProcessedUpto(
     @SerialName("last_msg_lt") val lastMsgLt: ULong,

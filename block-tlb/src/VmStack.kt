@@ -3,7 +3,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.BigInt
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -81,7 +80,7 @@ public interface MutableVmStack : VmStack {
 }
 
 @SerialName("vm_stack")
-@Serializable
+
 public data class VmStackImpl(
     override val depth: Int,
     override val stack: VmStackList

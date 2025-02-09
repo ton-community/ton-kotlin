@@ -7,6 +7,8 @@ internal object EmptyBitString : BitString {
 
     override fun getOrNull(index: Int): Boolean? = null
 
+    override fun countLeadingBits(fromIndex: Int, toIndex: Int, bit: Boolean): Int = 0
+
     override fun plus(bits: BooleanArray): BitString = BitString(*bits)
 
     override fun plus(bits: Iterable<Boolean>): BitString = BitString(bits)
@@ -24,7 +26,7 @@ internal object EmptyBitString : BitString {
         throw IndexOutOfBoundsException(indices.toString())
     }
 
-    override fun slice(startIndex: Int, endIndex: Int): BitString {
+    override fun substring(startIndex: Int, endIndex: Int): BitString {
         if (startIndex == 0 && endIndex == 0) return this
         throw IndexOutOfBoundsException((startIndex..endIndex).toString())
     }

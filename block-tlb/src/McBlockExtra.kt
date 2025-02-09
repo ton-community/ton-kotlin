@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -9,11 +8,12 @@ import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.hashmap.HashmapAugE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("masterchain_block_extra")
 public data class McBlockExtra(
     @SerialName("key_block") val keyBlock: Boolean,
@@ -37,7 +37,7 @@ public data class McBlockExtra(
     public companion object : TlbCombinatorProvider<McBlockExtra> by McBlockExtraTlbConstructor.asTlbCombinator()
 }
 
-@Serializable
+
 public data class McBlockExtraAux(
     @SerialName("prev_blk_signatures") val prevBlkSignatures: HashMapE<CryptoSignaturePair>,
     @SerialName("recover_create_msg") val recoverCreateMsg: Maybe<CellRef<InMsg>>,

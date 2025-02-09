@@ -1,10 +1,9 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 
-@Serializable
+
 @SerialName("smc_info")
 public data class SmartContractInfo(
     val actions: Int,

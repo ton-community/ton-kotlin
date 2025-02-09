@@ -1,6 +1,7 @@
 package org.ton.api.pk
 
 import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.ton.api.pub.PublicKeyEd25519
@@ -24,7 +25,7 @@ public data class PrivateKeyEd25519(
     @Serializable(ByteStringBase64Serializer::class)
     public val key: ByteString
 ) : PrivateKey, Decryptor {
-    public constructor(key: ByteArray) : this(ByteString(key))
+    public constructor(key: ByteArray) : this(ByteString(*key.copyOf(32)))
 
     init {
         require(key.size == 32) { "key must be 32 byte long" }
@@ -41,6 +42,8 @@ public data class PrivateKeyEd25519(
 
     public fun sharedKey(publicKey: PublicKeyEd25519): ByteArray =
         Ed25519.sharedKey(key.toByteArray(), publicKey.key.toByteArray())
+
+    override fun toString(): String = "PrivateKeyEd25519(${key.toHexString()})"
 
     public companion object : TlConstructor<PrivateKeyEd25519>(
         schema = "pk.ed25519 key:int256 = PrivateKey"

@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -10,7 +9,7 @@ import org.ton.tlb.*
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("tr_phase_compute_vm")
 public data class TrPhaseComputeVm(
     val success: Boolean,
@@ -60,7 +59,7 @@ public object TrPhaseComputeVmTlbConstructor : TlbConstructor<TrPhaseComputeVm>(
     }
 }
 
-@Serializable
+
 public data class TrComputePhaseAux(
     @SerialName("gas_used") val gasUsed: VarUInteger,
     @SerialName("gas_limit") val gasLimit: VarUInteger,

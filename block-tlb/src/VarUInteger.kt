@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bigint.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
@@ -14,12 +13,11 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
 @SerialName("var_uint")
-@Serializable
+
 public data class VarUInteger(
     @get:JvmName("len")
     val len: Int,
 
-    @Serializable(BigIntSerializer::class)
     @get:JvmName("value")
     val value: BigInt
 ) : TlbObject {

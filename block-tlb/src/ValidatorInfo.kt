@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
@@ -10,7 +9,7 @@ import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("validator_info")
 public data class ValidatorInfo(
     @SerialName("validator_list_hash_short") val validatorListHashShort: UInt,

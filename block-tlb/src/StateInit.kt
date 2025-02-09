@@ -1,19 +1,20 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.invoke
+import org.ton.bitstring.BitString
+import org.ton.cell.*
 import org.ton.hashmap.HashMapE
+import org.ton.hashmap.HmeEmpty
+import org.ton.kotlin.cell.CellSize
+import org.ton.kotlin.cell.CellSizeable
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.UIntTlbConstructor
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 
-@Serializable
+
 public data class StateInit(
     @SerialName("split_depth")
     @get:JvmName("splitDepth")
@@ -30,7 +31,7 @@ public data class StateInit(
 
     @get:JvmName("library")
     val library: HashMapE<SimpleLib>
-) : TlbObject {
+) : TlbObject, CellSizeable {
     public constructor(
         code: Cell? = null,
         data: Cell? = null,
@@ -44,6 +45,29 @@ public data class StateInit(
         data?.let { CellRef(cell = it, AnyTlbConstructor) }.toMaybe(),
         library
     )
+
+    override val cellSize: CellSize
+        get() = CellSize(
+            bits = (1 + if (splitDepth.value != null) 5 else 0) + (1 + if (special.value != null) 2 else 0) + 3,
+            refs = (if (code.value != null) 1 else 0) + (if (data.value != null) 1 else 0) + (if (library is HmeEmpty) 0 else 1)
+        )
+
+    private var hash: BitString = BitString.empty()
+
+    public fun address(workchain: Int = 0): AddrStd {
+        var hash = hash
+        if (hash == BitString.empty()) {
+            hash = buildCell {
+                storeTlb(StateInitTlbConstructor, this@StateInit)
+            }.hash()
+            this.hash = hash
+        }
+        return AddrStd(workchain, hash)
+    }
+
+    public fun toCell(): Cell = buildCell {
+        storeTlb(StateInitTlbConstructor, this@StateInit)
+    }
 
     override fun toString(): String = print().toString()
 

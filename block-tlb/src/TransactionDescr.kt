@@ -2,14 +2,13 @@
 
 package org.ton.block
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.tlb.TlbCombinator
 import org.ton.tlb.TlbObject
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface TransactionDescr : TlbObject {
     public companion object : TlbCombinatorProvider<TransactionDescr> by TransactionDescrTlbCombinator
 }

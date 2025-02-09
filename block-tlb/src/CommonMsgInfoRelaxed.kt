@@ -3,16 +3,16 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
-@Serializable
+
 public sealed interface CommonMsgInfoRelaxed : TlbObject {
     @SerialName("int_msg_info")
     public data class IntMsgInfoRelaxed(
@@ -21,7 +21,7 @@ public sealed interface CommonMsgInfoRelaxed : TlbObject {
         val bounced: Boolean = false,
         val src: MsgAddress = MsgAddressExt(),
         val dest: MsgAddressInt = AddrStd(),
-        val value: CurrencyCollection = CurrencyCollection(),
+        val value: CurrencyCollection = CurrencyCollection.ZERO,
         val ihrFee: Coins = Coins(),
         val fwdFee: Coins = Coins(),
         val createdLt: ULong = 0u,
@@ -30,7 +30,7 @@ public sealed interface CommonMsgInfoRelaxed : TlbObject {
         public constructor(dest: MsgAddressInt, bounce: Boolean, value: Coins) : this(
             dest = dest,
             bounce = bounce,
-            value = CurrencyCollection(value, ExtraCurrencyCollection())
+            value = CurrencyCollection(value, ExtraCurrencyCollection.EMPTY)
         )
 
         public constructor(dest: MsgAddressInt, bounce: Boolean, value: CurrencyCollection) : this(

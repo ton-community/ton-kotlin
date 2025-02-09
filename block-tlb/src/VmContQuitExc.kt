@@ -1,13 +1,12 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.TlbConstructor
 
 @SerialName("vmc_quit_exc")
-@Serializable
+
 public object VmContQuitExc : VmCont {
     public fun tlbConstructor(): TlbConstructor<VmContQuitExc> = VmContQuitExcTlbConstructor
 }

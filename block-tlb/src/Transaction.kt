@@ -1,7 +1,6 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
@@ -9,11 +8,12 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashMapE
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmName
 
-@Serializable
+
 @SerialName("transaction")
 public data class Transaction(
     @SerialName("account_addr")
@@ -96,7 +96,7 @@ public data class Transaction(
     public companion object : TlbCombinatorProvider<Transaction> by TransactionTlConstructor.asTlbCombinator()
 }
 
-@Serializable
+
 public data class TransactionAux(
     @SerialName("in_msg")
     @get:JvmName("inMsg")

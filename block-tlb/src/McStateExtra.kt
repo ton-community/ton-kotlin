@@ -1,15 +1,15 @@
 package org.ton.block
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@Serializable
+
 @SerialName("masterchain_state_extra")
 public data class McStateExtra(
     @SerialName("shard_hashes") val shardHashes: ShardHashes, // shard_hashes: ShardHashes
@@ -31,7 +31,7 @@ public data class McStateExtra(
     public companion object : TlbCombinatorProvider<McStateExtra> by McStateExtraTlbConstructor.asTlbCombinator()
 }
 
-@Serializable
+
 public data class McStateExtraAux(
     val flags: Int, // flags : ## 16
     @SerialName("validator_info") val validatorInfo: ValidatorInfo, // validator_info : ValidatorInfo
