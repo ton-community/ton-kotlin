@@ -31,7 +31,7 @@ https://github.com/andreypfau/ton-kotlin/wiki/TON-Kotlin-documentation
 
 <!-- Badges -->
 
-[maven-central]: https://central.sonatype.com/artifact/org.ton/ton-kotlin-tvm/0.4.0
+[maven-central]: https://central.sonatype.com/artifact/org.ton.kotlin/ton-kotlin-tvm/0.4.0
 
 [license]: LICENSE
 
