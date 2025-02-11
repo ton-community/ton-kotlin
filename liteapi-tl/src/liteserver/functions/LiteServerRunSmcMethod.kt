@@ -8,7 +8,9 @@ import org.ton.block.VmStack
 import org.ton.block.VmStackList
 import org.ton.block.VmStackValue
 import org.ton.boc.BagOfCells
+import org.ton.cell.buildCell
 import org.ton.crypto.crc16
+import org.ton.kotlin.cell.CellContext
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.api.liteserver.LiteServerRunMethodResult
 import org.ton.tl.*
@@ -44,7 +46,9 @@ public data class LiteServerRunSmcMethod(
 
         @JvmStatic
         public fun params(vmStack: VmStack): ByteArray =
-            BagOfCells(VmStack.createCell(vmStack)).toByteArray()
+            BagOfCells(buildCell(CellContext.EMPTY) {
+                VmStack.storeTlb(this, vmStack, CellContext.EMPTY)
+            }).toByteArray()
 
         @JvmStatic
         public fun params(vmStackList: VmStackList?): ByteArray =

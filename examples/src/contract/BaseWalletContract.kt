@@ -3,8 +3,9 @@ package contract
 import kotlinx.coroutines.delay
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.api.tonnode.TonNodeBlockIdExt
-import org.ton.block.AccountInfo
+import org.ton.block.Account
 import org.ton.block.AddrStd
+import org.ton.block.ShardAccount
 import org.ton.block.StateInit
 import org.ton.cell.Cell
 import org.ton.kotlin.examples.provider.Provider
@@ -33,15 +34,25 @@ abstract class BaseWalletContract(
 
     abstract fun initCodeCell(): Cell
 
-    suspend fun getState(blockId: TonNodeBlockIdExt? = null): AccountInfo? = provider.getAccountState(address, blockId)
+    suspend fun getState(blockId: TonNodeBlockIdExt? = null): ShardAccount? = provider.getAccount(address, blockId)
 
-    abstract suspend fun getSeqno(accountInfo: AccountInfo): Int
+    abstract fun getSeqno(accountInfo: Account?): Int
 
-    suspend fun waitForStateChange(currentState: AccountInfo?): AccountInfo? {
+    suspend fun waitForShardAccountChange(shardAccount: ShardAccount?): ShardAccount? {
         while (true) {
-            val state = provider.getAccountState(address)
-            if (state != currentState) {
-                return state
+            val newShardAccount = provider.getAccount(address)
+            if (newShardAccount != shardAccount) {
+                return newShardAccount
+            }
+            delay(2000)
+        }
+    }
+
+    suspend fun waitForAccountChange(account: Account?, condition: (Account?) -> Boolean = { true }): Account? {
+        while (true) {
+            val newAccount = provider.getAccount(address)?.loadAccount()
+            if (newAccount != account && condition(newAccount)) {
+                return newAccount
             }
             delay(2000)
         }

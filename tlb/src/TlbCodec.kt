@@ -5,19 +5,22 @@ package org.ton.tlb
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 
 public interface TlbStorer<in T> {
-    public fun storeTlb(cellBuilder: CellBuilder, value: T)
+    public fun storeTlb(builder: CellBuilder, value: T): Unit = storeTlb(builder, value, CellContext.EMPTY)
+    public fun storeTlb(builder: CellBuilder, value: T, context: CellContext): Unit = storeTlb(builder, value)
     public fun createCell(value: T): Cell = CellBuilder.createCell {
-        storeTlb(this, value)
+        storeTlb(this, value, CellContext.EMPTY)
     }
 }
 
+@Deprecated("Scheduled to remove")
 public interface TlbNegatedStorer<T> : TlbStorer<T> {
-    public fun storeNegatedTlb(cellBuilder: CellBuilder, value: T): Int
+    public fun storeNegatedTlb(builder: CellBuilder, value: T): Int
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
-        storeNegatedTlb(cellBuilder, value)
+    override fun storeTlb(builder: CellBuilder, value: T, context: CellContext) {
+        storeNegatedTlb(builder, value)
     }
 }
 
@@ -27,17 +30,20 @@ public interface TlbLoader<T> {
         return loadTlb(cellSlice)
     }
 
-    public fun loadTlb(cellSlice: CellSlice): T
+    public fun loadTlb(slice: CellSlice): T = loadTlb(slice, CellContext.EMPTY)
+
+    public fun loadTlb(slice: CellSlice, context: CellContext): T = loadTlb(slice)
 }
 
+@Deprecated("Scheduled to remove")
 public interface TlbNegatedLoader<T> : TlbLoader<T> {
     public fun loadNegatedTlb(cell: Cell): TlbNegatedResult<T> = cell.parse {
         loadNegatedTlb(this)
     }
 
-    public fun loadNegatedTlb(cellSlice: CellSlice): TlbNegatedResult<T>
+    public fun loadNegatedTlb(slice: CellSlice): TlbNegatedResult<T>
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
+    override fun loadTlb(slice: CellSlice): T = loadNegatedTlb(slice).value
 }
 
 public data class TlbNegatedResult<T>(
@@ -46,7 +52,33 @@ public data class TlbNegatedResult<T>(
 )
 
 public interface TlbCodec<T> : TlbStorer<T>, TlbLoader<T>
+
+@Suppress("DEPRECATION")
+@Deprecated("Scheduled to remove")
 public interface TlbNegatedCodec<T> : TlbCodec<T>, TlbNegatedStorer<T>, TlbNegatedLoader<T>
+
+public fun <T> TlbCodec<T>.asNullable(): TlbCodec<T?> = NullableTlbCodec(this)
+
+public class NullableTlbCodec<T>(
+    private val codec: TlbCodec<T>
+) : TlbCodec<T?> {
+    override fun storeTlb(builder: CellBuilder, value: T?, context: CellContext) {
+        if (value == null) {
+            builder.storeBoolean(false)
+        } else {
+            builder.storeBoolean(true)
+            codec.storeTlb(builder, value, context)
+        }
+    }
+
+    override fun loadTlb(slice: CellSlice, context: CellContext): T? {
+        return if (slice.loadBoolean()) {
+            codec.loadTlb(slice, context)
+        } else {
+            null
+        }
+    }
+}
 
 public inline fun <T> CellSlice.loadTlb(codec: TlbLoader<T>): T {
     return codec.loadTlb(this)
@@ -56,8 +88,12 @@ public inline fun <T> CellSlice.loadNegatedTlb(codec: TlbNegatedLoader<T>): TlbN
     return codec.loadNegatedTlb(this)
 }
 
-public inline fun <T> CellBuilder.storeTlb(codec: TlbStorer<T>, value: T): CellBuilder = apply {
-    codec.storeTlb(this, value)
+public inline fun <T> CellBuilder.storeTlb(
+    codec: TlbStorer<T>,
+    value: T,
+    context: CellContext = CellContext.EMPTY
+): CellBuilder = apply {
+    codec.storeTlb(this, value, context)
 }
 
 public inline fun <T> CellBuilder.storeNegatedTlb(codec: TlbNegatedStorer<T>, value: T): Int =

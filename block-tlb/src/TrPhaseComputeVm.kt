@@ -6,6 +6,7 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.tlb.*
+import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.IntTlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
@@ -17,7 +18,7 @@ public data class TrPhaseComputeVm(
     @SerialName("account_activated") val accountActivated: Boolean,
     @SerialName("gas_fees") val gasFees: Coins,
     val r1: CellRef<TrComputePhaseAux>
-) : TrComputePhase {
+) : ComputePhase {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("tr_phase_compute_vm") {
             field("success", success)

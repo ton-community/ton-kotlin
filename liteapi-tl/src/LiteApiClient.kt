@@ -1,11 +1,13 @@
 package org.ton.lite.api
 
+import kotlinx.coroutines.coroutineScope
 import kotlinx.io.Buffer
 import kotlinx.io.readByteString
 import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.liteserver.*
 import org.ton.lite.api.liteserver.functions.*
 import org.ton.tl.TlCodec
+import kotlin.coroutines.cancellation.CancellationException
 
 public interface LiteApiClient : LiteApi {
     public suspend fun <Q, A> sendQuery(
@@ -13,7 +15,7 @@ public interface LiteApiClient : LiteApi {
         answerCodec: TlCodec<A>,
         query: Q,
         waitMasterchainSeqno: Int = -1
-    ): A {
+    ): A = coroutineScope {
         val rawQuery = Buffer().apply {
             if (waitMasterchainSeqno > 0) {
                 val wait = LiteServerWaitMasterchainSeqno(waitMasterchainSeqno, 30000)
@@ -29,10 +31,10 @@ public interface LiteApiClient : LiteApi {
             null
         }
         if (liteServerError != null) {
-            throw LiteServerException.create(liteServerError.code, liteServerError.message)
+            throw CancellationException(LiteServerException.create(liteServerError.code, liteServerError.message))
         }
         val answer = answerCodec.decodeBoxed(result)
-        return answer
+        answer
     }
 
     public suspend fun sendRawQuery(query: ByteArray): ByteArray

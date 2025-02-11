@@ -3,6 +3,7 @@ package org.ton.tlb
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.exception.UnknownTlbConstructorException
 import org.ton.tlb.providers.TlbCombinatorProvider
 import org.ton.tlb.providers.TlbConstructorProvider
@@ -44,24 +45,24 @@ public abstract class TlbCombinator<T : Any>(
 
     override fun tlbCombinator(): TlbCombinator<T> = this
 
-    override fun loadTlb(cellSlice: CellSlice): T {
-        val constructor = findTlbLoaderOrNull(cellSlice) ?: throw UnknownTlbConstructorException(
-            cellSlice.preloadBits(32)
+    override fun loadTlb(slice: CellSlice, context: CellContext): T {
+        val constructor = findTlbLoaderOrNull(slice) ?: throw UnknownTlbConstructorException(
+            slice.preloadBitString(32)
         )
         if (constructor is TlbConstructor<*>) {
-            cellSlice.skipBits(constructor.id.size)
+            slice.skipBits(constructor.id.size)
         }
-        return constructor.loadTlb(cellSlice)
+        return constructor.loadTlb(slice, context)
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+    override fun storeTlb(builder: CellBuilder, value: T, context: CellContext) {
         val storer = findTlbStorerOrNull(value) ?: throw UnknownTlbConstructorException()
         if (storer is TlbConstructorProvider<*>) {
-            cellBuilder.storeBits(storer.tlbConstructor().id)
+            builder.storeBitString(storer.tlbConstructor().id)
         } else if (storer is TlbConstructor<*>) {
-            cellBuilder.storeBits(storer.id)
+            builder.storeBitString(storer.id)
         }
-        return storer.storeTlb(cellBuilder, value)
+        return storer.storeTlb(builder, value, context)
     }
 
     protected open fun findTlbLoaderOrNull(cellSlice: CellSlice): TlbLoader<out T>? {

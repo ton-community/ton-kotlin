@@ -19,6 +19,8 @@ public value class AccountActive(
     @get:JvmName("value")
     public val value: StateInit
 ) : AccountState {
+    override val status: AccountStatus get() = AccountStatus.ACTIVE
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer.type("account_active") {
             value.print(printer)

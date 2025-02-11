@@ -11,6 +11,7 @@ import kotlin.jvm.JvmName
 
 @SerialName("account_storage")
 
+@Deprecated("Use fields from Account instead")
 public data class AccountStorage(
     @SerialName("last_trans_lt")
     @get:JvmName("lastTransLt")

@@ -14,31 +14,9 @@ public data class HmnFork<T>(
     val left: CellRef<HmEdge<T>>,
     val right: CellRef<HmEdge<T>>
 ) : HashMapNode<T> {
-    public constructor(
-        left: HmEdge<T>,
-        right: HmEdge<T>,
-    ) : this(
-        left = CellRef(left),
-        right = CellRef(right)
-    )
-
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("hmn_fork") {
         field("left", left)
         field("right", right)
-    }
-
-    public fun set(key: BitString, value: T): HmnFork<T> {
-        return if (key[0]) {
-            copy(
-                left = left,
-                right = CellRef(right.value.set(key.slice(1), value))
-            )
-        } else {
-            copy(
-                left = CellRef(left.value.set(key.slice(1), value)),
-                right = right,
-            )
-        }
     }
 
     override fun toString(): String = print().toString()

@@ -38,7 +38,7 @@ public open class Dictionary<K, V>(
         val builder = CellBuilder()
         map.forEach { (key, value) ->
             builder.reset()
-            valueCodec.storeTlb(builder, value)
+            valueCodec.storeTlb(builder, value, context)
             val slice = builder.endCell().beginParse()
             val bitString = keyCodec.encodeKey(key)
             set(bitString, slice, context)
@@ -55,6 +55,8 @@ public open class Dictionary<K, V>(
         context
     )
 
+    public val cell: Cell? get() = dict.root
+
     override val size: Int
         get() = dict.iterator(context).asSequence().count()
 
@@ -69,8 +71,7 @@ public open class Dictionary<K, V>(
 
     public fun loadEntries(context: CellContext = this.context): Sequence<Map.Entry<K, V>> =
         dict.iterator(context).asSequence().map { (key, value) ->
-//            val value = valueSerializer.load(value, context) TODO: use context
-            val value = valueCodec.loadTlb(value)
+            val value = valueCodec.loadTlb(value, context)
             val key = keyCodec.decodeKey(key)
             DictEntry(key, value)
         }
@@ -82,8 +83,7 @@ public open class Dictionary<K, V>(
 
     public fun loadValues(context: CellContext = this.context): Sequence<V> =
         dict.iterator(context).asSequence().map { (_, value) ->
-//        valueSerializer.load(value, context) TODO: use context
-            valueCodec.loadTlb(value)
+            valueCodec.loadTlb(value, context)
         }
 
     override fun isEmpty(): Boolean {
@@ -101,9 +101,7 @@ public open class Dictionary<K, V>(
     override fun get(key: K): V? = get(key, context)
 
     public fun get(key: K, context: CellContext = this.context): V? {
-        // TODO: use context
-//        return valueSerializer.loadTlb(dict.get(keySerializer(key), context) ?: return null, context)
-        return valueCodec.loadTlb(dict.get(keyCodec.encodeKey(key), context) ?: return null)
+        return valueCodec.loadTlb(dict.get(keyCodec.encodeKey(key), context) ?: return null, context)
     }
 
     public fun toMap(context: CellContext = this.context): Map<K, V> {
@@ -114,7 +112,7 @@ public open class Dictionary<K, V>(
     public fun <M : MutableMap<in K, in V>> toMap(destination: M, context: CellContext = this.context): M {
         if (dict.isEmpty()) return destination
         dict.iterator(context).forEach { (key, value) ->
-            val value = valueCodec.loadTlb(value)
+            val value = valueCodec.loadTlb(value, context)
             val key = keyCodec.decodeKey(key)
             destination[key] = value
         }

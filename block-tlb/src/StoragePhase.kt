@@ -10,7 +10,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 
 @SerialName("tr_phase_storage")
-public data class TrStoragePhase(
+public data class StoragePhase(
     @SerialName("storage_fees_collected") val storageFeesCollected: Coins,
     @SerialName("storage_fees_due") val storageFeesDue: Maybe<Coins>,
     @SerialName("status_change") val statusChange: AccStatusChange
@@ -25,10 +25,10 @@ public data class TrStoragePhase(
         }
     }
 
-    public companion object : TlbConstructorProvider<TrStoragePhase> by TrStoragePhaseTlbConstructor
+    public companion object : TlbConstructorProvider<StoragePhase> by TrStoragePhaseTlbConstructor
 }
 
-private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
+private object TrStoragePhaseTlbConstructor : TlbConstructor<StoragePhase>(
     schema = "tr_phase_storage\$_ storage_fees_collected:Coins " +
             "storage_fees_due:(Maybe Coins) " +
             "status_change:AccStatusChange " +
@@ -38,7 +38,7 @@ private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: TrStoragePhase
+        value: StoragePhase
     ) = cellBuilder {
         storeTlb(Coins, value.storageFeesCollected)
         storeTlb(maybeCoins, value.storageFeesDue)
@@ -47,10 +47,10 @@ private object TrStoragePhaseTlbConstructor : TlbConstructor<TrStoragePhase>(
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): TrStoragePhase = cellSlice {
+    ): StoragePhase = cellSlice {
         val storageFeesCollected = loadTlb(Coins)
         val storageFeesDue = loadTlb(maybeCoins)
         val statusChange = loadTlb(AccStatusChange)
-        TrStoragePhase(storageFeesCollected, storageFeesDue, statusChange)
+        StoragePhase(storageFeesCollected, storageFeesDue, statusChange)
     }
 }

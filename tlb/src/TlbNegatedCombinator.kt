@@ -2,6 +2,7 @@ package org.ton.tlb
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.exception.UnknownTlbConstructorException
 import kotlin.reflect.KClass
 
@@ -12,11 +13,11 @@ public abstract class TlbNegatedCombinator<T : Any>(
     baseClass,
     *subClasses
 ), TlbNegatedCodec<T> {
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: T, context: CellContext) {
         storeNegatedTlb(cellBuilder, value)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
+    override fun loadTlb(cellSlice: CellSlice, context: CellContext): T = loadNegatedTlb(cellSlice).value
 
     override fun storeNegatedTlb(cellBuilder: CellBuilder, value: T): Int {
         val constructor = findTlbStorerOrNull(value) as? TlbNegatedConstructor<T>

@@ -14,7 +14,7 @@ import org.ton.tlb.storeTlb
 @SerialName("tr_phase_compute_skipped")
 public data class TrPhaseComputeSkipped(
     val reason: ComputeSkipReason
-) : TrComputePhase {
+) : ComputePhase {
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("tr_phase_compute_skipped") {
             field("reason", reason)

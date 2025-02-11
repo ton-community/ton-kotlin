@@ -3,6 +3,7 @@ package org.ton.block
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.hashmap.HashmapAugE
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbObject
 import org.ton.tlb.TlbPrettyPrinter
@@ -25,11 +26,11 @@ public value class OldMcBlocksInfo(
 private object OldMcBlocksInfoTlbCodec : TlbCodec<OldMcBlocksInfo> {
     private val codec = HashmapAugE.tlbCodec(32, KeyExtBlkRef, KeyMaxLt)
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: OldMcBlocksInfo) {
-        codec.storeTlb(cellBuilder, value.value)
+    override fun storeTlb(cellBuilder: CellBuilder, value: OldMcBlocksInfo, context: CellContext) {
+        codec.storeTlb(cellBuilder, value.value, context)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): OldMcBlocksInfo {
-        return OldMcBlocksInfo(codec.loadTlb(cellSlice))
+    override fun loadTlb(cellSlice: CellSlice, context: CellContext): OldMcBlocksInfo {
+        return OldMcBlocksInfo(codec.loadTlb(cellSlice, context))
     }
 }

@@ -10,6 +10,8 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("account_uninit")
 public object AccountUninit : AccountState, TlbConstructorProvider<AccountUninit> by AccountUninitTlbConstructor {
+    override val status: AccountStatus get() = AccountStatus.UNINIT
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter {
         return printer.type("account_uninit")
     }

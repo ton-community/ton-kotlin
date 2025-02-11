@@ -1,12 +1,14 @@
 package org.ton.cell
 
 import io.github.andreypfau.kotlinx.crypto.sha2.SHA256
+import kotlinx.io.bytestring.ByteString
 import org.ton.bigint.*
 import org.ton.bitstring.BitString
 import org.ton.bitstring.ByteBackedMutableBitString
 import org.ton.bitstring.MutableBitString
 import org.ton.bitstring.toBitString
 import org.ton.cell.exception.CellOverflowException
+import org.ton.kotlin.cell.CellContext
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -48,6 +50,7 @@ public interface CellBuilder {
 
     public fun storeBitString(value: BitString, startIndex: Int = 0, endIndex: Int = value.size): CellBuilder
 
+    public fun storeByteString(value: ByteString): CellBuilder
     public fun storeBytes(byteArray: ByteArray): CellBuilder
     public fun storeByte(byte: Byte): CellBuilder
 
@@ -55,6 +58,7 @@ public interface CellBuilder {
      * Stores a reference to cell into builder.
      */
     public fun storeRef(ref: Cell): CellBuilder
+    public fun storeNullableRef(ref: Cell?): CellBuilder
 
     public fun storeRefs(vararg refs: Cell): CellBuilder
     public fun storeRefs(refs: Iterable<Cell>): CellBuilder
@@ -69,10 +73,14 @@ public interface CellBuilder {
     public fun storeUInt(value: Int, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
     public fun storeUInt(value: Long, length: Int): CellBuilder = storeUInt(value.toBigInt(), length)
 
+    public fun storeULong(value: ULong, bitCount: Int = ULong.SIZE_BITS): CellBuilder = storeLong(value.toLong(), 64)
+
     public fun storeUInt8(value: UByte): CellBuilder = storeInt(value.toByte(), 8)
     public fun storeUInt16(value: UShort): CellBuilder = storeInt(value.toShort(), 16)
     public fun storeUInt32(value: UInt): CellBuilder = storeInt(value.toInt(), 32)
-    public fun storeUInt64(value: ULong): CellBuilder = storeInt(value.toLong(), 64)
+
+    @Deprecated("Use storeULong(value) instead.", ReplaceWith("storeULong(value)"))
+    public fun storeUInt64(value: ULong): CellBuilder = storeULong(value)
 
     public fun storeUIntLeq(value: BigInt, max: BigInt): CellBuilder = storeUInt(value, max.bitLength)
     public fun storeUIntLeq(value: Byte, max: Byte): CellBuilder = storeUIntLeq(value.toInt(), max.toInt())
@@ -154,6 +162,7 @@ public interface CellBuilder {
     }
 
     public fun storeBytes(byteArray: ByteArray, length: Int): CellBuilder
+
 }
 
 public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
@@ -161,16 +170,22 @@ public inline operator fun CellBuilder.invoke(builder: CellBuilder.() -> Unit) {
 }
 
 @OptIn(ExperimentalContracts::class)
-public inline fun buildCell(builderAction: CellBuilder.() -> Unit): Cell {
+public inline fun buildCell(context: CellContext = CellContext.EMPTY, builderAction: CellBuilder.() -> Unit): Cell {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
-    return CellBuilder.beginCell().apply(builderAction).endCell()
+    return context.finalizeCell(CellBuilder.beginCell().apply(builderAction))
 }
 
-public inline fun CellBuilder.storeRef(refBuilder: CellBuilder.() -> Unit): CellBuilder = apply {
-    val cellBuilder = CellBuilder.beginCell()
-    cellBuilder.apply(refBuilder)
-    val cell = cellBuilder.endCell()
+@OptIn(ExperimentalContracts::class)
+public inline fun CellBuilder.storeRef(
+    context: CellContext = CellContext.EMPTY,
+    block: CellBuilder.() -> Unit
+): CellBuilder {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    val cell = context.finalizeCell(CellBuilder.beginCell().apply(block))
     storeRef(cell)
+    return this
 }
 
 public inline fun CellBuilder(cell: Cell): CellBuilder = CellBuilder.of(cell)
@@ -213,6 +228,12 @@ private class CellBuilderImpl(
 
     override fun storeBits(bits: Iterable<Boolean>): CellBuilder = storeBits(bits.toList())
 
+    override fun storeByteString(value: ByteString): CellBuilder {
+        checkBitsOverflow(value.size * Byte.SIZE_BITS)
+        this.bits.plus(value.toByteArray())
+        return this
+    }
+
     override fun storeBytes(byteArray: ByteArray): CellBuilder = apply {
         checkBitsOverflow(byteArray.size * Byte.SIZE_BITS)
         this.bits.plus(byteArray)
@@ -231,6 +252,17 @@ private class CellBuilderImpl(
     override fun storeRef(ref: Cell): CellBuilder = apply {
         checkRefsOverflow(1)
         refs.add(ref)
+    }
+
+    override fun storeNullableRef(ref: Cell?): CellBuilder {
+        if (ref != null) {
+            checkRefsOverflow(1)
+            storeBoolean(true)
+            refs.add(ref)
+        } else {
+            storeBoolean(false)
+        }
+        return this
     }
 
     override fun storeRefs(vararg refs: Cell): CellBuilder = apply {

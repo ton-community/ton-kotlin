@@ -9,8 +9,8 @@ plugins {
 }
 
 allprojects {
-    group = "org.ton.kotlin"
-    version = "0.4.0"
+    group = "org.ton"
+    version = "0.4.1"
 
     repositories {
         mavenCentral()

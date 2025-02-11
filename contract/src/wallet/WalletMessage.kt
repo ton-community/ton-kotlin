@@ -18,19 +18,12 @@ public interface WalletMessage<X : Any> {
             WalletMessageImpl(mode, msg)
 
         @JvmStatic
-        public fun <X : Any> of(mode: Int, msg: MessageRelaxed<X>): WalletMessage<X> =
-            of(mode, CellRef(msg))
-
-        @JvmStatic
         public fun <X : Any> tlbCodec(x: TlbCodec<X>): TlbCodec<WalletMessage<X>> =
             WalletMessageTlbConstructor(x)
     }
 }
 
 public inline fun <X : Any> WalletMessage(mode: Int, msg: CellRef<MessageRelaxed<X>>): WalletMessage<X> =
-    WalletMessage.of(mode, msg)
-
-public inline fun <X : Any> WalletMessage(mode: Int, msg: MessageRelaxed<X>): WalletMessage<X> =
     WalletMessage.of(mode, msg)
 
 private data class WalletMessageImpl<X : Any>(

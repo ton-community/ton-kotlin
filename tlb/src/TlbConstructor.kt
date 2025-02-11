@@ -3,6 +3,7 @@ package org.ton.tlb
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.exception.ParseTlbException
 import org.ton.tlb.providers.TlbConstructorProvider
 import kotlin.jvm.JvmStatic
@@ -72,11 +73,20 @@ public abstract class TlbNegatedConstructor<T : Any>(
     schema: String,
     id: BitString? = null
 ) : TlbConstructor<T>(schema, id), TlbNegatedCodec<T> {
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
+
+    override fun storeTlb(builder: CellBuilder, value: T) {
+        storeNegatedTlb(builder, value)
+    }
+
+    override fun storeTlb(cellBuilder: CellBuilder, value: T, context: CellContext) {
         storeNegatedTlb(cellBuilder, value)
     }
 
-    override fun loadTlb(cellSlice: CellSlice): T = loadNegatedTlb(cellSlice).value
+    override fun loadTlb(slice: CellSlice, context: CellContext): T = loadNegatedTlb(slice).value
+
+    override fun loadTlb(slice: CellSlice): T {
+        return loadNegatedTlb(slice).value
+    }
 }
 
 public inline fun <reified T : Any> TlbConstructor<T>.asTlbCombinator(): TlbCombinator<T> = asTlbCombinator(T::class)

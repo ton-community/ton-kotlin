@@ -16,7 +16,7 @@ import org.ton.tlb.providers.TlbConstructorProvider
 
 @SerialName("tr_phase_action")
 
-public data class TrActionPhase(
+public data class ActionPhase(
     val success: Boolean,
     val valid: Boolean,
     @SerialName("no_funds") val noFunds: Boolean,
@@ -57,10 +57,10 @@ public data class TrActionPhase(
 
     override fun toString(): String = print().toString()
 
-    public companion object : TlbConstructorProvider<TrActionPhase> by TrActionPhaseTlbConstructor
+    public companion object : TlbConstructorProvider<ActionPhase> by TrActionPhaseTlbConstructor
 }
 
-private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
+private object TrActionPhaseTlbConstructor : TlbConstructor<ActionPhase>(
     schema = "tr_phase_action\$_ success:Bool valid:Bool no_funds:Bool " +
             "status_change:AccStatusChange " +
             "total_fwd_fees:(Maybe Coins) total_action_fees:(Maybe Coins) " +
@@ -74,7 +74,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: TrActionPhase
+        value: ActionPhase
     ) = cellBuilder {
         storeBit(value.success)
         storeBit(value.valid)
@@ -94,7 +94,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): TrActionPhase = cellSlice {
+    ): ActionPhase = cellSlice {
         val success = loadBit()
         val valid = loadBit()
         val noFunds = loadBit()
@@ -109,7 +109,7 @@ private object TrActionPhaseTlbConstructor : TlbConstructor<TrActionPhase>(
         val msgCreated = loadUInt(16).toInt()
         val actionListHash = loadBits(256)
         val totMsgSize = loadTlb(StorageUsedShort)
-        TrActionPhase(
+        ActionPhase(
             success,
             valid,
             noFunds,

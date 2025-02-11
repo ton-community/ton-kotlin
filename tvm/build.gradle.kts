@@ -11,6 +11,7 @@ kotlin {
                 api(projects.tonKotlinBigint)
                 api(projects.tonKotlinCrypto)
                 implementation(libs.serialization.json)
+                api(libs.kotlinx.io)
             }
         }
     }
