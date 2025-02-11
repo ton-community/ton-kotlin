@@ -10,6 +10,11 @@ import org.ton.tlb.providers.TlbCombinatorProvider
 
 @JsonClassDiscriminator("@type")
 public sealed interface AccountState : TlbObject {
+    /**
+     * Account status.
+     */
+    public val status: AccountStatus
+
     public companion object : TlbCombinatorProvider<AccountState> by AccountStateTlbCombinator
 }
 

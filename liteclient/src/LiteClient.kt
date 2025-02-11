@@ -318,7 +318,7 @@ public class LiteClient(
         } catch (e: Exception) {
             throw RuntimeException("Can't deserialize block data", e)
         }
-        val actualRootHash = root.hash().toBitString()
+        root.hash().toBitString()
         // FIXME: https://github.com/andreypfau/ton-kotlin/issues/82
 //        check(blockId.rootHash.toBitString() == actualRootHash) {
 //            "block root hash mismatch, expected: ${blockId.rootHash} , actual: $actualRootHash"
@@ -344,7 +344,7 @@ public class LiteClient(
             throw IllegalStateException("Can't deserialize account state", e)
         }
         if (root.isEmpty()) {
-            return FullAccountState(rawAccountState.shardBlock, accountAddress, null, CellRef(AccountNone, Account))
+            return FullAccountState(rawAccountState.shardBlock, accountAddress, null, CellRef(null, Account))
         }
 
         check(rawAccountState.id == blockId || rawAccountState.id.seqno == 0) {
@@ -454,9 +454,11 @@ public class LiteClient(
     }
 
 
-    public suspend fun sendMessage(body: Message<Cell>): LiteServerSendMsgStatus = sendMessage(CellRef(body))
+    public suspend fun sendMessage(body: Message<Cell>): LiteServerSendMsgStatus =
+        sendMessage(CellRef(body, Message.tlbCodec(AnyTlbConstructor)))
+
     public suspend fun sendMessage(body: CellRef<Message<Cell>>): LiteServerSendMsgStatus =
-        sendMessage(body.toCell(Message.tlbCodec(AnyTlbConstructor)))
+        sendMessage(body.cell)
 
     public suspend fun sendMessage(cell: Cell): LiteServerSendMsgStatus = sendMessage(BagOfCells(cell))
     public suspend fun sendMessage(boc: BagOfCells): LiteServerSendMsgStatus {

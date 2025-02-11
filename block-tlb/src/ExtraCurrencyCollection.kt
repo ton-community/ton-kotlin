@@ -42,8 +42,6 @@ public class ExtraCurrencyCollection : Dictionary<Int, VarUInt248> {
         return true
     }
 
-    override fun hashCode(): Int = super.hashCode()
-
     override fun toString(): String = this.asSequence().joinToString { (key, value) -> "$key=$value" }
 
     public companion object : TlbConstructorProvider<ExtraCurrencyCollection> by ExtraCurrencyCollectionTlbConstructor {
@@ -55,21 +53,18 @@ private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurre
     schema = "extra_currencies\$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;"
 ) {
     override fun storeTlb(
-        cellBuilder: CellBuilder, value: ExtraCurrencyCollection
+        builder: CellBuilder,
+        value: ExtraCurrencyCollection,
+        context: CellContext
     ) {
-        val root = value.dict.root
-        if (root == null) {
-            cellBuilder.storeBoolean(false)
-        } else {
-            cellBuilder.storeBoolean(true)
-            cellBuilder.storeRef(root)
-        }
+        builder.storeNullableRef(value.cell)
     }
 
     override fun loadTlb(
-        cellSlice: CellSlice
+        slice: CellSlice,
+        context: CellContext
     ): ExtraCurrencyCollection {
-        val root = if (cellSlice.loadBoolean()) cellSlice.loadRef() else null
-        return ExtraCurrencyCollection(root)
+        val cell = slice.loadNullableRef()
+        return ExtraCurrencyCollection(cell, context)
     }
 }

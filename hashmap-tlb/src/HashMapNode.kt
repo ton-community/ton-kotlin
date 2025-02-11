@@ -21,11 +21,6 @@ public sealed interface HashMapNode<T> : TlbObject {
                 HmnFork.tlbCodec(n, x)
             } as TlbCodec<HashMapNode<X>>
 
-        public fun <T> fork(
-            left: HmEdge<T>,
-            right: HmEdge<T>
-        ): HmnFork<T> = HmnFork(left, right)
-
         public fun <T> leaf(value: T): HmnLeaf<T> = HmnLeaf(value)
     }
 }

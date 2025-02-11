@@ -6,6 +6,7 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.storeRef
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.TlbConstructor
 import kotlin.math.min
 
@@ -23,7 +24,7 @@ public object CellStringTlbConstructor : TlbConstructor<ByteString>(
         return ByteString(*result.toByteArray())
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: ByteString) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: ByteString, context: CellContext) {
         require(value.size <= MAX_BYTES) {
             "String is too long"
         }
@@ -40,8 +41,8 @@ public object CellStringTlbConstructor : TlbConstructor<ByteString>(
             cellBuilder.storeBytes(value.toByteArray())
         } else {
             cellBuilder.storeBytes(value.substring(0, head / 8).toByteArray())
-            cellBuilder.storeRef {
-                storeTlb(this, value.substring(head / 8, value.size))
+            cellBuilder.storeRef(context) {
+                storeTlb(this, value.substring(head / 8, value.size), context)
             }
         }
     }

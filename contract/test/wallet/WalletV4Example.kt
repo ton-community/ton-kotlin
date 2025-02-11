@@ -4,7 +4,7 @@ import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.block.AccountInfo
+import org.ton.block.Account
 import org.ton.block.AddrStd
 import org.ton.block.Coins
 import kotlin.test.Test
@@ -24,7 +24,7 @@ class WalletV4Example {
         println("Wallet Address: $testnetNonBounceAddr")
 
         var accountState = liteClient.getAccountState(contract.address)
-        val account = accountState.account.value as? AccountInfo
+        val account = accountState.account.value as? Account
         if (account == null) {
             println("Account $testnetNonBounceAddr not initialized")
             return@runBlocking

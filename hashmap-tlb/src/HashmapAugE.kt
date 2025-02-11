@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 import org.ton.bitstring.BitString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
@@ -122,14 +123,14 @@ private class AhmeEmptyTlbConstructor<X, Y>(
 ) : TlbConstructor<HashmapAugE.AhmeEmpty<X, Y>>(
     schema = "ahme_empty\$0 {n:#} {X:Type} {Y:Type} extra:Y = HashmapAugE n X Y"
 ) {
-    override fun loadTlb(cellSlice: CellSlice): HashmapAugE.AhmeEmpty<X, Y> {
-        val extra = y.loadTlb(cellSlice)
+    override fun loadTlb(cellSlice: CellSlice, context: CellContext): HashmapAugE.AhmeEmpty<X, Y> {
+        val extra = y.loadTlb(cellSlice, context)
         return AhmeEmptyImpl(n, extra)
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugE.AhmeEmpty<X, Y>) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugE.AhmeEmpty<X, Y>, context: CellContext) {
         require(value.n == n) { "n mismatch, expected: $n, actual: ${value.n}" }
-        y.storeTlb(cellBuilder, value.extra)
+        y.storeTlb(cellBuilder, value.extra, context)
     }
 }
 
@@ -142,15 +143,15 @@ private class AhmeRootTlbConstructor<X, Y>(
 ) {
     private val hashmapAug = HashmapAug.tlbCodec(n, x, y)
 
-    override fun loadTlb(cellSlice: CellSlice): HashmapAugE.AhmeRoot<X, Y> {
+    override fun loadTlb(cellSlice: CellSlice, context: CellContext): HashmapAugE.AhmeRoot<X, Y> {
         val root = cellSlice.loadRef(hashmapAug)
-        val extra = y.loadTlb(cellSlice)
+        val extra = y.loadTlb(cellSlice, context)
         return AhmeRootImpl(n, root, extra)
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugE.AhmeRoot<X, Y>) {
+    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugE.AhmeRoot<X, Y>, context: CellContext) {
         require(value.n == n) { "n mismatch, expected: $n, actual: ${value.n}" }
         cellBuilder.storeRef(hashmapAug, value.root)
-        y.storeTlb(cellBuilder, value.extra)
+        y.storeTlb(cellBuilder, value.extra, context)
     }
 }

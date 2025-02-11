@@ -1,15 +1,18 @@
 package org.ton.tlb.providers
 
 import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbConstructor
 
-public interface TlbConstructorProvider<T : Any> : TlbProvider<T>, TlbCodec<T> {
+public interface TlbConstructorProvider<T : Any> : TlbCodec<T> {
     public fun tlbConstructor(): TlbConstructor<T>
 
-    override fun loadTlb(cellSlice: CellSlice): T = tlbConstructor().loadTlb(cellSlice)
-    override fun storeTlb(cellBuilder: CellBuilder, value: T) {
-        tlbConstructor().storeTlb(cellBuilder, value)
+    override fun storeTlb(builder: CellBuilder, value: T, context: CellContext) {
+        tlbConstructor().storeTlb(builder, value)
+    }
+
+    override fun storeTlb(builder: CellBuilder, value: T) {
+        tlbConstructor().storeTlb(builder, value, CellContext.EMPTY)
     }
 }

@@ -21,6 +21,8 @@ public data class AccountFrozen(
         require(stateHash.size == 256) { "stateHash must be 256 bits long" }
     }
 
+    override val status: AccountStatus get() = AccountStatus.FROZEN
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_frozen") {
         printer.field("state_hash", stateHash)
     }

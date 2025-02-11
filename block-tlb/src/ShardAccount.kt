@@ -1,21 +1,43 @@
 package org.ton.block
 
-import kotlinx.serialization.SerialName
-import org.ton.bitstring.BitString
+import kotlinx.io.bytestring.ByteString
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
-import org.ton.tlb.*
+import org.ton.kotlin.cell.CellContext
+import org.ton.tlb.CellRef
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
-
-@SerialName("account_descr")
+/**
+ * Shard accounts entry.
+ */
 public data class ShardAccount(
-    val account: CellRef<Account>,
-    @SerialName("last_trans_hash") val lastTransHash: BitString,
-    @SerialName("last_trans_lt") val lastTransLt: ULong
+    /**
+     * Optional reference to account state.
+     */
+    val account: CellRef<Account?>,
+
+    /**
+     * The exact hash of the last transaction.
+     */
+    val lastTransHash: ByteString,
+
+    /**
+     * The exact logical time of the last transaction.
+     */
+    val lastTransLt: Long
 ) : TlbObject {
+
+    /**
+     * Load account data from cell.
+     */
+    public fun loadAccount(context: CellContext = CellContext.EMPTY): Account? {
+        return account.load(context)
+    }
+
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_descr") {
         field("account", account)
         field("last_trans_hash", lastTransHash)
@@ -23,6 +45,23 @@ public data class ShardAccount(
     }
 
     override fun toString(): String = print().toString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as ShardAccount
+        if (lastTransLt != other.lastTransLt) return false
+        if (account != other.account) return false
+        if (lastTransHash != other.lastTransHash) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = lastTransLt.hashCode()
+        result = 31 * result + account.hashCode()
+        result = 31 * result + lastTransHash.hashCode()
+        return result
+    }
 
     public companion object : TlbConstructorProvider<ShardAccount> by ShardAccountTlbConstructor
 }
@@ -34,17 +73,17 @@ private object ShardAccountTlbConstructor : TlbConstructor<ShardAccount>(
         cellBuilder: CellBuilder,
         value: ShardAccount
     ) = cellBuilder {
-        storeRef(Account, value.account)
-        storeBits(value.lastTransHash)
-        storeUInt64(value.lastTransLt)
+        storeRef(value.account.cell)
+        storeBytes(value.lastTransHash.toByteArray())
+        storeULong(value.lastTransLt.toULong())
     }
 
     override fun loadTlb(
         cellSlice: CellSlice
     ): ShardAccount = cellSlice {
-        val account = loadRef(Account)
-        val lastTransHash = loadBits(256)
-        val lastTransLt = loadUInt64()
+        val account = CellRef(loadRef(), Account)
+        val lastTransHash = loadByteString(32)
+        val lastTransLt = loadULong().toLong()
         ShardAccount(account, lastTransHash, lastTransLt)
     }
 }

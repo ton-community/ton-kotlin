@@ -16,43 +16,6 @@ public data class HmEdge<T>(
 ) : Iterable<Pair<BitString, T>>, TlbObject {
     override fun iterator(): Iterator<Pair<BitString, T>> = HmEdgeIterator(this)
 
-    public fun set(key: BitString, value: T): HmEdge<T> {
-        check(!key.isEmpty())
-        val label = label.toBitString()
-        if (label == key) {
-            // replace existing leaf
-            return HmEdge(this.label, HmnLeaf(value))
-        } else if (label.isEmpty()) {
-            // 1-bit edge
-            node as HmnFork<T>
-            return HmEdge(this.label, node.set(key, value))
-        } else {
-            val labelPrefix = label.commonPrefixWith(key)
-            val labelReminder = label.slice(labelPrefix.size)
-            val keyReminder = key.slice(labelPrefix.size)
-
-            if (keyReminder.isEmpty()) {
-                throw IllegalArgumentException("variable length key: $key")
-            } else if (!labelReminder.isEmpty() && !keyReminder.isEmpty()) {
-                // forking
-                val (left, right) = if (keyReminder[0]) {
-                    HmEdge(HmLabel(labelReminder.slice(1)), node) to
-                            HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value))
-                } else {
-                    HmEdge(HmLabel(keyReminder.slice(1)), HmnLeaf(value)) to
-                            HmEdge(HmLabel(labelReminder.slice(1)), node)
-                }
-                return HmEdge(HmLabel(labelPrefix), HmnFork(left, right))
-            } else if (!labelPrefix.isEmpty() && labelReminder.isEmpty() && !keyReminder.isEmpty()) {
-                // next iteration
-                node as HmnFork<T>
-                val newNode = node.set(keyReminder, value)
-                return HmEdge(HmLabel(labelPrefix), newNode)
-            }
-            throw IllegalStateException()
-        }
-    }
-
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("hm_edge") {
             field("label", label)
