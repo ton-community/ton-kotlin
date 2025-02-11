@@ -6,18 +6,14 @@ import org.ton.api.pub.PublicKeyEd25519
 import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.cell.CellSlice
-import org.ton.cell.storeUInt
+import org.ton.cell.*
 import org.ton.contract.wallet.WalletTransfer
+import org.ton.kotlin.cell.CellContext
 import org.ton.kotlin.examples.provider.Provider
 import org.ton.kotlin.message.MessageLayout
-import org.ton.tlb.CellRef
 import org.ton.tlb.TlbCodec
 import org.ton.tlb.TlbStorer
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeRef
 
 open class WalletV1R3Contract(
     workchain: Int = DEFAULT_WORKCHAIN,
@@ -35,14 +31,27 @@ open class WalletV1R3Contract(
 
     override fun initCodeCell(): Cell = CODE
 
-    override suspend fun getSeqno(accountInfo: AccountInfo): Int {
-        val state = (accountInfo.storage.state as AccountActive).value
-        val data = requireNotNull(state.data.value).value.beginParse()
+    override fun getSeqno(accountInfo: Account?): Int {
+        val accountState = accountInfo?.state ?: return 0
+        val stateInit = when (accountState) {
+            is AccountActive -> accountState.value
+            is AccountFrozen -> throw IllegalStateException("Account ${accountInfo.address} frozen")
+            AccountUninit -> return 0
+        }
+        val data = requireNotNull(stateInit.data.value).load().beginParse()
         return data.loadUInt(32).toInt()
     }
 
+    suspend fun transfer(privateKey: PrivateKey, seqno: Int, vararg transfers: WalletTransfer) =
+        transfer(privateKey, seqno, transfers.toList())
+
     suspend fun transfer(privateKey: PrivateKey, seqno: Int, transfers: List<WalletTransfer>) {
-        val message = WalletV1R3Message(seqno, transfers).sign(privateKey).toMessage(address)
+        val message = WalletV1R3Message(seqno, transfers)
+            .sign(privateKey)
+            .toMessage(
+                address = address,
+                init = if (seqno == 0) stateInit else null
+            )
         provider.sendMessage(SignedWalletV1R3Message, message)
     }
 
@@ -57,24 +66,29 @@ open class WalletV1R3Contract(
         }
 
         override fun sign(privateKey: PrivateKey): SignedWalletV1R3Message {
-            val cell = CellBuilder().apply {
-                storeTlb(this, this@WalletV1R3Message)
-            }.build()
+            val cell = buildCell {
+                storeTlb(this, this@WalletV1R3Message, CellContext.EMPTY)
+            }
             val signature = BitString(privateKey.sign(cell.hash().toByteArray()))
             return SignedWalletV1R3Message(signature, seqno, transfers)
         }
 
         companion object : TlbStorer<WalletV1R3Message> {
+            val messageRelaxed = MessageRelaxed.Companion.tlbCodec(AnyTlbConstructor)
+
             override fun storeTlb(
                 builder: CellBuilder,
-                value: WalletV1R3Message
+                value: WalletV1R3Message,
+                context: CellContext
             ) {
                 builder.storeUInt(value.seqno.toUInt())
                 for (gift in value.transfers) {
-                    val intMsg = CellRef(gift.toMessageRelaxed())
+                    val intMsg = gift.toMessageRelaxed()
 
                     builder.storeUInt(gift.sendMode, 8)
-                    builder.storeRef(MessageRelaxed.Companion.tlbCodec(AnyTlbConstructor), intMsg)
+                    builder.storeRef(context) {
+                        messageRelaxed.storeTlb(this, intMsg)
+                    }
                 }
             }
         }
@@ -100,10 +114,11 @@ open class WalletV1R3Contract(
             layout: MessageLayout? = null
         ): Message<SignedWalletV1R3Message> {
             val info = ExtInMsgInfo(source, address)
-            return Message<SignedWalletV1R3Message>(
+            return Message(
                 info = info,
                 init = init,
                 body = this,
+                bodyCodec = Companion,
                 layout = layout ?: MessageLayout.compute(
                     info = info,
                     init = init,
@@ -116,13 +131,14 @@ open class WalletV1R3Contract(
         companion object : TlbCodec<SignedWalletV1R3Message> {
             override fun storeTlb(
                 builder: CellBuilder,
-                value: SignedWalletV1R3Message
+                value: SignedWalletV1R3Message,
+                context: CellContext
             ) {
                 builder.storeBitString(value.signature)
-                WalletV1R3Message.storeTlb(builder, value)
+                WalletV1R3Message.storeTlb(builder, value, context)
             }
 
-            override fun loadTlb(cellSlice: CellSlice): SignedWalletV1R3Message {
+            override fun loadTlb(cellSlice: CellSlice, context: CellContext): SignedWalletV1R3Message {
                 TODO("Not yet implemented")
             }
         }

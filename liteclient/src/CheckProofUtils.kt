@@ -59,14 +59,14 @@ internal object CheckProofUtils {
         val shardAccount = checkNotNull(shardState.accounts.value.x[address.address]?.value) {
             "Shard account ${address.address} not found in shard state"
         }
-        check(shardAccount.account.hash() == root.hash()) {
+        check(shardAccount.account.cell.virtualize().hash() == root.hash()) {
             "Account state hash mismatch, expected: ${shardAccount.account.hash()}, actual: ${root.hash()}"
         }
 
         return FullAccountState(
             shardBlock,
             address,
-            TransactionId(shardAccount.lastTransHash, shardAccount.lastTransLt.toLong()),
+            TransactionId(shardAccount.lastTransHash.toByteArray(), shardAccount.lastTransLt.toLong()),
             account
         )
     }

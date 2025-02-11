@@ -6,7 +6,6 @@ import org.ton.bitstring.BitString
 import org.ton.cell.Cell
 import org.ton.cell.CellDescriptor
 import org.ton.cell.buildCell
-import kotlin.experimental.and
 
 internal fun Input.readBagOfCell(): BagOfCells {
     val prefix = readInt()
@@ -50,8 +49,8 @@ internal fun Input.readBagOfCell(): BagOfCells {
     val offsetSize = readByte().toInt()
     val cellCount = readInt(refSize)
     val rootsCount = readInt(refSize)
-    val absentCount = readInt(refSize)
-    val totalCellsSize = readInt(offsetSize)
+    readInt(refSize)
+    readInt(offsetSize)
 
     // Roots
     val rootIndexes = IntArray(rootsCount) {
@@ -164,7 +163,7 @@ private suspend fun createCell(
         cells[refIndex].await()
     }
     val descriptor = descriptors[index]
-    val hashes = cellHashes[index]
+    cellHashes[index]
 //    val cell = if (!descriptors[index].isExotic && hashes != null) {
 //        val new = buildCell {
 //            isExotic = descriptor.isExotic
@@ -255,26 +254,25 @@ private fun serializeBagOfCells(
     }
 
     val serializedCells = cells.mapIndexed { index: Int, cell: Cell ->
-        buildPacket {
-            val (d1, d2) = cell.descriptor
-            writeByte(d1)
-            writeByte(d2)
-            val cellData = cell.bits.toByteArray(
-                augment = (d2 and 1) != 0.toByte()
-            )
+        val serializedCell = buildPacket {
+            val descriptor = cell.descriptor
+            writeByte(descriptor.d1)
+            writeByte(descriptor.d2)
+            val cellData = cell.bits.toByteArray(true)
             writeFully(cellData)
             cell.refs.forEach { reference ->
                 val refIndex = cells.indexOf(reference)
                 writeInt(refIndex, sizeBytes)
             }
-        }
+        }.readBytes()
+        serializedCell
     }
 
     var fullSize = 0
     val sizeIndex = ArrayList<Int>()
     serializedCells.forEach { serializedCell ->
         sizeIndex.add(fullSize)
-        fullSize += serializedCell.remaining.toInt()
+        fullSize += serializedCell.size
     }
     var offsetBytes = 0
     while (fullSize >= (1L shl (offsetBytes shl 3))) {
@@ -312,8 +310,7 @@ private fun serializeBagOfCells(
         }
     }
     serializedCells.forEach { serializedCell ->
-        val bytes = serializedCell.readBytes()
-        writeFully(bytes)
+        writeFully(serializedCell)
     }
 }.readBytes()
 

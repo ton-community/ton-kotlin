@@ -2,11 +2,12 @@ package org.ton.block
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
-import org.ton.cell.invoke
+import org.ton.kotlin.cell.CellContext
 import org.ton.kotlin.currency.VarUInt248
 import org.ton.kotlin.dict.Dictionary
-import org.ton.tlb.*
 import org.ton.tlb.TlbConstructor
+import org.ton.tlb.TlbObject
+import org.ton.tlb.TlbPrettyPrinter
 import org.ton.tlb.providers.TlbConstructorProvider
 
 /**
@@ -16,12 +17,12 @@ public data class CurrencyCollection(
     /**
      * Amount in native currency.
      */
-    val coins: Coins,
+    val coins: Coins = Coins.ZERO,
 
     /**
      * Amounts in other currencies.
      */
-    val other: ExtraCurrencyCollection
+    val other: ExtraCurrencyCollection = ExtraCurrencyCollection.EMPTY
 ) : TlbObject {
     public constructor() : this(Coins.ZERO, ExtraCurrencyCollection.EMPTY)
 
@@ -30,6 +31,12 @@ public data class CurrencyCollection(
     public constructor(coins: Coins, other: Map<Int, VarUInt248>) : this(coins, ExtraCurrencyCollection(other))
 
     public constructor(coins: Coins, other: Dictionary<Int, VarUInt248>) : this(coins, ExtraCurrencyCollection(other))
+
+    public constructor(other: Map<Int, VarUInt248>) : this(Coins.ZERO, ExtraCurrencyCollection(other))
+
+    public constructor(other: Dictionary<Int, VarUInt248>) : this(Coins.ZERO, ExtraCurrencyCollection(other))
+
+    public operator fun get(id: Int): VarUInt248? = other[id]
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("currencies") {
         field("coins", coins)
@@ -60,17 +67,20 @@ private object CurrencyCollectionTlbConstructor : TlbConstructor<CurrencyCollect
     schema = "currencies\$_ coins:Coins other:ExtraCurrencyCollection = CurrencyCollection;"
 ) {
     override fun storeTlb(
-        cellBuilder: CellBuilder, value: CurrencyCollection
-    ) = cellBuilder {
-        storeTlb(Coins, value.coins)
-        storeTlb(ExtraCurrencyCollection, value.other)
+        builder: CellBuilder,
+        value: CurrencyCollection,
+        context: CellContext
+    ) {
+        Coins.storeTlb(builder, value.coins, context)
+        ExtraCurrencyCollection.storeTlb(builder, value.other, context)
     }
 
     override fun loadTlb(
-        cellSlice: CellSlice
-    ): CurrencyCollection = cellSlice {
-        val coins = loadTlb(Coins)
-        val other = loadTlb(ExtraCurrencyCollection)
-        CurrencyCollection(coins, other)
+        slice: CellSlice,
+        context: CellContext
+    ): CurrencyCollection {
+        val coins = Coins.loadTlb(slice, context)
+        val other = ExtraCurrencyCollection.loadTlb(slice, context)
+        return CurrencyCollection(coins, other)
     }
 }

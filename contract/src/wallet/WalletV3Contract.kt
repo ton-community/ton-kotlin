@@ -15,7 +15,6 @@ import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeRef
 import org.ton.tlb.storeTlb
 
 public class WalletV3R2Contract(
@@ -24,7 +23,8 @@ public class WalletV3R2Contract(
 ) : WalletContract {
     public suspend fun getWalletData(): WalletV3R2Data {
         val data =
-            ((liteClient.getAccountState(address).account.value as? AccountInfo)?.storage?.state as? AccountActive)?.value?.data?.value?.value?.beginParse()
+            ((liteClient.getAccountState(address).account.load())?.state as? AccountActive)?.value?.data?.value?.load()
+                ?.beginParse()
         require(data != null) { throw AccountNotInitializedException(address) }
         return WalletV3R2Data.loadTlb(data)
     }
@@ -48,7 +48,7 @@ public class WalletV3R2Contract(
                 walletId,
                 privateKey.publicKey()
             )
-        ).value else null
+        ).load() else null
         val message = transferMessage(
             address = address,
             stateInit = stateInit,
@@ -101,8 +101,10 @@ public class WalletV3R2Contract(
             val dataCell = buildCell {
                 storeTlb(WalletV3R2Data, data)
             }
+            val stateCell = StateInit(CODE, dataCell).toCell()
+
             return CellRef(
-                StateInit(CODE, dataCell),
+                stateCell,
                 StateInit
             )
         }
@@ -122,7 +124,12 @@ public class WalletV3R2Contract(
                 importFee = Coins()
             )
             val maybeStateInit =
-                Maybe.of(stateInit?.let { Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it)) })
+                Maybe.of(stateInit?.let {
+                    Either.of<StateInit, CellRef<StateInit>>(
+                        null,
+                        CellRef(value = it, StateInit)
+                    )
+                })
             val transferBody = createTransferMessageBody(
                 privateKey,
                 walletId,
@@ -130,7 +137,7 @@ public class WalletV3R2Contract(
                 seqno,
                 *transfers
             )
-            val body = Either.of<Cell, CellRef<Cell>>(null, CellRef(transferBody))
+            val body = Either.of<Cell, CellRef<Cell>>(null, CellRef(value = transferBody, AnyTlbConstructor))
             return Message(
                 info = info,
                 init = maybeStateInit,
@@ -154,10 +161,10 @@ public class WalletV3R2Contract(
                     if (gift.sendMode > -1) {
                         sendMode = gift.sendMode
                     }
-                    val intMsg = CellRef(gift.toMessageRelaxed())
+                    val intMsg = CellRef(gift.toMessageRelaxed(), MessageRelaxed.tlbCodec(AnyTlbConstructor))
 
                     storeUInt(sendMode, 8)
-                    storeRef(MessageRelaxed.tlbCodec(AnyTlbConstructor), intMsg)
+                    storeRef(intMsg.cell)
                 }
             }
             val signature = BitString(privateKey.sign(unsignedBody.hash().toByteArray()))

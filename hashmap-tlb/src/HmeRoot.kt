@@ -15,14 +15,8 @@ public data class HmeRoot<T>(
     val root: CellRef<HmEdge<T>>
 ) : HashMapE<T> {
     public constructor(root: Cell, tlbCodec: TlbCodec<HmEdge<T>>) : this(CellRef(root, tlbCodec))
-    public constructor(root: HmEdge<T>) : this(CellRef(root))
 
     override fun iterator(): Iterator<Pair<BitString, T>> = root.value.iterator()
-
-    override fun set(key: BitString, value: T): HmeRoot<T> {
-        val root = root.value.set(key, value)
-        return HmeRoot(root)
-    }
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {
         type("hme_root") {

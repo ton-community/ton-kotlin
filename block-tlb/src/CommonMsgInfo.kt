@@ -23,3 +23,5 @@ private object CommonMsgInfoTlbCombinator : TlbCombinator<CommonMsgInfo>(
     ExtInMsgInfo::class to ExtInMsgInfo,
     ExtOutMsgInfo::class to ExtOutMsgInfo
 )
+
+public val CommonMsgInfo?.value: CurrencyCollection get() = (this as? IntMsgInfo)?.value ?: CurrencyCollection.ZERO

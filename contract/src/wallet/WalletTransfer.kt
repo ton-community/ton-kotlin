@@ -50,6 +50,7 @@ public data class WalletTransfer internal constructor(
             info = msgInfo,
             init = init,
             body = body,
+            bodyCodec = AnyTlbConstructor,
             layout = layout ?: MessageLayout.compute(msgInfo, init, body, AnyTlbConstructor)
         )
     }
@@ -89,11 +90,11 @@ public sealed interface MessageData {
 
     public data class Text(
         public val text: CellRef<MessageText>,
-        override val layout: MessageLayout?
+        override val layout: MessageLayout? = null
     ) : MessageData {
-        public constructor(text: MessageText) : this(CellRef(text, MessageText), null)
+        public constructor(text: MessageText) : this(CellRef(text, MessageText))
 
-        override val body: Cell get() = text.toCell(MessageText)
+        override val body: Cell get() = text.cell
         override val stateInit: CellRef<StateInit>? get() = null
     }
 

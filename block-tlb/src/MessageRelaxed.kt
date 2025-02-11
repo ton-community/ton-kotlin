@@ -20,11 +20,12 @@ public data class MessageRelaxed<X>(
         info: CommonMsgInfoRelaxed,
         init: StateInit?,
         body: X,
+        bodyCodec: TlbCodec<X>,
         layout: MessageLayout
     ) : this(
         info = info,
         init = layout.eitherInit(init).toMaybe(),
-        body = layout.eitherBody(body),
+        body = layout.eitherBody(body, bodyCodec),
     )
 
     override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer {

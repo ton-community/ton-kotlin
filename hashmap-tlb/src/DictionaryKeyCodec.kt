@@ -3,21 +3,12 @@
 package org.ton.kotlin.dict
 
 import org.ton.bitstring.BitString
+import org.ton.cell.CellSlice
+import org.ton.cell.buildCell
 
 public interface DictionaryKeyCodec<K> : DictionaryKeyLoader<K>, DictionaryKeyStorer<K> {
     public companion object {
-        public val INT32: DictionaryKeyCodec<Int> = object : DictionaryKeyCodec<Int> {
-            override val keySize: Int get() = Int.SIZE_BITS
-
-            override fun decodeKey(value: BitString): Int {
-                require(value.size == Int.SIZE_BITS)
-                return value.toHexString().toUInt(16).toInt()
-            }
-
-            override fun encodeKey(value: Int): BitString {
-                return BitString.parse(value.toHexString())
-            }
-        }
+        public val INT32: DictionaryKeyCodec<Int> = int()
 
         public val BITS256: DictionaryKeyCodec<BitString> = object : DictionaryKeyCodec<BitString> {
             override val keySize: Int get() = 256
@@ -30,6 +21,34 @@ public interface DictionaryKeyCodec<K> : DictionaryKeyLoader<K>, DictionaryKeySt
             override fun encodeKey(value: BitString): BitString {
                 require(value.size == 256)
                 return value
+            }
+        }
+
+        public fun long(keySize: Int = Long.SIZE_BITS): DictionaryKeyCodec<Long> = object : DictionaryKeyCodec<Long> {
+            override val keySize: Int = keySize
+
+            override fun decodeKey(value: BitString): Long {
+                return CellSlice(value).loadLong(keySize)
+            }
+
+            override fun encodeKey(value: Long): BitString {
+                return buildCell {
+                    storeLong(value, keySize)
+                }.bits
+            }
+        }
+
+        public fun int(keySize: Int = Int.SIZE_BITS): DictionaryKeyCodec<Int> = object : DictionaryKeyCodec<Int> {
+            override val keySize: Int = keySize
+
+            override fun decodeKey(value: BitString): Int {
+                return CellSlice(value).loadInt(keySize).toInt()
+            }
+
+            override fun encodeKey(value: Int): BitString {
+                return buildCell {
+                    storeInt(value, keySize)
+                }.bits
             }
         }
     }

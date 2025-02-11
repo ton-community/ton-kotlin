@@ -17,7 +17,6 @@ internal data class BlockHeaderResult(
     val stateHash: BitString?
 )
 
-@Serializable
 public data class FullAccountState(
     @SerialName("block_id")
     @get:JvmName("blockId")
@@ -31,7 +30,7 @@ public data class FullAccountState(
     public val lastTransactionId: TransactionId?,
 
     @get:JvmName("account")
-    public val account: CellRef<Account>
+    public val account: CellRef<Account?>
 )
 
 @Serializable

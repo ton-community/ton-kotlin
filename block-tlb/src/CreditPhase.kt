@@ -8,9 +8,7 @@ import org.ton.tlb.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbConstructorProvider
 
-@SerialName("tr_phase_credit")
-
-public data class TrCreditPhase(
+public data class CreditPhase(
     @SerialName("due_fees_collected") val dueFeesCollected: Maybe<Coins>,
     val credit: CurrencyCollection
 ) : TlbObject {
@@ -23,17 +21,17 @@ public data class TrCreditPhase(
 
     override fun toString(): String = print().toString()
 
-    public companion object : TlbConstructorProvider<TrCreditPhase> by TrCreditPhaseTlbConstructor
+    public companion object : TlbConstructorProvider<CreditPhase> by TrCreditPhaseTlbConstructor
 }
 
-private object TrCreditPhaseTlbConstructor : TlbConstructor<TrCreditPhase>(
+private object TrCreditPhaseTlbConstructor : TlbConstructor<CreditPhase>(
     schema = "tr_phase_credit\$_ due_fees_collected:(Maybe Coins) credit:CurrencyCollection = TrCreditPhase;"
 ) {
     val maybeCoins = Maybe.tlbCodec(Coins)
 
     override fun storeTlb(
         cellBuilder: CellBuilder,
-        value: TrCreditPhase
+        value: CreditPhase
     ) = cellBuilder {
         storeTlb(maybeCoins, value.dueFeesCollected)
         storeTlb(CurrencyCollection, value.credit)
@@ -41,9 +39,9 @@ private object TrCreditPhaseTlbConstructor : TlbConstructor<TrCreditPhase>(
 
     override fun loadTlb(
         cellSlice: CellSlice
-    ): TrCreditPhase = cellSlice {
+    ): CreditPhase = cellSlice {
         val dueFeesCollected = loadTlb(maybeCoins)
         val credit = loadTlb(CurrencyCollection)
-        TrCreditPhase(dueFeesCollected, credit)
+        CreditPhase(dueFeesCollected, credit)
     }
 }

@@ -16,8 +16,6 @@ public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
 
     override fun iterator(): Iterator<Pair<BitString, T>>
 
-    public fun set(key: BitString, value: T): HmeRoot<T>
-
     public companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
@@ -28,19 +26,6 @@ public sealed interface HashMapE<T> : Iterable<Pair<BitString, T>>, TlbObject {
 
         @JvmStatic
         public fun <T> root(root: CellRef<HmEdge<T>>): HashMapE<T> = HmeRoot(root)
-
-        public fun <T> fromMap(map: Map<BitString, T>?): HashMapE<T> {
-            var hashMap = empty<T>()
-            if (map == null) return hashMap
-            var i = -1
-            map.forEach { (key, value) ->
-                require(!key.isEmpty()) { "Empty key" }
-                if (i == -1) i = key.size
-                else require(i == key.size) { "Variable length key, expected: $i, actual: (${key.size}) $key" }
-                hashMap = hashMap.set(key, value)
-            }
-            return hashMap
-        }
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic

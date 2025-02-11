@@ -2,6 +2,7 @@ package org.ton.hashmap
 
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.*
 import kotlin.jvm.JvmStatic
 
@@ -112,15 +113,15 @@ private class AhmnLeafTlbConstructor<X, Y>(
 ) : TlbConstructor<HashmapAugNode.AhmnLeaf<X, Y>>(
     schema = "ahmn_leaf#_ {X:Type} {Y:Type} extra:Y value:X = HashmapAugNode 0 X Y"
 ) {
-    override fun loadTlb(cellSlice: CellSlice): HashmapAugNode.AhmnLeaf<X, Y> {
-        val extra = y.loadTlb(cellSlice)
-        val value = x.loadTlb(cellSlice)
+    override fun loadTlb(cellSlice: CellSlice, context: CellContext): HashmapAugNode.AhmnLeaf<X, Y> {
+        val extra = y.loadTlb(cellSlice, context)
+        val value = x.loadTlb(cellSlice, context)
         return AhmnLeafImpl(extra, value)
     }
 
-    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugNode.AhmnLeaf<X, Y>) {
-        y.storeTlb(cellBuilder, value.extra)
-        x.storeTlb(cellBuilder, value.value)
+    override fun storeTlb(cellBuilder: CellBuilder, value: HashmapAugNode.AhmnLeaf<X, Y>, context: CellContext) {
+        y.storeTlb(cellBuilder, value.extra, context)
+        x.storeTlb(cellBuilder, value.value, context)
     }
 }
 
