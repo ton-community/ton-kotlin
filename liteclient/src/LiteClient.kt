@@ -33,6 +33,7 @@ import org.ton.lite.client.internal.FullAccountState
 import org.ton.lite.client.internal.TransactionId
 import org.ton.lite.client.internal.TransactionInfo
 import org.ton.tlb.CellRef
+import org.ton.tlb.NullableTlbCodec
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeTlb
 import kotlin.coroutines.CoroutineContext
@@ -346,7 +347,12 @@ public class LiteClient(
             throw IllegalStateException("Can't deserialize account state", e)
         }
         if (root.isEmpty()) {
-            return FullAccountState(rawAccountState.shardBlock, accountAddress, null, CellRef(null, Account))
+            return FullAccountState(
+                rawAccountState.shardBlock,
+                accountAddress,
+                null,
+                CellRef(null, NullableTlbCodec(Account))
+            )
         }
 
         check(rawAccountState.id == blockId || rawAccountState.id.seqno == 0) {
