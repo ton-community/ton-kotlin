@@ -4,9 +4,9 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bigint.BigInt
 import org.ton.block.Coins
 import org.ton.block.MsgAddressInt
-import org.ton.block.balance
 import org.ton.contract.wallet.MessageData
 import org.ton.contract.wallet.WalletTransfer
+import org.ton.kotlin.account.balance
 import org.ton.kotlin.examples.contract.WalletV1R3Contract
 import org.ton.kotlin.examples.provider.Provider
 

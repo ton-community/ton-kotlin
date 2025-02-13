@@ -6,6 +6,7 @@ import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.kotlin.account.Account
 import org.ton.lite.client.internal.BlockHeaderResult
 import org.ton.lite.client.internal.FullAccountState
 import org.ton.lite.client.internal.TransactionId

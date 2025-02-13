@@ -8,6 +8,7 @@ import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.*
 import org.ton.contract.wallet.WalletTransfer
+import org.ton.kotlin.account.Account
 import org.ton.kotlin.cell.CellContext
 import org.ton.kotlin.examples.provider.Provider
 import org.ton.kotlin.message.MessageLayout

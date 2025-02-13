@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
-import org.ton.block.Account
 import org.ton.block.MsgAddressInt
-import org.ton.block.Transaction
+import org.ton.kotlin.account.Account
+import org.ton.kotlin.transaction.Transaction
 import org.ton.tlb.CellRef
 import kotlin.jvm.JvmName
 

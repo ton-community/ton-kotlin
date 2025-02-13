@@ -7,11 +7,16 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.*
 import org.ton.contract.wallet.MessageData
 import org.ton.contract.wallet.WalletTransfer
+import org.ton.kotlin.account.Account
+import org.ton.kotlin.account.balance
 import org.ton.kotlin.currency.VarUInt248
 import org.ton.kotlin.examples.contract.WalletV1R3Contract
 import org.ton.kotlin.examples.faucet.TestnetFaucet
 import org.ton.kotlin.examples.provider.LiteClientProvider
 import org.ton.kotlin.examples.provider.liteClientTestnet
+import org.ton.kotlin.transaction.Transaction
+import org.ton.kotlin.transaction.TransactionInfo
+import org.ton.kotlin.transaction.phase.BouncePhase
 
 private val provider = LiteClientProvider(liteClientTestnet())
 private val swapAddress = AddrStd("kQC_rkxBuZDwS81yvMSLzeXBNLCGFNofm0avwlMfNXCwoOgr")
@@ -57,7 +62,7 @@ suspend fun WalletV1R3Contract.waitForExtraCurrency(
         for (cellTx in provider.getTransactions(address, fromTxLt, fromTxHash)) {
             val tx = cellTx.load()
             (tx.inMsg?.load()?.info as? IntMsgInfo)?.value?.get(id) ?: continue
-            val info = tx.loadInfo()
+            val info = tx.loadInfo() as? TransactionInfo.Ordinary ?: continue
             if (info.bouncePhase !is BouncePhase.Executed) {
                 return tx
             }

@@ -1,17 +1,20 @@
-package org.ton.block
+@file:Suppress("PackageDirectoryMismatch")
 
+package org.ton.kotlin.transaction.phase
+
+import org.ton.block.Coins
+import org.ton.block.StorageUsedShort
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.TlbCodec
-import org.ton.tlb.loadTlb
-import org.ton.tlb.storeTlb
 
 /**
  * Bounce phase info.
  *
  * At this phase, some funds are returned to the sender.
  *
- * @see [TransactionInfo]
+ * @see [org.ton.kotlin.transaction.TransactionInfo]
  */
 public sealed interface BouncePhase {
     public val forwardFees: Coins
@@ -38,17 +41,17 @@ public sealed interface BouncePhase {
         /**
          * The total number of unique cells (bits / refs) of the bounced message.
          */
-        val msgSize: StorageUsedShort = StorageUsedShort.ZERO,
+        val msgSize: StorageUsedShort = StorageUsedShort.Companion.ZERO,
 
         /**
          * The part of fees for the validators.
          */
-        val forwardFeesCollected: Coins = Coins.ZERO,
+        val forwardFeesCollected: Coins = Coins.Companion.ZERO,
 
         /**
          * Message forwarding fee.
          */
-        override val forwardFees: Coins = Coins.ZERO,
+        override val forwardFees: Coins = Coins.Companion.ZERO,
     ) : BouncePhase
 
     public companion object : TlbCodec<BouncePhase> by BouncePhaseCodec
@@ -57,24 +60,24 @@ public sealed interface BouncePhase {
 private object BouncePhaseCodec : TlbCodec<BouncePhase> {
     private val ZERO = BouncePhase.Executed()
 
-    override fun storeTlb(builder: CellBuilder, value: BouncePhase) {
+    override fun storeTlb(builder: CellBuilder, value: BouncePhase, context: CellContext) {
         when (value) {
             is BouncePhase.Executed -> { // tr_phase_bounce_ok$1
                 builder.storeBoolean(true)
-                builder.storeTlb(StorageUsedShort, value.msgSize) // msg_size:StorageUsed
-                builder.storeTlb(Coins, value.forwardFeesCollected) // msg_fees:Coins
-                builder.storeTlb(Coins, value.forwardFees) // fwd_fees:Coins
+                StorageUsedShort.storeTlb(builder, value.msgSize, context)
+                Coins.storeTlb(builder, value.forwardFeesCollected, context)
+                Coins.storeTlb(builder, value.forwardFees, context)
             }
 
             is BouncePhase.NoFunds -> { // tr_phase_bounce_nofunds$01
                 builder.storeUInt(0b01, 2)
-                builder.storeTlb(StorageUsedShort, value.msgSize) // msg_size:StorageUsed
-                builder.storeTlb(Coins, value.forwardFees) // req_fwd_fees:Coins
+                StorageUsedShort.storeTlb(builder, value.msgSize, context)
+                Coins.storeTlb(builder, value.forwardFees, context)
             }
         }
     }
 
-    override fun loadTlb(slice: CellSlice): BouncePhase {
+    override fun loadTlb(slice: CellSlice, context: CellContext): BouncePhase {
         when (val tag = slice.preloadUInt(2).toInt()) {
             0b00 -> {
                 slice.skipBits(2)
@@ -83,15 +86,15 @@ private object BouncePhaseCodec : TlbCodec<BouncePhase> {
 
             0b01 -> { // tr_phase_bounce_nofunds$01
                 slice.skipBits(2)
-                val msgSize = slice.loadTlb(StorageUsedShort)
-                val forwardFees = slice.loadTlb(Coins)
+                val msgSize = StorageUsedShort.loadTlb(slice, context)
+                val forwardFees = Coins.loadTlb(slice, context)
                 return BouncePhase.NoFunds(msgSize, forwardFees)
             }
 
             0b10, 0b11 -> { // tr_phase_bounce_ok$1
                 slice.skipBits(1)
-                val msgSize = slice.loadTlb(StorageUsedShort)
-                val forwardFees = slice.loadTlb(Coins)
+                val msgSize = StorageUsedShort.loadTlb(slice, context)
+                val forwardFees = Coins.loadTlb(slice, context)
                 return BouncePhase.Executed(msgSize, forwardFees)
             }
 

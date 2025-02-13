@@ -11,7 +11,6 @@ public open class Dictionary<K, V>(
     public val dict: RawDictionary,
     protected val keyCodec: DictionaryKeyCodec<K>,
     protected val valueCodec: TlbCodec<V>,
-    protected val context: CellContext = CellContext.EMPTY
 ) : Map<K, V> {
     init {
         require(dict.keySize == keyCodec.keySize)
@@ -21,12 +20,10 @@ public open class Dictionary<K, V>(
         cell: Cell?,
         keyCodec: DictionaryKeyCodec<K>,
         valueCodec: TlbCodec<V>,
-        context: CellContext = CellContext.EMPTY
     ) : this(
         RawDictionary(cell, keyCodec.keySize),
         keyCodec,
         valueCodec,
-        context
     )
 
     public constructor(
@@ -43,22 +40,20 @@ public open class Dictionary<K, V>(
             val bitString = keyCodec.encodeKey(key)
             set(bitString, slice, context)
         }
-    }, keyCodec, valueCodec, context)
+    }, keyCodec, valueCodec)
 
     public constructor(
         dictionary: Dictionary<K, V>,
-        context: CellContext = CellContext.EMPTY
     ) : this(
         dictionary.dict.root,
         dictionary.keyCodec,
         dictionary.valueCodec,
-        context
     )
 
     public val cell: Cell? get() = dict.root
 
     override val size: Int
-        get() = dict.iterator(context).asSequence().count()
+        get() = dict.iterator().asSequence().count()
 
     override val keys: Set<K>
         get() = loadKeys().toSet()
@@ -69,19 +64,19 @@ public open class Dictionary<K, V>(
     override val entries: Set<Map.Entry<K, V>>
         get() = loadEntries().toSet()
 
-    public fun loadEntries(context: CellContext = this.context): Sequence<Map.Entry<K, V>> =
+    public fun loadEntries(context: CellContext = CellContext.EMPTY): Sequence<Map.Entry<K, V>> =
         dict.iterator(context).asSequence().map { (key, value) ->
             val value = valueCodec.loadTlb(value, context)
             val key = keyCodec.decodeKey(key)
             DictEntry(key, value)
         }
 
-    public fun loadKeys(context: CellContext = this.context): Sequence<K> =
+    public fun loadKeys(context: CellContext = CellContext.EMPTY): Sequence<K> =
         dict.iterator(context).asSequence().map { (key, _) ->
             keyCodec.decodeKey(key)
         }
 
-    public fun loadValues(context: CellContext = this.context): Sequence<V> =
+    public fun loadValues(context: CellContext = CellContext.EMPTY): Sequence<V> =
         dict.iterator(context).asSequence().map { (_, value) ->
             valueCodec.loadTlb(value, context)
         }
@@ -98,18 +93,18 @@ public open class Dictionary<K, V>(
         return loadValues().contains(value)
     }
 
-    override fun get(key: K): V? = get(key, context)
+    override fun get(key: K): V? = get(key, CellContext.EMPTY)
 
-    public fun get(key: K, context: CellContext = this.context): V? {
+    public fun get(key: K, context: CellContext = CellContext.EMPTY): V? {
         return valueCodec.loadTlb(dict.get(keyCodec.encodeKey(key), context) ?: return null, context)
     }
 
-    public fun toMap(context: CellContext = this.context): Map<K, V> {
+    public fun toMap(context: CellContext = CellContext.EMPTY): Map<K, V> {
         if (dict.isEmpty()) return emptyMap()
         return toMap(LinkedHashMap<K, V>(), context)
     }
 
-    public fun <M : MutableMap<in K, in V>> toMap(destination: M, context: CellContext = this.context): M {
+    public fun <M : MutableMap<in K, in V>> toMap(destination: M, context: CellContext = CellContext.EMPTY): M {
         if (dict.isEmpty()) return destination
         dict.iterator(context).forEach { (key, value) ->
             val value = valueCodec.loadTlb(value, context)

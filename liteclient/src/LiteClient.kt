@@ -21,6 +21,8 @@ import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellType
 import org.ton.crypto.crc16
+import org.ton.kotlin.account.Account
+import org.ton.kotlin.transaction.Transaction
 import org.ton.lite.api.LiteApiClient
 import org.ton.lite.api.exception.LiteServerException
 import org.ton.lite.api.exception.LiteServerNotReadyException
