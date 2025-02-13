@@ -1,11 +1,16 @@
-@file:Suppress("OPT_IN_USAGE")
+@file:Suppress("OPT_IN_USAGE", "PackageDirectoryMismatch")
 
-package org.ton.block
+package org.ton.kotlin.transaction
 
+import org.ton.block.SplitMergeInfo
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.storeRef
-import org.ton.tlb.*
+import org.ton.kotlin.cell.CellContext
+import org.ton.kotlin.transaction.phase.*
+import org.ton.tlb.CellRef
+import org.ton.tlb.NullableTlbCodec
+import org.ton.tlb.TlbCodec
 
 /**
  * Detailed transaction info.
@@ -13,33 +18,6 @@ import org.ton.tlb.*
  * @see [Transaction]
  */
 public sealed interface TransactionInfo {
-    /**
-     * Storage phase info.
-     */
-    public val storagePhase: StoragePhase?
-
-    /**
-     * Credit phase info.
-     */
-    public val creditPhase: CreditPhase?
-
-    /**
-     * Compute phase info.
-     */
-    public val computePhase: ComputePhase?
-
-    /**
-     * Action phase info.
-     */
-    public val actionPhase: ActionPhase?
-
-    /**
-     * Bounce phase info.
-     *
-     * Only present in [Ordinary] transaction and if the incoming [Message] had `bounce: true` and
-     * the compute phase failed.
-     */
-    public val bouncePhase: BouncePhase?
 
     /**
      * Ordinary transaction info.
@@ -57,26 +35,26 @@ public sealed interface TransactionInfo {
          *
          * Skipped if the account did not exist prior to execution.
          */
-        override val storagePhase: StoragePhase?,
+        val storagePhase: StoragePhase?,
 
         /**
          * Credit phase info.
          *
          * Skipped if the incoming message is external.
          */
-        override val creditPhase: CreditPhase?,
+        val creditPhase: CreditPhase?,
 
         /**
          * Compute phase info.
          */
-        override val computePhase: ComputePhase,
+        val computePhase: ComputePhase,
 
         /**
          * Action phase info.
          *
          * Skipped if the transaction was aborted at the compute phase.
          */
-        override val actionPhase: ActionPhase?,
+        val actionPhase: ActionPhase?,
 
         /**
          * Whether the transaction was reverted.
@@ -89,7 +67,7 @@ public sealed interface TransactionInfo {
          * Only present if the incoming message had `bounce: true` and
          * the compute phase failed.
          */
-        override val bouncePhase: BouncePhase?,
+        val bouncePhase: BouncePhase?,
 
         /**
          * Whether the account was destroyed during this transaction.
@@ -106,19 +84,19 @@ public sealed interface TransactionInfo {
         /**
          * Storage phase info.
          */
-        override val storagePhase: StoragePhase,
+        val storagePhase: StoragePhase,
 
         /**
          * Compute phase info.
          */
-        override val computePhase: ComputePhase,
+        val computePhase: ComputePhase,
 
         /**
          * Action phase info.
          *
          * Skipped if the transaction was aborted at the compute phase.
          */
-        override val actionPhase: ActionPhase?,
+        val actionPhase: ActionPhase?,
 
         /**
          * Whether the transaction was reverted.
@@ -131,8 +109,6 @@ public sealed interface TransactionInfo {
         val isDestroyed: Boolean
     ) : TransactionInfo {
         val isTick: Boolean get() = !isTock
-        override val creditPhase: CreditPhase? get() = null
-        override val bouncePhase: BouncePhase? get() = null
     }
 
     /**
@@ -145,13 +121,8 @@ public sealed interface TransactionInfo {
         /**
          * Storage phase info.
          */
-        override val storagePhase: StoragePhase,
-    ) : TransactionInfo {
-        override val creditPhase: CreditPhase? get() = null
-        override val computePhase: ComputePhase? get() = null
-        override val actionPhase: ActionPhase? get() = null
-        override val bouncePhase: BouncePhase? get() = null
-    }
+        val storagePhase: StoragePhase,
+    ) : TransactionInfo
 
     /**
      * Split prepare transaction info.
@@ -161,15 +132,12 @@ public sealed interface TransactionInfo {
     @Deprecated("Not implemented in TON Blockchain")
     public data class SplitPrepare(
         val splitInfo: SplitMergeInfo,
-        override val storagePhase: StoragePhase?,
-        override val computePhase: ComputePhase,
-        override val actionPhase: ActionPhase?,
+        val storagePhase: StoragePhase?,
+        val computePhase: ComputePhase,
+        val actionPhase: ActionPhase?,
         val isAborted: Boolean,
         val isDestroyed: Boolean
-    ) : TransactionInfo {
-        override val creditPhase: CreditPhase? get() = null
-        override val bouncePhase: BouncePhase? get() = null
-    }
+    ) : TransactionInfo
 
     /**
      * Split install transaction info.
@@ -181,13 +149,7 @@ public sealed interface TransactionInfo {
         val splitInfo: SplitMergeInfo,
         val prepareTransaction: CellRef<Transaction>,
         val isInstalled: Boolean,
-    ) : TransactionInfo {
-        override val storagePhase: StoragePhase? get() = null
-        override val creditPhase: CreditPhase? get() = null
-        override val computePhase: ComputePhase? get() = null
-        override val actionPhase: ActionPhase? get() = null
-        override val bouncePhase: BouncePhase? get() = null
-    }
+    ) : TransactionInfo
 
     /**
      * Merge-prepare transaction info.
@@ -197,14 +159,9 @@ public sealed interface TransactionInfo {
     @Deprecated("Not implemented in TON Blockchain")
     public data class MergePrepare(
         val splitInfo: SplitMergeInfo,
-        override val storagePhase: StoragePhase,
+        val storagePhase: StoragePhase,
         val isAborted: Boolean,
-    ) : TransactionInfo {
-        override val creditPhase: CreditPhase? get() = null
-        override val computePhase: ComputePhase? get() = null
-        override val actionPhase: ActionPhase? get() = null
-        override val bouncePhase: BouncePhase? get() = null
-    }
+    ) : TransactionInfo
 
     /**
      * Merge-install transaction info.
@@ -215,70 +172,120 @@ public sealed interface TransactionInfo {
     public data class MergeInstall(
         val splitInfo: SplitMergeInfo,
         val prepareTransaction: CellRef<Transaction>,
-        override val storagePhase: StoragePhase?,
-        override val creditPhase: CreditPhase?,
-        override val computePhase: ComputePhase,
-        override val actionPhase: ActionPhase?,
+        val storagePhase: StoragePhase?,
+        val creditPhase: CreditPhase?,
+        val computePhase: ComputePhase,
+        val actionPhase: ActionPhase?,
         val isAborted: Boolean,
         val isDestroyed: Boolean
-    ) : TransactionInfo {
-        override val bouncePhase: BouncePhase? get() = null
-    }
+    ) : TransactionInfo
 
     public companion object : TlbCodec<TransactionInfo> by TransactionInfoCodec
 }
 
 private object TransactionInfoCodec : TlbCodec<TransactionInfo> {
-    private val maybeStoragePhase = StoragePhase.asNullable()
-    private val maybeCreditPhase = CreditPhase.asNullable()
-    private val maybeRefActionPhase = CellRef.tlbCodec(ActionPhase).asNullable()
-    private val maybeBouncePhase = BouncePhase.asNullable()
+    private val maybeStoragePhase = NullableTlbCodec(StoragePhase)
+    private val maybeCreditPhase = NullableTlbCodec(CreditPhase)
+    private val maybeBouncePhase = NullableTlbCodec(BouncePhase)
 
-    @Suppress("DEPRECATION")
-    override fun storeTlb(builder: CellBuilder, value: TransactionInfo) {
-        when (value) {
-            is TransactionInfo.Ordinary -> { // trans_ord$0000
-                builder.storeUInt(0b0000, 4)
-                builder.storeBoolean(value.isCreditFirst)
-                builder.storeTlb(maybeStoragePhase, value.storagePhase)
-                builder.storeTlb(maybeCreditPhase, value.creditPhase)
-                builder.storeTlb(ComputePhase, value.computePhase)
-                val actionPhase = value.actionPhase
-                if (actionPhase != null) {
-                    builder.storeBoolean(true)
-                    builder.storeRef {
-                        storeTlb(ActionPhase, actionPhase)
-                    }
-                } else {
-                    builder.storeBoolean(false)
-                }
-                builder.storeBoolean(value.isAborted)
-                builder.storeTlb(maybeBouncePhase, value.bouncePhase)
-                builder.storeBoolean(value.isDestroyed)
+    private fun CellBuilder.storeMaybeRefActionPhase(actionPhase: ActionPhase?, context: CellContext) {
+        if (actionPhase != null) {
+            storeBoolean(true)
+            storeRef(context) {
+                ActionPhase.storeTlb(this, actionPhase, context)
             }
+        } else {
+            storeBoolean(false)
+        }
+    }
 
-            is TransactionInfo.TickTock -> TODO()
-            is TransactionInfo.MergeInstall -> TODO()
-            is TransactionInfo.MergePrepare -> TODO()
-            is TransactionInfo.SplitInstall -> TODO()
-            is TransactionInfo.SplitPrepare -> TODO()
-            is TransactionInfo.Storage -> TODO()
+    private fun CellSlice.loadMaybeRefActionPhase(context: CellContext): ActionPhase? {
+        return if (loadBoolean()) {
+            ActionPhase.loadTlb(context.loadCell(loadRef()).beginParse(), context)
+        } else {
+            null
         }
     }
 
     @Suppress("DEPRECATION")
-    override fun loadTlb(slice: CellSlice): TransactionInfo {
+    override fun storeTlb(builder: CellBuilder, value: TransactionInfo, context: CellContext) {
+        when (value) {
+            is TransactionInfo.Ordinary -> { // trans_ord$0000
+                builder.storeUInt(0b0000, 4)
+                builder.storeBoolean(value.isCreditFirst)
+                maybeStoragePhase.storeTlb(builder, value.storagePhase, context)
+                maybeCreditPhase.storeTlb(builder, value.creditPhase, context)
+                ComputePhase.storeTlb(builder, value.computePhase, context)
+                builder.storeMaybeRefActionPhase(value.actionPhase, context)
+                builder.storeBoolean(value.isAborted)
+                maybeBouncePhase.storeTlb(builder, value.bouncePhase, context)
+                builder.storeBoolean(value.isDestroyed)
+            }
+
+            is TransactionInfo.TickTock -> {
+                builder.storeUInt(if (value.isTock) 0b0001 else 0b0000, 4)
+                StoragePhase.storeTlb(builder, value.storagePhase, context)
+                ComputePhase.storeTlb(builder, value.computePhase, context)
+
+                builder.storeBoolean(value.isAborted)
+                builder.storeBoolean(value.isDestroyed)
+            }
+
+            is TransactionInfo.SplitPrepare -> {
+                builder.storeUInt(0b1000, 4)
+                SplitMergeInfo.storeTlb(builder, value.splitInfo, context)
+                maybeStoragePhase.storeTlb(builder, value.storagePhase, context)
+                ComputePhase.storeTlb(builder, value.computePhase, context)
+                builder.storeMaybeRefActionPhase(value.actionPhase, context)
+                builder.storeBoolean(value.isAborted)
+                builder.storeBoolean(value.isDestroyed)
+            }
+
+            is TransactionInfo.SplitInstall -> {
+                builder.storeUInt(0b0101, 4)
+                SplitMergeInfo.storeTlb(builder, value.splitInfo, context)
+                builder.storeRef(value.prepareTransaction.cell)
+                builder.storeBoolean(value.isInstalled)
+            }
+
+            is TransactionInfo.MergePrepare -> {
+                builder.storeUInt(0b0110, 4)
+                SplitMergeInfo.storeTlb(builder, value.splitInfo, context)
+                StoragePhase.storeTlb(builder, value.storagePhase, context)
+                builder.storeBoolean(value.isAborted)
+            }
+
+            is TransactionInfo.MergeInstall -> {
+                builder.storeUInt(0b0111, 4)
+                SplitMergeInfo.storeTlb(builder, value.splitInfo, context)
+                builder.storeRef(value.prepareTransaction.cell)
+                maybeStoragePhase.storeTlb(builder, value.storagePhase, context)
+                maybeCreditPhase.storeTlb(builder, value.creditPhase, context)
+                ComputePhase.storeTlb(builder, value.computePhase, context)
+                builder.storeMaybeRefActionPhase(value.actionPhase, context)
+                builder.storeBoolean(value.isAborted)
+                builder.storeBoolean(value.isDestroyed)
+            }
+
+            is TransactionInfo.Storage -> {
+                builder.storeUInt(0b0001, 4)
+                StoragePhase.storeTlb(builder, value.storagePhase, context)
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun loadTlb(slice: CellSlice, context: CellContext): TransactionInfo {
         when (val tag = getTag(slice)) {
             0b0000 -> { // trans_ord$0000
                 slice.bitsPosition += 4
                 val isCreditFirst = slice.loadBoolean()
-                val storagePhase = slice.loadTlb(maybeStoragePhase)
-                val creditPhase = slice.loadTlb(maybeCreditPhase)
-                val computePhase = slice.loadTlb(ComputePhase)
-                val actionPhase = slice.loadTlb(maybeRefActionPhase)?.load()
+                val storagePhase = maybeStoragePhase.loadTlb(slice, context)
+                val creditPhase = maybeCreditPhase.loadTlb(slice, context)
+                val computePhase = ComputePhase.loadTlb(slice, context)
+                val actionPhase = slice.loadMaybeRefActionPhase(context)
                 val isAborted = slice.loadBoolean()
-                val bouncePhase = slice.loadTlb(maybeBouncePhase)
-                println("bounce: $bouncePhase")
+                val bouncePhase = maybeBouncePhase.loadTlb(slice, context)
                 val isDestroyed = slice.loadBoolean()
                 return TransactionInfo.Ordinary(
                     isCreditFirst,
@@ -294,16 +301,16 @@ private object TransactionInfoCodec : TlbCodec<TransactionInfo> {
 
             0b0001 -> { // trans_storage$0001
                 slice.bitsPosition += 4
-                val storagePhase = slice.loadTlb(StoragePhase)
+                val storagePhase = StoragePhase.loadTlb(slice, context)
                 return TransactionInfo.Storage(storagePhase)
             }
 
             0b0010 -> { // trans_tick_tock$001
                 slice.bitsPosition += 3
                 val isTock = slice.loadBoolean()
-                val storagePhase = slice.loadTlb(StoragePhase)
-                val computePhase = slice.loadTlb(ComputePhase)
-                val actionPhase = slice.loadTlb(maybeRefActionPhase)?.load()
+                val storagePhase = StoragePhase.loadTlb(slice, context)
+                val computePhase = ComputePhase.loadTlb(slice, context)
+                val actionPhase = slice.loadMaybeRefActionPhase(context)
                 val isAborted = slice.loadBoolean()
                 val isDestroyed = slice.loadBoolean()
                 return TransactionInfo.TickTock(isTock, storagePhase, computePhase, actionPhase, isAborted, isDestroyed)
@@ -311,10 +318,10 @@ private object TransactionInfoCodec : TlbCodec<TransactionInfo> {
 
             0b0100 -> { // trans_split_prepare$0100
                 slice.bitsPosition += 4
-                val splitInfo = slice.loadTlb(SplitMergeInfo)
-                val storagePhase = slice.loadTlb(maybeStoragePhase)
-                val computePhase = slice.loadTlb(ComputePhase)
-                val actionPhase = slice.loadTlb(maybeRefActionPhase)?.load()
+                val splitInfo = SplitMergeInfo.loadTlb(slice, context)
+                val storagePhase = maybeStoragePhase.loadTlb(slice, context)
+                val computePhase = ComputePhase.loadTlb(slice, context)
+                val actionPhase = slice.loadMaybeRefActionPhase(context)
                 val isAborted = slice.loadBoolean()
                 val isDestroyed = slice.loadBoolean()
                 return TransactionInfo.SplitPrepare(
@@ -329,7 +336,7 @@ private object TransactionInfoCodec : TlbCodec<TransactionInfo> {
 
             0b0101 -> { // trans_split_install$0101
                 slice.bitsPosition += 4
-                val splitInfo = slice.loadTlb(SplitMergeInfo)
+                val splitInfo = SplitMergeInfo.loadTlb(slice, context)
                 val prepareTransaction = CellRef(slice.loadRef(), Transaction)
                 val isInstalled = slice.loadBoolean()
                 return TransactionInfo.SplitInstall(splitInfo, prepareTransaction, isInstalled)
@@ -337,20 +344,20 @@ private object TransactionInfoCodec : TlbCodec<TransactionInfo> {
 
             0b0110 -> { // trans_merge_prepare$0110
                 slice.bitsPosition += 4
-                val splitInfo = slice.loadTlb(SplitMergeInfo)
-                val storagePhase = slice.loadTlb(StoragePhase)
+                val splitInfo = SplitMergeInfo.loadTlb(slice, context)
+                val storagePhase = StoragePhase.loadTlb(slice, context)
                 val isAborted = slice.loadBoolean()
                 return TransactionInfo.MergePrepare(splitInfo, storagePhase, isAborted)
             }
 
             0b0111 -> { // trans_merge_install$0111
                 slice.bitsPosition += 4
-                val splitInfo = slice.loadTlb(SplitMergeInfo)
+                val splitInfo = SplitMergeInfo.loadTlb(slice, context)
                 val prepareTransaction = CellRef(slice.loadRef(), Transaction)
-                val storagePhase = slice.loadTlb(maybeStoragePhase)
-                val creditPhase = slice.loadTlb(maybeCreditPhase)
-                val computePhase = slice.loadTlb(ComputePhase)
-                val actionPhase = slice.loadTlb(maybeRefActionPhase)?.load()
+                val storagePhase = maybeStoragePhase.loadTlb(slice, context)
+                val creditPhase = maybeCreditPhase.loadTlb(slice, context)
+                val computePhase = ComputePhase.loadTlb(slice, context)
+                val actionPhase = slice.loadMaybeRefActionPhase(context)
                 val isAborted = slice.loadBoolean()
                 val isDestroyed = slice.loadBoolean()
                 return TransactionInfo.MergeInstall(

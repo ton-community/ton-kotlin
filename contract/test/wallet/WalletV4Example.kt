@@ -4,9 +4,9 @@ import io.github.andreypfau.kotlinx.crypto.sha2.sha256
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.ton.api.pk.PrivateKeyEd25519
-import org.ton.block.Account
 import org.ton.block.AddrStd
 import org.ton.block.Coins
+import org.ton.kotlin.account.Account
 import kotlin.test.Test
 
 class WalletV4Example {

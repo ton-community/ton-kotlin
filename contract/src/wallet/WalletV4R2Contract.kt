@@ -13,6 +13,7 @@ import org.ton.cell.buildCell
 import org.ton.contract.exception.AccountNotInitializedException
 import org.ton.contract.wallet.WalletContract.Companion.DEFAULT_WALLET_ID
 import org.ton.hashmap.HashMapE
+import org.ton.kotlin.account.Account
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.TlbConstructor

@@ -1,4 +1,6 @@
-package org.ton.block
+@file:Suppress("PackageDirectoryMismatch")
+
+package org.ton.kotlin.account
 
 import kotlinx.io.bytestring.ByteString
 import org.ton.cell.CellBuilder
@@ -6,10 +8,8 @@ import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.kotlin.cell.CellContext
 import org.ton.tlb.CellRef
-import org.ton.tlb.TlbConstructor
-import org.ton.tlb.TlbObject
-import org.ton.tlb.TlbPrettyPrinter
-import org.ton.tlb.providers.TlbConstructorProvider
+import org.ton.tlb.NullableTlbCodec
+import org.ton.tlb.TlbCodec
 
 /**
  * Shard accounts entry.
@@ -29,7 +29,7 @@ public data class ShardAccount(
      * The exact logical time of the last transaction.
      */
     val lastTransLt: Long
-) : TlbObject {
+) {
 
     /**
      * Load account data from cell.
@@ -37,14 +37,6 @@ public data class ShardAccount(
     public fun loadAccount(context: CellContext = CellContext.EMPTY): Account? {
         return account.load(context)
     }
-
-    override fun print(printer: TlbPrettyPrinter): TlbPrettyPrinter = printer.type("account_descr") {
-        field("account", account)
-        field("last_trans_hash", lastTransHash)
-        field("last_trans_lt", lastTransLt)
-    }
-
-    override fun toString(): String = print().toString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -63,12 +55,12 @@ public data class ShardAccount(
         return result
     }
 
-    public companion object : TlbConstructorProvider<ShardAccount> by ShardAccountTlbConstructor
+    public companion object : TlbCodec<ShardAccount> by ShardAccountTlbConstructor
 }
 
-private object ShardAccountTlbConstructor : TlbConstructor<ShardAccount>(
-    schema = "account_descr\$_ account:^Account last_trans_hash:bits256 last_trans_lt:uint64 = ShardAccount;"
-) {
+private object ShardAccountTlbConstructor : TlbCodec<ShardAccount> {
+    private val maybeAccount = NullableTlbCodec(Account)
+
     override fun storeTlb(
         cellBuilder: CellBuilder,
         value: ShardAccount
@@ -81,7 +73,7 @@ private object ShardAccountTlbConstructor : TlbConstructor<ShardAccount>(
     override fun loadTlb(
         cellSlice: CellSlice
     ): ShardAccount = cellSlice {
-        val account = CellRef(loadRef(), Account)
+        val account = CellRef(loadRef(), maybeAccount)
         val lastTransHash = loadByteString(32)
         val lastTransLt = loadULong().toLong()
         ShardAccount(account, lastTransHash, lastTransLt)

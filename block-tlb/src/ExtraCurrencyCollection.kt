@@ -23,16 +23,16 @@ public class ExtraCurrencyCollection : Dictionary<Int, VarUInt248> {
         map, DictionaryKeyCodec.INT32, VarUInt248, context
     )
 
-    public constructor(cell: Cell?, context: CellContext = CellContext.EMPTY) : super(
-        cell, DictionaryKeyCodec.INT32, VarUInt248, context
+    public constructor(cell: Cell?) : super(
+        cell, DictionaryKeyCodec.INT32, VarUInt248
     )
 
-    public constructor(rawDictionary: RawDictionary, context: CellContext = CellContext.EMPTY) : super(
-        rawDictionary, DictionaryKeyCodec.INT32, VarUInt248, context
+    public constructor(rawDictionary: RawDictionary) : super(
+        rawDictionary, DictionaryKeyCodec.INT32, VarUInt248
     )
 
-    public constructor(dictionary: Dictionary<Int, VarUInt248>, context: CellContext = CellContext.EMPTY) : super(
-        dictionary.dict.root, DictionaryKeyCodec.INT32, VarUInt248, context
+    public constructor(dictionary: Dictionary<Int, VarUInt248>) : super(
+        dictionary.dict.root, DictionaryKeyCodec.INT32, VarUInt248
     )
 
     override fun equals(other: Any?): Boolean {
@@ -65,6 +65,6 @@ private object ExtraCurrencyCollectionTlbConstructor : TlbConstructor<ExtraCurre
         context: CellContext
     ): ExtraCurrencyCollection {
         val cell = slice.loadNullableRef()
-        return ExtraCurrencyCollection(cell, context)
+        return ExtraCurrencyCollection(cell)
     }
 }

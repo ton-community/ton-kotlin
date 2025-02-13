@@ -6,10 +6,12 @@ import org.ton.bitstring.toBitString
 import org.ton.block.*
 import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
+import org.ton.kotlin.account.Account
 import org.ton.lite.client.internal.BlockHeaderResult
 import org.ton.lite.client.internal.FullAccountState
 import org.ton.lite.client.internal.TransactionId
 import org.ton.tlb.CellRef
+import org.ton.tlb.NullableTlbCodec
 
 internal object CheckProofUtils {
     fun checkBlockHeaderProof(
@@ -40,7 +42,7 @@ internal object CheckProofUtils {
         address: MsgAddressInt,
         root: Cell
     ): FullAccountState {
-        val account = CellRef(root, Account)
+        val account = CellRef(root, NullableTlbCodec(Account))
 
         val qRoots = BagOfCells(proof).roots.toList()
         check(qRoots.size == 2) {

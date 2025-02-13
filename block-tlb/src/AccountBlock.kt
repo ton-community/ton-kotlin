@@ -6,10 +6,10 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.cell.invoke
 import org.ton.hashmap.HashmapAug
+import org.ton.kotlin.transaction.Transaction
 import org.ton.tlb.*
 import org.ton.tlb.TlbConstructor
 import org.ton.tlb.providers.TlbCombinatorProvider
-
 
 @SerialName("acc_trans")
 public data class AccountBlock(
