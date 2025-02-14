@@ -52,7 +52,7 @@ public class WalletV4R2Contract(
                 walletId,
                 privateKey.publicKey(),
             )
-        ).value else null
+        ).load() else null
         val message = transferMessage(
             address = address,
             stateInit = stateInit,

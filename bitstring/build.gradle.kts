@@ -9,6 +9,7 @@ kotlin {
             dependencies {
                 api(projects.tonKotlinCrypto)
                 implementation(libs.serialization.core)
+                implementation(libs.kotlinx.io)
             }
         }
     }

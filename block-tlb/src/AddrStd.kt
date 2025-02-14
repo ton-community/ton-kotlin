@@ -1,5 +1,6 @@
 package org.ton.block
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.SerialName
 import org.ton.bitstring.BitString
 import org.ton.bitstring.toBitString
@@ -33,6 +34,7 @@ public data class AddrStd(
     public constructor() : this(0, BitString(256))
     public constructor(workchainId: Int, address: BitString) : this(null, workchainId, address)
     public constructor(workchainId: Int, address: ByteArray) : this(null, workchainId, address)
+    public constructor(workchainId: Int, address: ByteString) : this(null, workchainId, address.toByteArray())
     public constructor(anycast: Anycast?, workchainId: Int, address: ByteArray) : this(
         anycast.toMaybe(),
         workchainId,
@@ -40,6 +42,12 @@ public data class AddrStd(
     )
 
     public constructor(anycast: Anycast?, workchainId: Int, address: BitString) : this(
+        anycast.toMaybe(),
+        workchainId,
+        address.toBitString()
+    )
+
+    public constructor(anycast: Anycast?, workchainId: Int, address: ByteString) : this(
         anycast.toMaybe(),
         workchainId,
         address.toBitString()

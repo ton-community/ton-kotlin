@@ -45,14 +45,15 @@ public open class ByteBackedBitString protected constructor(
         if (augment && (size % 8 != 0)) {
             appendAugmentTag(bytes, size)
         } else {
-            bytes.copyOf()
+            bytes.copyOf((size + 7) ushr 3)
         }
 
     override fun toBooleanArray(): BooleanArray = toList().toBooleanArray()
 
-    override fun toMutableBitString(): MutableBitString = ByteBackedMutableBitString.of(bytes.copyOf(), size)
+    override fun toMutableBitString(): MutableBitString =
+        ByteBackedMutableBitString.of(bytes.copyOf((size + 7) ushr 3), size)
 
-    override fun toBitString(): BitString = ByteBackedBitString(size, bytes.copyOf())
+    override fun toBitString(): BitString = ByteBackedBitString(size, bytes.copyOf((size + 7) ushr 3))
 
     override fun iterator(): Iterator<Boolean> = BitStringIterator(this)
 
