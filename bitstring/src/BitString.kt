@@ -2,6 +2,7 @@
 
 package org.ton.bitstring
 
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Serializable
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -19,6 +20,8 @@ public inline fun BitString(hex: String): BitString = BitString.parse(hex)
 public inline fun Iterable<Boolean>.toBitString(): BitString = BitString(this)
 public inline fun BooleanArray.toBitString(): BitString = BitString(*this)
 public inline fun ByteArray.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString = BitString(this, size)
+public inline fun ByteString.toBitString(size: Int = this.size * Byte.SIZE_BITS): BitString =
+    BitString(this.toByteArray(), size)
 
 @Serializable(with = FiftHexBitStringSerializer::class)
 public interface BitString : Iterable<Boolean>, Comparable<BitString> {

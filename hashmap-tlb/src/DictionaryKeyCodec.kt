@@ -2,6 +2,7 @@
 
 package org.ton.kotlin.dict
 
+import kotlinx.io.bytestring.ByteString
 import org.ton.bitstring.BitString
 import org.ton.cell.CellSlice
 import org.ton.cell.buildCell
@@ -21,6 +22,18 @@ public interface DictionaryKeyCodec<K> : DictionaryKeyLoader<K>, DictionaryKeySt
             override fun encodeKey(value: BitString): BitString {
                 require(value.size == 256)
                 return value
+            }
+        }
+
+        public val BYTE_STRING_32: DictionaryKeyCodec<ByteString> = object : DictionaryKeyCodec<ByteString> {
+            override val keySize: Int get() = 256
+
+            override fun decodeKey(value: BitString): ByteString {
+                return ByteString(*value.toByteArray())
+            }
+
+            override fun encodeKey(value: ByteString): BitString {
+                return BitString(value.toByteArray())
             }
         }
 

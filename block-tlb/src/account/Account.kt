@@ -10,6 +10,8 @@ import org.ton.tlb.TlbCodec
 
 /**
  * Existing account data.
+ *
+ * @see [ShardAccount]
  */
 public data class Account(
     /**
